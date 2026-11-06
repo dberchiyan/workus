@@ -13,4 +13,7 @@ export interface RequestContext extends ClsStore {
   principal?: Principal;
   sessionState?: SessionState;
   queryCount?: number;
+  /** For audit events: the caller's IP (Express `trust proxy`) and user agent. */
+  clientIp?: string;
+  userAgent?: string | null;
 }

@@ -20,8 +20,9 @@ import { RateLimitGuard } from './common/security/rate-limit.guard';
 import { SecurityModule } from './common/security/security.module';
 import { SessionGuard } from './common/security/session.guard';
 import { AuthModule } from './modules/auth/auth.module';
-import { EmployeeModule } from './modules/employee/employee.module';
-import { ReviewModule } from './modules/review/review.module';
+import { EmployeeModule } from './modules/employee/core/employee.module';
+import { HiringModule } from './modules/employee/hiring/hiring.module';
+import { ReviewModule } from './modules/employee/review/review.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -41,6 +42,7 @@ import { UserModule } from './modules/user/user.module';
     AuthModule,
     EmployeeModule,
     ReviewModule,
+    HiringModule,
   ],
   providers: [
     // Guards run in registration order (security.md → Guards).

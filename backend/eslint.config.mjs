@@ -3,12 +3,16 @@ import eslint from '@eslint/js';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
-const crossModuleInternals = [
-  '../../*/repository/**',
-  '../../../*/repository/**',
-  '../../*/controller/**',
-  '../../../*/controller/**',
-];
+// A module is src/modules/<module>/ or, inside a group, src/modules/<group>/<module>/ (e.g.
+// employee/review). Reaching up out of a module and into another one's internals is forbidden.
+const crossModuleInternals = ['repository', 'controller'].flatMap((layer) => [
+  `../../*/${layer}/**`,
+  `../../../*/${layer}/**`,
+  `../../../../*/${layer}/**`,
+  `../../*/*/${layer}/**`,
+  `../../../*/*/${layer}/**`,
+  `../../../../*/*/${layer}/**`,
+]);
 const prismaClient = ['**/generated/prisma/**', '@prisma/client', '@prisma/client/**'];
 
 export default tseslint.config(
@@ -53,7 +57,7 @@ export default tseslint.config(
   },
   {
     files: [
-      'src/modules/*/repository/**/*.ts',
+      'src/modules/**/repository/**/*.ts',
       'src/common/persistence/**/*.ts',
       'src/common/security/permission.service.ts',
       'prisma/**/*.ts',
@@ -70,7 +74,7 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/modules/*/controller/**/*.ts'],
+    files: ['src/modules/**/controller/**/*.ts'],
     rules: {
       'no-restricted-imports': [
         'error',
@@ -85,7 +89,7 @@ export default tseslint.config(
   },
   {
     // Mappers turn records into DTOs (architecture.md → Record + mapper): record types only.
-    files: ['src/modules/*/controller/mapper/**/*.ts'],
+    files: ['src/modules/**/controller/mapper/**/*.ts'],
     rules: {
       'no-restricted-imports': [
         'error',

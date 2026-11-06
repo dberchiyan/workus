@@ -30,6 +30,9 @@ export type I18nTranslations = {
         };
         "review": {
             "responsibleNotFound": string;
+            "startingNotDeletable": string;
+            "startingDateLocked": string;
+            "startingStatusLocked": string;
         };
     };
     "validation": {
@@ -99,6 +102,9 @@ export type I18nTranslations = {
         "feedback": {
             "tooLong": string;
             "textTooLong": string;
+        };
+        "startingSalary": {
+            "required": string;
         };
     };
 };

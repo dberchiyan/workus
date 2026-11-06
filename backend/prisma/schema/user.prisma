@@ -11,6 +11,7 @@ model User {
   updatedBy            String?                     @map("updated_by") @db.Uuid
   version              Int                         @default(0)
   sessions             Session[]
+  auditEvents          AuditEvent[]                @relation("AuditEventActor")
   idempotencyKeys      IdempotencyKey[]
   reviewResponsibleFor EmployeeReviewResponsible[] @relation("ReviewResponsibleUser")
   employee             Employee?                   @relation("EmployeeUser")

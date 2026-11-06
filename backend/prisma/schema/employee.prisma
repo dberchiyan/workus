@@ -51,6 +51,7 @@ model Employee {
   version         Int                   @default(0)
   responsibles    EmployeeResponsible[]
   employeeReviews EmployeeReview[]
+  auditEvents     AuditEvent[]
 
   @@unique([userId], map: "uq_employees_user_id")
   @@index([positionId], map: "idx_employees_position_id")

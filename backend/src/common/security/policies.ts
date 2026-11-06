@@ -12,6 +12,8 @@ export const can = {
    * the admin authority; the service answers 404 for an unknown id.
    */
   viewEmployee: policy(['employeeId'], (principal) => principal.hasAuthority('ADMIN')),
+  /** The employee's change history (shows salaries): admin only. */
+  viewEmployeeActivity: policy(['employeeId'], (principal) => principal.hasAuthority('ADMIN')),
   /** Reviews hold salaries: admin only, for the employee in the path. */
   viewEmployeeReviews: policy(['employeeId'], (principal) => principal.hasAuthority('ADMIN')),
   manageEmployeeReviews: policy(['employeeId'], (principal) => principal.hasAuthority('ADMIN')),

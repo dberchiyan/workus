@@ -65,5 +65,8 @@
   "feedback": {
     "tooLong": "Feedback must be at most {max} characters",
     "textTooLong": "Feedback must be at most 2000 characters"
+  },
+  "startingSalary": {
+    "required": "Enter the starting salary"
   }
 }

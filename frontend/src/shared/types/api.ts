@@ -99,8 +99,8 @@ export interface paths {
         /** List employees with search, status and category filters */
         get: operations["EmployeeController_list"];
         put?: never;
-        /** Create an employee with their account and responsibles */
-        post: operations["EmployeeController_create"];
+        /** Create an employee with their account, responsibles and starting salary */
+        post: operations["HiringController_hire"];
         delete?: never;
         options?: never;
         head?: never;
@@ -133,6 +133,23 @@ export interface paths {
         };
         /** Return one employee with contacts and responsibles */
         get: operations["EmployeeController_profile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/{employeeId}/activity": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List changes made to an employee's records, newest first, with who made them */
+        get: operations["EmployeeActivityController_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -311,53 +328,6 @@ export interface components {
             averageTenureDays: number;
             withoutResponsible: number;
         };
-        CreateEmployeeRequest: {
-            firstName: string;
-            lastName: string;
-            email: string;
-            /** Format: uuid */
-            positionId: string;
-            /** Format: date */
-            startDate: string;
-            mobile?: string;
-            personalEmail?: string;
-            linkedinUrl?: string;
-            telegram?: string;
-            address?: string;
-            /** @default [] */
-            responsibleUserIds: string[];
-        };
-        EmployeeListItemResponse_Output: {
-            /** Format: uuid */
-            id: string;
-            /** Format: uuid */
-            userId: string;
-            firstName: string;
-            lastName: string;
-            email: string;
-            position: {
-                /** Format: uuid */
-                id: string;
-                title: string;
-                category: {
-                    /** Format: uuid */
-                    id: string;
-                    name: string;
-                };
-            };
-            responsibles: {
-                /** Format: uuid */
-                id: string;
-                firstName: string;
-                lastName: string;
-            }[];
-            responsibleCount: number;
-            /** Format: date */
-            startDate: string;
-            /** Format: date */
-            terminatedOn: string | null;
-            status: components["schemas"]["EmployeeStatus_Output"];
-        };
         EmployeeProfileResponse_Output: {
             /** Format: uuid */
             id: string;
@@ -403,6 +373,98 @@ export interface components {
             /** Format: date-time */
             createdAt: string;
         };
+        Money_Output: {
+            amount: string;
+            currency: string;
+        };
+        EmployeeActivityPageResponse_Output: {
+            content: {
+                /** Format: uuid */
+                id: string;
+                /** Format: date-time */
+                occurredAt: string;
+                /** @enum {string} */
+                action: "employee.created" | "review.created" | "review.updated" | "review.deleted";
+                actor: {
+                    /** Format: uuid */
+                    id: string;
+                    firstName: string;
+                    lastName: string;
+                } | null;
+                target: {
+                    /** @enum {string} */
+                    type: "employee" | "review";
+                    /** Format: uuid */
+                    id: string;
+                    label: string;
+                };
+                changes: {
+                    /** @enum {string} */
+                    field: "title" | "date" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startDate";
+                    from: ({
+                        /** @enum {string} */
+                        kind: "text";
+                        text: string;
+                    } | {
+                        /** @enum {string} */
+                        kind: "date";
+                        /** Format: date */
+                        date: string;
+                    } | {
+                        /** @enum {string} */
+                        kind: "money";
+                        money: components["schemas"]["Money_Output"];
+                    } | {
+                        /** @enum {string} */
+                        kind: "reviewStatus";
+                        status: string;
+                    } | {
+                        /** @enum {string} */
+                        kind: "people";
+                        people: {
+                            /** Format: uuid */
+                            id: string;
+                            firstName: string;
+                            lastName: string;
+                        }[];
+                    } | {
+                        /** @enum {string} */
+                        kind: "feedback";
+                    }) | null;
+                    to: ({
+                        /** @enum {string} */
+                        kind: "text";
+                        text: string;
+                    } | {
+                        /** @enum {string} */
+                        kind: "date";
+                        /** Format: date */
+                        date: string;
+                    } | {
+                        /** @enum {string} */
+                        kind: "money";
+                        money: components["schemas"]["Money_Output"];
+                    } | {
+                        /** @enum {string} */
+                        kind: "reviewStatus";
+                        status: string;
+                    } | {
+                        /** @enum {string} */
+                        kind: "people";
+                        people: {
+                            /** Format: uuid */
+                            id: string;
+                            firstName: string;
+                            lastName: string;
+                        }[];
+                    } | {
+                        /** @enum {string} */
+                        kind: "feedback";
+                    }) | null;
+                }[];
+            }[];
+            totalElements: number;
+        };
         PositionCategoryCountsResponse_Output: {
             total: number;
             categories: {
@@ -436,13 +498,10 @@ export interface components {
                 positionTitle: string | null;
             }[];
         };
-        Money_Output: {
-            amount: string;
-            currency: string;
-        };
         Review_Output: {
             /** Format: uuid */
             id: string;
+            kind: components["schemas"]["ReviewKind_Output"];
             title: string;
             /** Format: date */
             date: string;
@@ -480,6 +539,8 @@ export interface components {
             createdAt: string;
             version: number;
         };
+        /** @enum {string} */
+        ReviewKind_Output: "STARTING" | "REGULAR";
         /** @enum {string} */
         ReviewStatus_Output: "COMPLETED" | "SCHEDULED" | "CANCELED";
         EmployeeReviewsResponse_Output__schema0_Output: {
@@ -638,6 +699,7 @@ export interface components {
         ReviewResponse_Output: {
             /** Format: uuid */
             id: string;
+            kind: components["schemas"]["ReviewKind_Output"];
             title: string;
             /** Format: date */
             date: string;
@@ -743,6 +805,29 @@ export interface components {
                 } | null;
             };
             version: number;
+        };
+        CreateEmployeeRequest: {
+            firstName: string;
+            lastName: string;
+            email: string;
+            /** Format: uuid */
+            positionId: string;
+            /** Format: date */
+            startDate: string;
+            startingSalary: string;
+            mobile?: string;
+            personalEmail?: string;
+            linkedinUrl?: string;
+            telegram?: string;
+            address?: string;
+            /** @default [] */
+            responsibleUserIds: string[];
+        };
+        HiredEmployeeResponse_Output: {
+            /** Format: uuid */
+            id: string;
+            firstName: string;
+            lastName: string;
         };
         /** @enum {string} */
         EmployeeStatus: "ACTIVE" | "TERMINATED";
@@ -979,7 +1064,7 @@ export interface operations {
             };
         };
     };
-    EmployeeController_create: {
+    HiringController_hire: {
         parameters: {
             query?: never;
             header: {
@@ -1000,7 +1085,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EmployeeListItemResponse_Output"];
+                    "application/json": components["schemas"]["HiredEmployeeResponse_Output"];
                 };
             };
             /** @description VALIDATION_FAILED | INVALID_PARAMETER */
@@ -1102,6 +1187,66 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EmployeeProfileResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmployeeActivityController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+                /** @description One of: occurredAt,asc|desc */
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeActivityPageResponse_Output"];
                 };
             };
             /** @description INVALID_PARAMETER */
@@ -1572,6 +1717,24 @@ export interface operations {
             };
             /** @description FORBIDDEN */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

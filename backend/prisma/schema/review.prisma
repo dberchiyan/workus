@@ -3,6 +3,8 @@ model EmployeeReview {
   id             String                      @id(map: "pk_employee_reviews") @default(dbgenerated("uuidv7()")) @db.Uuid
   employeeId     String                      @map("employee_id") @db.Uuid
   employee       Employee                    @relation(fields: [employeeId], references: [id], onDelete: Restrict, map: "fk_employee_reviews_employee_id")
+  /// STARTING = the salary agreed at hire (one per employee, dated the start date, always COMPLETED); REGULAR otherwise.
+  kind           String                      @default("REGULAR") @db.VarChar(16) // STARTING | REGULAR — CHECK in migration
   title          String                      @db.VarChar(150)
   reviewDate     DateTime                    @map("review_date") @db.Date
   status         String                      @db.VarChar(32) // COMPLETED | SCHEDULED | CANCELED — CHECK in migration

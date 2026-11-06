@@ -5,6 +5,7 @@ import { PrismaClient } from '../src/generated/prisma/client';
 import { PasswordHasher } from '../src/modules/auth/service/password-hasher.service';
 import { UserRole } from '../src/modules/user/service/user-role';
 import { ADMINS, contactsFor, EMPLOYEES, POSITION_CATEGORIES } from './seed-data';
+import { seedActivity } from './seed-activity';
 import { seedReviews } from './seed-reviews';
 
 /**
@@ -179,8 +180,10 @@ const seed = async (): Promise<void> => {
       admins[0] ?? '',
     );
 
+    const activity = await seedActivity(prisma, admins);
+
     process.stdout.write(
-      `Seeded ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}\n`,
+      `Seeded ${activity} activity events, ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}\n`,
     );
   } finally {
     await prisma.$disconnect();

@@ -1,4 +1,8 @@
 import { Prisma, type PrismaClient } from '../src/generated/prisma/client';
+import {
+  ReviewKind,
+  STARTING_REVIEW_TITLE,
+} from '../src/modules/employee/review/service/review-kind';
 
 /** Monthly USD base salary by position category (fictional). */
 const BASE_SALARY: Readonly<Record<string, number>> = {
@@ -62,9 +66,17 @@ interface SeedReviewEmployee {
   responsibleUserIds: string[];
 }
 
+/** Seeded salaries are round: whole hundreds of dollars. */
+const roundToHundreds = (amount: Prisma.Decimal): Prisma.Decimal =>
+  amount.dividedBy(100).toDecimalPlaces(0, Prisma.Decimal.ROUND_HALF_UP).times(100);
+
+/** Every six months; the yearly one is the "Annual review". */
+const REVIEW_INTERVAL_MONTHS = 6;
+
 /**
- * Completed reviews 6 months after the start and then yearly (4–14 % raises), the next review
- * scheduled for active people, and the odd canceled one. Skips employees that have reviews.
+ * The starting salary on the start date, then a completed review every six months (0–6 % raises
+ * rounded to whole hundreds, some rounds without one), the next review scheduled for active people and the odd canceled
+ * one. Skips employees that have reviews.
  */
 export const seedReviews = async (
   prisma: PrismaClient,
@@ -92,17 +104,28 @@ export const seedReviews = async (
         : [fallbackResponsibleId];
     const end = employee.terminatedOn ?? today;
     let salary = new Prisma.Decimal(BASE_SALARY[employee.categoryName] ?? 3000).plus(
-      (index % 5) * 150,
+      (index % 5) * 100,
     );
-    const reviews: Prisma.EmployeeReviewCreateManyInput[] = [];
-    let date = addMonths(employee.startDate, 6);
-    let round = 0;
+    const reviews: Prisma.EmployeeReviewCreateManyInput[] = [
+      {
+        employeeId: employee.id,
+        kind: ReviewKind.STARTING,
+        title: STARTING_REVIEW_TITLE,
+        reviewDate: employee.startDate,
+        status: 'COMPLETED',
+        salaryAmount: salary,
+        salaryCurrency: 'USD',
+      },
+    ];
+    let round = 1;
+    let date = addMonths(employee.startDate, REVIEW_INTERVAL_MONTHS);
+    const titleOf = (n: number): string => (n % 2 === 0 ? 'Annual review' : 'Mid-year review');
     while (date <= end) {
-      const raise = new Prisma.Decimal(4 + ((index + round * 3) % 11)).dividedBy(100);
-      salary = salary.times(raise.plus(1)).toDecimalPlaces(0, Prisma.Decimal.ROUND_HALF_UP);
+      const raise = new Prisma.Decimal((index + round * 3) % 7).dividedBy(100);
+      salary = roundToHundreds(salary.times(raise.plus(1)));
       reviews.push({
         employeeId: employee.id,
-        title: round === 0 ? 'Probation review' : 'Annual review',
+        title: titleOf(round),
         reviewDate: date,
         status: 'COMPLETED',
         salaryAmount: salary,
@@ -113,13 +136,13 @@ export const seedReviews = async (
         feedbackTeam: round % 3 === 2 ? Prisma.DbNull : doc(FEEDBACK.team[round % 2]),
         feedbackClient: index % 2 === 0 ? doc(FEEDBACK.client[round % 2]) : Prisma.DbNull,
       });
-      date = addMonths(date, 12);
       round += 1;
+      date = addMonths(employee.startDate, REVIEW_INTERVAL_MONTHS * round);
     }
     if (!employee.terminatedOn) {
       reviews.push({
         employeeId: employee.id,
-        title: round === 0 ? 'Probation review' : 'Annual review',
+        title: titleOf(round),
         reviewDate: date,
         status: index % 9 === 4 ? 'CANCELED' : 'SCHEDULED',
         salaryAmount: null,

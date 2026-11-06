@@ -1,0 +1,26 @@
+/// Append-only history of changes made in the app (data.md → Audit log). No UPDATE/DELETE:
+/// a trigger rejects both. Targets are referenced by type + id without a FK — a deleted review
+/// keeps its history.
+model AuditEvent {
+  id          String    @id(map: "pk_audit_events") @default(dbgenerated("uuidv7()")) @db.Uuid
+  occurredAt  DateTime  @default(now()) @map("occurred_at") @db.Timestamptz(3)
+  action      String    @db.VarChar(64) // <resource>.<past_tense> — CHECK in migration
+  actorUserId String?   @map("actor_user_id") @db.Uuid // null = the system
+  actor       User?     @relation("AuditEventActor", fields: [actorUserId], references: [id], onDelete: Restrict, map: "fk_audit_events_actor_user_id")
+  /// The employee whose history shows the event.
+  employeeId  String?   @map("employee_id") @db.Uuid
+  employee    Employee? @relation(fields: [employeeId], references: [id], onDelete: Restrict, map: "fk_audit_events_employee_id")
+  targetType  String    @map("target_type") @db.VarChar(32) // employee | review — CHECK in migration
+  targetId    String    @map("target_id") @db.Uuid
+  /// Name of the target at the time (e.g. the review title).
+  targetLabel String    @map("target_label") @db.VarChar(255)
+  /// Minimal before/after summary: [{ field, from, to }] — never secrets or full documents.
+  changes     Json      @db.JsonB
+  ipAddress   String?   @map("ip_address") @db.VarChar(64)
+  userAgent   String?   @map("user_agent") @db.VarChar(512)
+  traceId     String?   @map("trace_id") @db.VarChar(64)
+
+  @@index([employeeId, occurredAt], map: "idx_audit_events_employee_id_occurred_at")
+  @@index([actorUserId], map: "idx_audit_events_actor_user_id")
+  @@map("audit_events")
+}
