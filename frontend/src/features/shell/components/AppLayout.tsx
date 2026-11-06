@@ -39,10 +39,7 @@ export function AppLayout() {
       </Link>
       {isTabletUp ? (
         <aside
-          className={cn(
-            'sticky top-0 h-dvh shrink-0 overflow-hidden transition-[width] duration-200 ease-out motion-reduce:transition-none',
-            isRail ? 'w-rail-width' : 'w-sidebar-width',
-          )}
+          className={cn('sticky top-0 h-dvh shrink-0', isRail ? 'w-rail-width' : 'w-sidebar-width')}
         >
           <SidebarContent
             isCollapsed={isRail}
