@@ -70,7 +70,10 @@ export function AppLayout() {
           tabIndex={-1}
           className="flex flex-1 flex-col px-4 py-6 outline-none md:px-8 md:py-8"
         >
-          <Outlet />
+          {/* One content width for every signed-in page (theme token `container-page`). */}
+          <div className="mx-auto flex w-full max-w-page flex-1 flex-col">
+            <Outlet />
+          </div>
         </main>
       </div>
     </div>

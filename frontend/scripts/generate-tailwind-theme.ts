@@ -35,6 +35,9 @@ for (const [name, px] of Object.entries(TOKENS.radius)) {
 for (const [name, px] of Object.entries(TOKENS.layout)) {
   push(`spacing-${name.replace(/[A-Z]/g, (c) => `-${c.toLowerCase()}`)}`, `${px / 16}rem`);
 }
+for (const [name, px] of Object.entries(TOKENS.containers)) {
+  push(`container-${name}`, `${px / 16}rem`);
+}
 for (const [group, value] of Object.entries(TOKENS.colors.light)) {
   if (typeof value === 'string') {
     push(`color-${group}`, `var(--mui-palette-${group})`);

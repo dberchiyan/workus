@@ -3,6 +3,8 @@ export const TOKENS = {
   breakpoints: { xs: 0, sm: 600, md: 900, lg: 1200, xl: 1536 },
   radius: { sm: 8, md: 12, lg: 20 },
   layout: { sidebarWidth: 240, railWidth: 80, topBarHeight: 64 },
+  /** Max content widths (Tailwind `max-w-*`). `page` = every signed-in page (set once in AppLayout). */
+  containers: { page: 1536 },
   colors: {
     light: {
       primary: { main: '#21697C', light: '#7CC4D6', dark: '#174C5A', contrastText: '#FFFFFF' },

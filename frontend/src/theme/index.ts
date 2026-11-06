@@ -38,6 +38,11 @@ export const theme = createTheme({
   shape: { borderRadius: TOKENS.radius.sm },
   typography: muiTypography,
   components: {
+    // The page reserves the scrollbar gutter (html { scrollbar-gutter: stable }), so MUI's
+    // scroll lock would compensate twice and shift the page sideways when a menu/dialog opens.
+    MuiModal: { defaultProps: { disableScrollLock: true } },
+    // Popover (Menu, Select, Autocomplete lists) passes its own value to Modal, so set it here too.
+    MuiPopover: { defaultProps: { disableScrollLock: true } },
     MuiTypography: { defaultProps: { variantMapping: { metric: 'p', tableHeader: 'span' } } },
     MuiButton: {
       defaultProps: { disableElevation: true },

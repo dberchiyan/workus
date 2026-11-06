@@ -18,6 +18,7 @@
   --spacing-sidebar-width: 15rem;
   --spacing-rail-width: 5rem;
   --spacing-top-bar-height: 4rem;
+  --container-page: 96rem;
   --color-primary: var(--mui-palette-primary-main);
   --color-primary-light: var(--mui-palette-primary-light);
   --color-primary-dark: var(--mui-palette-primary-dark);
