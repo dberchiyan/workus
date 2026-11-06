@@ -32,7 +32,8 @@ export function UserMenu() {
         onClick={(event) => {
           setAnchor(event.currentTarget);
         }}
-        className="min-h-11 gap-3 rounded-sm px-2"
+        // -mr-2: the avatar (not the padded hit area) aligns with the content edge.
+        className="-mr-2 min-h-11 gap-3 rounded-sm px-2"
       >
         <span className="hidden flex-col items-end sm:flex">
           <Typography variant="subtitle2" component="span">

@@ -6,12 +6,13 @@ import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router';
 import { cn } from '@/shared/lib/cn';
+import { useSidebarCollapsed } from '../hooks/useSidebarCollapsed';
 import { SidebarContent } from './SidebarContent';
 import { TopBar } from './TopBar';
 
 /**
- * Signed-in layout (ux.md patterns): desktop — persistent sidebar; tablet — icon rail;
- * mobile — temporary drawer opened from the top bar.
+ * Signed-in layout (ux.md patterns): desktop — persistent sidebar the person can fold to the
+ * icon rail; tablet — icon rail; mobile — temporary drawer opened from the top bar.
  */
 export function AppLayout() {
   const { t } = useTranslation();
@@ -20,6 +21,8 @@ export function AppLayout() {
   const isTabletUp = useMediaQuery(theme.breakpoints.up('md'));
   const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const sidebar = useSidebarCollapsed();
+  const isRail = !isDesktop || sidebar.isCollapsed;
   const menuButtonId = useId();
 
   const closeDrawer = (): void => {
@@ -37,11 +40,14 @@ export function AppLayout() {
       {isTabletUp ? (
         <aside
           className={cn(
-            'sticky top-0 h-dvh shrink-0',
-            isDesktop ? 'w-sidebar-width' : 'w-rail-width',
+            'sticky top-0 h-dvh shrink-0 overflow-hidden transition-[width] duration-200 ease-out motion-reduce:transition-none',
+            isRail ? 'w-rail-width' : 'w-sidebar-width',
           )}
         >
-          <SidebarContent isCollapsed={!isDesktop} />
+          <SidebarContent
+            isCollapsed={isRail}
+            {...(isDesktop ? { onToggleCollapsed: sidebar.toggle } : {})}
+          />
         </aside>
       ) : (
         <Drawer
