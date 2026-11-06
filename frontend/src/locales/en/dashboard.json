@@ -1,0 +1,5 @@
+{
+  "pageTitle": "Dashboard · Workus",
+  "title": "Welcome, {{name}}",
+  "description": "You are signed in as {{email}}. Your workspace is on its way."
+}

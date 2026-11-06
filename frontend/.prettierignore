@@ -1,0 +1,4 @@
+dist
+node_modules
+src/shared/types/api.ts
+package-lock.json

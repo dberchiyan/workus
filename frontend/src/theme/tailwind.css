@@ -1,0 +1,9 @@
+/* Cascade order declared once: MUI (Emotion) emits into `mui`, utilities always win. */
+@layer theme, base, mui, components, utilities;
+
+/* Granular import — no Preflight; CssBaseline is the only reset. */
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+@import './tailwind.theme.css';
+
+@custom-variant dark (&:where(.dark, .dark *));

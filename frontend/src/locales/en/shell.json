@@ -1,0 +1,29 @@
+{
+  "nav": {
+    "label": "Main navigation",
+    "dashboard": "Dashboard",
+    "employees": "Employees",
+    "timeOff": "Time off",
+    "calendar": "Calendar",
+    "insights": "Insights",
+    "settings": "Settings"
+  },
+  "menu": {
+    "open": "Open menu",
+    "close": "Close menu"
+  },
+  "account": {
+    "open": "Account menu for {{name}}",
+    "signOut": "Sign out",
+    "signingOut": "Signing out…"
+  },
+  "role": {
+    "ADMIN": "Administrator",
+    "MANAGER": "Manager",
+    "EMPLOYEE": "Employee"
+  },
+  "placeholder": {
+    "pageTitle": "{{section}} · Workus",
+    "description": "This section is coming soon."
+  }
+}

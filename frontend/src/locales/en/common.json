@@ -1,0 +1,21 @@
+{
+  "app": {
+    "name": "Workus",
+    "tagline": "Your day-to-day HR solution"
+  },
+  "a11y": {
+    "skipToContent": "Skip to content"
+  },
+  "theme": {
+    "switchToDark": "Switch to dark theme",
+    "switchToLight": "Switch to light theme"
+  },
+  "status": {
+    "loading": "Loading…"
+  },
+  "errorBoundary": {
+    "title": "Something went wrong",
+    "description": "This page failed to load. Try again — if it keeps happening, contact support.",
+    "retry": "Try again"
+  }
+}
