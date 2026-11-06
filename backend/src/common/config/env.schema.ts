@@ -44,6 +44,12 @@ export const validateEnv = (raw: Record<string, unknown>): Env => {
     const fields = result.error.issues.map((issue) => issue.path.join('.')).join(', ');
     throw new Error(`Invalid environment configuration: ${fields}`);
   }
+  if (result.data.SESSION_IDLE_TIMEOUT_MINUTES > result.data.SESSION_ABSOLUTE_TIMEOUT_MINUTES) {
+    // A longer idle timeout would never apply: the absolute one ends the session first.
+    throw new Error(
+      'Invalid environment configuration: SESSION_IDLE_TIMEOUT_MINUTES must not exceed SESSION_ABSOLUTE_TIMEOUT_MINUTES',
+    );
+  }
   if (result.data.COOKIE_SAME_SITE === 'none' && !result.data.COOKIE_SECURE) {
     throw new Error(
       'Invalid environment configuration: COOKIE_SAME_SITE=none requires COOKIE_SECURE=true',
