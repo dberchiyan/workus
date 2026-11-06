@@ -20,6 +20,8 @@ import {
   responsibleCandidateSelect,
   type EmployeeTimeOffRecord,
   employeeTimeOffSelect,
+  type EmployeeMovementRecord,
+  employeeMovementSelect,
 } from './record/employee.record';
 
 const orderByFor = (
@@ -220,6 +222,26 @@ export class EmployeeRepository {
     return this.txHost.tx.employee.findUnique({ where: { id }, select: employeeTimeOffSelect });
   }
 
+  /** People starting in (from, to], soonest first (bounded). */
+  findStartingBetween(from: Date, to: Date): Promise<EmployeeMovementRecord[]> {
+    return this.txHost.tx.employee.findMany({
+      where: { startDate: { gt: from, lte: to } },
+      select: employeeMovementSelect,
+      orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+      take: MAX_MOVEMENTS,
+    });
+  }
+
+  /** People whose termination falls in (from, to], soonest first (bounded). */
+  findLeavingBetween(from: Date, to: Date): Promise<EmployeeMovementRecord[]> {
+    return this.txHost.tx.employee.findMany({
+      where: { terminatedOn: { gt: from, lte: to } },
+      select: employeeMovementSelect,
+      orderBy: [{ terminatedOn: 'asc' }, { id: 'asc' }],
+      take: MAX_MOVEMENTS,
+    });
+  }
+
   findProfileById(id: string): Promise<EmployeeProfileRecord | null> {
     return this.txHost.tx.employee.findUnique({ where: { id }, select: employeeProfileSelect });
   }
@@ -273,3 +295,6 @@ export class EmployeeRepository {
     });
   }
 }
+
+/** People starting or leaving within a month are few; bounded defensively. */
+const MAX_MOVEMENTS = 200;

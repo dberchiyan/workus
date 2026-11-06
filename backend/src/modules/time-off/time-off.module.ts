@@ -9,6 +9,7 @@ import { TimeOffService } from './service/time-off.service';
 @Module({
   imports: [EmployeeModule, AuditModule],
   controllers: [TimeOffController, EmployeeTimeOffController],
+  exports: [TimeOffService],
   providers: [TimeOffService, TimeOffRequestRepository],
 })
 export class TimeOffModule {}

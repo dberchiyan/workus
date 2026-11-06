@@ -338,6 +338,31 @@ export const EMPLOYEES: SeedEmployee[] = [
     position: 'Frontend Developer',
     startedDaysAgo: 3,
   },
+  // Joining and leaving soon (the admin dashboard's "Joining & leaving").
+  {
+    firstName: 'Nora',
+    lastName: 'Starling',
+    email: 'nora.starling@workus.dev',
+    position: 'Product Designer',
+    startedDaysAgo: -9,
+  },
+  {
+    firstName: 'Felix',
+    lastName: 'Brandt',
+    email: 'felix.brandt@workus.dev',
+    position: 'Backend Developer',
+    startedDaysAgo: -23,
+  },
+  {
+    firstName: 'Clara',
+    lastName: 'Weiss',
+    email: 'clara.weiss@workus.dev',
+    position: 'Data Scientist',
+    startedDaysAgo: 1460,
+    terminatedDaysAgo: -18,
+    terminationReason: 'RESIGNATION',
+    terminationComment: 'Moving to research',
+  },
 ];
 
 const CITIES = [

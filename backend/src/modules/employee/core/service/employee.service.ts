@@ -17,6 +17,7 @@ import type { Pageable } from '../../../../common/dto/pageable';
 import { EmployeeRepository } from '../repository/employee.repository';
 import type {
   EmployeeListItemRecord,
+  EmployeeMovementRecord,
   EmployeeProfileRecord,
   EmployeeTimeOffRecord,
 } from '../repository/record/employee.record';
@@ -26,6 +27,8 @@ import type { EmployeeStatus } from './employee-status';
 import type {
   CreateEmployeeCommand,
   EmployeeForTimeOff,
+  EmployeeMovement,
+  EmployeeMovements,
   EmployeeProfile,
   TerminateEmployeeCommand,
   UpdateEmployeeCommand,
@@ -492,6 +495,22 @@ export class EmployeeService {
     return employee ? toTimeOff(employee) : null;
   }
 
+  /** For other modules (dashboard): who starts and who leaves in the next `days` days. */
+  async movements(today: Date, days: number): Promise<EmployeeMovements> {
+    const until = new Date(today.getTime() + days * 86_400_000);
+    const [joining, leaving] = await Promise.all([
+      this.employeeRepository.findStartingBetween(today, until),
+      this.employeeRepository.findLeavingBetween(today, until),
+    ]);
+    const events: EmployeeMovement[] = [
+      ...joining.map((employee) => movementOf('JOINING', employee.startDate, employee)),
+      ...leaving.flatMap((employee) =>
+        employee.terminatedOn ? [movementOf('LEAVING', employee.terminatedOn, employee)] : [],
+      ),
+    ].sort((left, right) => left.date.getTime() - right.date.getTime());
+    return { joining: joining.length, leaving: leaving.length, next: events[0] ?? null };
+  }
+
   /** For other modules: does the employee exist? */
   exists(id: string): Promise<boolean> {
     return this.employeeRepository.existsById(id);
@@ -545,4 +564,17 @@ const toTimeOff = (employee: EmployeeTimeOffRecord): EmployeeForTimeOff => ({
   startDate: employee.startDate,
   terminatedOn: employee.terminatedOn,
   responsibleUserIds: employee.responsibles.map(({ responsibleUserId }) => responsibleUserId),
+});
+
+const movementOf = (
+  kind: EmployeeMovement['kind'],
+  date: Date,
+  employee: EmployeeMovementRecord,
+): EmployeeMovement => ({
+  kind,
+  date,
+  employeeId: employee.id,
+  userId: employee.user.id,
+  firstName: employee.user.firstName,
+  lastName: employee.user.lastName,
 });

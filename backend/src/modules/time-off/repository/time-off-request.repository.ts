@@ -8,6 +8,8 @@ import type { Prisma } from '../../../generated/prisma/client';
 import { HOLDING_STATUSES, TimeOffStatus } from '../service/time-off-type';
 import type { TimeOffRequestSortField } from '../service/time-off-sort';
 import {
+  type AbsenceRecord,
+  absenceSelect,
   type HeldDaysRecord,
   heldDaysSelect,
   type TimeOffRequestRecord,
@@ -131,4 +133,27 @@ export class TimeOffRequestRepository {
     });
     return count > 0;
   }
+
+  /** Company-wide: how many wait for a decision, and since when the oldest one waits. */
+  async pendingSummary(): Promise<{ count: number; oldestCreatedAt: Date | null }> {
+    const result = await this.txHost.tx.timeOffRequest.aggregate({
+      where: { status: TimeOffStatus.PENDING },
+      _count: { _all: true },
+      _min: { createdAt: true },
+    });
+    return { count: result._count._all, oldestCreatedAt: result._min.createdAt };
+  }
+
+  /** Approved requests covering any day of [from, to]; who (bounded) and their dates. */
+  findApprovedOverlapping(from: Date, to: Date): Promise<AbsenceRecord[]> {
+    return this.txHost.tx.timeOffRequest.findMany({
+      where: { status: TimeOffStatus.APPROVED, startDate: { lte: to }, endDate: { gte: from } },
+      select: absenceSelect,
+      orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+      take: MAX_ABSENCES,
+    });
+  }
 }
+
+/** A company has a bounded number of people off in one week. */
+const MAX_ABSENCES = 500;

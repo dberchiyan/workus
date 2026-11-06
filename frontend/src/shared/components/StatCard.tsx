@@ -11,6 +11,7 @@ export interface StatCardProps {
   hint?: ReactNode;
 }
 
+/** A titled number with a hint line under it (stat rows on Employees and the dashboard). */
 export function StatCard({ title, value, hint }: StatCardProps) {
   return (
     <Card variant="outlined">

@@ -90,3 +90,14 @@ export const employeeTimeOffSelect = {
 export type EmployeeTimeOffRecord = Prisma.EmployeeGetPayload<{
   select: typeof employeeTimeOffSelect;
 }>;
+
+/** Who starts or leaves, and when (dashboard). */
+export const employeeMovementSelect = {
+  id: true,
+  startDate: true,
+  terminatedOn: true,
+  user: { select: { id: true, firstName: true, lastName: true } },
+} satisfies Prisma.EmployeeSelect;
+export type EmployeeMovementRecord = Prisma.EmployeeGetPayload<{
+  select: typeof employeeMovementSelect;
+}>;

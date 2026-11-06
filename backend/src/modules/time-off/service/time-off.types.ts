@@ -35,3 +35,21 @@ export interface CreateTimeOffCommand {
   endDate: string;
   note: string | undefined;
 }
+
+export interface AbsentPerson {
+  /** The person's user id (for the avatar colour). */
+  id: string;
+  firstName: string;
+  lastName: string;
+}
+
+/** Company-wide time off for the admin dashboard. */
+export interface TimeOffOverview {
+  pendingCount: number;
+  oldestPendingCreatedAt: Date | null;
+  /** People on approved time off today (first few, by name). */
+  outToday: AbsentPerson[];
+  outTodayCount: number;
+  /** Others off on a later day of this week (Monday–Sunday). */
+  outLaterThisWeekCount: number;
+}

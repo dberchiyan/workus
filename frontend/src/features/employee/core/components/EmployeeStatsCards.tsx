@@ -7,7 +7,7 @@ import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatCalendarDate, formatCount, formatTenure } from '../format';
 import { useEmployeeSummary } from '../hooks/useEmployeeQueries';
-import { StatCard } from './StatCard';
+import { StatCard } from '@/shared/components/StatCard';
 
 const TERMINATION_WINDOW_DAYS = 90;
 

@@ -94,6 +94,16 @@ export class ReviewService {
     return { reviews, salary: salaryOverview(reviews) };
   }
 
+  /** For other modules (dashboard): scheduled reviews in the next `days` and overdue ones. */
+  async dueSummary(today: Date, days: number): Promise<{ upcoming: number; overdue: number }> {
+    const until = new Date(today.getTime() + days * 86_400_000);
+    const [upcoming, overdue] = await Promise.all([
+      this.reviewRepository.countScheduledBetween(today, until),
+      this.reviewRepository.countScheduledBefore(today),
+    ]);
+    return { upcoming, overdue };
+  }
+
   /** The policy has already checked that the review belongs to the employee in the path. */
   async findOne(reviewId: string): Promise<ReviewRecord> {
     const review = await this.reviewRepository.findById(reviewId);

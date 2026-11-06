@@ -1,15 +1,14 @@
-import Card from '@mui/material/Card';
-import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 import { useCurrentUser } from '@/features/auth';
 import { MyTimeOff } from '@/features/time-off';
+import { AdminOverview } from '../components/AdminOverview';
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
 import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
 
 /**
- * Employees and managers: their time off (balances and requests). Admins have no employee
- * record — their dashboard is still a placeholder.
+ * Admins: what needs attention (requests, absences, reviews, people starting / leaving).
+ * Employees and managers: their time off (balances and requests).
  */
 export default function DashboardPage() {
   const { t } = useTranslation('dashboard');
@@ -34,17 +33,7 @@ export default function DashboardPage() {
       >
         {t('title')}
       </Typography>
-      {user.role === 'ADMIN' ? (
-        <Card variant="outlined">
-          <CardContent className="p-6 sm:p-8">
-            <Typography variant="body1" color="textSecondary" className="[overflow-wrap:anywhere]">
-              {t('description', { email: user.email })}
-            </Typography>
-          </CardContent>
-        </Card>
-      ) : (
-        <MyTimeOff />
-      )}
+      {user.role === 'ADMIN' ? <AdminOverview /> : <MyTimeOff />}
     </div>
   );
 }

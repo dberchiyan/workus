@@ -66,3 +66,21 @@ export interface EmployeeForTimeOff {
   terminatedOn: Date | null;
   responsibleUserIds: string[];
 }
+
+export interface EmployeeMovement {
+  kind: 'JOINING' | 'LEAVING';
+  date: Date;
+  employeeId: string;
+  /** For the avatar colour. */
+  userId: string;
+  firstName: string;
+  lastName: string;
+}
+
+/** People starting and leaving within the window (dashboard). */
+export interface EmployeeMovements {
+  joining: number;
+  leaving: number;
+  /** The soonest start or leave, if any. */
+  next: EmployeeMovement | null;
+}

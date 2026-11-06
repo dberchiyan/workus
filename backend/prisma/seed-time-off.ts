@@ -49,6 +49,18 @@ interface Plan {
  * ahead; an approved sick day and day off this year. Vacation days stay within the allowance.
  */
 const plansFor = (index: number): Plan[] => [
+  // Every fifth person is off around today (the admin dashboard's "Out today").
+  ...(index % 5 === 2
+    ? [
+        {
+          type: TimeOffType.VACATION,
+          offset: -1,
+          length: 3,
+          status: 'APPROVED',
+          fromToday: true,
+        } satisfies Plan,
+      ]
+    : []),
   { type: TimeOffType.VACATION, offset: -150 + (index % 20), length: 5, status: 'APPROVED' },
   { type: TimeOffType.VACATION, offset: 20 + (index % 15), length: 3, status: 'APPROVED' },
   {

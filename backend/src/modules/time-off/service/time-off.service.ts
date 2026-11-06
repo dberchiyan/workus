@@ -13,18 +13,23 @@ import type { EmployeeForTimeOff } from '../../employee/core/service/employee.ty
 import { EmployeeService } from '../../employee/core/service/employee.service';
 import type { TimeOffRequestRecord } from '../repository/record/time-off-request.record';
 import { TimeOffRequestRepository } from '../repository/time-off-request.repository';
-import { cycleOf, LEAVE_POLICY, todayUtc, workingDaysBetween } from './leave-policy';
+import { cycleOf, LEAVE_POLICY, plusDays, todayUtc, workingDaysBetween } from './leave-policy';
 import type { TimeOffRequestSortField } from './time-off-sort';
 import { timeOffLabel } from './time-off-label';
 import { TIME_OFF_TYPES, TimeOffStatus } from './time-off-type';
 import type {
+  AbsentPerson,
   CreateTimeOffCommand,
   LeaveBalance,
+  TimeOffOverview,
   TimeOffRequestPage,
   TimeOffRequestView,
 } from './time-off.types';
 
 const asDate = (iso: string): Date => new Date(`${iso}T00:00:00Z`);
+
+/** Avatars shown on the "Out today" card; the rest is "+N". */
+const OUT_TODAY_SHOWN = 5;
 
 /** A pending request, or an approved one that has not started, can still be canceled. */
 const isCancelable = (request: { status: string; startDate: Date }, today: Date): boolean =>
@@ -51,6 +56,34 @@ export class TimeOffService {
       throw new ResourceNotFoundException();
     }
     return this.balancesOf(employee, todayUtc());
+  }
+
+  /** For other modules (dashboard): pending requests and who is off today / this week. */
+  async overview(today: Date): Promise<TimeOffOverview> {
+    const weekEnd = plusDays(today, (7 - today.getUTCDay()) % 7);
+    const [pending, absences] = await Promise.all([
+      this.requestRepository.pendingSummary(),
+      this.requestRepository.findApprovedOverlapping(today, weekEnd),
+    ]);
+    const offToday = new Map<string, AbsentPerson>();
+    const offLater = new Set<string>();
+    for (const absence of absences) {
+      if (absence.startDate <= today && absence.endDate >= today) {
+        offToday.set(absence.employeeId, absence.employee.user);
+      } else {
+        offLater.add(absence.employeeId);
+      }
+    }
+    const outToday = [...offToday.values()].sort((left, right) =>
+      `${left.firstName} ${left.lastName}`.localeCompare(`${right.firstName} ${right.lastName}`),
+    );
+    return {
+      pendingCount: pending.count,
+      oldestPendingCreatedAt: pending.oldestCreatedAt,
+      outToday: outToday.slice(0, OUT_TODAY_SHOWN),
+      outTodayCount: outToday.length,
+      outLaterThisWeekCount: [...offLater].filter((id) => !offToday.has(id)).length,
+    };
   }
 
   /** The caller's requests, newest first, each with its history. */

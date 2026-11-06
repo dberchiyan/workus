@@ -162,4 +162,18 @@ export class ReviewRepository {
       data: { status: ReviewStatus.CANCELED, updatedBy, version: { increment: 1 } },
     });
   }
+
+  /** Scheduled reviews dated in [from, to]. */
+  countScheduledBetween(from: Date, to: Date): Promise<number> {
+    return this.txHost.tx.employeeReview.count({
+      where: { status: ReviewStatus.SCHEDULED, reviewDate: { gte: from, lte: to } },
+    });
+  }
+
+  /** Scheduled reviews whose date has passed (never completed or canceled). */
+  countScheduledBefore(date: Date): Promise<number> {
+    return this.txHost.tx.employeeReview.count({
+      where: { status: ReviewStatus.SCHEDULED, reviewDate: { lt: date } },
+    });
+  }
 }

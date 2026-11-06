@@ -1,5 +1,35 @@
 {
   "pageTitle": "Dashboard · Workus",
   "title": "Dashboard",
-  "description": "You are signed in as {{email}}. Your workspace is on its way."
+  "admin": {
+    "error": "Couldn’t load the dashboard",
+    "retry": "Try again",
+    "pending": {
+      "title": "Pending requests",
+      "none": "Nothing waiting for a decision",
+      "oldestToday": "Oldest made today",
+      "oldest_one": "Oldest waiting {{count}} day",
+      "oldest_other": "Oldest waiting {{count}} days"
+    },
+    "out": {
+      "title": "Out today",
+      "none": "Everyone is in this week",
+      "noneLater": "Nobody else out this week",
+      "laterThisWeek_one": "+{{count}} more later this week",
+      "laterThisWeek_other": "+{{count}} more later this week"
+    },
+    "reviews": {
+      "title": "Reviews in 30 days",
+      "noneOverdue": "None overdue",
+      "overdue_one": "{{count}} overdue",
+      "overdue_other": "{{count}} overdue"
+    },
+    "movements": {
+      "title": "Joining & leaving · 30 days",
+      "value": "+{{joining}} / −{{leaving}}",
+      "starts": "starts {{date}}",
+      "leaves": "leaves {{date}}",
+      "none": "No one starts or leaves"
+    }
+  }
 }

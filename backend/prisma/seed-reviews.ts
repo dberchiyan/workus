@@ -141,6 +141,24 @@ export const seedReviews = async (
       round += 1;
       date = addMonths(employee.startDate, REVIEW_INTERVAL_MONTHS * round);
     }
+    // Every eleventh: the last review (within a month) was never held — it is overdue.
+    const last = reviews.at(-1);
+    if (
+      index % 11 === 5 &&
+      last &&
+      reviews.length > 1 &&
+      last.reviewDate instanceof Date &&
+      today.getTime() - last.reviewDate.getTime() < 30 * 86_400_000
+    ) {
+      reviews[reviews.length - 1] = {
+        employeeId: employee.id,
+        title: last.title,
+        reviewDate: last.reviewDate,
+        status: 'SCHEDULED',
+        salaryAmount: null,
+        salaryCurrency: null,
+      };
+    }
     if (!employee.terminatedOn) {
       reviews.push({
         employeeId: employee.id,
