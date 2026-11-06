@@ -64,7 +64,8 @@ export class EmployeeRepository {
   ): Promise<{ content: EmployeeListItemRecord[]; totalElements: number }> {
     const where = employeeWhere(criteria);
     const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
-    const [totalElements, content] = await this.txHost.tx.$transaction([
+    // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
+    const [totalElements, content] = await Promise.all([
       this.txHost.tx.employee.count({ where }),
       this.txHost.tx.employee.findMany({ where, select: employeeListItemSelect, ...page }),
     ]);
