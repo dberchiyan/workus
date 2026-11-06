@@ -19,7 +19,7 @@ cd backend
 cp .env.example .env        # fill in the values
 npm ci
 npm run db:migrate:deploy
-npm run db:seed             # 2 admins + 10 employees, password from SEED_USER_PASSWORD
+npm run db:seed             # 2 admins + 40 employees, password from SEED_USER_PASSWORD
 npm run start:dev
 ```
 
