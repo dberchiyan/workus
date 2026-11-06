@@ -1,0 +1,12 @@
+{
+  "invalid": "Invalid value",
+  "email": {
+    "required": "Enter your email",
+    "invalid": "Enter a valid email address",
+    "tooLong": "Email must be at most {max} characters"
+  },
+  "password": {
+    "required": "Enter your password",
+    "tooLong": "Password must be at most {max} characters"
+  }
+}

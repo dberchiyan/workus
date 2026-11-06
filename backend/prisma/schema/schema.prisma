@@ -1,0 +1,21 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../../src/generated/prisma"
+  moduleFormat        = "cjs"
+  runtime             = "nodejs"
+  importFileExtension = "js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Store of rate-limiter-flexible (security.md → Rate limiting). Structure is defined by the
+// library; created by migration so the app never issues DDL at runtime.
+model RateLimit {
+  key    String @id(map: "pk_rate_limits") @db.VarChar(255)
+  points Int    @default(0)
+  expire BigInt?
+
+  @@map("rate_limits")
+}
