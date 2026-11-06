@@ -16,7 +16,7 @@ export function EmployeeCardList({ employees }: EmployeeCardListProps) {
   return (
     <ul className="m-0 flex list-none flex-col divide-y divide-divider p-0">
       {employees.map((employee) => (
-        <li key={employee.id} className="flex flex-col gap-3 px-4 py-4">
+        <li key={employee.id} className="relative flex flex-col gap-3 px-4 py-4">
           <div className="flex items-start justify-between gap-3">
             <EmployeeIdentity employee={employee} />
             <EmployeeStatusChip status={employee.status} />

@@ -64,7 +64,7 @@ export function ResponsibleAvatars({ employee }: ResponsibleAvatarsProps) {
         // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
         tabIndex={0}
         aria-label={t('responsibles.label', { names })}
-        className="inline-flex max-w-full rounded-sm"
+        className="relative z-10 inline-flex max-w-full rounded-sm"
       >
         {content}
       </span>

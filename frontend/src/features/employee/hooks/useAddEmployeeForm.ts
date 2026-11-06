@@ -9,7 +9,7 @@ import {
   createEmployeeSchema,
   DETAILS_FIELDS,
 } from '../schemas';
-import type { CreatedEmployee, CreateEmployeeRequest, ResponsibleCandidate } from '../types';
+import type { CreatedEmployee, CreateEmployeeRequest, ResponsibleOption } from '../types';
 import { useCreateEmployee } from './useEmployeeQueries';
 
 export const AddEmployeeStep = { DETAILS: 0, RESPONSIBLE: 1 } as const;
@@ -64,7 +64,7 @@ export const useAddEmployeeForm = (onCreated: (employee: CreatedEmployee) => voi
   const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());
   const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);
   const [errorCount, setErrorCount] = useState(0);
-  const [responsibles, setResponsibles] = useState<ResponsibleCandidate[]>([]);
+  const [responsibles, setResponsibles] = useState<ResponsibleOption[]>([]);
   const errorRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<CreateEmployeeFormValues, unknown, CreateEmployeeFormOutput>({
@@ -101,7 +101,7 @@ export const useAddEmployeeForm = (onCreated: (employee: CreatedEmployee) => voi
     setStep(AddEmployeeStep.DETAILS);
   };
 
-  const selectResponsibles = (people: ResponsibleCandidate[]): void => {
+  const selectResponsibles = (people: ResponsibleOption[]): void => {
     setResponsibles(people);
     form.setValue(
       'responsibleUserIds',

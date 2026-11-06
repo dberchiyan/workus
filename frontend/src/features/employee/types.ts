@@ -27,3 +27,8 @@ export type CreatedEmployee = Schemas['EmployeeListItemResponse_Output'];
 export type PositionOption = Schemas['PositionOptionsResponse_Output']['content'][number];
 export type ResponsibleCandidate =
   Schemas['ResponsibleCandidatesResponse_Output']['content'][number];
+
+export type EmployeeProfile = Schemas['EmployeeProfileResponse_Output'];
+
+/** A candidate as shown in the people picker. */
+export type ResponsibleOption = ResponsibleCandidate & { subtitle: string };

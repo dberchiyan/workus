@@ -14,6 +14,8 @@ const AVATAR_TONES = [
   'bg-avatar-c8',
 ] as const;
 
+const SIZE_CLASS = { sm: 'size-7', md: 'size-8', lg: 'size-16' } as const;
+
 /** Same person → same tone, on every screen and every load. */
 const toneFor = (id: string): string => {
   let hash = 0;
@@ -28,8 +30,8 @@ export interface InitialsAvatarProps {
   id: string;
   firstName: string;
   lastName: string;
-  /** `sm` for responsibles in tables, `md` for a person's own row. */
-  size?: 'sm' | 'md';
+  /** `sm` responsibles in tables, `md` a person's own row, `lg` a profile header. */
+  size?: 'sm' | 'md' | 'lg';
   className?: string;
 }
 
@@ -44,14 +46,13 @@ export function InitialsAvatar({
   return (
     <Avatar
       aria-hidden
-      className={cn(
-        toneFor(id),
-        'text-avatar-text',
-        size === 'sm' ? 'size-7' : 'size-8',
-        className,
-      )}
+      className={cn(toneFor(id), 'text-avatar-text', SIZE_CLASS[size], className)}
     >
-      <Typography variant="caption" component="span" className="app-tabular">
+      <Typography
+        variant={size === 'lg' ? 'h5' : 'caption'}
+        component="span"
+        className="app-tabular"
+      >
         {`${firstName.charAt(0)}${lastName.charAt(0)}`}
       </Typography>
     </Avatar>

@@ -42,9 +42,28 @@
     "tooLong": "Address must be at most {{max}} characters"
   },
   "responsibles": {
-    "tooMany": "Choose at most {{max}} people"
+    "tooMany": "Choose at most {{max}} people",
+    "required": "Choose at least one responsible person"
   },
   "workEmail": {
     "required": "Enter a work email"
+  },
+  "title": {
+    "required": "Enter a title",
+    "tooLong": "Title must be at most {{max}} characters"
+  },
+  "reviewDate": {
+    "invalid": "Enter a review date"
+  },
+  "reviewStatus": {
+    "required": "Choose a status"
+  },
+  "salary": {
+    "invalid": "Enter an amount like 4500 or 4500.50",
+    "requiredForCompleted": "Enter the salary agreed in this review"
+  },
+  "feedback": {
+    "tooLong": "Feedback must be at most {{max}} characters",
+    "textTooLong": "Feedback must be at most 2000 characters"
   }
 }

@@ -65,3 +65,9 @@ export const useCreateEmployee = () => {
     },
   });
 };
+
+export const useEmployeeProfile = (employeeId: string) =>
+  useQuery({
+    queryKey: employeeKeys.detail(employeeId),
+    queryFn: () => employeeApi.profile(employeeId),
+  });

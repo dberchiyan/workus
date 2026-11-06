@@ -1,0 +1,122 @@
+{
+  "tab": {
+    "loading": "Loading reviews…"
+  },
+  "salary": {
+    "title": "Current salary",
+    "perMonth": "per month",
+    "none": "No salary recorded yet",
+    "noneHint": "It appears after the first completed review with a salary.",
+    "change": "{{percent}} since {{date}}",
+    "chartTitle": "Salary history",
+    "chartSummary": "Salary history: {{count}} completed reviews, from {{first}} to {{last}}",
+    "tableCaption": "Salary by completed review",
+    "date": "Date",
+    "amount": "Monthly salary"
+  },
+  "list": {
+    "title": "Reviews",
+    "empty": "No reviews yet",
+    "emptyHint": "Add the first review to start the salary history.",
+    "noSalary": "No salary",
+    "retry": "Try again"
+  },
+  "status": {
+    "COMPLETED": "Completed",
+    "SCHEDULED": "Scheduled",
+    "CANCELED": "Canceled"
+  },
+  "feedback": {
+    "hr": "HR",
+    "teamLead": "Team Lead",
+    "team": "Team",
+    "client": "Client",
+    "none": "No feedback",
+    "tabsLabel": "Feedback source",
+    "filled": "{{source}} (has feedback)"
+  },
+  "add": {
+    "open": "Add review",
+    "title": "Add review",
+    "sections": {
+      "details": "Review details",
+      "feedback": "Feedback"
+    },
+    "fields": {
+      "title": "Title",
+      "date": "Date",
+      "salary": "New salary (USD per month)",
+      "status": "Status",
+      "responsibles": "Responsible people"
+    },
+    "hints": {
+      "feedback": "Optional"
+    },
+    "responsible": {
+      "noOptions": "No one found",
+      "loading": "Searching…",
+      "roles": {
+        "ADMIN": "Administrator",
+        "MANAGER": "Manager",
+        "EMPLOYEE": "Employee"
+      }
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "submit": "Add review",
+      "submitting": "Adding…"
+    },
+    "created": "Review “{{title}}” was added",
+    "dismiss": "Dismiss"
+  },
+  "edit": {
+    "title": "Edit review",
+    "submit": "Save changes",
+    "submitting": "Saving…",
+    "saved": "Review “{{title}}” was saved"
+  },
+  "view": {
+    "title": "Review",
+    "close": "Close",
+    "edit": "Edit",
+    "delete": "Delete",
+    "salary": "Salary",
+    "status": "Status",
+    "date": "Date",
+    "responsible": "Responsible"
+  },
+  "actions": {
+    "edit": "Edit",
+    "delete": "Delete",
+    "editNamed": "Edit “{{title}}”",
+    "deleteNamed": "Delete “{{title}}”"
+  },
+  "delete": {
+    "title": "Delete this review?",
+    "body": "“{{title}}” from {{date}} will be deleted. This can’t be undone.",
+    "salaryNote": "Its salary ({{salary}}) will also leave the salary history.",
+    "confirm": "Delete review",
+    "deleting": "Deleting…",
+    "cancel": "Cancel",
+    "deleted": "Review “{{title}}” was deleted"
+  },
+  "table": {
+    "caption": "Reviews",
+    "title": "Title",
+    "date": "Date",
+    "status": "Status",
+    "salary": "Salary",
+    "responsible": "Responsible",
+    "more": "+{{count}}",
+    "responsibleLabel": "Responsible: {{names}}"
+  },
+  "editor": {
+    "toolbar": "Formatting for {{label}}",
+    "bold": "Bold",
+    "italic": "Italic",
+    "bulletList": "Bulleted list",
+    "orderedList": "Numbered list",
+    "count": "{{count}} / {{max}}",
+    "placeholder": "Write feedback from {{source}}…"
+  }
+}

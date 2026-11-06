@@ -109,5 +109,86 @@
     },
     "created": "{{name}} was added",
     "dismiss": "Dismiss"
+  },
+  "profile": {
+    "pageTitle": "{{name}} · Workus",
+    "back": "Employees",
+    "tabs": {
+      "label": "Profile sections",
+      "info": "Info",
+      "files": "Files ({{count}})",
+      "review": "Review",
+      "actions": "Actions"
+    },
+    "sections": {
+      "overall": "Overall info",
+      "contact": "Contact info"
+    },
+    "fields": {
+      "position": "Position",
+      "category": "Category",
+      "level": "Level",
+      "workEmail": "Work email",
+      "dateOfBirth": "Date of birth",
+      "startDate": "Start date",
+      "terminatedOn": "Terminated on",
+      "holidayEligibility": "Holiday eligibility from",
+      "laptopId": "Laptop ID",
+      "additionalInfo": "Additional info",
+      "systemRole": "System role",
+      "mobile": "Mobile",
+      "personalEmail": "Personal email",
+      "linkedin": "LinkedIn",
+      "telegram": "Telegram",
+      "address": "Address"
+    },
+    "values": {
+      "notProvided": "Not provided",
+      "age": "{{date}} · {{count}} years old",
+      "tenure": "{{date}} · {{duration}} at Workus",
+      "years_one": "{{count}} year",
+      "years_other": "{{count}} years",
+      "months_one": "{{count}} month",
+      "months_other": "{{count}} months",
+      "opensInNewTab": "(opens in a new tab)",
+      "yearsAndMonths": "{{years}} {{months}}",
+      "lessThanMonth": "less than a month"
+    },
+    "roles": {
+      "ADMIN": "Administrator",
+      "MANAGER": "Manager",
+      "EMPLOYEE": "Employee"
+    },
+    "responsible": {
+      "title": "Responsible",
+      "none": "Nobody is assigned yet"
+    },
+    "leave": {
+      "vacation": "Vacation days",
+      "daysOff": "Days off",
+      "sickDays": "Sick days",
+      "cycle": "Current cycle: {{start}} – {{end}}",
+      "available": "Available",
+      "used": "Used",
+      "sample": "Sample data — balances arrive with Time off"
+    },
+    "files": {
+      "empty": "No files yet",
+      "emptyHint": "Contracts, certificates and other documents will appear here."
+    },
+    "actions": {
+      "empty": "No actions yet",
+      "kind": {
+        "HIRED": "Hired",
+        "EQUIPMENT": "Equipment",
+        "REVIEW": "Review",
+        "LEVEL": "Level"
+      }
+    },
+    "notFound": {
+      "title": "Employee not found",
+      "description": "The employee may have been removed, or the link is wrong."
+    },
+    "sampleNotice": "Some details on this page are sample data until the matching features exist."
   }
 }

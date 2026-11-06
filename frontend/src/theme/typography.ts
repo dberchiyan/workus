@@ -110,5 +110,9 @@ export const typographyGlobalStyles = {
     '& h2': variantStyle('h3'),
     '& h3': variantStyle('h4'),
     '& small': variantStyle('caption'),
+    '& p': { marginBlock: '0 0.5em' },
+    '& ul, & ol': { marginBlock: '0 0.5em', paddingInlineStart: '1.5em' },
+    '& li p': { marginBlock: 0 },
+    '& > :last-child': { marginBlockEnd: 0 },
   },
 } as const;

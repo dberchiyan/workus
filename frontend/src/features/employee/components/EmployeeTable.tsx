@@ -86,7 +86,7 @@ export function EmployeeTable({ employees, params, onSort }: EmployeeTableProps)
       </TableHead>
       <TableBody>
         {employees.map((employee) => (
-          <TableRow key={employee.id} hover className="h-15">
+          <TableRow key={employee.id} hover className="relative h-15 cursor-pointer">
             <TableCell component="th" scope="row">
               <EmployeeIdentity employee={employee} isCompact />
             </TableCell>

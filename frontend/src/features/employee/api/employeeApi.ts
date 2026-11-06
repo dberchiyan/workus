@@ -6,6 +6,7 @@ import type {
   EmployeeFilters,
   EmployeeListParams,
   EmployeePage,
+  EmployeeProfile,
   EmployeeSummary,
   PositionOption,
   ResponsibleCandidate,
@@ -29,6 +30,9 @@ export const employeeApi = {
         },
       })
     ).data,
+  profile: async (employeeId: string): Promise<EmployeeProfile> =>
+    (await apiClient.get<EmployeeProfile>(`/api/v1/employees/${encodeURIComponent(employeeId)}`))
+      .data,
   summary: async (): Promise<EmployeeSummary> =>
     (await apiClient.get<EmployeeSummary>('/api/v1/employees/summary')).data,
   categories: async (filters: EmployeeFilters): Promise<CategoryCounts> =>
