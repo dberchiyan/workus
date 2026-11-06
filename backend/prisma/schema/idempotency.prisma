@@ -1,0 +1,18 @@
+/// Idempotency-Key ledger for side-effecting POSTs (api.md → Idempotency).
+model IdempotencyKey {
+  id           String   @id(map: "pk_idempotency_keys") @default(dbgenerated("uuidv7()")) @db.Uuid
+  key          String   @db.Uuid
+  userId       String   @map("user_id") @db.Uuid
+  // Replays belong to the caller; they go with the account.
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade, map: "fk_idempotency_keys_user_id")
+  endpoint     String   @db.VarChar(255) // "POST /api/v1/employees"
+  requestHash  String   @map("request_hash") @db.Char(64)
+  statusCode   Int?     @map("status_code") // null → still in flight
+  responseBody Json?    @map("response_body")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  expiresAt    DateTime @map("expires_at") @db.Timestamptz(3)
+
+  @@unique([userId, key], map: "uq_idempotency_keys_user_id_key")
+  @@index([expiresAt], map: "idx_idempotency_keys_expires_at")
+  @@map("idempotency_keys")
+}

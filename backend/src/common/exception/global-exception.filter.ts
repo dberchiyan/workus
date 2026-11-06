@@ -81,7 +81,21 @@ export class GlobalExceptionFilter implements ExceptionFilter {
 
   private resolve(exception: unknown, lang: string): ResolvedError {
     if (exception instanceof ApiException) {
-      return { code: exception.code, messageKey: exception.messageKey, args: exception.args };
+      const resolved: ResolvedError = {
+        code: exception.code,
+        messageKey: exception.messageKey,
+        args: exception.args,
+      };
+      const field =
+        'field' in exception && typeof exception.field === 'string' ? exception.field : undefined;
+      return field
+        ? {
+            ...resolved,
+            details: [
+              { field, message: this.i18n.t(exception.messageKey, { lang, args: exception.args }) },
+            ],
+          }
+        : resolved;
     }
     if (exception instanceof ZodValidationException) {
       return {

@@ -15,5 +15,10 @@
   "UNSUPPORTED_MEDIA_TYPE": "Only JSON requests are accepted",
   "RATE_LIMIT_EXCEEDED": "Too many attempts — try again in {minutes} minutes",
   "UPSTREAM_UNAVAILABLE": "A service we depend on is unavailable — try again later",
-  "INTERNAL_ERROR": "Something went wrong on our side — try again later"
+  "INTERNAL_ERROR": "Something went wrong on our side — try again later",
+  "employee": {
+    "emailTaken": "An account with the email “{email}” already exists",
+    "positionNotFound": "This position no longer exists — reload and choose another",
+    "responsibleNotFound": "One of the chosen responsible people is no longer active — choose again"
+  }
 }

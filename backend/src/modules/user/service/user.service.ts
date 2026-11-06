@@ -1,7 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { UserRepository } from '../repository/user.repository';
 import { isUserRole, type UserRole } from './user-role';
-import type { UserCredentials, UserProfile } from './user.types';
+import type { NewUser, UserCredentials, UserProfile } from './user.types';
 
 const toRole = (role: string): UserRole => {
   if (!isUserRole(role)) {
@@ -23,6 +23,15 @@ export class UserService {
   async findProfileById(id: string): Promise<UserProfile | null> {
     const user = await this.userRepository.findProfileById(id);
     return user ? { ...user, role: toRole(user.role) } : null;
+  }
+
+  existsByEmail(email: string): Promise<boolean> {
+    return this.userRepository.existsByEmail(email.toLowerCase());
+  }
+
+  /** Returns the new user's id. Email is stored lower-case. */
+  createWithoutPassword(user: NewUser): Promise<string> {
+    return this.userRepository.createWithoutPassword({ ...user, email: user.email.toLowerCase() });
   }
 
   updatePasswordHash(id: string, passwordHash: string): Promise<void> {

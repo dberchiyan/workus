@@ -23,9 +23,11 @@ export type I18nTranslations = {
         "RATE_LIMIT_EXCEEDED": string;
         "UPSTREAM_UNAVAILABLE": string;
         "INTERNAL_ERROR": string;
-    };
-    "messages": {
-        "validationFailed": string;
+        "employee": {
+            "emailTaken": string;
+            "positionNotFound": string;
+            "responsibleNotFound": string;
+        };
     };
     "validation": {
         "invalid": string;
@@ -37,6 +39,44 @@ export type I18nTranslations = {
         "password": {
             "required": string;
             "tooLong": string;
+        };
+        "search": {
+            "tooLong": string;
+        };
+        "firstName": {
+            "required": string;
+            "tooLong": string;
+        };
+        "lastName": {
+            "required": string;
+            "tooLong": string;
+        };
+        "position": {
+            "required": string;
+        };
+        "startDate": {
+            "invalid": string;
+        };
+        "mobile": {
+            "invalid": string;
+        };
+        "personalEmail": {
+            "invalid": string;
+        };
+        "linkedin": {
+            "invalid": string;
+        };
+        "telegram": {
+            "invalid": string;
+        };
+        "address": {
+            "tooLong": string;
+        };
+        "responsibles": {
+            "tooMany": string;
+        };
+        "workEmail": {
+            "required": string;
         };
     };
 };

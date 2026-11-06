@@ -26,6 +26,13 @@ export class MetricsService {
     registers: [this.registry],
   });
 
+  readonly idempotencyCollisions = new Counter({
+    name: 'idempotency_collisions_total',
+    help: 'Requests rejected for a reused or in-flight Idempotency-Key',
+    labelNames: ['reason'] as const,
+    registers: [this.registry],
+  });
+
   constructor() {
     collectDefaultMetrics({ register: this.registry });
   }

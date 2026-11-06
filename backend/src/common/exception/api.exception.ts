@@ -60,3 +60,44 @@ export class UpstreamUnavailableException extends ApiException {
     super('UPSTREAM_UNAVAILABLE', 'errors.UPSTREAM_UNAVAILABLE');
   }
 }
+
+export class InvalidParameterException extends ApiException {
+  constructor(parameter: string) {
+    super('INVALID_PARAMETER', 'errors.INVALID_PARAMETER', { parameter });
+  }
+}
+
+/** 409 — the request conflicts with existing data; `field` points the client at the input. */
+export class BusinessConflictException extends ApiException {
+  constructor(
+    messageKey: I18nPath,
+    args: MessageArgs = {},
+    readonly field?: string,
+  ) {
+    super('CONFLICT', messageKey, args);
+  }
+}
+
+/** 422 — the request is well-formed but breaks a business rule. */
+export class BusinessRuleException extends ApiException {
+  constructor(
+    messageKey: I18nPath,
+    args: MessageArgs = {},
+    readonly field?: string,
+  ) {
+    super('BUSINESS_RULE_VIOLATION', messageKey, args);
+  }
+}
+
+export class IdempotencyKeyReusedException extends ApiException {
+  constructor() {
+    super('IDEMPOTENCY_KEY_REUSED', 'errors.IDEMPOTENCY_KEY_REUSED');
+  }
+}
+
+/** 409 — the same Idempotency-Key is still being processed. */
+export class RequestInProgressException extends ApiException {
+  constructor() {
+    super('CONFLICT', 'errors.CONFLICT');
+  }
+}

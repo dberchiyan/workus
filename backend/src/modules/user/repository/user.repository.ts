@@ -23,6 +23,32 @@ export class UserRepository {
     return this.txHost.tx.user.findUnique({ where: { id }, select: userProfileSelect });
   }
 
+  existsByEmail(email: string): Promise<boolean> {
+    return this.txHost.tx.user.count({ where: { email } }).then((count) => count > 0);
+  }
+
+  /** No password: the person sets one later (invitation flow). */
+  async createWithoutPassword(user: {
+    email: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    createdBy: string;
+  }): Promise<string> {
+    const { id } = await this.txHost.tx.user.create({
+      data: {
+        email: user.email,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        role: user.role,
+        createdBy: user.createdBy,
+        updatedBy: user.createdBy,
+      },
+      select: { id: true },
+    });
+    return id;
+  }
+
   async updatePasswordHash(id: string, passwordHash: string): Promise<void> {
     await this.txHost.tx.user.update({
       where: { id },

@@ -78,4 +78,22 @@ export default tseslint.config(
       ],
     },
   },
+  {
+    // Mappers turn records into DTOs (architecture.md → Record + mapper): record types only.
+    files: ['src/modules/*/controller/mapper/**/*.ts'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              regex: '/repository/(?!record/)',
+              message: 'Mappers may import only record types from the repository.',
+            },
+            { group: prismaClient, message: 'Controllers never touch Prisma types.' },
+          ],
+        },
+      ],
+    },
+  },
 );

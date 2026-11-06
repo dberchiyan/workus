@@ -1,0 +1,74 @@
+model PositionCategory {
+  id        String     @id(map: "pk_position_categories") @default(dbgenerated("uuidv7()")) @db.Uuid
+  name      String     @db.VarChar(100)
+  sortOrder Int        @map("sort_order")
+  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy String?    @map("created_by") @db.Uuid
+  updatedBy String?    @map("updated_by") @db.Uuid
+  version   Int        @default(0)
+  positions Position[]
+
+  @@unique([name], map: "uq_position_categories_name")
+  @@map("position_categories")
+}
+
+model Position {
+  id         String           @id(map: "pk_positions") @default(dbgenerated("uuidv7()")) @db.Uuid
+  categoryId String           @map("category_id") @db.Uuid
+  category   PositionCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict, map: "fk_positions_category_id")
+  title      String           @db.VarChar(150)
+  createdAt  DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt  DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy  String?          @map("created_by") @db.Uuid
+  updatedBy  String?          @map("updated_by") @db.Uuid
+  version    Int              @default(0)
+  employees  Employee[]
+
+  @@unique([title], map: "uq_positions_title")
+  @@index([categoryId], map: "idx_positions_category_id")
+  @@map("positions")
+}
+
+/// HR record of a user with the EMPLOYEE (or MANAGER) role; admins have none.
+model Employee {
+  id            String                @id(map: "pk_employees") @default(dbgenerated("uuidv7()")) @db.Uuid
+  userId        String                @map("user_id") @db.Uuid
+  user          User                  @relation("EmployeeUser", fields: [userId], references: [id], onDelete: Restrict, map: "fk_employees_user_id")
+  positionId    String                @map("position_id") @db.Uuid
+  position      Position              @relation(fields: [positionId], references: [id], onDelete: Restrict, map: "fk_employees_position_id")
+  startDate     DateTime              @map("start_date") @db.Date
+  terminatedOn  DateTime?             @map("terminated_on") @db.Date // set → terminated from that day
+  mobile        String?               @db.VarChar(32)
+  personalEmail String?               @map("personal_email") @db.VarChar(254)
+  linkedinUrl   String?               @map("linkedin_url") @db.VarChar(255)
+  telegram      String?               @db.VarChar(33) // "@handle"
+  address       String?               @db.VarChar(500)
+  createdAt     DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt     DateTime              @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy     String?               @map("created_by") @db.Uuid
+  updatedBy     String?               @map("updated_by") @db.Uuid
+  version       Int                   @default(0)
+  responsibles  EmployeeResponsible[]
+
+  @@unique([userId], map: "uq_employees_user_id")
+  @@index([positionId], map: "idx_employees_position_id")
+  @@index([startDate], map: "idx_employees_start_date")
+  @@index([terminatedOn], map: "idx_employees_terminated_on")
+  @@map("employees")
+}
+
+/// People responsible for an employee (any user, e.g. an admin or a project manager).
+model EmployeeResponsible {
+  employeeId        String   @map("employee_id") @db.Uuid
+  // The assignment means nothing without the employee.
+  employee          Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, map: "fk_employee_responsibles_employee_id")
+  responsibleUserId String   @map("responsible_user_id") @db.Uuid
+  responsible       User     @relation("EmployeeResponsibleUser", fields: [responsibleUserId], references: [id], onDelete: Restrict, map: "fk_employee_responsibles_responsible_user_id")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy         String?  @map("created_by") @db.Uuid
+
+  @@id([employeeId, responsibleUserId], map: "pk_employee_responsibles")
+  @@index([responsibleUserId], map: "idx_employee_responsibles_responsible_user_id")
+  @@map("employee_responsibles")
+}

@@ -4,6 +4,7 @@ import type { Request, Response } from 'express';
 import { ZodResponse } from 'nestjs-zod';
 import { AppConfigService } from '../../../common/config/app-config.service';
 import { ApiErrors } from '../../../common/exception/api-errors.decorator';
+import { IdempotencyExempt } from '../../../common/idempotency/idempotent.decorator';
 import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
 import { can } from '../../../common/security/policies';
 import type { Principal } from '../../../common/security/principal';
@@ -28,6 +29,7 @@ export class AuthController {
   @Post('login')
   @HttpCode(HttpStatus.OK)
   @Public()
+  @IdempotencyExempt('No session yet; a repeat only replaces the session')
   @RateLimit(RateLimitName.LOGIN)
   @ApiOperation({ summary: 'Sign in with email and password and start a session' })
   @ZodResponse({ status: HttpStatus.OK, type: CurrentUserResponse })
@@ -57,6 +59,7 @@ export class AuthController {
   @Post('logout')
   @HttpCode(HttpStatus.OK)
   @Authorize(can.authenticated)
+  @IdempotencyExempt('Deleting the session is idempotent by nature')
   @ApiOperation({ summary: 'End the current session' })
   @ApiOkResponse({ description: 'Session ended; cookies cleared' })
   @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')

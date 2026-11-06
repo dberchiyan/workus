@@ -1,6 +1,7 @@
 import { HttpStatus, Injectable, type OnApplicationBootstrap, RequestMethod } from '@nestjs/common';
 import { HTTP_CODE_METADATA, METHOD_METADATA, PATH_METADATA } from '@nestjs/common/constants';
 import { DiscoveryService, MetadataScanner, Reflector } from '@nestjs/core';
+import { IDEMPOTENCY_EXEMPT_KEY, IDEMPOTENT_KEY } from '../idempotency/idempotent.decorator';
 import type { Policy } from './policy';
 import { POLICY_KEY, PUBLIC_KEY } from './security.decorators';
 
@@ -62,6 +63,13 @@ export class RouteAuditService implements OnApplicationBootstrap {
       this.reflector.get<number | undefined>(HTTP_CODE_METADATA, handler) !== HttpStatus.OK
     ) {
       violations.push(`${route}: POST needs @HttpCode(HttpStatus.OK)`);
+    }
+    if (
+      method === RequestMethod.POST &&
+      this.reflector.get<boolean | undefined>(IDEMPOTENT_KEY, handler) !== true &&
+      this.reflector.get<string | undefined>(IDEMPOTENCY_EXEMPT_KEY, handler) === undefined
+    ) {
+      violations.push(`${route}: POST needs @Idempotent() or @IdempotencyExempt(reason)`);
     }
     return violations;
   }

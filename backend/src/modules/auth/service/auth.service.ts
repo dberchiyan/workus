@@ -40,7 +40,8 @@ export class AuthService {
   async login(input: LoginCommand): Promise<LoginResult> {
     const command = { ...input, email: input.email.toLowerCase() };
     const credentials = await this.userService.findCredentialsByEmail(command.email);
-    if (!credentials) {
+    // Unknown email and an account without a password look the same — no timing oracle.
+    if (!credentials?.passwordHash) {
       await this.passwordHasher.verifyDummy(command.password);
       throw this.loginFailed(command);
     }

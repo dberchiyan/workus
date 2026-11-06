@@ -7,6 +7,7 @@ import { AppConfigModule } from './common/config/config.module';
 import { AppConfigService } from './common/config/app-config.service';
 import { ContextModule } from './common/context/context.module';
 import { GlobalExceptionFilter } from './common/exception/global-exception.filter';
+import { IdempotencyInterceptor } from './common/idempotency/idempotency.interceptor';
 import { AppI18nModule } from './common/i18n/i18n.module';
 import { createLoggerOptions } from './common/observability/logger.options';
 import { ObservabilityModule } from './common/observability/observability.module';
@@ -19,6 +20,7 @@ import { RateLimitGuard } from './common/security/rate-limit.guard';
 import { SecurityModule } from './common/security/security.module';
 import { SessionGuard } from './common/security/session.guard';
 import { AuthModule } from './modules/auth/auth.module';
+import { EmployeeModule } from './modules/employee/employee.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -36,6 +38,7 @@ import { UserModule } from './modules/user/user.module';
     ScheduleModule.forRoot(),
     UserModule,
     AuthModule,
+    EmployeeModule,
   ],
   providers: [
     // Guards run in registration order (security.md → Guards).
@@ -44,7 +47,9 @@ import { UserModule } from './modules/user/user.module';
     { provide: APP_GUARD, useClass: RateLimitGuard },
     { provide: APP_GUARD, useClass: AuthorizationGuard },
     { provide: APP_PIPE, useClass: ZodValidationPipe },
+    // Outermost first: timing measures everything; idempotency stores the serialized response.
     { provide: APP_INTERCEPTOR, useClass: TimingInterceptor },
+    { provide: APP_INTERCEPTOR, useClass: IdempotencyInterceptor },
     { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
     { provide: APP_FILTER, useClass: GlobalExceptionFilter },
   ],
