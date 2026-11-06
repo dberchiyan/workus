@@ -61,7 +61,7 @@ export function SalaryOverview({ salary }: { salary: EmployeeReviews['salary'] }
           </Typography>
         )}
       </div>
-      <div className="w-full sm:max-w-md">
+      <div className="w-full min-w-0 sm:flex-1">
         <SalaryHistoryChart history={salary.history} />
       </div>
     </div>

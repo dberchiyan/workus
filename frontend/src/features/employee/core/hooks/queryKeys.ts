@@ -7,6 +7,7 @@ export const employeeKeys = {
   list: (params: EmployeeListParams) => [...employeeKeys.lists(), params] as const,
   summary: () => [...employeeKeys.all, 'summary'] as const,
   detail: (employeeId: string) => [...employeeKeys.all, 'detail', employeeId] as const,
+  activity: (employeeId: string) => [...employeeKeys.detail(employeeId), 'activity'] as const,
   categories: (filters: EmployeeFilters) => [...employeeKeys.all, 'categories', filters] as const,
   positions: () => [...employeeKeys.all, 'positions'] as const,
   responsibleCandidates: (search: string) =>

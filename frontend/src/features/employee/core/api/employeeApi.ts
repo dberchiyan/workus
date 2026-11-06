@@ -1,5 +1,6 @@
 import { apiClient } from '@/shared/api/client';
 import type {
+  ActivityPage,
   CategoryCounts,
   CreatedEmployee,
   CreateEmployeeRequest,
@@ -33,6 +34,14 @@ export const employeeApi = {
   profile: async (employeeId: string): Promise<EmployeeProfile> =>
     (await apiClient.get<EmployeeProfile>(`/api/v1/employees/${encodeURIComponent(employeeId)}`))
       .data,
+  /** Newest first; `page` is 0-based. */
+  activity: async (employeeId: string, page: number, size: number): Promise<ActivityPage> =>
+    (
+      await apiClient.get<ActivityPage>(
+        `/api/v1/employees/${encodeURIComponent(employeeId)}/activity`,
+        { params: { page, size, sort: 'occurredAt,desc' } },
+      )
+    ).data,
   summary: async (): Promise<EmployeeSummary> =>
     (await apiClient.get<EmployeeSummary>('/api/v1/employees/summary')).data,
   categories: async (filters: EmployeeFilters): Promise<CategoryCounts> =>

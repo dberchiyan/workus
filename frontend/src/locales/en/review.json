@@ -118,5 +118,9 @@
     "orderedList": "Numbered list",
     "count": "{{count}} / {{max}}",
     "placeholder": "Write feedback from {{source}}…"
+  },
+  "starting": {
+    "dateHint": "Always the employee’s start date",
+    "statusHint": "The starting salary is always completed"
   }
 }

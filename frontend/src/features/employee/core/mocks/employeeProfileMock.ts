@@ -12,13 +12,6 @@ export interface LeaveBalance {
   used: number;
 }
 
-export interface ProfileAction {
-  id: string;
-  date: string;
-  kind: 'HIRED' | 'EQUIPMENT' | 'REVIEW' | 'LEVEL';
-  text: string;
-}
-
 export interface EmployeeProfileMock {
   level: string;
   dateOfBirth: string;
@@ -27,7 +20,6 @@ export interface EmployeeProfileMock {
   vacation: LeaveBalance;
   daysOff: LeaveBalance;
   sickDays: LeaveBalance;
-  actions: ProfileAction[];
   fileCount: number;
 }
 
@@ -101,10 +93,6 @@ export const mockEmployeeProfile = (employeeId: string, startDate: string): Empl
       available: 5 - Math.min(sickUsed, 5),
       used: sickUsed,
     },
-    actions: [
-      { id: `${employeeId}-a1`, date: startDate, kind: 'HIRED', text: 'Joined the company' },
-      { id: `${employeeId}-a2`, date: startDate, kind: 'EQUIPMENT', text: 'Laptop issued' },
-    ],
     fileCount: 0,
   };
 };

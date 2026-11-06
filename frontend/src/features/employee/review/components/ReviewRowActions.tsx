@@ -44,6 +44,10 @@ export function ReviewDeleteButton({
   onAction: OnReviewAction;
 }) {
   const { t } = useTranslation('review');
+  // The starting salary opens the salary history: it can be edited, never deleted.
+  if (review.kind === 'STARTING') {
+    return null;
+  }
   const label = t('actions.deleteNamed', { title: review.title });
   return (
     <Tooltip title={t('actions.delete')}>

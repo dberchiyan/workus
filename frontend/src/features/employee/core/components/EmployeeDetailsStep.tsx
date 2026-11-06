@@ -1,3 +1,4 @@
+import InputAdornment from '@mui/material/InputAdornment';
 import ListSubheader from '@mui/material/ListSubheader';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
@@ -119,6 +120,22 @@ export function EmployeeDetailsStep({ form }: EmployeeDetailsStepProps) {
           error={Boolean(errors.startDate)}
           helperText={message(errors.startDate)}
           slotProps={{ inputLabel: { shrink: true } }}
+        />
+        <TextField
+          {...register('startingSalary')}
+          required
+          label={t('add.fields.startingSalary')}
+          error={Boolean(errors.startingSalary)}
+          helperText={message(errors.startingSalary, undefined, t('add.hints.startingSalary'))}
+          slotProps={{
+            htmlInput: {
+              inputMode: 'decimal',
+              autoComplete: 'off',
+              maxLength: EMPLOYEE_LIMITS.salary,
+              className: 'app-tabular',
+            },
+            input: { startAdornment: <InputAdornment position="start">$</InputAdornment> },
+          }}
         />
       </fieldset>
       <fieldset className="m-0 grid grid-cols-1 gap-x-4 gap-y-2 border-0 p-0 sm:grid-cols-2">

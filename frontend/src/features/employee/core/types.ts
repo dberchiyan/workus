@@ -23,7 +23,7 @@ export interface EmployeeListParams {
 export type EmployeeFilters = Pick<EmployeeListParams, 'status' | 'search'>;
 
 export type CreateEmployeeRequest = Schemas['CreateEmployeeRequest'];
-export type CreatedEmployee = Schemas['EmployeeListItemResponse_Output'];
+export type CreatedEmployee = Schemas['HiredEmployeeResponse_Output'];
 export type PositionOption = Schemas['PositionOptionsResponse_Output']['content'][number];
 export type ResponsibleCandidate =
   Schemas['ResponsibleCandidatesResponse_Output']['content'][number];
@@ -32,3 +32,9 @@ export type EmployeeProfile = Schemas['EmployeeProfileResponse_Output'];
 
 /** A candidate as shown in the people picker. */
 export type ResponsibleOption = ResponsibleCandidate & { subtitle: string };
+
+export type ActivityPage = Schemas['EmployeeActivityPageResponse_Output'];
+export type ActivityEvent = ActivityPage['content'][number];
+export type ActivityAction = ActivityEvent['action'];
+export type ActivityChange = ActivityEvent['changes'][number];
+export type ActivityValue = NonNullable<ActivityChange['from']>;

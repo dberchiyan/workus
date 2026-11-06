@@ -35,6 +35,9 @@ const feedback = z
 
 export const REVIEW_STATUSES = ['COMPLETED', 'SCHEDULED', 'CANCELED'] as const;
 
+export const isReviewStatus = (value: string): value is (typeof REVIEW_STATUSES)[number] =>
+  (REVIEW_STATUSES as readonly string[]).includes(value);
+
 export const createReviewSchema = z
   .object({
     title: z

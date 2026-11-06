@@ -48,6 +48,8 @@ export function ReviewFormDialog({
   const { form, submit, errorCode, errorRef, responsibles, selectResponsibles, isSubmitting } =
     useReviewForm(employeeId, review, onSaved);
   const isEdit = review !== null;
+  // A starting review keeps the start date and stays completed (the server enforces it too).
+  const isStarting = review?.kind === 'STARTING';
   const { register, control, formState } = form;
   const { errors } = formState;
   const [feedbackHr, feedbackTeamLead, feedbackTeam, feedbackClient] = form.watch([
@@ -116,8 +118,13 @@ export function ReviewFormDialog({
               type="date"
               required
               label={t('add.fields.date')}
+              disabled={isStarting}
               error={Boolean(errors.date)}
-              helperText={message(errors.date)}
+              helperText={message(
+                errors.date,
+                undefined,
+                isStarting ? t('starting.dateHint') : undefined,
+              )}
               slotProps={{ inputLabel: { shrink: true } }}
             />
             <Controller
@@ -129,8 +136,13 @@ export function ReviewFormDialog({
                   select
                   required
                   label={t('add.fields.status')}
+                  disabled={isStarting}
                   error={Boolean(fieldState.error)}
-                  helperText={message(fieldState.error)}
+                  helperText={message(
+                    fieldState.error,
+                    undefined,
+                    isStarting ? t('starting.statusHint') : undefined,
+                  )}
                 >
                   {REVIEW_STATUSES.map((status) => (
                     <MenuItem key={status} value={status}>

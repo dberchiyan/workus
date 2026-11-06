@@ -6,8 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { PROFILE_TABS, type ProfileTab, useProfileTab } from '../hooks/useProfileTab';
 import type { EmployeeProfileMock } from '../mocks/employeeProfileMock';
 import type { EmployeeProfile } from '../types';
-import { ReviewTab } from '@/features/review';
-import { ProfileActionsTab, ProfileFilesTab } from './ProfileHistoryTabs';
+import { ReviewTab } from '@/features/employee/review';
+import { ProfileActivityTab } from './ProfileActivityTab';
+import { ProfileFilesTab } from './ProfileFilesTab';
 import { ProfileInfoTab } from './ProfileInfoTab';
 
 export interface ProfileTabsProps {
@@ -15,7 +16,7 @@ export interface ProfileTabsProps {
   mock: EmployeeProfileMock;
 }
 
-/** Info, Files, Review, Actions — the open tab is kept in the URL. */
+/** Info, Files, Review, Activity — the open tab is kept in the URL. */
 export function ProfileTabs({ employee, mock }: ProfileTabsProps) {
   const { t } = useTranslation('employee');
   const { tab, setTab } = useProfileTab();
@@ -24,7 +25,7 @@ export function ProfileTabs({ employee, mock }: ProfileTabsProps) {
     info: t('profile.tabs.info'),
     files: t('profile.tabs.files', { count: mock.fileCount }),
     review: t('profile.tabs.review'),
-    actions: t('profile.tabs.actions'),
+    activity: t('profile.tabs.activity'),
   };
 
   return (
@@ -61,7 +62,7 @@ export function ProfileTabs({ employee, mock }: ProfileTabsProps) {
         {tab === 'info' && <ProfileInfoTab employee={employee} mock={mock} />}
         {tab === 'files' && <ProfileFilesTab mock={mock} />}
         {tab === 'review' && <ReviewTab employeeId={employee.id} />}
-        {tab === 'actions' && <ProfileActionsTab mock={mock} />}
+        {tab === 'activity' && <ProfileActivityTab employeeId={employee.id} />}
       </div>
     </Card>
   );

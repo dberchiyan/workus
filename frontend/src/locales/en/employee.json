@@ -79,6 +79,7 @@
       "email": "Work email",
       "positionId": "Position",
       "startDate": "Start date",
+      "startingSalary": "Starting salary (USD per month)",
       "mobile": "Mobile",
       "personalEmail": "Personal email",
       "linkedinUrl": "LinkedIn",
@@ -86,7 +87,8 @@
       "address": "Address"
     },
     "hints": {
-      "email": "Also used to sign in"
+      "email": "Also used to sign in",
+      "startingSalary": "Starts the salary history"
     },
     "responsible": {
       "intro": "Choose who looks after this employee. You can skip this and assign people later.",
@@ -118,7 +120,7 @@
       "info": "Info",
       "files": "Files ({{count}})",
       "review": "Review",
-      "actions": "Actions"
+      "activity": "Activity"
     },
     "sections": {
       "overall": "Overall info",
@@ -176,14 +178,53 @@
       "empty": "No files yet",
       "emptyHint": "Contracts, certificates and other documents will appear here."
     },
-    "actions": {
-      "empty": "No actions yet",
-      "kind": {
-        "HIRED": "Hired",
-        "EQUIPMENT": "Equipment",
-        "REVIEW": "Review",
-        "LEVEL": "Level"
-      }
+    "activity": {
+      "title": "Change history",
+      "summary_one": "{{count}} entry · newest first",
+      "summary_other": "{{count}} entries · newest first",
+      "loading": "Loading the change history…",
+      "empty": "No changes yet",
+      "emptyHint": "Reviews, salary and other changes made by admins will appear here.",
+      "retry": "Try again",
+      "loadMore": "Show older changes",
+      "loadingMore": "Loading…",
+      "shown": "Showing {{shown}} of {{total}}",
+      "end": "That's the whole history",
+      "today": "Today",
+      "yesterday": "Yesterday",
+      "system": "System",
+      "headline": {
+        "employeeCreated": "<actor>{{actor}}</actor> added <target>{{target}}</target>",
+        "reviewCreated": "<actor>{{actor}}</actor> added the review <target>“{{target}}”</target>",
+        "reviewUpdated": "<actor>{{actor}}</actor> updated the review <target>“{{target}}”</target>",
+        "reviewDeleted": "<actor>{{actor}}</actor> deleted the review <target>“{{target}}”</target>"
+      },
+      "fields": {
+        "title": "Title",
+        "date": "Date",
+        "status": "Status",
+        "salary": "Salary",
+        "responsibles": "Responsible people",
+        "feedbackHr": "HR feedback",
+        "feedbackTeamLead": "Team Lead feedback",
+        "feedbackTeam": "Team feedback",
+        "feedbackClient": "Client feedback",
+        "position": "Position",
+        "startDate": "Start date"
+      },
+      "feedback": {
+        "added": "Added",
+        "edited": "Edited",
+        "removed": "Removed"
+      },
+      "previous": "Before:",
+      "current": "After:",
+      "nobody": "Nobody",
+      "peopleAdded": "Added {{names}}",
+      "peopleRemoved": "Removed {{names}}",
+      "salaryChange": "{{percent}} vs before",
+      "showAll": "Show all {{count}} changes",
+      "showFewer": "Show fewer"
     },
     "notFound": {
       "title": "Employee not found",

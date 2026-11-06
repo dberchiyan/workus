@@ -8,6 +8,7 @@ export const EMPLOYEE_LIMITS = {
   linkedin: 255,
   telegram: 33,
   address: 500,
+  salary: 16,
   responsibles: 10,
 } as const;
 
@@ -21,6 +22,8 @@ const MESSAGES = {
   emailTooLong: 'validation:email.tooLong',
   positionRequired: 'validation:position.required',
   startDateInvalid: 'validation:startDate.invalid',
+  startingSalaryRequired: 'validation:startingSalary.required',
+  salaryInvalid: 'validation:salary.invalid',
   mobileInvalid: 'validation:mobile.invalid',
   personalEmailInvalid: 'validation:personalEmail.invalid',
   linkedinInvalid: 'validation:linkedin.invalid',
@@ -62,6 +65,16 @@ export const createEmployeeSchema = z.object({
     .pipe(z.email(MESSAGES.emailInvalid)),
   positionId: z.uuid(MESSAGES.positionRequired),
   startDate: z.iso.date(MESSAGES.startDateInvalid),
+  /** Monthly USD, a decimal string with up to two places — never a number (data.md → Money). */
+  startingSalary: z
+    .string()
+    .trim()
+    .min(1, MESSAGES.startingSalaryRequired)
+    .max(EMPLOYEE_LIMITS.salary, MESSAGES.salaryInvalid)
+    .refine(
+      (value) => /^\d{1,13}(\.\d{1,2})?$/.test(value) && /[1-9]/.test(value),
+      MESSAGES.salaryInvalid,
+    ),
   mobile: optionalMatching(
     EMPLOYEE_LIMITS.mobile,
     /^\+?[0-9][0-9 ()-]{5,30}$/,
@@ -98,6 +111,7 @@ export const DETAILS_FIELDS = [
   'email',
   'positionId',
   'startDate',
+  'startingSalary',
   'mobile',
   'personalEmail',
   'linkedinUrl',

@@ -24,6 +24,9 @@ export default tseslint.config(
       'boundaries/include': ['src/**/*'],
       'boundaries/elements': [
         { type: 'app', pattern: 'src/app' },
+        // Features grouped like the backend modules (employee/core, employee/review) come first:
+        // the first matching element wins.
+        { type: 'feature', pattern: 'src/features/employee/*', capture: ['featureName'] },
         { type: 'feature', pattern: 'src/features/*', capture: ['featureName'] },
         { type: 'shared', pattern: 'src/shared' },
         { type: 'theme', pattern: 'src/theme' },
@@ -77,7 +80,11 @@ export default tseslint.config(
         {
           paths: [{ name: '@mui/icons-material', message: 'Import icons individually.' }],
           patterns: [
-            { group: ['@/features/*/*'], message: 'Import a feature only through its index.ts.' },
+            {
+              // A grouped feature's index is @/features/<group>/<feature>; anything deeper is internal.
+              group: ['@/features/*/*', '!@/features/employee/*', '@/features/employee/*/*'],
+              message: 'Import a feature only through its index.ts.',
+            },
             { group: ['../../*'], message: 'No ../../ chains — use the @/ alias.' },
             { group: ['framer-motion'], message: 'Use motion/react.' },
           ],
@@ -93,11 +100,38 @@ export default tseslint.config(
         {
           paths: [{ name: '@mui/icons-material', message: 'Import icons individually.' }],
           patterns: [
-            { group: ['@/features/*/*'], message: 'Import a feature only through its index.ts.' },
+            {
+              // A grouped feature's index is @/features/<group>/<feature>; anything deeper is internal.
+              group: ['@/features/*/*', '!@/features/employee/*', '@/features/employee/*/*'],
+              message: 'Import a feature only through its index.ts.',
+            },
             { group: ['@/app', '@/app/*'], message: 'Features never import app/.' },
             {
               group: ['../../*'],
               message: 'Another feature is reached only through @/features/<name>.',
+            },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    // Files at the root of a grouped feature: a sibling feature is one level up, not two.
+    files: ['src/features/employee/*/*.{ts,tsx}'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          paths: [{ name: '@mui/icons-material', message: 'Import icons individually.' }],
+          patterns: [
+            {
+              group: ['@/features/*/*', '!@/features/employee/*', '@/features/employee/*/*'],
+              message: 'Import a feature only through its index.ts.',
+            },
+            { group: ['@/app', '@/app/*'], message: 'Features never import app/.' },
+            {
+              group: ['../../*', '../*/**', '!../*/'],
+              message: 'Another feature is reached only through @/features/<group>/<name>.',
             },
           ],
         },

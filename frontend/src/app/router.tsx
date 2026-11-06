@@ -2,7 +2,7 @@ import { Suspense, type ReactNode } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router';
 import { LoginPage, RequireAuth } from '@/features/auth';
 import { DashboardPage } from '@/features/dashboard';
-import { EmployeeProfilePage, EmployeesPage } from '@/features/employee';
+import { EmployeeProfilePage, EmployeesPage } from '@/features/employee/core';
 import { ADMIN_ONLY, AppLayout, RequireRole, SectionPlaceholderPage } from '@/features/shell';
 import { PageLoader } from '@/shared/components/PageLoader';
 import { RouteErrorBoundary } from '@/shared/components/RouteErrorBoundary';
