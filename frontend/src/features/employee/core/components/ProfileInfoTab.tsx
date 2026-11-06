@@ -1,7 +1,6 @@
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import ContactPhoneOutlined from '@mui/icons-material/ContactPhoneOutlined';
 import Link from '@mui/material/Link';
-import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 import { addMonthsIso, formatCalendarDate, todayIso, yearsAndMonthsBetween } from '../format';
 import type { EmployeeProfileMock } from '../mocks/employeeProfileMock';
@@ -136,9 +135,6 @@ export function ProfileInfoTab({ employee, mock }: ProfileInfoTabProps) {
           { key: 'address', label: t('profile.fields.address'), value: contacts.address },
         ]}
       />
-      <Typography variant="caption" color="textSecondary" className="px-4 sm:px-6">
-        {t('profile.sampleNotice')}
-      </Typography>
     </div>
   );
 }

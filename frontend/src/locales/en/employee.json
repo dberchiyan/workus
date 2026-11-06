@@ -93,7 +93,6 @@
     "responsible": {
       "intro": "Choose who looks after this employee. You can skip this and assign people later.",
       "label": "Responsible people",
-      "hint": "Search by name or email",
       "noOptions": "No one found",
       "loading": "Searching…",
       "roles": {
@@ -171,8 +170,7 @@
       "sickDays": "Sick days",
       "cycle": "Current cycle: {{start}} – {{end}}",
       "available": "Available",
-      "used": "Used",
-      "sample": "Sample data — balances arrive with Time off"
+      "used": "Used"
     },
     "files": {
       "empty": "No files yet",
@@ -229,7 +227,6 @@
     "notFound": {
       "title": "Employee not found",
       "description": "The employee may have been removed, or the link is wrong."
-    },
-    "sampleNotice": "Some details on this page are sample data until the matching features exist."
+    }
   }
 }

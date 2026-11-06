@@ -113,9 +113,6 @@ export default function EmployeeProfilePage() {
             toneClass="bg-avatar-c4"
             balance={mock.sickDays}
           />
-          <Typography variant="caption" color="textSecondary">
-            {t('profile.leave.sample')}
-          </Typography>
         </aside>
       </div>
     </div>

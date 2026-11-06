@@ -47,7 +47,7 @@ export function ResponsibleStep({ form, responsibles, onChange }: ResponsibleSte
         onSearch={setSearch}
         max={EMPLOYEE_LIMITS.responsibles}
         error={Boolean(error)}
-        helperText={message(error, EMPLOYEE_LIMITS.responsibles, t('add.responsible.hint'))}
+        helperText={message(error, EMPLOYEE_LIMITS.responsibles)}
         noOptionsText={t('add.responsible.noOptions')}
         loadingText={t('add.responsible.loading')}
         inputRef={inputRef}
