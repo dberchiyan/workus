@@ -1,0 +1,69 @@
+# Whole app on one machine: docker compose up --build → http://localhost:8080
+# Local use only (http, dev seed allowed). Values come from .env (copy .env.example).
+name: workus
+
+services:
+  db:
+    image: postgres:18.6-alpine
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-workus}
+      POSTGRES_USER: ${DATABASE_USERNAME:-workus}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:?Set DATABASE_PASSWORD in .env}
+    ports:
+      - '${DATABASE_PORT:-5433}:5432'
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      APP_ENV: dev
+      NODE_ENV: production
+      PORT: '3000'
+      TZ: UTC
+      DATABASE_HOST: db
+      DATABASE_PORT: '5432'
+      DATABASE_NAME: ${DATABASE_NAME:-workus}
+      DATABASE_USERNAME: ${DATABASE_USERNAME:-workus}
+      DATABASE_PASSWORD: ${DATABASE_PASSWORD}
+      DB_POOL_SIZE: '10'
+      DB_QUERY_LOG: 'false'
+      # nginx (frontend) sits in front.
+      TRUST_PROXY_HOPS: '1'
+      SESSION_COOKIE_NAME: workus_session
+      COOKIE_DOMAIN: ''
+      # Plain http on localhost.
+      COOKIE_SECURE: 'false'
+      COOKIE_SAME_SITE: lax
+      SESSION_IDLE_TIMEOUT_MINUTES: '1440'
+      SESSION_ABSOLUTE_TIMEOUT_MINUTES: '1440'
+      CORS_ALLOWED_ORIGINS: http://localhost:${APP_PORT:-8080}
+      SUPPORTED_LOCALES: en
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://localhost:3000/health/live >/dev/null || exit 1']
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - '${APP_PORT:-8080}:80'
+    restart: unless-stopped
+
+volumes:
+  db-data:
