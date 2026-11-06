@@ -4,19 +4,23 @@ import { z } from 'zod';
 import { PrismaClient } from '../src/generated/prisma/client';
 import { PasswordHasher } from '../src/modules/auth/service/password-hasher.service';
 import { UserRole } from '../src/modules/user/service/user-role';
-import { ADMINS, contactsFor, EMPLOYEES, POSITION_CATEGORIES } from './seed-data';
+import { databaseUrl } from '../src/common/config/database-url';
+import { ADMINS, contactsFor, EMPLOYEES, POSITION_CATEGORIES, SEED_PASSWORD } from './seed-data';
 import { seedActivity } from './seed-activity';
 import { seedReviews } from './seed-reviews';
 import { seedTimeOff } from './seed-time-off';
 
 /**
- * Development seed (APP_ENV=dev only): 2 admins and 40 employees sharing SEED_USER_PASSWORD,
- * position categories and positions, responsibles. Idempotent — existing rows are kept.
+ * Development seed (APP_ENV=dev only): admins and employees sharing SEED_PASSWORD, position
+ * categories and positions, responsibles. Idempotent — existing rows are kept.
  */
 const seedEnv = z.object({
   APP_ENV: z.literal('dev'),
-  DATABASE_URL: z.url(),
-  SEED_USER_PASSWORD: z.string().min(12).max(128),
+  DATABASE_HOST: z.string().min(1),
+  DATABASE_PORT: z.coerce.number().int().min(1).max(65535),
+  DATABASE_NAME: z.string().min(1),
+  DATABASE_USERNAME: z.string().min(1),
+  DATABASE_PASSWORD: z.string().min(1),
 });
 
 const DAY_MS = 86_400_000;
@@ -39,10 +43,18 @@ const seed = async (): Promise<void> => {
   }
   const env = seedEnv.parse(process.env);
   const prisma = new PrismaClient({
-    adapter: new PrismaPg({ connectionString: env.DATABASE_URL }),
+    adapter: new PrismaPg({
+      connectionString: databaseUrl({
+        host: env.DATABASE_HOST,
+        port: env.DATABASE_PORT,
+        name: env.DATABASE_NAME,
+        username: env.DATABASE_USERNAME,
+        password: env.DATABASE_PASSWORD,
+      }),
+    }),
   });
   try {
-    const passwordHash = await new PasswordHasher().hash(env.SEED_USER_PASSWORD);
+    const passwordHash = await new PasswordHasher().hash(SEED_PASSWORD);
     const users = await prisma.user.createMany({
       data: [
         ...ADMINS.map((admin) => ({ ...admin, role: UserRole.ADMIN, passwordHash })),

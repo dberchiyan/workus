@@ -1,5 +1,11 @@
 /** Development seed data — fictional people only. */
 
+/**
+ * Password of every seeded account. Public on purpose: the accounts are fictional and the seed
+ * runs only with APP_ENV=dev, so they never exist outside a developer's database.
+ */
+export const SEED_PASSWORD = 'Workus-Dev-2026!';
+
 export const ADMINS = [
   { firstName: 'Olivia', lastName: 'Bennett', email: 'olivia.bennett@workus.dev' },
   { firstName: 'Marcus', lastName: 'Reid', email: 'marcus.reid@workus.dev' },
