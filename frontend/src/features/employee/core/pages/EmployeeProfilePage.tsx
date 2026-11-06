@@ -1,17 +1,14 @@
 import ArrowBackOutlined from '@mui/icons-material/ArrowBackOutlined';
-import BeachAccessOutlined from '@mui/icons-material/BeachAccessOutlined';
-import EventBusyOutlined from '@mui/icons-material/EventBusyOutlined';
-import LocalHospitalOutlined from '@mui/icons-material/LocalHospitalOutlined';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useLocation, useParams } from 'react-router';
+import { EmployeeLeaveBalances } from '@/features/time-off';
 import { isApiError } from '@/shared/api/apiError';
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
 import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
 import { PATHS } from '@/shared/lib/paths';
 import { EmployeeListError, EmployeeListLoading } from '../components/EmployeeListStates';
-import { LeaveBalanceCard } from '../components/LeaveBalanceCard';
 import { ProfileEmptyState } from '../components/ProfileEmptyState';
 import { ProfileHeader } from '../components/ProfileHeader';
 import { ProfileTabs } from '../components/ProfileTabs';
@@ -76,7 +73,7 @@ export default function EmployeeProfilePage() {
     );
   }
 
-  const mock = mockEmployeeProfile(employee.id, employee.startDate);
+  const mock = mockEmployeeProfile(employee.id);
   return (
     <div className="flex flex-col gap-4">
       {back}
@@ -95,24 +92,7 @@ export default function EmployeeProfilePage() {
           <ProfileTabs employee={employee} mock={mock} />
         </div>
         <aside className="flex flex-col gap-4">
-          <LeaveBalanceCard
-            title={t('profile.leave.vacation')}
-            icon={<BeachAccessOutlined fontSize="small" />}
-            toneClass="bg-avatar-c2"
-            balance={mock.vacation}
-          />
-          <LeaveBalanceCard
-            title={t('profile.leave.daysOff')}
-            icon={<EventBusyOutlined fontSize="small" />}
-            toneClass="bg-avatar-c5"
-            balance={mock.daysOff}
-          />
-          <LeaveBalanceCard
-            title={t('profile.leave.sickDays')}
-            icon={<LocalHospitalOutlined fontSize="small" />}
-            toneClass="bg-avatar-c4"
-            balance={mock.sickDays}
-          />
+          <EmployeeLeaveBalances employeeId={employee.id} />
         </aside>
       </div>
     </div>

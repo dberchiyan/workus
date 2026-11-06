@@ -1,6 +1,12 @@
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 import { isReviewStatus, ReviewStatusChip } from '@/features/employee/review';
+import {
+  isTimeOffStatus,
+  isTimeOffType,
+  TimeOffStatusChip,
+  TimeOffTypeChip,
+} from '@/features/time-off';
 import { InitialsAvatar } from '@/shared/components/InitialsAvatar';
 import { formatMoney } from '@/shared/lib/money';
 import { fullName } from '../activityFormat';
@@ -77,6 +83,28 @@ export function ActivityValueView({ value }: { value: ActivityValue }) {
           {isTerminationReason(value.reason)
             ? t(`termination.reasons.${value.reason}`)
             : value.reason}
+        </Typography>
+      );
+    case 'timeOffType':
+      return isTimeOffType(value.type) ? (
+        <TimeOffTypeChip type={value.type} />
+      ) : (
+        <Typography variant="body2" component="span">
+          {value.type}
+        </Typography>
+      );
+    case 'timeOffStatus':
+      return isTimeOffStatus(value.status) ? (
+        <TimeOffStatusChip status={value.status} />
+      ) : (
+        <Typography variant="body2" component="span">
+          {value.status}
+        </Typography>
+      );
+    case 'number':
+      return (
+        <Typography variant="body2" component="span" className="app-tabular">
+          {new Intl.NumberFormat(i18n.language).format(value.number)}
         </Typography>
       );
     case 'feedback':

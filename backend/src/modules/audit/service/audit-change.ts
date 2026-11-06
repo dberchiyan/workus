@@ -21,6 +21,9 @@ export const AuditValueSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('feedback') }),
   z.object({ kind: z.literal('terminationReason'), reason: z.string().max(32) }),
   z.object({ kind: z.literal('redacted') }),
+  z.object({ kind: z.literal('timeOffType'), type: z.string().max(16) }),
+  z.object({ kind: z.literal('timeOffStatus'), status: z.string().max(16) }),
+  z.object({ kind: z.literal('number'), number: z.number().int() }),
 ]);
 export type AuditValue = z.infer<typeof AuditValueSchema>;
 
@@ -47,6 +50,12 @@ export const AuditField = {
   TERMINATION_DATE: 'terminationDate',
   TERMINATION_REASON: 'terminationReason',
   TERMINATION_COMMENT: 'terminationComment',
+  TIME_OFF_TYPE: 'timeOffType',
+  PERIOD_START: 'periodStart',
+  PERIOD_END: 'periodEnd',
+  DAYS: 'days',
+  NOTE: 'note',
+  DECISION_COMMENT: 'decisionComment',
 } as const;
 export type AuditField = (typeof AuditField)[keyof typeof AuditField];
 export const AUDIT_FIELDS = Object.values(AuditField) as [AuditField, ...AuditField[]];
@@ -71,6 +80,9 @@ export const auditValue = {
   feedback: (): AuditValue => ({ kind: 'feedback' }),
   terminationReason: (reason: string): AuditValue => ({ kind: 'terminationReason', reason }),
   redacted: (): AuditValue => ({ kind: 'redacted' }),
+  timeOffType: (type: string): AuditValue => ({ kind: 'timeOffType', type }),
+  timeOffStatus: (status: string): AuditValue => ({ kind: 'timeOffStatus', status }),
+  number: (number: number): AuditValue => ({ kind: 'number', number }),
 };
 
 /** Deep equality for JSON values; jsonb reorders object keys, so key order is ignored. */

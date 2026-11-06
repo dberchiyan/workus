@@ -58,3 +58,11 @@ export interface EmployeeProfile {
   employee: EmployeeProfileRecord;
   today: Date;
 }
+
+/** For time off: the employee's dates and responsible people (who decide requests). */
+export interface EmployeeForTimeOff {
+  id: string;
+  startDate: Date;
+  terminatedOn: Date | null;
+  responsibleUserIds: string[];
+}

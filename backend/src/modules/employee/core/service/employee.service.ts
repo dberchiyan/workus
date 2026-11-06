@@ -18,12 +18,14 @@ import { EmployeeRepository } from '../repository/employee.repository';
 import type {
   EmployeeListItemRecord,
   EmployeeProfileRecord,
+  EmployeeTimeOffRecord,
 } from '../repository/record/employee.record';
 import { minusDays, todayUtc } from './calendar-date';
 import type { EmployeeSortField } from './employee-sort';
 import type { EmployeeStatus } from './employee-status';
 import type {
   CreateEmployeeCommand,
+  EmployeeForTimeOff,
   EmployeeProfile,
   TerminateEmployeeCommand,
   UpdateEmployeeCommand,
@@ -478,6 +480,18 @@ export class EmployeeService {
     return { employee, today: todayUtc() };
   }
 
+  /** For other modules (time off): the caller's employee record; null for admins (none). */
+  async findForTimeOffByUserId(userId: string): Promise<EmployeeForTimeOff | null> {
+    const employee = await this.employeeRepository.findTimeOffByUserId(userId);
+    return employee ? toTimeOff(employee) : null;
+  }
+
+  /** For other modules (time off): one employee; null when unknown. */
+  async findForTimeOff(employeeId: string): Promise<EmployeeForTimeOff | null> {
+    const employee = await this.employeeRepository.findTimeOffById(employeeId);
+    return employee ? toTimeOff(employee) : null;
+  }
+
   /** For other modules: does the employee exist? */
   exists(id: string): Promise<boolean> {
     return this.employeeRepository.existsById(id);
@@ -525,3 +539,10 @@ const peopleOf = (employee: EmployeeProfileRecord) => {
     .sort((left, right) => left.id.localeCompare(right.id));
   return people.length > 0 ? auditValue.people(people) : null;
 };
+
+const toTimeOff = (employee: EmployeeTimeOffRecord): EmployeeForTimeOff => ({
+  id: employee.id,
+  startDate: employee.startDate,
+  terminatedOn: employee.terminatedOn,
+  responsibleUserIds: employee.responsibles.map(({ responsibleUserId }) => responsibleUserId),
+});

@@ -79,3 +79,14 @@ export const employeeProfileSelect = {
 export type EmployeeProfileRecord = Prisma.EmployeeGetPayload<{
   select: typeof employeeProfileSelect;
 }>;
+
+/** What other modules need to plan time off: dates and who decides. */
+export const employeeTimeOffSelect = {
+  id: true,
+  startDate: true,
+  terminatedOn: true,
+  responsibles: { select: { responsibleUserId: true }, take: 10 },
+} satisfies Prisma.EmployeeSelect;
+export type EmployeeTimeOffRecord = Prisma.EmployeeGetPayload<{
+  select: typeof employeeTimeOffSelect;
+}>;

@@ -57,4 +57,16 @@ export class AuditEventRepository {
     ]);
     return { content, totalElements };
   }
+
+  /** Oldest first; bounded (a request has a handful of events). */
+  findByTargets(targetIds: string[]): Promise<AuditEventRecord[]> {
+    return this.txHost.tx.auditEvent.findMany({
+      where: { targetId: { in: targetIds } },
+      select: auditEventSelect,
+      orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
+      take: targetIds.length * MAX_EVENTS_PER_TARGET,
+    });
+  }
 }
+
+const MAX_EVENTS_PER_TARGET = 20;

@@ -18,6 +18,8 @@ import {
   positionOptionSelect,
   type ResponsibleCandidateRecord,
   responsibleCandidateSelect,
+  type EmployeeTimeOffRecord,
+  employeeTimeOffSelect,
 } from './record/employee.record';
 
 const orderByFor = (
@@ -208,6 +210,14 @@ export class EmployeeRepository {
       },
     });
     return count > 0;
+  }
+
+  findTimeOffByUserId(userId: string): Promise<EmployeeTimeOffRecord | null> {
+    return this.txHost.tx.employee.findUnique({ where: { userId }, select: employeeTimeOffSelect });
+  }
+
+  findTimeOffById(id: string): Promise<EmployeeTimeOffRecord | null> {
+    return this.txHost.tx.employee.findUnique({ where: { id }, select: employeeTimeOffSelect });
   }
 
   findProfileById(id: string): Promise<EmployeeProfileRecord | null> {

@@ -7,6 +7,7 @@ import enErrors from '@/locales/en/errors.json';
 import enDashboard from '@/locales/en/dashboard.json';
 import enReview from '@/locales/en/review.json';
 import enShell from '@/locales/en/shell.json';
+import enTimeOff from '@/locales/en/timeOff.json';
 import enValidation from '@/locales/en/validation.json';
 
 export const SUPPORTED_LOCALES = ['en'] as const;
@@ -22,6 +23,7 @@ export const resources = {
     employee: enEmployee,
     review: enReview,
     shell: enShell,
+    timeOff: enTimeOff,
   },
 } as const;
 

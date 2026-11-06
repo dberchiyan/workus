@@ -102,7 +102,9 @@ export const seedReviews = async (
       employee.responsibleUserIds.length > 0
         ? employee.responsibleUserIds
         : [fallbackResponsibleId];
-    const end = employee.terminatedOn ?? today;
+    // Completed reviews happen up to today, or up to the last day if that came first.
+    const end =
+      employee.terminatedOn && employee.terminatedOn < today ? employee.terminatedOn : today;
     let salary = new Prisma.Decimal(BASE_SALARY[employee.categoryName] ?? 3000).plus(
       (index % 5) * 100,
     );

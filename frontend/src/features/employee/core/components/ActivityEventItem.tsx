@@ -1,6 +1,9 @@
 import AddOutlined from '@mui/icons-material/AddOutlined';
 import DeleteOutlineOutlined from '@mui/icons-material/DeleteOutlineOutlined';
 import EditOutlined from '@mui/icons-material/EditOutlined';
+import EventAvailableOutlined from '@mui/icons-material/EventAvailableOutlined';
+import EventBusyOutlined from '@mui/icons-material/EventBusyOutlined';
+import EventNoteOutlined from '@mui/icons-material/EventNoteOutlined';
 import PersonAddAlt1Outlined from '@mui/icons-material/PersonAddAlt1Outlined';
 import PersonRemoveOutlined from '@mui/icons-material/PersonRemoveOutlined';
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
@@ -41,6 +44,26 @@ const ACTION_STYLE = {
     headline: 'profile.activity.headline.employeeTerminationCanceled',
     icon: UndoOutlined,
     tone: 'bg-badge-active-background text-badge-active-text',
+  },
+  'time_off_request.created': {
+    headline: 'profile.activity.headline.timeOffCreated',
+    icon: EventNoteOutlined,
+    tone: 'bg-badge-active-background text-badge-active-text',
+  },
+  'time_off_request.approved': {
+    headline: 'profile.activity.headline.timeOffApproved',
+    icon: EventAvailableOutlined,
+    tone: 'bg-success-light text-success-dark dark:text-success',
+  },
+  'time_off_request.rejected': {
+    headline: 'profile.activity.headline.timeOffRejected',
+    icon: EventBusyOutlined,
+    tone: 'bg-badge-neutral-background text-error',
+  },
+  'time_off_request.canceled': {
+    headline: 'profile.activity.headline.timeOffCanceled',
+    icon: UndoOutlined,
+    tone: 'bg-badge-neutral-background text-badge-neutral-text',
   },
   'review.created': {
     headline: 'profile.activity.headline.reviewCreated',

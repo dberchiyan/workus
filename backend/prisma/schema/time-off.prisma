@@ -1,0 +1,46 @@
+/// A time-off request of an employee: a type, an inclusive date range and the working days it
+/// takes. Decided (approved / rejected) by the employee's responsible people; the employee may
+/// cancel it. Its history lives in audit_events (target_type time_off_request).
+model TimeOffRequest {
+  id              String                      @id(map: "pk_time_off_requests") @default(dbgenerated("uuidv7()")) @db.Uuid
+  employeeId      String                      @map("employee_id") @db.Uuid
+  employee        Employee                    @relation(fields: [employeeId], references: [id], onDelete: Restrict, map: "fk_time_off_requests_employee_id")
+  type            String                      @db.VarChar(16) // VACATION | SICK_DAY | DAY_OFF — CHECK in migration
+  startDate       DateTime                    @map("start_date") @db.Date
+  endDate         DateTime                    @map("end_date") @db.Date // inclusive; >= start_date — CHECK
+  /// Working days (Mon–Fri) in the range, counted when the request was made; > 0 — CHECK.
+  days            Int
+  status          String                      @db.VarChar(16) // PENDING | APPROVED | REJECTED | CANCELED — CHECK
+  /// The employee's note.
+  note            String?                     @db.VarChar(500)
+  /// Why it was rejected (or a note with the approval).
+  decisionComment String?                     @map("decision_comment") @db.VarChar(500)
+  decidedBy       String?                     @map("decided_by") @db.Uuid
+  decider         User?                       @relation("TimeOffRequestDecider", fields: [decidedBy], references: [id], onDelete: Restrict, map: "fk_time_off_requests_decided_by")
+  decidedAt       DateTime?                   @map("decided_at") @db.Timestamptz(3)
+  createdAt       DateTime                    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt       DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy       String?                     @map("created_by") @db.Uuid
+  updatedBy       String?                     @map("updated_by") @db.Uuid
+  version         Int                         @default(0)
+  responsibles    TimeOffRequestResponsible[]
+
+  @@index([employeeId, startDate], map: "idx_time_off_requests_employee_id_start_date")
+  @@index([decidedBy], map: "idx_time_off_requests_decided_by")
+  @@map("time_off_requests")
+}
+
+/// Who may decide the request: the employee's responsible people when it was made.
+model TimeOffRequestResponsible {
+  requestId         String         @map("request_id") @db.Uuid
+  // The assignment means nothing without the request.
+  request           TimeOffRequest @relation(fields: [requestId], references: [id], onDelete: Cascade, map: "fk_time_off_request_responsibles_request_id")
+  responsibleUserId String         @map("responsible_user_id") @db.Uuid
+  responsible       User           @relation("TimeOffRequestResponsibleUser", fields: [responsibleUserId], references: [id], onDelete: Restrict, map: "fk_time_off_request_responsibles_responsible_user_id")
+  createdAt         DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy         String?        @map("created_by") @db.Uuid
+
+  @@id([requestId, responsibleUserId], map: "pk_time_off_request_responsibles")
+  @@index([responsibleUserId], map: "idx_time_off_request_responsibles_responsible_user_id")
+  @@map("time_off_request_responsibles")
+}

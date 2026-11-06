@@ -23,6 +23,7 @@ import { AuthModule } from './modules/auth/auth.module';
 import { EmployeeModule } from './modules/employee/core/employee.module';
 import { EmploymentModule } from './modules/employee/employment/employment.module';
 import { ReviewModule } from './modules/employee/review/review.module';
+import { TimeOffModule } from './modules/time-off/time-off.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -43,6 +44,7 @@ import { UserModule } from './modules/user/user.module';
     EmployeeModule,
     ReviewModule,
     EmploymentModule,
+    TimeOffModule,
   ],
   providers: [
     // Guards run in registration order (security.md → Guards).

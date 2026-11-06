@@ -12,6 +12,8 @@ export interface AuditActor {
   id: string;
   firstName: string;
   lastName: string;
+  /** Null for admins (no employee record). */
+  positionTitle: string | null;
 }
 
 export interface AuditEvent {

@@ -171,14 +171,6 @@
       "saving": "Saving…",
       "cancel": "Cancel"
     },
-    "leave": {
-      "vacation": "Vacation days",
-      "daysOff": "Days off",
-      "sickDays": "Sick days",
-      "cycle": "Current cycle: {{start}} – {{end}}",
-      "available": "Available",
-      "used": "Used"
-    },
     "files": {
       "empty": "No files yet",
       "emptyHint": "Contracts, certificates and other documents will appear here."
@@ -205,7 +197,11 @@
         "reviewDeleted": "<actor>{{actor}}</actor> deleted the review <target>“{{target}}”</target>",
         "employeeUpdated": "<actor>{{actor}}</actor> updated <target>{{target}}</target>",
         "employeeTerminated": "<actor>{{actor}}</actor> terminated <target>{{target}}</target>",
-        "employeeTerminationCanceled": "<actor>{{actor}}</actor> canceled the termination of <target>{{target}}</target>"
+        "employeeTerminationCanceled": "<actor>{{actor}}</actor> canceled the termination of <target>{{target}}</target>",
+        "timeOffCreated": "<actor>{{actor}}</actor> requested time off <target>{{target}}</target>",
+        "timeOffApproved": "<actor>{{actor}}</actor> approved the time off <target>{{target}}</target>",
+        "timeOffRejected": "<actor>{{actor}}</actor> rejected the time off <target>{{target}}</target>",
+        "timeOffCanceled": "<actor>{{actor}}</actor> canceled the time off <target>{{target}}</target>"
       },
       "fields": {
         "title": "Title",
@@ -229,7 +225,13 @@
         "address": "Address",
         "terminationDate": "Termination date",
         "terminationReason": "Reason",
-        "terminationComment": "Comment"
+        "terminationComment": "Comment",
+        "timeOffType": "Type",
+        "periodStart": "First day",
+        "periodEnd": "Last day",
+        "days": "Working days",
+        "note": "Note",
+        "decisionComment": "Reason"
       },
       "previous": "Before:",
       "current": "After:",

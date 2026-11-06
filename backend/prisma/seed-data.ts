@@ -35,7 +35,7 @@ export interface SeedEmployee {
    * history); recent hires have only their starting salary.
    */
   startedDaysAgo: number;
-  /** Termination as days before the seed run; absent → active. */
+  /** Termination as days before the seed run (negative = planned); absent → active. */
   terminatedDaysAgo?: number;
   /** With a termination: one of the termination reasons; OTHER needs a comment. */
   terminationReason?: 'RESIGNATION' | 'DISMISSAL' | 'END_OF_CONTRACT' | 'LAYOFF' | 'OTHER';

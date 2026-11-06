@@ -68,6 +68,15 @@ export class AuditService {
     };
   }
 
+  /** History of several targets (e.g. a page of requests), oldest first. */
+  async findByTargets(targetIds: string[]): Promise<AuditEvent[]> {
+    if (targetIds.length === 0) {
+      return [];
+    }
+    const records = await this.auditEventRepository.findByTargets(targetIds);
+    return records.flatMap((record) => this.toEvent(record));
+  }
+
   /** Rows are guarded by CHECK constraints; a summary that no longer parses shows no details. */
   private toEvent(record: AuditEventRecord): AuditEvent[] {
     if (!isAction(record.action) || !isTargetType(record.targetType)) {
@@ -83,7 +92,14 @@ export class AuditService {
         id: record.id,
         occurredAt: record.occurredAt,
         action: record.action,
-        actor: record.actor,
+        actor: record.actor
+          ? {
+              id: record.actor.id,
+              firstName: record.actor.firstName,
+              lastName: record.actor.lastName,
+              positionTitle: record.actor.employee?.position.title ?? null,
+            }
+          : null,
         target: { type: record.targetType, id: record.targetId, label: record.targetLabel },
         changes: changes.success ? changes.data : [],
       },

@@ -8,6 +8,13 @@ export const auditEventSelect = {
   targetId: true,
   targetLabel: true,
   changes: true,
-  actor: { select: { id: true, firstName: true, lastName: true } },
+  actor: {
+    select: {
+      id: true,
+      firstName: true,
+      lastName: true,
+      employee: { select: { position: { select: { title: true } } } },
+    },
+  },
 } satisfies Prisma.AuditEventSelect;
 export type AuditEventRecord = Prisma.AuditEventGetPayload<{ select: typeof auditEventSelect }>;

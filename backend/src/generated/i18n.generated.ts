@@ -39,6 +39,15 @@ export type I18nTranslations = {
             "startingStatusLocked": string;
             "reviewsBeforeStart": string;
         };
+        "timeOff": {
+            "beforeStart": string;
+            "afterTermination": string;
+            "noWorkingDays": string;
+            "overlaps": string;
+            "notEnoughDays": string;
+            "noResponsible": string;
+            "notCancelable": string;
+        };
     };
     "validation": {
         "invalid": string;
@@ -120,6 +129,18 @@ export type I18nTranslations = {
         "terminationComment": {
             "tooLong": string;
             "requiredForOther": string;
+        };
+        "timeOffType": {
+            "required": string;
+        };
+        "period": {
+            "start": string;
+            "end": string;
+            "order": string;
+            "tooLong": string;
+        };
+        "note": {
+            "tooLong": string;
         };
     };
 };

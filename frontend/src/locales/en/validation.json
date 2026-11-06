@@ -78,5 +78,17 @@
   "terminationComment": {
     "tooLong": "Comment must be at most {{max}} characters",
     "requiredForOther": "Describe the reason"
+  },
+  "timeOffType": {
+    "required": "Choose a type"
+  },
+  "period": {
+    "start": "Enter the first day",
+    "end": "Enter the last day",
+    "order": "The last day can’t be before the first day",
+    "tooLong": "A request can cover at most {{max}} days"
+  },
+  "note": {
+    "tooLong": "Note must be at most {{max}} characters"
   }
 }

@@ -7,6 +7,10 @@ export const AuditAction = {
   REVIEW_CREATED: 'review.created',
   REVIEW_UPDATED: 'review.updated',
   REVIEW_DELETED: 'review.deleted',
+  TIME_OFF_REQUEST_CREATED: 'time_off_request.created',
+  TIME_OFF_REQUEST_APPROVED: 'time_off_request.approved',
+  TIME_OFF_REQUEST_REJECTED: 'time_off_request.rejected',
+  TIME_OFF_REQUEST_CANCELED: 'time_off_request.canceled',
 } as const;
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];
 export const AUDIT_ACTIONS = Object.values(AuditAction) as [AuditAction, ...AuditAction[]];
@@ -15,6 +19,7 @@ export const AUDIT_ACTIONS = Object.values(AuditAction) as [AuditAction, ...Audi
 export const AuditTargetType = {
   EMPLOYEE: 'employee',
   REVIEW: 'review',
+  TIME_OFF_REQUEST: 'time_off_request',
 } as const;
 export type AuditTargetType = (typeof AuditTargetType)[keyof typeof AuditTargetType];
 export const AUDIT_TARGET_TYPES = Object.values(AuditTargetType) as [

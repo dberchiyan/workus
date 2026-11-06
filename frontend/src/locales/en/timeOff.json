@@ -1,0 +1,115 @@
+{
+  "balances": {
+    "title": "Available days",
+    "subtitle": "Your leave balances in the current cycles",
+    "cycle": "Current cycle: {{start}} – {{end}}",
+    "available": "Available",
+    "used": "Used",
+    "pending_one": "{{count}} day pending",
+    "pending_other": "{{count}} days pending",
+    "loading": "Loading balances…",
+    "error": "Couldn’t load the balances",
+    "retry": "Try again",
+    "noLimit": "No limit — days are counted"
+  },
+  "types": {
+    "VACATION": "Vacation",
+    "SICK_DAY": "Sick day",
+    "DAY_OFF": "Day off"
+  },
+  "cardTitles": {
+    "VACATION": "Vacation days",
+    "SICK_DAY": "Sick days",
+    "DAY_OFF": "Days off"
+  },
+  "status": {
+    "PENDING": "Pending",
+    "APPROVED": "Approved",
+    "REJECTED": "Rejected",
+    "CANCELED": "Canceled"
+  },
+  "requests": {
+    "title": "Your requests",
+    "subtitle": "Pending requests and anything that changed today",
+    "create": "Create request",
+    "caption": "Your pending requests and those changed today, newest first",
+    "loading": "Loading requests…",
+    "error": "Couldn’t load your requests",
+    "retry": "Try again",
+    "empty": "Nothing pending",
+    "emptyHint": "No requests are waiting for a decision and nothing changed today. Create a request for vacation, a sick day or a day off.",
+    "loadMore": "Show older requests",
+    "loadingMore": "Loading…",
+    "shown": "Showing {{shown}} of {{total}}",
+    "end": "That’s everything pending or changed today",
+    "columns": {
+      "type": "Request type",
+      "period": "Period",
+      "created": "Created",
+      "responsible": "Responsible",
+      "status": "Status",
+      "details": "Details"
+    },
+    "days_one": "{{count}} working day",
+    "days_other": "{{count}} working days",
+    "showDetails": "Show details of the {{type}} request, {{period}}",
+    "hideDetails": "Hide details of the {{type}} request, {{period}}",
+    "more": "+{{count}}",
+    "responsibleLabel": "Responsible: {{names}}"
+  },
+  "details": {
+    "responsible_one": "Responsible",
+    "responsible_other": "Responsible ({{count}})",
+    "status": "Request status",
+    "decidedBy": "Decided by {{name}} on {{date}}",
+    "waiting": "Waiting for a decision",
+    "history": "History",
+    "comments": "Comments",
+    "note": "Your note",
+    "decisionComment": "Reason from {{name}}",
+    "noComments": "No comments",
+    "cancel": "Cancel request",
+    "admin": "Administrator",
+    "actions": {
+      "CREATED": "Created the request",
+      "APPROVED": "Approved",
+      "REJECTED": "Rejected",
+      "CANCELED": "Canceled"
+    }
+  },
+  "create": {
+    "title": "Create new request",
+    "type": "Request type",
+    "startDate": "First day",
+    "endDate": "Last day",
+    "note": "Comment",
+    "noteHint": "Optional — context for your responsible people",
+    "summary_one": "{{count}} working day",
+    "summary_other": "{{count}} working days",
+    "summaryNone": "Pick dates with at least one working day",
+    "submit": "Send request",
+    "submitting": "Sending…",
+    "cancel": "Cancel",
+    "close": "Close",
+    "range": "Choose a date range",
+    "daysAvailable": "Days available",
+    "unlimited": "No limit",
+    "notePlaceholder": "Add a comment",
+    "overBalance": "more than available"
+  },
+  "cancel": {
+    "title": "Cancel this request?",
+    "description": "The {{type}} request for {{period}} will be canceled. This can’t be undone — create a new request if you change your mind.",
+    "confirm": "Cancel request",
+    "keep": "Keep it",
+    "canceling": "Canceling…"
+  },
+  "notice": {
+    "created": "Request sent",
+    "canceled": "Request canceled"
+  },
+  "calendar": {
+    "previous": "Previous month",
+    "next": "Next month"
+  }
+}

@@ -7,6 +7,7 @@ import { UserRole } from '../src/modules/user/service/user-role';
 import { ADMINS, contactsFor, EMPLOYEES, POSITION_CATEGORIES } from './seed-data';
 import { seedActivity } from './seed-activity';
 import { seedReviews } from './seed-reviews';
+import { seedTimeOff } from './seed-time-off';
 
 /**
  * Development seed (APP_ENV=dev only): 2 admins and 40 employees sharing SEED_USER_PASSWORD,
@@ -183,9 +184,10 @@ const seed = async (): Promise<void> => {
     );
 
     const activity = await seedActivity(prisma, admins);
+    const timeOff = await seedTimeOff(prisma, admins[0] ?? '');
 
     process.stdout.write(
-      `Seeded ${activity} activity events, ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}\n`,
+      `Seeded ${timeOff} time-off requests, ${activity} activity events, ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}\n`,
     );
   } finally {
     await prisma.$disconnect();

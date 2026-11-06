@@ -22,5 +22,6 @@ model AuditEvent {
 
   @@index([employeeId, occurredAt], map: "idx_audit_events_employee_id_occurred_at")
   @@index([actorUserId], map: "idx_audit_events_actor_user_id")
+  @@index([targetId, occurredAt], map: "idx_audit_events_target_id_occurred_at")
   @@map("audit_events")
 }

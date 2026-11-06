@@ -31,5 +31,14 @@
     "startingDateLocked": "The starting salary is always dated the employee’s start date",
     "startingStatusLocked": "The starting salary is always a completed review",
     "reviewsBeforeStart": "Another review is dated before this start date — move or delete it first"
+  },
+  "timeOff": {
+    "beforeStart": "Time off can’t start before your start date",
+    "afterTermination": "Time off can’t reach past your last day",
+    "noWorkingDays": "These dates have no working days — choose Monday to Friday",
+    "overlaps": "You already have a request for some of these days",
+    "notEnoughDays": "Only {available} days are left in this cycle; this request takes {requested}",
+    "noResponsible": "Nobody is responsible for you yet, so no one can approve the request — ask an admin",
+    "notCancelable": "This request can no longer be canceled"
   }
 }

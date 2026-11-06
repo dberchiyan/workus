@@ -28,4 +28,8 @@ export const can = {
   manageEmployees: policy([], (principal) => principal.hasAuthority('ADMIN')),
   /** Edit one employee (e.g. their responsible people): admin, for the employee in the path. */
   manageEmployee: policy(['employeeId'], (principal) => principal.hasAuthority('ADMIN')),
+  /** One time-off request: the caller's own (the request belongs to their employee record). */
+  cancelOwnTimeOffRequest: policy(['requestId'], (principal, args, permissions) =>
+    permissions.isOwnTimeOffRequest(principal.userId, args.requestId ?? ''),
+  ),
 } as const;
