@@ -72,3 +72,14 @@ export const CreateEmployeeRequestSchema = z.object({
 });
 
 export class CreateEmployeeRequest extends createZodDto(CreateEmployeeRequestSchema) {}
+
+/**
+ * Edit the profile: the same fields as when adding, without responsibles (edited on their own)
+ * and the starting salary (edited as its review). An absent contact clears it.
+ */
+export class UpdateEmployeeRequest extends createZodDto(
+  CreateEmployeeRequestSchema.omit({ responsibleUserIds: true, startingSalary: true }).extend({
+    /** The version the client read; a stale one is 409 CONCURRENT_MODIFICATION. */
+    version: z.number().int().min(0),
+  }),
+) {}

@@ -3,7 +3,8 @@ import { MoneySchema } from '../../../common/dto/money';
 
 /**
  * One value in a change summary. Typed, so the client formats it (dates, money, people) and
- * never parses free text. Feedback is logged as present/absent only — its text stays out of the log.
+ * never parses free text. Feedback is logged as present/absent only — its text stays out of the log;
+ * personal contacts are logged as "changed" (`redacted`) without their values.
  */
 const PersonSchema = z.object({
   id: z.uuid(),
@@ -18,6 +19,8 @@ export const AuditValueSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('reviewStatus'), status: z.string().max(32) }),
   z.object({ kind: z.literal('people'), people: z.array(PersonSchema).max(20) }),
   z.object({ kind: z.literal('feedback') }),
+  z.object({ kind: z.literal('terminationReason'), reason: z.string().max(32) }),
+  z.object({ kind: z.literal('redacted') }),
 ]);
 export type AuditValue = z.infer<typeof AuditValueSchema>;
 
@@ -33,6 +36,17 @@ export const AuditField = {
   FEEDBACK_CLIENT: 'feedbackClient',
   POSITION: 'position',
   START_DATE: 'startDate',
+  FIRST_NAME: 'firstName',
+  LAST_NAME: 'lastName',
+  EMAIL: 'email',
+  MOBILE: 'mobile',
+  PERSONAL_EMAIL: 'personalEmail',
+  LINKEDIN_URL: 'linkedinUrl',
+  TELEGRAM: 'telegram',
+  ADDRESS: 'address',
+  TERMINATION_DATE: 'terminationDate',
+  TERMINATION_REASON: 'terminationReason',
+  TERMINATION_COMMENT: 'terminationComment',
 } as const;
 export type AuditField = (typeof AuditField)[keyof typeof AuditField];
 export const AUDIT_FIELDS = Object.values(AuditField) as [AuditField, ...AuditField[]];
@@ -55,6 +69,8 @@ export const auditValue = {
   reviewStatus: (status: string): AuditValue => ({ kind: 'reviewStatus', status }),
   people: (people: z.infer<typeof PersonSchema>[]): AuditValue => ({ kind: 'people', people }),
   feedback: (): AuditValue => ({ kind: 'feedback' }),
+  terminationReason: (reason: string): AuditValue => ({ kind: 'terminationReason', reason }),
+  redacted: (): AuditValue => ({ kind: 'redacted' }),
 };
 
 /** Deep equality for JSON values; jsonb reorders object keys, so key order is ignored. */

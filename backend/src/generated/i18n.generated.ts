@@ -27,12 +27,17 @@ export type I18nTranslations = {
             "emailTaken": string;
             "positionNotFound": string;
             "responsibleNotFound": string;
+            "selfResponsible": string;
+            "startAfterTermination": string;
+            "terminationBeforeStart": string;
+            "terminationReasonInvalid": string;
         };
         "review": {
             "responsibleNotFound": string;
             "startingNotDeletable": string;
             "startingDateLocked": string;
             "startingStatusLocked": string;
+            "reviewsBeforeStart": string;
         };
     };
     "validation": {
@@ -105,6 +110,16 @@ export type I18nTranslations = {
         };
         "startingSalary": {
             "required": string;
+        };
+        "terminationReason": {
+            "required": string;
+        };
+        "terminationDate": {
+            "invalid": string;
+        };
+        "terminationComment": {
+            "tooLong": string;
+            "requiredForOther": string;
         };
     };
 };

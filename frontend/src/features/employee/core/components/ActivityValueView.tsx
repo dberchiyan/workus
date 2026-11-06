@@ -5,6 +5,7 @@ import { InitialsAvatar } from '@/shared/components/InitialsAvatar';
 import { formatMoney } from '@/shared/lib/money';
 import { fullName } from '../activityFormat';
 import { formatCalendarDate } from '../format';
+import { isTerminationReason } from '../schemas';
 import type { ActivityValue } from '../types';
 
 type Person = Extract<ActivityValue, { kind: 'people' }>['people'][number];
@@ -40,7 +41,7 @@ export function PeopleList({ people }: { people: Person[] }) {
 
 /** One logged value, formatted by its kind. */
 export function ActivityValueView({ value }: { value: ActivityValue }) {
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation('employee');
   switch (value.kind) {
     case 'text':
       return (
@@ -70,8 +71,17 @@ export function ActivityValueView({ value }: { value: ActivityValue }) {
       );
     case 'people':
       return <PeopleList people={value.people} />;
+    case 'terminationReason':
+      return (
+        <Typography variant="body2" component="span">
+          {isTerminationReason(value.reason)
+            ? t(`termination.reasons.${value.reason}`)
+            : value.reason}
+        </Typography>
+      );
     case 'feedback':
-      // Rendered by the change row (added / edited / removed); the text is never logged.
+    case 'redacted':
+      // Rendered by the change row (added / edited / removed); the value is never logged.
       return null;
   }
 }

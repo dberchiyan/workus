@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { TerminationReason } from './types';
 
 /** Mirrors backend CreateEmployeeRequestSchema (employee/controller/dto/create-employee.request.ts). */
 export const EMPLOYEE_LIMITS = {
@@ -30,6 +31,10 @@ const MESSAGES = {
   telegramInvalid: 'validation:telegram.invalid',
   addressTooLong: 'validation:address.tooLong',
   responsiblesTooMany: 'validation:responsibles.tooMany',
+  terminationDateInvalid: 'validation:terminationDate.invalid',
+  terminationReasonRequired: 'validation:terminationReason.required',
+  terminationCommentTooLong: 'validation:terminationComment.tooLong',
+  terminationCommentRequired: 'validation:terminationComment.requiredForOther',
 } as const;
 
 export type EmployeeValidationMessage = (typeof MESSAGES)[keyof typeof MESSAGES];
@@ -104,6 +109,37 @@ export const createEmployeeSchema = z.object({
 export type CreateEmployeeFormValues = z.input<typeof createEmployeeSchema>;
 export type CreateEmployeeFormOutput = z.output<typeof createEmployeeSchema>;
 
+/** Edit profile: the Add employee details without the starting salary (edited as its review). */
+export const updateEmployeeSchema = createEmployeeSchema.omit({
+  startingSalary: true,
+  responsibleUserIds: true,
+});
+export type UpdateEmployeeFormValues = z.input<typeof updateEmployeeSchema>;
+export type UpdateEmployeeFormOutput = z.output<typeof updateEmployeeSchema>;
+
+export const TERMINATION_COMMENT_MAX = 500;
+
+/** Mirrors backend TerminateEmployeeRequest. */
+export const terminateEmployeeSchema = z
+  .object({
+    date: z.iso.date('validation:terminationDate.invalid'),
+    reason: z.string().min(1, 'validation:terminationReason.required'),
+    comment: z
+      .string()
+      .trim()
+      .max(TERMINATION_COMMENT_MAX, 'validation:terminationComment.tooLong'),
+  })
+  .superRefine((values, context) => {
+    if (values.reason === 'OTHER' && values.comment === '') {
+      context.addIssue({
+        code: 'custom',
+        path: ['comment'],
+        message: 'validation:terminationComment.requiredForOther',
+      });
+    }
+  });
+export type TerminateEmployeeFormValues = z.input<typeof terminateEmployeeSchema>;
+
 /** Fields validated when leaving step 1 ("Details"). */
 export const DETAILS_FIELDS = [
   'firstName',
@@ -118,3 +154,14 @@ export const DETAILS_FIELDS = [
   'telegram',
   'address',
 ] as const satisfies readonly (keyof CreateEmployeeFormValues)[];
+
+export const TERMINATION_REASONS = [
+  'RESIGNATION',
+  'DISMISSAL',
+  'END_OF_CONTRACT',
+  'LAYOFF',
+  'OTHER',
+] as const satisfies readonly TerminationReason[];
+const TERMINATION_REASON_SET: ReadonlySet<string> = new Set(TERMINATION_REASONS);
+export const isTerminationReason = (value: string): value is TerminationReason =>
+  TERMINATION_REASON_SET.has(value);

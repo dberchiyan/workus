@@ -100,7 +100,7 @@ export interface paths {
         get: operations["EmployeeController_list"];
         put?: never;
         /** Create an employee with their account, responsibles and starting salary */
-        post: operations["HiringController_hire"];
+        post: operations["EmploymentController_hire"];
         delete?: never;
         options?: never;
         head?: never;
@@ -133,7 +133,25 @@ export interface paths {
         };
         /** Return one employee with contacts and responsibles */
         get: operations["EmployeeController_profile"];
-        put?: never;
+        /** Edit name, work email, position, start date and contacts; the version must match the one read */
+        put: operations["EmploymentController_update"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/{employeeId}/responsibles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace the employee's responsible people; the version must match the one read */
+        put: operations["EmployeeController_updateResponsibles"];
         post?: never;
         delete?: never;
         options?: never;
@@ -246,6 +264,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/employees/{employeeId}/termination": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Terminate the employee from a date (or change the termination); later scheduled reviews are canceled */
+        put: operations["EmploymentController_terminate"];
+        post?: never;
+        /** Cancel the termination; the employee is active again */
+        delete: operations["EmploymentController_cancelTermination"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -328,6 +364,8 @@ export interface components {
             averageTenureDays: number;
             withoutResponsible: number;
         };
+        /** @enum {string} */
+        TerminationReason_Output: "RESIGNATION" | "DISMISSAL" | "END_OF_CONTRACT" | "LAYOFF" | "OTHER";
         EmployeeProfileResponse_Output: {
             /** Format: uuid */
             id: string;
@@ -352,6 +390,10 @@ export interface components {
             startDate: string;
             /** Format: date */
             terminatedOn: string | null;
+            termination: {
+                reason: components["schemas"]["TerminationReason_Output"];
+                comment: string | null;
+            } | null;
             status: components["schemas"]["EmployeeStatus_Output"];
             contacts: {
                 mobile: string | null;
@@ -372,6 +414,11 @@ export interface components {
             }[];
             /** Format: date-time */
             createdAt: string;
+            version: number;
+        };
+        UpdateResponsiblesRequest: {
+            responsibleUserIds: string[];
+            version: number;
         };
         Money_Output: {
             amount: string;
@@ -384,7 +431,7 @@ export interface components {
                 /** Format: date-time */
                 occurredAt: string;
                 /** @enum {string} */
-                action: "employee.created" | "review.created" | "review.updated" | "review.deleted";
+                action: "employee.created" | "employee.updated" | "employee.terminated" | "employee.termination_canceled" | "review.created" | "review.updated" | "review.deleted";
                 actor: {
                     /** Format: uuid */
                     id: string;
@@ -400,7 +447,7 @@ export interface components {
                 };
                 changes: {
                     /** @enum {string} */
-                    field: "title" | "date" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startDate";
+                    field: "title" | "date" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startDate" | "firstName" | "lastName" | "email" | "mobile" | "personalEmail" | "linkedinUrl" | "telegram" | "address" | "terminationDate" | "terminationReason" | "terminationComment";
                     from: ({
                         /** @enum {string} */
                         kind: "text";
@@ -430,6 +477,13 @@ export interface components {
                     } | {
                         /** @enum {string} */
                         kind: "feedback";
+                    } | {
+                        /** @enum {string} */
+                        kind: "terminationReason";
+                        reason: string;
+                    } | {
+                        /** @enum {string} */
+                        kind: "redacted";
                     }) | null;
                     to: ({
                         /** @enum {string} */
@@ -460,6 +514,13 @@ export interface components {
                     } | {
                         /** @enum {string} */
                         kind: "feedback";
+                    } | {
+                        /** @enum {string} */
+                        kind: "terminationReason";
+                        reason: string;
+                    } | {
+                        /** @enum {string} */
+                        kind: "redacted";
                     }) | null;
                 }[];
             }[];
@@ -829,6 +890,33 @@ export interface components {
             firstName: string;
             lastName: string;
         };
+        UpdateEmployeeRequest: {
+            firstName: string;
+            lastName: string;
+            email: string;
+            /** Format: uuid */
+            positionId: string;
+            /** Format: date */
+            startDate: string;
+            mobile?: string;
+            personalEmail?: string;
+            linkedinUrl?: string;
+            telegram?: string;
+            address?: string;
+            version: number;
+        };
+        /** @enum {string} */
+        TerminationReason: "RESIGNATION" | "DISMISSAL" | "END_OF_CONTRACT" | "LAYOFF" | "OTHER";
+        TerminateEmployeeRequest: {
+            /** Format: date */
+            date: string;
+            reason: components["schemas"]["TerminationReason"];
+            comment?: string;
+            version: number;
+        };
+        CancelTerminationRequest: {
+            version: number;
+        };
         /** @enum {string} */
         EmployeeStatus: "ACTIVE" | "TERMINATED";
     };
@@ -1064,7 +1152,7 @@ export interface operations {
             };
         };
     };
-    HiringController_hire: {
+    EmploymentController_hire: {
         parameters: {
             query?: never;
             header: {
@@ -1218,6 +1306,152 @@ export interface operations {
             };
             /** @description RESOURCE_NOT_FOUND */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmploymentController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateEmployeeRequest"];
+            };
+        };
+        responses: {
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT | CONCURRENT_MODIFICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmployeeController_updateResponsibles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateResponsiblesRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeProfileResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONCURRENT_MODIFICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -1735,6 +1969,135 @@ export interface operations {
             };
             /** @description BUSINESS_RULE_VIOLATION */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmploymentController_terminate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["TerminateEmployeeRequest"];
+            };
+        };
+        responses: {
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONCURRENT_MODIFICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmploymentController_cancelTermination: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CancelTerminationRequest"];
+            };
+        };
+        responses: {
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONCURRENT_MODIFICATION */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

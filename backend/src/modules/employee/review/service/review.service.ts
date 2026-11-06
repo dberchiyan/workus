@@ -7,6 +7,7 @@ import {
 } from '../../../../common/exception/api.exception';
 import { Currency, percentChange, toDecimal } from '../../../../common/persistence/money';
 import { AuditAction, AuditTargetType } from '../../../audit/service/audit-action';
+import { AuditField, auditValue, changeOf } from '../../../audit/service/audit-change';
 import { AuditService } from '../../../audit/service/audit.service';
 import { EmployeeService } from '../../core/service/employee.service';
 import type { ReviewRecord } from '../repository/record/review.record';
@@ -113,7 +114,7 @@ export class ReviewService {
   }
 
   /**
-   * For other modules (hiring): the employee's salary at hire, as a completed review dated the
+   * For other modules (employment): the employee's salary at hire, as a completed review dated the
    * start date. Part of the caller's transaction.
    */
   @Transactional()
@@ -136,6 +137,66 @@ export class ReviewService {
       },
       actorId,
     );
+  }
+
+  /**
+   * For other modules (employment): the start date changed — the starting salary moves with it.
+   * Refused when another review is dated before the new start date. Part of the caller's
+   * transaction.
+   */
+  @Transactional()
+  async moveStarting(employeeId: string, startDate: string, actorId: string): Promise<void> {
+    const date = new Date(`${startDate}T00:00:00Z`);
+    if (await this.reviewRepository.existsRegularBefore(employeeId, date)) {
+      throw new BusinessRuleException('errors.review.reviewsBeforeStart', {}, 'startDate');
+    }
+    const starting = await this.reviewRepository.findStarting(employeeId);
+    if (!starting || starting.reviewDate.getTime() === date.getTime()) {
+      return;
+    }
+    await this.reviewRepository.moveDate(starting.id, date, actorId);
+    await this.auditService.record({
+      action: AuditAction.REVIEW_UPDATED,
+      employeeId,
+      target: { type: AuditTargetType.REVIEW, id: starting.id, label: starting.title },
+      changes: changeOf(
+        AuditField.DATE,
+        auditValue.date(starting.reviewDate),
+        auditValue.date(date),
+      ),
+    });
+  }
+
+  /**
+   * For other modules (employment): the employee leaves on `date` — reviews still scheduled after
+   * it are canceled (each recorded). Part of the caller's transaction. Returns how many.
+   */
+  @Transactional()
+  async cancelScheduledAfter(employeeId: string, date: string, actorId: string): Promise<number> {
+    const reviews = await this.reviewRepository.findScheduledAfter(
+      employeeId,
+      new Date(`${date}T00:00:00Z`),
+    );
+    if (reviews.length === 0) {
+      return 0;
+    }
+    await this.reviewRepository.cancelMany(
+      reviews.map((review) => review.id),
+      actorId,
+    );
+    await this.auditService.recordMany(
+      reviews.map((review) => ({
+        action: AuditAction.REVIEW_UPDATED,
+        employeeId,
+        target: { type: AuditTargetType.REVIEW, id: review.id, label: review.title },
+        changes: changeOf(
+          AuditField.STATUS,
+          auditValue.reviewStatus(ReviewStatus.SCHEDULED),
+          auditValue.reviewStatus(ReviewStatus.CANCELED),
+        ),
+      })),
+    );
+    return reviews.length;
   }
 
   private async insert(

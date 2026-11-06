@@ -2,7 +2,9 @@ import AddOutlined from '@mui/icons-material/AddOutlined';
 import DeleteOutlineOutlined from '@mui/icons-material/DeleteOutlineOutlined';
 import EditOutlined from '@mui/icons-material/EditOutlined';
 import PersonAddAlt1Outlined from '@mui/icons-material/PersonAddAlt1Outlined';
+import PersonRemoveOutlined from '@mui/icons-material/PersonRemoveOutlined';
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
+import UndoOutlined from '@mui/icons-material/UndoOutlined';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
@@ -24,6 +26,21 @@ const ACTION_STYLE = {
     headline: 'profile.activity.headline.employeeCreated',
     icon: PersonAddAlt1Outlined,
     tone: 'bg-success-light text-success-dark dark:text-success',
+  },
+  'employee.updated': {
+    headline: 'profile.activity.headline.employeeUpdated',
+    icon: EditOutlined,
+    tone: 'bg-badge-active-background text-badge-active-text',
+  },
+  'employee.terminated': {
+    headline: 'profile.activity.headline.employeeTerminated',
+    icon: PersonRemoveOutlined,
+    tone: 'bg-badge-neutral-background text-error',
+  },
+  'employee.termination_canceled': {
+    headline: 'profile.activity.headline.employeeTerminationCanceled',
+    icon: UndoOutlined,
+    tone: 'bg-badge-active-background text-badge-active-text',
   },
   'review.created': {
     headline: 'profile.activity.headline.reviewCreated',

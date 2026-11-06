@@ -1,6 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 import { USER_ROLES } from '../../../../user/service/user-role';
+import { TerminationReasonSchema } from '../../service/termination-reason';
 import { EmployeeStatusSchema } from './employee-filter.query';
 
 export class EmployeeProfileResponse extends createZodDto(
@@ -18,6 +19,13 @@ export class EmployeeProfileResponse extends createZodDto(
     }),
     startDate: z.iso.date(),
     terminatedOn: z.iso.date().nullable(),
+    /** Set together with terminatedOn. */
+    termination: z
+      .object({
+        reason: TerminationReasonSchema,
+        comment: z.string().nullable(),
+      })
+      .nullable(),
     status: EmployeeStatusSchema,
     contacts: z.object({
       mobile: z.string().nullable(),
@@ -37,5 +45,7 @@ export class EmployeeProfileResponse extends createZodDto(
       }),
     ),
     createdAt: z.iso.datetime(),
+    /** Send back on update (optimistic locking). */
+    version: z.number().int().min(0),
   }),
 ) {}

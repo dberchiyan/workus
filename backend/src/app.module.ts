@@ -21,7 +21,7 @@ import { SecurityModule } from './common/security/security.module';
 import { SessionGuard } from './common/security/session.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { EmployeeModule } from './modules/employee/core/employee.module';
-import { HiringModule } from './modules/employee/hiring/hiring.module';
+import { EmploymentModule } from './modules/employee/employment/employment.module';
 import { ReviewModule } from './modules/employee/review/review.module';
 import { UserModule } from './modules/user/user.module';
 
@@ -42,7 +42,7 @@ import { UserModule } from './modules/user/user.module';
     AuthModule,
     EmployeeModule,
     ReviewModule,
-    HiringModule,
+    EmploymentModule,
   ],
   providers: [
     // Guards run in registration order (security.md → Guards).

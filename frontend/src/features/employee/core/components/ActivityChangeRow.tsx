@@ -122,7 +122,8 @@ export function ActivityChangeRow({ change }: { change: ActivityChange }) {
   const { field, from, to } = change;
 
   let value: ReactNode;
-  if (FEEDBACK_FIELDS.has(field)) {
+  // Feedback and personal contacts are logged without their values: only that they changed.
+  if (FEEDBACK_FIELDS.has(field) || from?.kind === 'redacted' || to?.kind === 'redacted') {
     const state = from && to ? 'edited' : to ? 'added' : 'removed';
     value = (
       <Typography
@@ -130,7 +131,7 @@ export function ActivityChangeRow({ change }: { change: ActivityChange }) {
         component="span"
         color={state === 'removed' ? 'textSecondary' : 'textPrimary'}
       >
-        {t(`profile.activity.feedback.${state}`)}
+        {t(`profile.activity.presence.${state}`)}
       </Typography>
     );
   } else if (from && to && from.kind === 'people') {

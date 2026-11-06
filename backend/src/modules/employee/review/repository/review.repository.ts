@@ -4,6 +4,8 @@ import { Injectable } from '@nestjs/common';
 import type { Decimal } from '../../../../common/persistence/money';
 import type { PrismaService } from '../../../../common/persistence/prisma.service';
 import { Prisma } from '../../../../generated/prisma/client';
+import { ReviewKind } from '../service/review-kind';
+import { ReviewStatus } from '../service/review-status';
 import type { RichTextDoc } from '../service/rich-text';
 import { MAX_REVIEWS, type ReviewRecord, reviewSelect } from './record/review.record';
 
@@ -116,5 +118,48 @@ export class ReviewRepository {
 
   async delete(reviewId: string): Promise<void> {
     await this.txHost.tx.employeeReview.deleteMany({ where: { id: reviewId } });
+  }
+
+  findStarting(
+    employeeId: string,
+  ): Promise<{ id: string; title: string; reviewDate: Date } | null> {
+    return this.txHost.tx.employeeReview.findFirst({
+      where: { employeeId, kind: ReviewKind.STARTING },
+      select: { id: true, title: true, reviewDate: true },
+    });
+  }
+
+  /** Any other review dated before `date`? */
+  async existsRegularBefore(employeeId: string, date: Date): Promise<boolean> {
+    return (
+      (await this.txHost.tx.employeeReview.count({
+        where: { employeeId, kind: { not: ReviewKind.STARTING }, reviewDate: { lt: date } },
+      })) > 0
+    );
+  }
+
+  async moveDate(reviewId: string, reviewDate: Date, updatedBy: string): Promise<void> {
+    await this.txHost.tx.employeeReview.update({
+      where: { id: reviewId },
+      data: { reviewDate, updatedBy, version: { increment: 1 } },
+      select: { id: true },
+    });
+  }
+
+  /** Scheduled reviews dated after `date` (bounded like every list). */
+  findScheduledAfter(employeeId: string, date: Date): Promise<{ id: string; title: string }[]> {
+    return this.txHost.tx.employeeReview.findMany({
+      where: { employeeId, status: ReviewStatus.SCHEDULED, reviewDate: { gt: date } },
+      select: { id: true, title: true },
+      orderBy: { reviewDate: 'asc' },
+      take: MAX_REVIEWS,
+    });
+  }
+
+  async cancelMany(reviewIds: string[], updatedBy: string): Promise<void> {
+    await this.txHost.tx.employeeReview.updateMany({
+      where: { id: { in: reviewIds }, status: ReviewStatus.SCHEDULED },
+      data: { status: ReviewStatus.CANCELED, updatedBy, version: { increment: 1 } },
+    });
   }
 }

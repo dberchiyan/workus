@@ -10,6 +10,9 @@ import type {
   EmployeeProfile,
   EmployeeSummary,
   PositionOption,
+  TerminateEmployeeRequest,
+  UpdateEmployeeRequest,
+  UpdateResponsiblesRequest,
   ResponsibleCandidate,
 } from '../types';
 
@@ -60,6 +63,24 @@ export const employeeApi = {
         headers: { 'Idempotency-Key': idempotencyKey },
       })
     ).data,
+  /** Replaces the responsible people; `version` is the one read (stale → 409). */
+  updateResponsibles: async (
+    employeeId: string,
+    request: UpdateResponsiblesRequest,
+  ): Promise<EmployeeProfile> =>
+    (await apiClient.put<EmployeeProfile>(`/api/v1/employees/${employeeId}/responsibles`, request))
+      .data,
+  /** Name, work email, position, start date, contacts; `version` is the one read. */
+  update: async (employeeId: string, request: UpdateEmployeeRequest): Promise<void> => {
+    await apiClient.put(`/api/v1/employees/${employeeId}`, request);
+  },
+  /** Terminate from a date, or change the termination. */
+  terminate: async (employeeId: string, request: TerminateEmployeeRequest): Promise<void> => {
+    await apiClient.put(`/api/v1/employees/${employeeId}/termination`, request);
+  },
+  cancelTermination: async (employeeId: string, version: number): Promise<void> => {
+    await apiClient.delete(`/api/v1/employees/${employeeId}/termination`, { data: { version } });
+  },
   positions: async (): Promise<PositionOption[]> =>
     (await apiClient.get<{ content: PositionOption[] }>('/api/v1/positions')).data.content,
   responsibleCandidates: async (search: string): Promise<ResponsibleCandidate[]> =>

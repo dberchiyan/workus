@@ -68,5 +68,15 @@
   },
   "startingSalary": {
     "required": "Enter the starting salary"
+  },
+  "terminationReason": {
+    "required": "Choose a reason"
+  },
+  "terminationDate": {
+    "invalid": "Enter the termination date"
+  },
+  "terminationComment": {
+    "tooLong": "Comment must be at most {max} characters",
+    "requiredForOther": "Describe the reason"
   }
 }

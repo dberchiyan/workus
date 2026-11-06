@@ -32,6 +32,10 @@ export type EmployeeProfile = Schemas['EmployeeProfileResponse_Output'];
 
 /** A candidate as shown in the people picker. */
 export type ResponsibleOption = ResponsibleCandidate & { subtitle: string };
+export type UpdateResponsiblesRequest = Schemas['UpdateResponsiblesRequest'];
+export type UpdateEmployeeRequest = Schemas['UpdateEmployeeRequest'];
+export type TerminateEmployeeRequest = Schemas['TerminateEmployeeRequest'];
+export type TerminationReason = Schemas['TerminationReason_Output'];
 
 export type ActivityPage = Schemas['EmployeeActivityPageResponse_Output'];
 export type ActivityEvent = ActivityPage['content'][number];

@@ -6,7 +6,12 @@ import type {
   CreateEmployeeRequest,
   EmployeeFilters,
   EmployeeListParams,
+  EmployeeProfile,
+  TerminateEmployeeRequest,
+  UpdateEmployeeRequest,
+  UpdateResponsiblesRequest,
 } from '../types';
+import { employeeReviewsKey } from '@/features/employee/review';
 import { employeeKeys } from './queryKeys';
 
 export const useEmployees = (params: EmployeeListParams) =>
@@ -65,6 +70,64 @@ export const useCreateEmployee = () => {
     },
   });
 };
+
+/** Not optimistic; on success the profile, its history, the list and the cards are refetched. */
+export const useUpdateResponsibles = (employeeId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation<EmployeeProfile, ApiError, UpdateResponsiblesRequest>({
+    mutationFn: (request) => employeeApi.updateResponsibles(employeeId, request),
+    onSuccess: async (profile) => {
+      queryClient.setQueryData(employeeKeys.detail(employeeId), profile);
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: employeeKeys.activity(employeeId) }),
+        queryClient.invalidateQueries({ queryKey: employeeKeys.lists() }),
+        queryClient.invalidateQueries({ queryKey: employeeKeys.summary() }),
+      ]);
+    },
+  });
+};
+
+/**
+ * Profile edits, terminations and their cancellation change the profile, its history, the list,
+ * the cards, the tab counts and — through the start date or canceled reviews — the reviews.
+ * Not optimistic.
+ */
+const useEmploymentMutation = <TVariables>(
+  employeeId: string,
+  mutationFn: (variables: TVariables) => Promise<void>,
+) => {
+  const queryClient = useQueryClient();
+  return useMutation<unknown, ApiError, TVariables>({
+    mutationFn,
+    onSuccess: async () => {
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: employeeKeys.detail(employeeId) }),
+        queryClient.invalidateQueries({ queryKey: employeeKeys.lists() }),
+        queryClient.invalidateQueries({ queryKey: employeeKeys.summary() }),
+        queryClient.invalidateQueries({ queryKey: [...employeeKeys.all, 'categories'] }),
+        queryClient.invalidateQueries({
+          queryKey: [...employeeKeys.all, 'responsible-candidates'],
+        }),
+        queryClient.invalidateQueries({ queryKey: employeeReviewsKey(employeeId) }),
+      ]);
+    },
+  });
+};
+
+export const useUpdateEmployee = (employeeId: string) =>
+  useEmploymentMutation(employeeId, (request: UpdateEmployeeRequest) =>
+    employeeApi.update(employeeId, request),
+  );
+
+export const useTerminateEmployee = (employeeId: string) =>
+  useEmploymentMutation(employeeId, (request: TerminateEmployeeRequest) =>
+    employeeApi.terminate(employeeId, request),
+  );
+
+export const useCancelTermination = (employeeId: string) =>
+  useEmploymentMutation(employeeId, (version: number) =>
+    employeeApi.cancelTermination(employeeId, version),
+  );
 
 export const useEmployeeProfile = (employeeId: string) =>
   useQuery({

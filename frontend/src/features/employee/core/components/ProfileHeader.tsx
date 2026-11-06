@@ -1,23 +1,38 @@
+import EventBusyOutlined from '@mui/icons-material/EventBusyOutlined';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import type { RefObject } from 'react';
 import { useTranslation } from 'react-i18next';
 import { InitialsAvatar } from '@/shared/components/InitialsAvatar';
+import { formatCalendarDate } from '../format';
 import type { EmployeeProfile } from '../types';
 import { EmployeeStatusChip } from './EmployeeStatusChip';
+import { ProfileActions } from './ProfileActions';
 
 export interface ProfileHeaderProps {
   employee: EmployeeProfile;
   headingRef: RefObject<HTMLHeadingElement | null>;
 }
 
-/** Name, position and status. Profile actions (edit, terminate) will sit on the right. */
+/** Name, position, status (with the termination, if any) and the profile actions. */
 export function ProfileHeader({ employee, headingRef }: ProfileHeaderProps) {
-  const { t } = useTranslation('employee');
+  const { t, i18n } = useTranslation('employee');
+  const termination =
+    employee.termination && employee.terminatedOn
+      ? t(
+          employee.status === 'TERMINATED'
+            ? 'profile.termination.since'
+            : 'profile.termination.leaves',
+          {
+            date: formatCalendarDate(employee.terminatedOn, i18n.language),
+            reason: t(`termination.reasons.${employee.termination.reason}`),
+          },
+        )
+      : null;
   return (
     <Card variant="outlined" className="flex-1">
-      <CardContent className="flex flex-wrap items-center gap-4 p-5 sm:p-6">
+      <CardContent className="flex items-center gap-4 p-5 sm:p-6">
         <InitialsAvatar
           id={employee.userId}
           firstName={employee.firstName}
@@ -44,6 +59,19 @@ export function ProfileHeader({ employee, headingRef }: ProfileHeaderProps) {
             {employee.email}
             <span className="sr-only">{`, ${t(`profile.roles.${employee.role}`)}`}</span>
           </Typography>
+          {termination && (
+            <Typography
+              variant="body2"
+              color={employee.status === 'TERMINATED' ? 'textSecondary' : 'warning'}
+              className="flex items-center gap-1"
+            >
+              <EventBusyOutlined aria-hidden fontSize="small" />
+              {termination}
+            </Typography>
+          )}
+        </div>
+        <div className="-mt-1 -mr-2 ml-auto self-start">
+          <ProfileActions employee={employee} />
         </div>
       </CardContent>
     </Card>

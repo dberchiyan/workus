@@ -29,6 +29,24 @@ export class UserService {
     return this.userRepository.existsByEmail(email.toLowerCase());
   }
 
+  /** Is the email taken by another user? (Compared lower-case.) */
+  isEmailTakenByOther(email: string, userId: string): Promise<boolean> {
+    return this.userRepository.existsByEmailExcept(email.toLowerCase(), userId);
+  }
+
+  /** Name and sign-in email; the email is stored lower-case. */
+  updateIdentity(
+    id: string,
+    identity: { firstName: string; lastName: string; email: string },
+    updatedBy: string,
+  ): Promise<void> {
+    return this.userRepository.updateIdentity(
+      id,
+      { ...identity, email: identity.email.toLowerCase() },
+      updatedBy,
+    );
+  }
+
   /** Returns the new user's id. Email is stored lower-case. */
   createWithoutPassword(user: NewUser): Promise<string> {
     return this.userRepository.createWithoutPassword({ ...user, email: user.email.toLowerCase() });

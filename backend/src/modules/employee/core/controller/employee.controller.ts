@@ -1,15 +1,18 @@
-import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpStatus, Put, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { ApiPageable, type Pageable, PageableQuery } from '../../../../common/dto/pageable';
 import { UuidParam } from '../../../../common/dto/uuid-param';
 import { ApiErrors } from '../../../../common/exception/api-errors.decorator';
+import { CurrentPrincipal } from '../../../../common/security/current-principal.decorator';
 import { can } from '../../../../common/security/policies';
+import type { Principal } from '../../../../common/security/principal';
 import { Authorize } from '../../../../common/security/security.decorators';
 import { EMPLOYEE_PAGEABLE, type EmployeeSortField } from '../service/employee-sort';
 import { EmployeeService } from '../service/employee.service';
 import { EmployeeProfileResponse } from './dto/employee-profile.response';
 import { EmployeeFilterQuery } from './dto/employee-filter.query';
+import { UpdateResponsiblesRequest } from './dto/update-responsibles.request';
 import { EmployeePageResponse, EmployeeSummaryResponse } from './dto/employee.response';
 import { toEmployeeProfileResponse } from './mapper/employee-profile.mapper';
 import { toEmployeePageResponse } from './mapper/employee.mapper';
@@ -69,6 +72,35 @@ export class EmployeeController {
   )
   async profile(@UuidParam('employeeId') employeeId: string): Promise<EmployeeProfileResponse> {
     const { employee, today } = await this.employeeService.findProfile(employeeId);
+    return toEmployeeProfileResponse(employee, today);
+  }
+
+  @Put(':employeeId/responsibles')
+  @Authorize(can.manageEmployee)
+  @ApiOperation({
+    summary: "Replace the employee's responsible people; the version must match the one read",
+  })
+  @ZodResponse({ status: HttpStatus.OK, type: EmployeeProfileResponse })
+  @ApiErrors(
+    'VALIDATION_FAILED',
+    'INVALID_PARAMETER',
+    'UNAUTHORIZED',
+    'SESSION_EXPIRED',
+    'FORBIDDEN',
+    'RESOURCE_NOT_FOUND',
+    'CONCURRENT_MODIFICATION',
+    'BUSINESS_RULE_VIOLATION',
+  )
+  async updateResponsibles(
+    @UuidParam('employeeId') employeeId: string,
+    @Body() request: UpdateResponsiblesRequest,
+    @CurrentPrincipal() principal: Principal,
+  ): Promise<EmployeeProfileResponse> {
+    const { employee, today } = await this.employeeService.updateResponsibles(
+      employeeId,
+      { responsibleUserIds: request.responsibleUserIds, version: request.version },
+      principal.userId,
+    );
     return toEmployeeProfileResponse(employee, today);
   }
 }

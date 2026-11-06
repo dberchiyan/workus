@@ -27,6 +27,25 @@ export class UserRepository {
     return this.txHost.tx.user.count({ where: { email } }).then((count) => count > 0);
   }
 
+  /** Is the email used by anyone other than `exceptUserId`? */
+  existsByEmailExcept(email: string, exceptUserId: string): Promise<boolean> {
+    return this.txHost.tx.user
+      .count({ where: { email, id: { not: exceptUserId } } })
+      .then((count) => count > 0);
+  }
+
+  async updateIdentity(
+    id: string,
+    identity: { firstName: string; lastName: string; email: string },
+    updatedBy: string,
+  ): Promise<void> {
+    await this.txHost.tx.user.update({
+      where: { id },
+      data: { ...identity, updatedBy, version: { increment: 1 } },
+      select: { id: true },
+    });
+  }
+
   /** No password: the person sets one later (invitation flow). */
   async createWithoutPassword(user: {
     email: string;

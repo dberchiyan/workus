@@ -42,6 +42,18 @@ export interface CreateEmployeeCommand {
   responsibleUserIds: string[];
 }
 
+export type UpdateEmployeeCommand = Omit<CreateEmployeeCommand, 'responsibleUserIds'> & {
+  version: number;
+};
+
+export interface TerminateEmployeeCommand {
+  /** Last-day semantics as stored: terminated from this date (inclusive). */
+  date: string;
+  reason: string;
+  comment: string | undefined;
+  version: number;
+}
+
 export interface EmployeeProfile {
   employee: EmployeeProfileRecord;
   today: Date;

@@ -140,6 +140,76 @@ export class EmployeeRepository {
     return id;
   }
 
+  /**
+   * Replaces the responsible people as a set. Optimistic lock: only if `version` still matches;
+   * false → someone changed the employee first.
+   */
+  async replaceResponsibles(
+    employeeId: string,
+    version: number,
+    responsibleUserIds: string[],
+    updatedBy: string,
+  ): Promise<boolean> {
+    const { count } = await this.txHost.tx.employee.updateMany({
+      where: { id: employeeId, version },
+      data: { updatedBy, version: { increment: 1 } },
+    });
+    if (count === 0) {
+      return false;
+    }
+    await this.txHost.tx.employeeResponsible.deleteMany({ where: { employeeId } });
+    await this.txHost.tx.employeeResponsible.createMany({
+      data: responsibleUserIds.map((responsibleUserId) => ({
+        employeeId,
+        responsibleUserId,
+        createdBy: updatedBy,
+      })),
+    });
+    return true;
+  }
+
+  /** Work facts and contacts; optimistic lock on `version` (false → changed by someone else). */
+  async updateDetails(
+    employeeId: string,
+    version: number,
+    details: {
+      positionId: string;
+      startDate: Date;
+      mobile: string | null;
+      personalEmail: string | null;
+      linkedinUrl: string | null;
+      telegram: string | null;
+      address: string | null;
+    },
+    updatedBy: string,
+  ): Promise<boolean> {
+    const { count } = await this.txHost.tx.employee.updateMany({
+      where: { id: employeeId, version },
+      data: { ...details, updatedBy, version: { increment: 1 } },
+    });
+    return count > 0;
+  }
+
+  /** Sets (or, with null, clears) the termination; optimistic lock on `version`. */
+  async updateTermination(
+    employeeId: string,
+    version: number,
+    termination: { terminatedOn: Date; reason: string; comment: string | null } | null,
+    updatedBy: string,
+  ): Promise<boolean> {
+    const { count } = await this.txHost.tx.employee.updateMany({
+      where: { id: employeeId, version },
+      data: {
+        terminatedOn: termination?.terminatedOn ?? null,
+        terminationReason: termination?.reason ?? null,
+        terminationComment: termination?.comment ?? null,
+        updatedBy,
+        version: { increment: 1 },
+      },
+    });
+    return count > 0;
+  }
+
   findProfileById(id: string): Promise<EmployeeProfileRecord | null> {
     return this.txHost.tx.employee.findUnique({ where: { id }, select: employeeProfileSelect });
   }

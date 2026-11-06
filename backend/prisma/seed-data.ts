@@ -37,6 +37,9 @@ export interface SeedEmployee {
   startedDaysAgo: number;
   /** Termination as days before the seed run; absent → active. */
   terminatedDaysAgo?: number;
+  /** With a termination: one of the termination reasons; OTHER needs a comment. */
+  terminationReason?: 'RESIGNATION' | 'DISMISSAL' | 'END_OF_CONTRACT' | 'LAYOFF' | 'OTHER';
+  terminationComment?: string;
   /** Nobody is responsible yet (shows on the "No responsible" card). */
   isUnassigned?: true;
 }
@@ -161,6 +164,8 @@ export const EMPLOYEES: SeedEmployee[] = [
     position: 'QA Engineer',
     startedDaysAgo: 1559,
     terminatedDaysAgo: 60,
+    terminationReason: 'RESIGNATION',
+    terminationComment: 'Moved to another city',
   },
   {
     firstName: 'Oliver',
@@ -183,6 +188,7 @@ export const EMPLOYEES: SeedEmployee[] = [
     position: 'Backend Developer',
     startedDaysAgo: 1393,
     terminatedDaysAgo: 20,
+    terminationReason: 'END_OF_CONTRACT',
   },
   {
     firstName: 'Harper',
@@ -219,6 +225,8 @@ export const EMPLOYEES: SeedEmployee[] = [
     position: 'UI/UX Designer',
     startedDaysAgo: 1227,
     terminatedDaysAgo: 110,
+    terminationReason: 'LAYOFF',
+    terminationComment: 'Project closed',
   },
   {
     firstName: 'William',
@@ -255,6 +263,8 @@ export const EMPLOYEES: SeedEmployee[] = [
     position: 'Full Stack Developer',
     startedDaysAgo: 165,
     terminatedDaysAgo: 5,
+    terminationReason: 'OTHER',
+    terminationComment: 'Relocated abroad; may return as a contractor',
   },
   {
     firstName: 'Nora',

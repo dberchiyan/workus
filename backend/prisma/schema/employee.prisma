@@ -32,26 +32,30 @@ model Position {
 
 /// HR record of a user with the EMPLOYEE (or MANAGER) role; admins have none.
 model Employee {
-  id              String                @id(map: "pk_employees") @default(dbgenerated("uuidv7()")) @db.Uuid
-  userId          String                @map("user_id") @db.Uuid
-  user            User                  @relation("EmployeeUser", fields: [userId], references: [id], onDelete: Restrict, map: "fk_employees_user_id")
-  positionId      String                @map("position_id") @db.Uuid
-  position        Position              @relation(fields: [positionId], references: [id], onDelete: Restrict, map: "fk_employees_position_id")
-  startDate       DateTime              @map("start_date") @db.Date
-  terminatedOn    DateTime?             @map("terminated_on") @db.Date // set → terminated from that day
-  mobile          String?               @db.VarChar(32)
-  personalEmail   String?               @map("personal_email") @db.VarChar(254)
-  linkedinUrl     String?               @map("linkedin_url") @db.VarChar(255)
-  telegram        String?               @db.VarChar(33) // "@handle"
-  address         String?               @db.VarChar(500)
-  createdAt       DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt       DateTime              @updatedAt @map("updated_at") @db.Timestamptz(3)
-  createdBy       String?               @map("created_by") @db.Uuid
-  updatedBy       String?               @map("updated_by") @db.Uuid
-  version         Int                   @default(0)
-  responsibles    EmployeeResponsible[]
-  employeeReviews EmployeeReview[]
-  auditEvents     AuditEvent[]
+  id                 String                @id(map: "pk_employees") @default(dbgenerated("uuidv7()")) @db.Uuid
+  userId             String                @map("user_id") @db.Uuid
+  user               User                  @relation("EmployeeUser", fields: [userId], references: [id], onDelete: Restrict, map: "fk_employees_user_id")
+  positionId         String                @map("position_id") @db.Uuid
+  position           Position              @relation(fields: [positionId], references: [id], onDelete: Restrict, map: "fk_employees_position_id")
+  startDate          DateTime              @map("start_date") @db.Date
+  terminatedOn       DateTime?             @map("terminated_on") @db.Date // set → terminated from that day
+  /// Set together with terminated_on: RESIGNATION | DISMISSAL | END_OF_CONTRACT | LAYOFF | OTHER — CHECK in migration.
+  terminationReason  String?               @map("termination_reason") @db.VarChar(32)
+  /// Optional note; required for OTHER — CHECK.
+  terminationComment String?               @map("termination_comment") @db.VarChar(500)
+  mobile             String?               @db.VarChar(32)
+  personalEmail      String?               @map("personal_email") @db.VarChar(254)
+  linkedinUrl        String?               @map("linkedin_url") @db.VarChar(255)
+  telegram           String?               @db.VarChar(33) // "@handle"
+  address            String?               @db.VarChar(500)
+  createdAt          DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt          DateTime              @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy          String?               @map("created_by") @db.Uuid
+  updatedBy          String?               @map("updated_by") @db.Uuid
+  version            Int                   @default(0)
+  responsibles       EmployeeResponsible[]
+  employeeReviews    EmployeeReview[]
+  auditEvents        AuditEvent[]
 
   @@unique([userId], map: "uq_employees_user_id")
   @@index([positionId], map: "idx_employees_position_id")

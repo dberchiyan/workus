@@ -132,7 +132,7 @@
       "workEmail": "Work email",
       "dateOfBirth": "Date of birth",
       "startDate": "Start date",
-      "terminatedOn": "Terminated on",
+      "terminatedOn": "Termination date",
       "holidayEligibility": "Holiday eligibility from",
       "laptopId": "Laptop ID",
       "additionalInfo": "Additional info",
@@ -141,7 +141,8 @@
       "personalEmail": "Personal email",
       "linkedin": "LinkedIn",
       "telegram": "Telegram",
-      "address": "Address"
+      "address": "Address",
+      "terminationReason": "Termination reason"
     },
     "values": {
       "notProvided": "Not provided",
@@ -162,7 +163,13 @@
     },
     "responsible": {
       "title": "Responsible",
-      "none": "Nobody is assigned yet"
+      "none": "Nobody is assigned yet",
+      "edit": "Edit responsible people",
+      "dialogTitle": "Responsible people",
+      "intro": "Choose who looks after {{name}}. Leave it empty if nobody is assigned yet.",
+      "save": "Save",
+      "saving": "Saving…",
+      "cancel": "Cancel"
     },
     "leave": {
       "vacation": "Vacation days",
@@ -195,7 +202,10 @@
         "employeeCreated": "<actor>{{actor}}</actor> added <target>{{target}}</target>",
         "reviewCreated": "<actor>{{actor}}</actor> added the review <target>“{{target}}”</target>",
         "reviewUpdated": "<actor>{{actor}}</actor> updated the review <target>“{{target}}”</target>",
-        "reviewDeleted": "<actor>{{actor}}</actor> deleted the review <target>“{{target}}”</target>"
+        "reviewDeleted": "<actor>{{actor}}</actor> deleted the review <target>“{{target}}”</target>",
+        "employeeUpdated": "<actor>{{actor}}</actor> updated <target>{{target}}</target>",
+        "employeeTerminated": "<actor>{{actor}}</actor> terminated <target>{{target}}</target>",
+        "employeeTerminationCanceled": "<actor>{{actor}}</actor> canceled the termination of <target>{{target}}</target>"
       },
       "fields": {
         "title": "Title",
@@ -208,12 +218,18 @@
         "feedbackTeam": "Team feedback",
         "feedbackClient": "Client feedback",
         "position": "Position",
-        "startDate": "Start date"
-      },
-      "feedback": {
-        "added": "Added",
-        "edited": "Edited",
-        "removed": "Removed"
+        "startDate": "Start date",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Work email",
+        "mobile": "Mobile",
+        "personalEmail": "Personal email",
+        "linkedinUrl": "LinkedIn",
+        "telegram": "Telegram",
+        "address": "Address",
+        "terminationDate": "Termination date",
+        "terminationReason": "Reason",
+        "terminationComment": "Comment"
       },
       "previous": "Before:",
       "current": "After:",
@@ -222,11 +238,71 @@
       "peopleRemoved": "Removed {{names}}",
       "salaryChange": "{{percent}} vs before",
       "showAll": "Show all {{count}} changes",
-      "showFewer": "Show fewer"
+      "showFewer": "Show fewer",
+      "presence": {
+        "added": "Added",
+        "edited": "Edited",
+        "removed": "Removed"
+      }
     },
     "notFound": {
       "title": "Employee not found",
       "description": "The employee may have been removed, or the link is wrong."
+    },
+    "actions": {
+      "edit": "Edit profile…",
+      "more": "More actions",
+      "moreFor": "More actions for {{name}}",
+      "terminate": "Terminate…",
+      "changeTermination": "Change termination…",
+      "cancelTermination": "Cancel termination…"
+    },
+    "termination": {
+      "since": "Terminated on {{date}} · {{reason}}",
+      "leaves": "Leaves on {{date}} · {{reason}}"
     }
+  },
+  "termination": {
+    "reasons": {
+      "RESIGNATION": "Resignation",
+      "DISMISSAL": "Dismissal",
+      "END_OF_CONTRACT": "End of contract",
+      "LAYOFF": "Layoff",
+      "OTHER": "Other"
+    }
+  },
+  "edit": {
+    "title": "Edit profile",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "hints": {
+      "startDate": "The starting salary moves with it"
+    }
+  },
+  "terminate": {
+    "title": "Terminate {{name}}",
+    "changeTitle": "Change termination of {{name}}",
+    "fields": {
+      "date": "Termination date",
+      "reason": "Reason",
+      "comment": "Comment"
+    },
+    "consequence": {
+      "now": "{{name}} will be terminated right away and drop out of the active list and responsible choices.",
+      "future": "{{name}} stays active until {{date}}, then is terminated.",
+      "reviews": "Reviews scheduled after the termination date will be canceled."
+    },
+    "submit": "Terminate {{name}}",
+    "saveChange": "Save changes",
+    "saving": "Saving…",
+    "cancel": "Cancel"
+  },
+  "cancelTermination": {
+    "title": "Cancel termination?",
+    "description": "{{name}} will be active again (the termination on {{date}} is removed). Reviews canceled by the termination stay canceled.",
+    "confirm": "Cancel termination",
+    "keep": "Keep it",
+    "saving": "Saving…"
   }
 }

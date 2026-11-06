@@ -26,4 +26,6 @@ export const can = {
   ),
   /** Adding employees (and their accounts) is an admin action. */
   manageEmployees: policy([], (principal) => principal.hasAuthority('ADMIN')),
+  /** Edit one employee (e.g. their responsible people): admin, for the employee in the path. */
+  manageEmployee: policy(['employeeId'], (principal) => principal.hasAuthority('ADMIN')),
 } as const;

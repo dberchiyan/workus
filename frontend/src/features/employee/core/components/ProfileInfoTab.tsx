@@ -70,12 +70,19 @@ export function ProfileInfoTab({ employee, mock }: ProfileInfoTabProps) {
                         }),
             }),
           },
-          ...(employee.terminatedOn
+          ...(employee.terminatedOn && employee.termination
             ? [
                 {
                   key: 'terminated',
                   label: t('profile.fields.terminatedOn'),
                   value: date(employee.terminatedOn),
+                },
+                {
+                  key: 'terminationReason',
+                  label: t('profile.fields.terminationReason'),
+                  value: employee.termination.comment
+                    ? `${t(`termination.reasons.${employee.termination.reason}`)} — ${employee.termination.comment}`
+                    : t(`termination.reasons.${employee.termination.reason}`),
                 },
               ]
             : []),

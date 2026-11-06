@@ -37,6 +37,13 @@ export class AuditEventRepository {
     await this.txHost.tx.auditEvent.create({ data: row, select: { id: true } });
   }
 
+  /** One statement for several events (e.g. reviews canceled by a termination). */
+  async createMany(rows: NewAuditEventRow[]): Promise<void> {
+    if (rows.length > 0) {
+      await this.txHost.tx.auditEvent.createMany({ data: rows });
+    }
+  }
+
   async findPageByEmployee(
     employeeId: string,
     pageable: Pageable<AuditEventSortField>,

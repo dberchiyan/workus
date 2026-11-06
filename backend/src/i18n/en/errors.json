@@ -19,12 +19,17 @@
   "employee": {
     "emailTaken": "An account with the email “{email}” already exists",
     "positionNotFound": "This position no longer exists — reload and choose another",
-    "responsibleNotFound": "One of the chosen responsible people is no longer active — choose again"
+    "responsibleNotFound": "One of the chosen responsible people is no longer active — choose again",
+    "selfResponsible": "An employee can’t be responsible for themselves — choose someone else",
+    "startAfterTermination": "The start date can’t be after the termination date",
+    "terminationBeforeStart": "The termination date can’t be before the start date",
+    "terminationReasonInvalid": "Choose a reason from the list"
   },
   "review": {
     "responsibleNotFound": "One of the chosen responsible people is no longer active — choose again",
     "startingNotDeletable": "The starting salary can’t be deleted — it starts the salary history. Edit it instead",
     "startingDateLocked": "The starting salary is always dated the employee’s start date",
-    "startingStatusLocked": "The starting salary is always a completed review"
+    "startingStatusLocked": "The starting salary is always a completed review",
+    "reviewsBeforeStart": "Another review is dated before this start date — move or delete it first"
   }
 }

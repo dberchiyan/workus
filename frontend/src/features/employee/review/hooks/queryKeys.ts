@@ -4,3 +4,5 @@ export const reviewKeys = {
   forEmployee: (employeeId: string) => [...reviewKeys.all, 'employee', employeeId] as const,
   candidates: (search: string) => [...reviewKeys.all, 'candidates', search] as const,
 };
+
+export const employeeReviewsKey = (employeeId: string) => reviewKeys.forEmployee(employeeId);

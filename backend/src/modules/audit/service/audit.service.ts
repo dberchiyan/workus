@@ -33,7 +33,16 @@ export class AuditService {
    * agent and trace id come from the request context.
    */
   async record(event: NewAuditEvent): Promise<void> {
-    await this.auditEventRepository.create({
+    await this.auditEventRepository.create(this.toRow(event));
+  }
+
+  /** Several events of one change, written in one statement; same rules as `record`. */
+  async recordMany(events: NewAuditEvent[]): Promise<void> {
+    await this.auditEventRepository.createMany(events.map((event) => this.toRow(event)));
+  }
+
+  private toRow(event: NewAuditEvent) {
+    return {
       action: event.action,
       actorUserId: this.cls.get('principal')?.userId ?? null,
       employeeId: event.employeeId,
@@ -44,7 +53,7 @@ export class AuditService {
       ipAddress: this.cls.get('clientIp') ?? null,
       userAgent: this.cls.get('userAgent') ?? null,
       traceId: this.cls.isActive() ? this.cls.getId() : null,
-    });
+    };
   }
 
   /** Newest first. */

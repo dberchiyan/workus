@@ -99,6 +99,8 @@ const seed = async (): Promise<void> => {
         startDate: daysAgo(employee.startedDaysAgo),
         terminatedOn:
           employee.terminatedDaysAgo === undefined ? null : daysAgo(employee.terminatedDaysAgo),
+        terminationReason: employee.terminationReason ?? null,
+        terminationComment: employee.terminationComment ?? null,
       })),
       skipDuplicates: true,
     });

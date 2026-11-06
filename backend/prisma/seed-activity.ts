@@ -40,6 +40,9 @@ export const seedActivity = async (prisma: PrismaClient, adminIds: string[]): Pr
     select: {
       id: true,
       startDate: true,
+      terminatedOn: true,
+      terminationReason: true,
+      terminationComment: true,
       user: { select: { firstName: true, lastName: true } },
       position: { select: { title: true } },
       responsibles: {
@@ -188,6 +191,42 @@ export const seedActivity = async (prisma: PrismaClient, adminIds: string[]): Pr
           [{ field: AuditField.STATUS, from: scheduled, to: auditValue.reviewStatus('CANCELED') }],
         );
       }
+    }
+
+    if (employee.terminatedOn && employee.terminationReason) {
+      // Recorded two weeks before the last day (or a few hours ago when that is in the future).
+      event(
+        index + 1,
+        past(shift(employee.terminatedOn, -14), now),
+        AuditAction.EMPLOYEE_TERMINATED,
+        employee.id,
+        {
+          type: AuditTargetType.EMPLOYEE,
+          id: employee.id,
+          label: `${employee.user.firstName} ${employee.user.lastName}`,
+        },
+        [
+          {
+            field: AuditField.TERMINATION_DATE,
+            from: null,
+            to: auditValue.date(employee.terminatedOn),
+          },
+          {
+            field: AuditField.TERMINATION_REASON,
+            from: null,
+            to: auditValue.terminationReason(employee.terminationReason),
+          },
+          ...(employee.terminationComment
+            ? [
+                {
+                  field: AuditField.TERMINATION_COMMENT,
+                  from: null,
+                  to: auditValue.text(employee.terminationComment),
+                },
+              ]
+            : []),
+        ],
+      );
     }
 
     if (index % 7 === 3) {
