@@ -89,6 +89,92 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/employees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List employees with search, status and category filters */
+        get: operations["EmployeeController_list"];
+        put?: never;
+        /** Create an employee with their account and responsibles */
+        post: operations["EmployeeController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/summary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Return the active headcount, hires of the last 30 days and terminations of the last 90 */
+        get: operations["EmployeeController_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/position-categories": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List position categories with matching employee counts */
+        get: operations["PositionCategoryController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/positions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List positions grouped by category, for the position picker */
+        get: operations["EmployeeOptionController_positions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/responsible-candidates": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Search people who can be responsible for an employee */
+        get: operations["EmployeeOptionController_responsibleCandidates"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -127,6 +213,132 @@ export interface components {
             lastName: string;
             role: components["schemas"]["UserRole_Output"];
         };
+        EmployeeListItem_Output: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            userId: string;
+            firstName: string;
+            lastName: string;
+            email: string;
+            position: {
+                /** Format: uuid */
+                id: string;
+                title: string;
+                category: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                };
+            };
+            responsibles: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+            }[];
+            responsibleCount: number;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            terminatedOn: string | null;
+            status: components["schemas"]["EmployeeStatus_Output"];
+        };
+        /** @enum {string} */
+        EmployeeStatus_Output: "ACTIVE" | "TERMINATED";
+        EmployeePageResponse_Output: {
+            content: components["schemas"]["EmployeeListItem_Output"][];
+            totalElements: number;
+        };
+        EmployeeSummaryResponse_Output: {
+            totalActive: number;
+            newLast30Days: number;
+            terminatedLast90Days: number;
+            averageTenureDays: number;
+            withoutResponsible: number;
+        };
+        CreateEmployeeRequest: {
+            firstName: string;
+            lastName: string;
+            email: string;
+            /** Format: uuid */
+            positionId: string;
+            /** Format: date */
+            startDate: string;
+            mobile?: string;
+            personalEmail?: string;
+            linkedinUrl?: string;
+            telegram?: string;
+            address?: string;
+            /** @default [] */
+            responsibleUserIds: string[];
+        };
+        EmployeeListItemResponse_Output: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            userId: string;
+            firstName: string;
+            lastName: string;
+            email: string;
+            position: {
+                /** Format: uuid */
+                id: string;
+                title: string;
+                category: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                };
+            };
+            responsibles: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+            }[];
+            responsibleCount: number;
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            terminatedOn: string | null;
+            status: components["schemas"]["EmployeeStatus_Output"];
+        };
+        PositionCategoryCountsResponse_Output: {
+            total: number;
+            categories: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                employeeCount: number;
+            }[];
+        };
+        PositionOptionsResponse_Output: {
+            content: {
+                /** Format: uuid */
+                id: string;
+                title: string;
+                category: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                };
+            }[];
+        };
+        ResponsibleCandidatesResponse_Output: {
+            content: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+                email: string;
+                /** @enum {string} */
+                role: "ADMIN" | "MANAGER" | "EMPLOYEE";
+                positionTitle: string | null;
+            }[];
+        };
+        /** @enum {string} */
+        EmployeeStatus: "ACTIVE" | "TERMINATED";
     };
     responses: never;
     parameters: never;
@@ -297,6 +509,302 @@ export interface operations {
             };
             /** @description UNAUTHORIZED | SESSION_EXPIRED */
             401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmployeeController_list: {
+        parameters: {
+            query?: {
+                search?: string;
+                status?: components["schemas"]["EmployeeStatus"];
+                categoryId?: string;
+                page?: number;
+                size?: number;
+                /** @description One of: name,asc|desc, startDate,asc|desc */
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeePageResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmployeeController_create: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per logical operation, reused on retry */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateEmployeeRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeListItemResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT | IDEMPOTENCY_KEY_REUSED */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmployeeController_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeSummaryResponse_Output"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    PositionCategoryController_list: {
+        parameters: {
+            query?: {
+                search?: string;
+                status?: components["schemas"]["EmployeeStatus"];
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PositionCategoryCountsResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmployeeOptionController_positions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PositionOptionsResponse_Output"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmployeeOptionController_responsibleCandidates: {
+        parameters: {
+            query?: {
+                search?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponsibleCandidatesResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

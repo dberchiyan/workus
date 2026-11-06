@@ -34,13 +34,22 @@ export const TYPE = {
     h5: { size: '1.25rem', weight: 600, leading: 1.35, tracking: '0' },
     h6: { size: '1.125rem', weight: 600, leading: 1.4, tracking: '0' },
     subtitle1: { size: '1.125rem', weight: 400, leading: 1.5, tracking: '0' },
-    subtitle2: { size: '0.875rem', weight: 600, leading: 1.5, tracking: '0' },
+    subtitle2: { size: '0.875rem', weight: 500, leading: 1.5, tracking: '0' },
     body1: { size: '1rem', weight: 400, leading: 1.5, tracking: '0' },
     body2: { size: '0.875rem', weight: 400, leading: 1.5, tracking: '0' },
     caption: { size: '0.75rem', weight: 400, leading: 1.4, tracking: '0.01em' },
     overline: { size: '0.75rem', weight: 600, leading: 1.4, tracking: '0.08em' },
     button: { size: '1rem', weight: 600, leading: 1.5, tracking: '0' },
+    tableHeader: { size: '0.8125rem', weight: 500, leading: 1.4, tracking: '0.01em' },
+    metric: {
+      size: 'clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem)',
+      weight: 700,
+      leading: 1.1,
+      tracking: '-0.01em',
+    },
   },
+  /** Variants whose figures are always tabular. */
+  tabularVariants: ['metric'],
 } as const;
 
 export type TypeVariant = keyof typeof TYPE.variants;
@@ -52,11 +61,14 @@ const cssVar = (
   property: 'size' | 'weight' | 'leading' | 'tracking',
 ): string => `var(--app-${variant}-${property})`;
 
+const TABULAR: ReadonlySet<string> = new Set(TYPE.tabularVariants);
+
 const variantStyle = (variant: TypeVariant): CSSProperties => ({
   fontSize: cssVar(variant, 'size'),
   fontWeight: cssVar(variant, 'weight'),
   lineHeight: cssVar(variant, 'leading'),
   letterSpacing: cssVar(variant, 'tracking'),
+  ...(TABULAR.has(variant) ? { fontVariantNumeric: 'tabular-nums' } : {}),
 });
 
 /** MUI typography options — every variant reads the generated custom properties. */
@@ -90,6 +102,8 @@ export const typographyGlobalStyles = {
       { fontFamily: 'var(--app-font-family)', ...variantStyle(variant) },
     ]),
   ),
+  /** Tabular figures for numbers in columns (dates, counts). */
+  '.app-tabular': { fontVariantNumeric: 'tabular-nums' },
   '.app-prose': {
     maxWidth: 'var(--app-measure)',
     ...variantStyle('body1'),

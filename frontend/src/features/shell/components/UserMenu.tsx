@@ -1,5 +1,4 @@
 import LogoutOutlined from '@mui/icons-material/LogoutOutlined';
-import Avatar from '@mui/material/Avatar';
 import ButtonBase from '@mui/material/ButtonBase';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import Menu from '@mui/material/Menu';
@@ -8,6 +7,7 @@ import Typography from '@mui/material/Typography';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useCurrentUser, useLogout } from '@/features/auth';
+import { InitialsAvatar } from '@/shared/components/InitialsAvatar';
 
 /** Name, role and avatar; opens a menu with Sign out. */
 export function UserMenu() {
@@ -21,7 +21,6 @@ export function UserMenu() {
     return null;
   }
   const fullName = `${user.firstName} ${user.lastName}`;
-  const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`;
 
   return (
     <>
@@ -39,15 +38,11 @@ export function UserMenu() {
           <Typography variant="subtitle2" component="span">
             {fullName}
           </Typography>
-          <Typography variant="caption" component="span" color="text.secondary">
+          <Typography variant="caption" component="span" color="textSecondary">
             {t(`role.${user.role}`)}
           </Typography>
         </span>
-        <Avatar className="size-9 bg-primary text-primary-contrast-text">
-          <Typography variant="subtitle2" component="span">
-            {initials}
-          </Typography>
-        </Avatar>
+        <InitialsAvatar id={user.id} firstName={user.firstName} lastName={user.lastName} />
       </ButtonBase>
       <Menu
         id={menuId}

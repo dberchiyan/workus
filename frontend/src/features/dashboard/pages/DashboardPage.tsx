@@ -31,7 +31,7 @@ export default function DashboardPage() {
       </Typography>
       <Card variant="outlined">
         <CardContent className="p-6 sm:p-8">
-          <Typography variant="body1" color="text.secondary" className="[overflow-wrap:anywhere]">
+          <Typography variant="body1" color="textSecondary" className="[overflow-wrap:anywhere]">
             {t('description', { email: user.email })}
           </Typography>
         </CardContent>

@@ -13,7 +13,7 @@ export function BrandLogo() {
           {t('app.name')}
         </Typography>
       </div>
-      <Typography variant="subtitle1" component="p" color="text.secondary">
+      <Typography variant="subtitle1" component="p" color="textSecondary">
         {t('app.tagline')}
       </Typography>
     </div>

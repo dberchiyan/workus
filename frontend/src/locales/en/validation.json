@@ -8,5 +8,43 @@
   "password": {
     "required": "Enter your password",
     "tooLong": "Password must be at most {{max}} characters"
+  },
+  "search": {
+    "tooLong": "Search must be at most {{max}} characters"
+  },
+  "firstName": {
+    "required": "Enter a first name",
+    "tooLong": "First name must be at most {{max}} characters"
+  },
+  "lastName": {
+    "required": "Enter a last name",
+    "tooLong": "Last name must be at most {{max}} characters"
+  },
+  "position": {
+    "required": "Choose a position"
+  },
+  "startDate": {
+    "invalid": "Enter a start date"
+  },
+  "mobile": {
+    "invalid": "Enter a phone number, e.g. +44 20 7946 0958"
+  },
+  "personalEmail": {
+    "invalid": "Enter a valid email address"
+  },
+  "linkedin": {
+    "invalid": "Enter a LinkedIn profile URL, e.g. https://www.linkedin.com/in/name"
+  },
+  "telegram": {
+    "invalid": "Enter a Telegram username, e.g. @username"
+  },
+  "address": {
+    "tooLong": "Address must be at most {{max}} characters"
+  },
+  "responsibles": {
+    "tooMany": "Choose at most {{max}} people"
+  },
+  "workEmail": {
+    "required": "Enter a work email"
   }
 }

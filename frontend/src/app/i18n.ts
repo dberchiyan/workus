@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import enAuth from '@/locales/en/auth.json';
 import enCommon from '@/locales/en/common.json';
+import enEmployee from '@/locales/en/employee.json';
 import enErrors from '@/locales/en/errors.json';
 import enDashboard from '@/locales/en/dashboard.json';
 import enShell from '@/locales/en/shell.json';
@@ -17,6 +18,7 @@ export const resources = {
     errors: enErrors,
     auth: enAuth,
     dashboard: enDashboard,
+    employee: enEmployee,
     shell: enShell,
   },
 } as const;

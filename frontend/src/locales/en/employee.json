@@ -1,0 +1,113 @@
+{
+  "pageTitle": "Employees · Workus",
+  "title": "Employees",
+  "stats": {
+    "total": "Total employees",
+    "growth": "+{{count}} in the last 30 days",
+    "terminated": "Terminated in the last 90 days",
+    "terminatedHint": "Since {{date}}",
+    "averageTenure": "Average tenure",
+    "averageTenureHint": "Across active employees",
+    "withoutResponsible": "No responsible",
+    "withoutResponsibleHint": "Active, nobody assigned"
+  },
+  "tabs": {
+    "label": "Position categories",
+    "all": "All"
+  },
+  "filters": {
+    "search": "Search by name or email",
+    "status": "Status",
+    "sort": "Sort by",
+    "sortOptions": {
+      "name,asc": "Name, A–Z",
+      "name,desc": "Name, Z–A",
+      "startDate,desc": "Start date, newest first",
+      "startDate,asc": "Start date, oldest first"
+    }
+  },
+  "status": {
+    "ACTIVE": "Active",
+    "TERMINATED": "Terminated"
+  },
+  "table": {
+    "caption": "Employees",
+    "name": "Name",
+    "position": "Position",
+    "responsible": "Responsible",
+    "startDate": "Start date",
+    "status": "Status"
+  },
+  "responsibles": {
+    "label": "Responsible: {{names}}",
+    "none": "Not assigned",
+    "more": "+{{count}}",
+    "andMore": "{{count}} more"
+  },
+  "empty": {
+    "title": "No employees found",
+    "description": "Try another search, status or category.",
+    "clear": "Clear search and filters"
+  },
+  "error": {
+    "retry": "Try again"
+  },
+  "pagination": {
+    "rowsPerPage": "Rows per page",
+    "displayed": "{{from}}–{{to}} of {{count}}"
+  },
+  "list": {
+    "count_one": "{{formatted}} employee",
+    "count_other": "{{formatted}} employees"
+  },
+  "add": {
+    "open": "Add employee",
+    "title": "Add employee",
+    "stepsLabel": "Steps",
+    "steps": {
+      "details": "Details",
+      "responsible": "Responsible",
+      "optional": "Optional"
+    },
+    "sections": {
+      "overall": "Overall info",
+      "contact": "Contact info"
+    },
+    "fields": {
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Work email",
+      "positionId": "Position",
+      "startDate": "Start date",
+      "mobile": "Mobile",
+      "personalEmail": "Personal email",
+      "linkedinUrl": "LinkedIn",
+      "telegram": "Telegram",
+      "address": "Address"
+    },
+    "hints": {
+      "email": "Also used to sign in"
+    },
+    "responsible": {
+      "intro": "Choose who looks after this employee. You can skip this and assign people later.",
+      "label": "Responsible people",
+      "hint": "Search by name or email",
+      "noOptions": "No one found",
+      "loading": "Searching…",
+      "roles": {
+        "ADMIN": "Administrator",
+        "MANAGER": "Manager",
+        "EMPLOYEE": "Employee"
+      }
+    },
+    "actions": {
+      "cancel": "Cancel",
+      "next": "Next",
+      "back": "Back",
+      "submit": "Create employee",
+      "submitting": "Creating…"
+    },
+    "created": "{{name}} was added",
+    "dismiss": "Dismiss"
+  }
+}

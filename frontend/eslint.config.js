@@ -42,6 +42,11 @@ export default tseslint.config(
           selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
           message: 'Forbidden (architecture.md).',
         },
+        {
+          // MUI 9 Typography silently ignores "text.secondary"; the value is "textSecondary".
+          selector: "JSXAttribute[name.name='color'] Literal[value=/^text[.]/]",
+          message: 'Use color="textSecondary" / "textPrimary" / "textDisabled".',
+        },
       ],
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'boundaries/dependencies': [

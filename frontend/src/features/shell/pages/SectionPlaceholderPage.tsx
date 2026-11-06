@@ -30,7 +30,7 @@ export default function SectionPlaceholderPage({ section }: SectionPlaceholderPa
       </Typography>
       <Card variant="outlined">
         <CardContent className="p-6 sm:p-8">
-          <Typography variant="body1" color="text.secondary">
+          <Typography variant="body1" color="textSecondary">
             {t('placeholder.description')}
           </Typography>
         </CardContent>
