@@ -28,6 +28,9 @@ export type I18nTranslations = {
             "positionNotFound": string;
             "responsibleNotFound": string;
         };
+        "review": {
+            "responsibleNotFound": string;
+        };
     };
     "validation": {
         "invalid": string;
@@ -74,9 +77,28 @@ export type I18nTranslations = {
         };
         "responsibles": {
             "tooMany": string;
+            "required": string;
         };
         "workEmail": {
             "required": string;
+        };
+        "title": {
+            "required": string;
+            "tooLong": string;
+        };
+        "reviewDate": {
+            "invalid": string;
+        };
+        "reviewStatus": {
+            "required": string;
+        };
+        "salary": {
+            "invalid": string;
+            "requiredForCompleted": string;
+        };
+        "feedback": {
+            "tooLong": string;
+            "textTooLong": string;
         };
     };
 };

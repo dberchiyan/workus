@@ -2,6 +2,7 @@ import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from '@nestj
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { ApiPageable, type Pageable, PageableQuery } from '../../../common/dto/pageable';
+import { UuidParam } from '../../../common/dto/uuid-param';
 import { ApiErrors } from '../../../common/exception/api-errors.decorator';
 import { Idempotent } from '../../../common/idempotency/idempotent.decorator';
 import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
@@ -11,12 +12,14 @@ import { Authorize } from '../../../common/security/security.decorators';
 import { EMPLOYEE_PAGEABLE, type EmployeeSortField } from '../service/employee-sort';
 import { EmployeeService } from '../service/employee.service';
 import { CreateEmployeeRequest } from './dto/create-employee.request';
+import { EmployeeProfileResponse } from './dto/employee-profile.response';
 import { EmployeeFilterQuery } from './dto/employee-filter.query';
 import {
   EmployeeListItemResponse,
   EmployeePageResponse,
   EmployeeSummaryResponse,
 } from './dto/employee.response';
+import { toEmployeeProfileResponse } from './mapper/employee-profile.mapper';
 import { toEmployeeListItem, toEmployeePageResponse } from './mapper/employee.mapper';
 
 @ApiTags('Employees')
@@ -97,5 +100,22 @@ export class EmployeeController {
       principal.userId,
     );
     return toEmployeeListItem(employee, today);
+  }
+
+  // Declared after the static `summary` route, so ":employeeId" never captures it.
+  @Get(':employeeId')
+  @Authorize(can.viewEmployee)
+  @ApiOperation({ summary: 'Return one employee with contacts and responsibles' })
+  @ZodResponse({ status: HttpStatus.OK, type: EmployeeProfileResponse })
+  @ApiErrors(
+    'INVALID_PARAMETER',
+    'UNAUTHORIZED',
+    'SESSION_EXPIRED',
+    'FORBIDDEN',
+    'RESOURCE_NOT_FOUND',
+  )
+  async profile(@UuidParam('employeeId') employeeId: string): Promise<EmployeeProfileResponse> {
+    const { employee, today } = await this.employeeService.findProfile(employeeId);
+    return toEmployeeProfileResponse(employee, today);
   }
 }

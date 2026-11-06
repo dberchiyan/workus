@@ -40,3 +40,39 @@ export const responsibleCandidateSelect = {
 export type ResponsibleCandidateRecord = Prisma.UserGetPayload<{
   select: typeof responsibleCandidateSelect;
 }>;
+
+/** Bounded: a profile shows everyone responsible, but never an unbounded list. */
+export const PROFILE_RESPONSIBLES_LIMIT = 20;
+
+export const employeeProfileSelect = {
+  id: true,
+  startDate: true,
+  terminatedOn: true,
+  mobile: true,
+  personalEmail: true,
+  linkedinUrl: true,
+  telegram: true,
+  address: true,
+  createdAt: true,
+  user: { select: { id: true, firstName: true, lastName: true, email: true, role: true } },
+  position: { select: { id: true, title: true, category: { select: { id: true, name: true } } } },
+  responsibles: {
+    select: {
+      responsible: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          role: true,
+          employee: { select: { position: { select: { title: true } } } },
+        },
+      },
+    },
+    orderBy: [{ responsible: { firstName: 'asc' } }, { responsible: { lastName: 'asc' } }],
+    take: PROFILE_RESPONSIBLES_LIMIT,
+  },
+} satisfies Prisma.EmployeeSelect;
+export type EmployeeProfileRecord = Prisma.EmployeeGetPayload<{
+  select: typeof employeeProfileSelect;
+}>;

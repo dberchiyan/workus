@@ -4,7 +4,8 @@ import { z } from 'zod';
 import { PrismaClient } from '../src/generated/prisma/client';
 import { PasswordHasher } from '../src/modules/auth/service/password-hasher.service';
 import { UserRole } from '../src/modules/user/service/user-role';
-import { ADMINS, EMPLOYEES, POSITION_CATEGORIES } from './seed-data';
+import { ADMINS, contactsFor, EMPLOYEES, POSITION_CATEGORIES } from './seed-data';
+import { seedReviews } from './seed-reviews';
 
 /**
  * Development seed (APP_ENV=dev only): 2 admins and 40 employees sharing SEED_USER_PASSWORD,
@@ -138,8 +139,48 @@ const seed = async (): Promise<void> => {
       skipDuplicates: true,
     });
 
+    // Contacts only where none are set yet, so edits made in the app survive a re-seed.
+    let contacts = 0;
+    for (const [index, employee] of EMPLOYEES.entries()) {
+      const { count } = await prisma.employee.updateMany({
+        where: {
+          userId: idOf(userIdByEmail, employee.email),
+          mobile: null,
+          personalEmail: null,
+          linkedinUrl: null,
+          telegram: null,
+          address: null,
+        },
+        data: contactsFor(employee, index),
+      });
+      contacts += count;
+    }
+
+    const seededEmployees = await prisma.employee.findMany({
+      where: { userId: { in: EMPLOYEES.map((employee) => idOf(userIdByEmail, employee.email)) } },
+      select: {
+        id: true,
+        startDate: true,
+        terminatedOn: true,
+        position: { select: { category: { select: { name: true } } } },
+        responsibles: { select: { responsibleUserId: true }, take: 10 },
+      },
+      orderBy: { startDate: 'asc' },
+    });
+    const reviews = await seedReviews(
+      prisma,
+      seededEmployees.map((employee) => ({
+        id: employee.id,
+        startDate: employee.startDate,
+        terminatedOn: employee.terminatedOn,
+        categoryName: employee.position.category.name,
+        responsibleUserIds: employee.responsibles.map((r) => r.responsibleUserId),
+      })),
+      admins[0] ?? '',
+    );
+
     process.stdout.write(
-      `Seeded ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles\n`,
+      `Seeded ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}\n`,
     );
   } finally {
     await prisma.$disconnect();

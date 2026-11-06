@@ -101,3 +101,16 @@ export class RequestInProgressException extends ApiException {
     super('CONFLICT', 'errors.CONFLICT');
   }
 }
+
+export class ResourceNotFoundException extends ApiException {
+  constructor() {
+    super('RESOURCE_NOT_FOUND', 'errors.RESOURCE_NOT_FOUND');
+  }
+}
+
+/** 409 — the record changed since the client read it (optimistic locking). */
+export class ConcurrentModificationException extends ApiException {
+  constructor() {
+    super('CONCURRENT_MODIFICATION', 'errors.CONCURRENT_MODIFICATION');
+  }
+}

@@ -326,3 +326,44 @@ export const EMPLOYEES: SeedEmployee[] = [
     startedDaysAgo: 3,
   },
 ];
+
+const CITIES = [
+  { city: 'Berlin', postcode: '10115', street: 'Lindenweg' },
+  { city: 'Lisbon', postcode: '1100-148', street: 'Rua das Flores' },
+  { city: 'Warsaw', postcode: '00-001', street: 'Ulica Sosnowa' },
+  { city: 'Amsterdam', postcode: '1012 AB', street: 'Kastanjelaan' },
+  { city: 'Prague', postcode: '110 00', street: 'Lipová' },
+  { city: 'Vienna', postcode: '1010', street: 'Ahorngasse' },
+] as const;
+
+export interface SeedContacts {
+  mobile: string | null;
+  personalEmail: string | null;
+  linkedinUrl: string | null;
+  telegram: string | null;
+  address: string | null;
+}
+
+const slug = (employee: SeedEmployee): string =>
+  `${employee.firstName}-${employee.lastName}`.toLowerCase().replace(/[^a-z-]/g, '');
+
+/**
+ * Fictional contacts that cannot reach a real person: phone numbers from the Ofcom range
+ * reserved for drama (+44 7700 900xxx), personal emails on example.com, demo-prefixed handles.
+ * Some people leave fields empty, as they would in real life.
+ */
+export const contactsFor = (employee: SeedEmployee, index: number): SeedContacts => {
+  const place = CITIES[index % CITIES.length] ?? CITIES[0];
+  return {
+    mobile: index % 7 === 6 ? null : `+44 7700 900${String(100 + index * 7).padStart(3, '0')}`,
+    personalEmail: index % 4 === 3 ? null : `${slug(employee).replace('-', '.')}@example.com`,
+    linkedinUrl:
+      index % 3 === 2 ? null : `https://www.linkedin.com/in/workus-demo-${slug(employee)}`,
+    telegram:
+      index % 5 === 4 ? null : `@workus_demo_${slug(employee).replace(/-/g, '_')}`.slice(0, 33),
+    address:
+      index % 6 === 5
+        ? null
+        : `${String(3 + ((index * 11) % 90))} ${place.street}, ${place.postcode} ${place.city}`,
+  };
+};

@@ -1,0 +1,143 @@
+import { Prisma, type PrismaClient } from '../src/generated/prisma/client';
+
+/** Monthly USD base salary by position category (fictional). */
+const BASE_SALARY: Readonly<Record<string, number>> = {
+  Developers: 3500,
+  'AI Engineers': 4200,
+  Designers: 3000,
+  'Project Managers': 3800,
+  QA: 2800,
+};
+
+const FEEDBACK = {
+  hr: [
+    'Settled into the team quickly and follows processes well.',
+    'Great attitude; takes part in company events.',
+  ],
+  teamLead: [
+    'Delivers on time and owns their tasks end to end.',
+    'Ready for more responsibility next cycle.',
+  ],
+  team: ['Helpful in code reviews and always open to questions.', 'Shares knowledge generously.'],
+  client: [
+    'Communicates clearly and keeps us informed.',
+    'The client is happy with the quality of work.',
+  ],
+} as const;
+
+/** Plain text → a one-paragraph rich-text document (TipTap JSON). */
+const doc = (text: string | null | undefined): Prisma.InputJsonValue | typeof Prisma.DbNull =>
+  text
+    ? { type: 'doc', content: [{ type: 'paragraph', content: [{ type: 'text', text }] }] }
+    : Prisma.DbNull;
+
+/** A short bold lead-in followed by a bullet list — shows the formatting in the UI. */
+const listDoc = (lead: string, items: readonly string[]): Prisma.InputJsonValue => ({
+  type: 'doc',
+  content: [
+    { type: 'paragraph', content: [{ type: 'text', text: lead, marks: [{ type: 'bold' }] }] },
+    {
+      type: 'bulletList',
+      content: items.map((item) => ({
+        type: 'listItem',
+        content: [{ type: 'paragraph', content: [{ type: 'text', text: item }] }],
+      })),
+    },
+  ],
+});
+
+const LEAD_POINTS = ['Delivers on time', 'Owns tasks end to end', 'Helps newcomers'] as const;
+
+const addMonths = (date: Date, months: number): Date => {
+  const next = new Date(date);
+  next.setUTCMonth(next.getUTCMonth() + months);
+  return next;
+};
+
+interface SeedReviewEmployee {
+  id: string;
+  startDate: Date;
+  terminatedOn: Date | null;
+  categoryName: string;
+  responsibleUserIds: string[];
+}
+
+/**
+ * Completed reviews 6 months after the start and then yearly (4–14 % raises), the next review
+ * scheduled for active people, and the odd canceled one. Skips employees that have reviews.
+ */
+export const seedReviews = async (
+  prisma: PrismaClient,
+  employees: SeedReviewEmployee[],
+  fallbackResponsibleId: string,
+): Promise<number> => {
+  const today = new Date();
+  const withReviews = new Set(
+    (
+      await prisma.employeeReview.groupBy({
+        by: ['employeeId'],
+        where: { employeeId: { in: employees.map((e) => e.id) } },
+        orderBy: { employeeId: 'asc' },
+      })
+    ).map((group) => group.employeeId),
+  );
+  let created = 0;
+  for (const [index, employee] of employees.entries()) {
+    if (withReviews.has(employee.id)) {
+      continue;
+    }
+    const responsibleUserIds =
+      employee.responsibleUserIds.length > 0
+        ? employee.responsibleUserIds
+        : [fallbackResponsibleId];
+    const end = employee.terminatedOn ?? today;
+    let salary = new Prisma.Decimal(BASE_SALARY[employee.categoryName] ?? 3000).plus(
+      (index % 5) * 150,
+    );
+    const reviews: Prisma.EmployeeReviewCreateManyInput[] = [];
+    let date = addMonths(employee.startDate, 6);
+    let round = 0;
+    while (date <= end) {
+      const raise = new Prisma.Decimal(4 + ((index + round * 3) % 11)).dividedBy(100);
+      salary = salary.times(raise.plus(1)).toDecimalPlaces(0, Prisma.Decimal.ROUND_HALF_UP);
+      reviews.push({
+        employeeId: employee.id,
+        title: round === 0 ? 'Probation review' : 'Annual review',
+        reviewDate: date,
+        status: 'COMPLETED',
+        salaryAmount: salary,
+        salaryCurrency: 'USD',
+        feedbackHr: doc(FEEDBACK.hr[round % 2]),
+        feedbackLead:
+          round % 2 === 0 ? listDoc('Strengths', LEAD_POINTS) : doc(FEEDBACK.teamLead[1]),
+        feedbackTeam: round % 3 === 2 ? Prisma.DbNull : doc(FEEDBACK.team[round % 2]),
+        feedbackClient: index % 2 === 0 ? doc(FEEDBACK.client[round % 2]) : Prisma.DbNull,
+      });
+      date = addMonths(date, 12);
+      round += 1;
+    }
+    if (!employee.terminatedOn) {
+      reviews.push({
+        employeeId: employee.id,
+        title: round === 0 ? 'Probation review' : 'Annual review',
+        reviewDate: date,
+        status: index % 9 === 4 ? 'CANCELED' : 'SCHEDULED',
+        salaryAmount: null,
+        salaryCurrency: null,
+      });
+    }
+    for (const review of reviews) {
+      await prisma.employeeReview.create({
+        data: {
+          ...review,
+          responsibles: {
+            create: responsibleUserIds.map((responsibleUserId) => ({ responsibleUserId })),
+          },
+        },
+        select: { id: true },
+      });
+      created += 1;
+    }
+  }
+  return created;
+};

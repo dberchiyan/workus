@@ -3,6 +3,7 @@ import { Injectable } from '@nestjs/common';
 import {
   BusinessConflictException,
   BusinessRuleException,
+  ResourceNotFoundException,
 } from '../../../common/exception/api.exception';
 import { UserService } from '../../user/service/user.service';
 import { UserRole } from '../../user/service/user-role';
@@ -14,6 +15,7 @@ import type { EmployeeStatus } from './employee-status';
 import type {
   CreatedEmployee,
   CreateEmployeeCommand,
+  EmployeeProfile,
   EmployeePage,
   EmployeeSummary,
 } from './employee.types';
@@ -133,6 +135,29 @@ export class EmployeeService {
       throw new Error('Created employee not found in the same transaction');
     }
     return { employee, today };
+  }
+
+  async findProfile(id: string): Promise<EmployeeProfile> {
+    const employee = await this.employeeRepository.findProfileById(id);
+    if (!employee) {
+      throw new ResourceNotFoundException();
+    }
+    return { employee, today: todayUtc() };
+  }
+
+  /** For other modules: does the employee exist? */
+  exists(id: string): Promise<boolean> {
+    return this.employeeRepository.existsById(id);
+  }
+
+  /** For other modules: are all these users admins or active employees (possible responsibles)? */
+  async areResponsibleCandidates(userIds: string[]): Promise<boolean> {
+    const unique = [...new Set(userIds)];
+    return (
+      unique.length === 0 ||
+      (await this.employeeRepository.countResponsibleCandidates(unique, todayUtc())) ===
+        unique.length
+    );
   }
 
   positionOptions() {

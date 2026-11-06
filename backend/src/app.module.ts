@@ -21,6 +21,7 @@ import { SecurityModule } from './common/security/security.module';
 import { SessionGuard } from './common/security/session.guard';
 import { AuthModule } from './modules/auth/auth.module';
 import { EmployeeModule } from './modules/employee/employee.module';
+import { ReviewModule } from './modules/review/review.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -39,6 +40,7 @@ import { UserModule } from './modules/user/user.module';
     UserModule,
     AuthModule,
     EmployeeModule,
+    ReviewModule,
   ],
   providers: [
     // Guards run in registration order (security.md → Guards).

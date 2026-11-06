@@ -4,6 +4,7 @@ import type { Request } from 'express';
 import { ClsService } from 'nestjs-cls';
 import { type RequestContext, SessionState } from '../context/request-context';
 import { NotAuthenticatedException, SessionExpiredException } from '../exception/api.exception';
+import { PermissionService } from './permission.service';
 import type { Policy, PolicyArgs } from './policy';
 import { POLICY_KEY, PUBLIC_KEY } from './security.decorators';
 
@@ -13,6 +14,7 @@ export class AuthorizationGuard implements CanActivate {
   constructor(
     private readonly reflector: Reflector,
     private readonly cls: ClsService<RequestContext>,
+    private readonly permissions: PermissionService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -37,6 +39,6 @@ export class AuthorizationGuard implements CanActivate {
         return [name, typeof value === 'string' ? value : ''];
       }),
     );
-    return requiredPolicy.check(principal, args);
+    return requiredPolicy.check(principal, args, this.permissions);
   }
 }

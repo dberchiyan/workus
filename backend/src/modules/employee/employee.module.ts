@@ -11,6 +11,7 @@ import { PositionCategoryService } from './service/position-category.service';
 @Module({
   imports: [UserModule],
   controllers: [EmployeeController, PositionCategoryController, EmployeeOptionController],
+  exports: [EmployeeService],
   providers: [
     EmployeeService,
     PositionCategoryService,

@@ -124,6 +124,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/employees/{employeeId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Return one employee with contacts and responsibles */
+        get: operations["EmployeeController_profile"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/position-categories": {
         parameters: {
             query?: never;
@@ -170,6 +187,43 @@ export interface paths {
         put?: never;
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/{employeeId}/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List an employee's reviews with the salary history */
+        get: operations["ReviewController_list"];
+        put?: never;
+        /** Add a review (with salary and feedback) to an employee */
+        post: operations["ReviewController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/{employeeId}/reviews/{reviewId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Return one review of the employee */
+        get: operations["ReviewController_findOne"];
+        /** Update a review; the version must match the one read */
+        put: operations["ReviewController_update"];
+        post?: never;
+        /** Delete a review (its salary leaves the history) */
+        delete: operations["ReviewController_remove"];
         options?: never;
         head?: never;
         patch?: never;
@@ -304,6 +358,51 @@ export interface components {
             terminatedOn: string | null;
             status: components["schemas"]["EmployeeStatus_Output"];
         };
+        EmployeeProfileResponse_Output: {
+            /** Format: uuid */
+            id: string;
+            /** Format: uuid */
+            userId: string;
+            firstName: string;
+            lastName: string;
+            email: string;
+            /** @enum {string} */
+            role: "ADMIN" | "MANAGER" | "EMPLOYEE";
+            position: {
+                /** Format: uuid */
+                id: string;
+                title: string;
+                category: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                };
+            };
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            terminatedOn: string | null;
+            status: components["schemas"]["EmployeeStatus_Output"];
+            contacts: {
+                mobile: string | null;
+                personalEmail: string | null;
+                linkedinUrl: string | null;
+                telegram: string | null;
+                address: string | null;
+            };
+            responsibles: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+                email: string;
+                /** @enum {string} */
+                role: "ADMIN" | "MANAGER" | "EMPLOYEE";
+                positionTitle: string | null;
+            }[];
+            /** Format: date-time */
+            createdAt: string;
+        };
         PositionCategoryCountsResponse_Output: {
             total: number;
             categories: {
@@ -336,6 +435,314 @@ export interface components {
                 role: "ADMIN" | "MANAGER" | "EMPLOYEE";
                 positionTitle: string | null;
             }[];
+        };
+        Money_Output: {
+            amount: string;
+            currency: string;
+        };
+        Review_Output: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: date */
+            date: string;
+            status: components["schemas"]["ReviewStatus_Output"];
+            salary: components["schemas"]["Money_Output"] | null;
+            responsibles: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+            }[];
+            feedback: {
+                hr: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["EmployeeReviewsResponse_Output__schema0_Output"][];
+                } | null;
+                teamLead: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["EmployeeReviewsResponse_Output__schema0_Output"][];
+                } | null;
+                team: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["EmployeeReviewsResponse_Output__schema0_Output"][];
+                } | null;
+                client: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["EmployeeReviewsResponse_Output__schema0_Output"][];
+                } | null;
+            };
+            /** Format: date-time */
+            createdAt: string;
+            version: number;
+        };
+        /** @enum {string} */
+        ReviewStatus_Output: "COMPLETED" | "SCHEDULED" | "CANCELED";
+        EmployeeReviewsResponse_Output__schema0_Output: {
+            /** @enum {string} */
+            type: "paragraph";
+            content?: ({
+                /** @enum {string} */
+                type: "text";
+                text: string;
+                marks?: {
+                    /** @enum {string} */
+                    type: "bold" | "italic";
+                }[];
+            } | {
+                /** @enum {string} */
+                type: "hardBreak";
+            })[];
+        } | {
+            /** @enum {string} */
+            type: "bulletList";
+            content: {
+                /** @enum {string} */
+                type: "listItem";
+                content: components["schemas"]["EmployeeReviewsResponse_Output__schema0_Output"][];
+            }[];
+        } | {
+            /** @enum {string} */
+            type: "orderedList";
+            attrs?: {
+                start?: number;
+                type?: string | null;
+            };
+            content: {
+                /** @enum {string} */
+                type: "listItem";
+                content: components["schemas"]["EmployeeReviewsResponse_Output__schema0_Output"][];
+            }[];
+        };
+        EmployeeReviewsResponse_Output: {
+            salary: {
+                current: components["schemas"]["Money_Output"] | null;
+                previous: components["schemas"]["Money_Output"] | null;
+                changePercent: string | null;
+                history: {
+                    /** Format: date */
+                    date: string;
+                    salary: components["schemas"]["Money_Output"];
+                }[];
+            };
+            content: components["schemas"]["Review_Output"][];
+        };
+        CreateReviewRequest__schema0: {
+            /** @enum {string} */
+            type: "paragraph";
+            content?: ({
+                /** @enum {string} */
+                type: "text";
+                text: string;
+                marks?: {
+                    /** @enum {string} */
+                    type: "bold" | "italic";
+                }[];
+            } | {
+                /** @enum {string} */
+                type: "hardBreak";
+            })[];
+        } | {
+            /** @enum {string} */
+            type: "bulletList";
+            content: {
+                /** @enum {string} */
+                type: "listItem";
+                content: components["schemas"]["CreateReviewRequest__schema0"][];
+            }[];
+        } | {
+            /** @enum {string} */
+            type: "orderedList";
+            attrs?: {
+                start?: number;
+                type?: string | null;
+            };
+            content: {
+                /** @enum {string} */
+                type: "listItem";
+                content: components["schemas"]["CreateReviewRequest__schema0"][];
+            }[];
+        };
+        CreateReviewRequest: {
+            title: string;
+            /** Format: date */
+            date: string;
+            /** @enum {string} */
+            status: "COMPLETED" | "SCHEDULED" | "CANCELED";
+            salary?: string;
+            responsibleUserIds: string[];
+            /** @default {} */
+            feedback: {
+                hr?: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["CreateReviewRequest__schema0"][];
+                } | null;
+                teamLead?: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["CreateReviewRequest__schema0"][];
+                } | null;
+                team?: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["CreateReviewRequest__schema0"][];
+                } | null;
+                client?: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["CreateReviewRequest__schema0"][];
+                } | null;
+            };
+        };
+        ReviewResponse_Output__schema0_Output: {
+            /** @enum {string} */
+            type: "paragraph";
+            content?: ({
+                /** @enum {string} */
+                type: "text";
+                text: string;
+                marks?: {
+                    /** @enum {string} */
+                    type: "bold" | "italic";
+                }[];
+            } | {
+                /** @enum {string} */
+                type: "hardBreak";
+            })[];
+        } | {
+            /** @enum {string} */
+            type: "bulletList";
+            content: {
+                /** @enum {string} */
+                type: "listItem";
+                content: components["schemas"]["ReviewResponse_Output__schema0_Output"][];
+            }[];
+        } | {
+            /** @enum {string} */
+            type: "orderedList";
+            attrs?: {
+                start?: number;
+                type?: string | null;
+            };
+            content: {
+                /** @enum {string} */
+                type: "listItem";
+                content: components["schemas"]["ReviewResponse_Output__schema0_Output"][];
+            }[];
+        };
+        ReviewResponse_Output: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: date */
+            date: string;
+            status: components["schemas"]["ReviewStatus_Output"];
+            salary: components["schemas"]["Money_Output"] | null;
+            responsibles: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+            }[];
+            feedback: {
+                hr: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["ReviewResponse_Output__schema0_Output"][];
+                } | null;
+                teamLead: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["ReviewResponse_Output__schema0_Output"][];
+                } | null;
+                team: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["ReviewResponse_Output__schema0_Output"][];
+                } | null;
+                client: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["ReviewResponse_Output__schema0_Output"][];
+                } | null;
+            };
+            /** Format: date-time */
+            createdAt: string;
+            version: number;
+        };
+        UpdateReviewRequest__schema0: {
+            /** @enum {string} */
+            type: "paragraph";
+            content?: ({
+                /** @enum {string} */
+                type: "text";
+                text: string;
+                marks?: {
+                    /** @enum {string} */
+                    type: "bold" | "italic";
+                }[];
+            } | {
+                /** @enum {string} */
+                type: "hardBreak";
+            })[];
+        } | {
+            /** @enum {string} */
+            type: "bulletList";
+            content: {
+                /** @enum {string} */
+                type: "listItem";
+                content: components["schemas"]["UpdateReviewRequest__schema0"][];
+            }[];
+        } | {
+            /** @enum {string} */
+            type: "orderedList";
+            attrs?: {
+                start?: number;
+                type?: string | null;
+            };
+            content: {
+                /** @enum {string} */
+                type: "listItem";
+                content: components["schemas"]["UpdateReviewRequest__schema0"][];
+            }[];
+        };
+        UpdateReviewRequest: {
+            title: string;
+            /** Format: date */
+            date: string;
+            /** @enum {string} */
+            status: "COMPLETED" | "SCHEDULED" | "CANCELED";
+            salary?: string;
+            responsibleUserIds: string[];
+            /** @default {} */
+            feedback: {
+                hr?: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["UpdateReviewRequest__schema0"][];
+                } | null;
+                teamLead?: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["UpdateReviewRequest__schema0"][];
+                } | null;
+                team?: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["UpdateReviewRequest__schema0"][];
+                } | null;
+                client?: {
+                    /** @enum {string} */
+                    type: "doc";
+                    content: components["schemas"]["UpdateReviewRequest__schema0"][];
+                } | null;
+            };
+            version: number;
         };
         /** @enum {string} */
         EmployeeStatus: "ACTIVE" | "TERMINATED";
@@ -680,6 +1087,61 @@ export interface operations {
             };
         };
     };
+    EmployeeController_profile: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeProfileResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     PositionCategoryController_list: {
         parameters: {
             query?: {
@@ -786,6 +1248,311 @@ export interface operations {
                 };
             };
             /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ReviewController_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeReviewsResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ReviewController_create: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per logical operation, reused on retry */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateReviewRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description IDEMPOTENCY_KEY_REUSED */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ReviewController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ReviewController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateReviewRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ReviewResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONCURRENT_MODIFICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ReviewController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description INVALID_PARAMETER */
             400: {
                 headers: {
                     [name: string]: unknown;

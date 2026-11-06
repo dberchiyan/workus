@@ -52,7 +52,12 @@ export default tseslint.config(
     },
   },
   {
-    files: ['src/modules/*/repository/**/*.ts', 'src/common/persistence/**/*.ts', 'prisma/**/*.ts'],
+    files: [
+      'src/modules/*/repository/**/*.ts',
+      'src/common/persistence/**/*.ts',
+      'src/common/security/permission.service.ts',
+      'prisma/**/*.ts',
+    ],
     rules: {
       'no-restricted-imports': [
         'error',

@@ -12,6 +12,8 @@ import { activeOn, employeeWhere } from './employee-where';
 import {
   type EmployeeListItemRecord,
   employeeListItemSelect,
+  type EmployeeProfileRecord,
+  employeeProfileSelect,
   type PositionOptionRecord,
   positionOptionSelect,
   type ResponsibleCandidateRecord,
@@ -135,6 +137,14 @@ export class EmployeeRepository {
       select: { id: true },
     });
     return id;
+  }
+
+  findProfileById(id: string): Promise<EmployeeProfileRecord | null> {
+    return this.txHost.tx.employee.findUnique({ where: { id }, select: employeeProfileSelect });
+  }
+
+  async existsById(id: string): Promise<boolean> {
+    return (await this.txHost.tx.employee.count({ where: { id } })) > 0;
   }
 
   findListItemById(id: string): Promise<EmployeeListItemRecord | null> {

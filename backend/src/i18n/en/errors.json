@@ -20,5 +20,8 @@
     "emailTaken": "An account with the email “{email}” already exists",
     "positionNotFound": "This position no longer exists — reload and choose another",
     "responsibleNotFound": "One of the chosen responsible people is no longer active — choose again"
+  },
+  "review": {
+    "responsibleNotFound": "One of the chosen responsible people is no longer active — choose again"
   }
 }

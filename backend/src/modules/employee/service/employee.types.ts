@@ -1,4 +1,7 @@
-import type { EmployeeListItemRecord } from '../repository/record/employee.record';
+import type {
+  EmployeeListItemRecord,
+  EmployeeProfileRecord,
+} from '../repository/record/employee.record';
 
 export interface EmployeePage {
   content: EmployeeListItemRecord[];
@@ -41,5 +44,10 @@ export interface CreateEmployeeCommand {
 
 export interface CreatedEmployee {
   employee: EmployeeListItemRecord;
+  today: Date;
+}
+
+export interface EmployeeProfile {
+  employee: EmployeeProfileRecord;
   today: Date;
 }
