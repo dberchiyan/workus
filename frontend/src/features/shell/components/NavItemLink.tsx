@@ -16,7 +16,10 @@ export interface NavItemLinkProps {
 
 export function NavItemLink({ item, isCollapsed, onNavigate }: NavItemLinkProps) {
   const { t } = useTranslation('shell');
-  const isActive = useMatch({ path: item.path, end: true }) !== null;
+  // A section stays active on its sub-pages (/settings/sessions, /employees/:id); the Dashboard
+  // ('/') only on itself.
+  const exact = item.path === '/';
+  const isActive = useMatch({ path: item.path, end: exact }) !== null;
   const label = t(`nav.${item.section}`);
   const Icon = item.icon;
 
@@ -24,7 +27,7 @@ export function NavItemLink({ item, isCollapsed, onNavigate }: NavItemLinkProps)
     <ListItemButton
       component={NavLink}
       to={item.path}
-      end
+      end={exact}
       onClick={onNavigate}
       aria-label={isCollapsed ? label : undefined}
       className={cn(
