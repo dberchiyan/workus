@@ -198,6 +198,13 @@ for (const name of [...byName.keys()].sort()) {
 }
 
 const escapeRegex = (text: string): string => text.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
+/** Per segment: 1 for a fixed name, 0 for a parameter — sorts the more specific path first. */
+const specificity = (path: string): string =>
+  path
+    .split('/')
+    .map((segment) => (segment.startsWith('{') ? '0' : '1'))
+    .join('');
+
 const pathPattern = (path: string): string =>
   `^${path
     .split(/\{[^}]+\}/)
@@ -218,7 +225,14 @@ const lines = [
   '/** The schema each endpoint answers with (JSON success responses). */',
   'export const RESPONSE_SCHEMAS: readonly { method: string; pattern: RegExp; schema: z.ZodType }[] = [',
   ...operations
-    .sort((a, b) => a.path.localeCompare(b.path) || a.method.localeCompare(b.method))
+    // A fixed segment wins over a parameter (`/employees/summary` before `/employees/{id}`):
+    // the client takes the first match.
+    .sort(
+      (a, b) =>
+        specificity(b.path).localeCompare(specificity(a.path)) ||
+        a.path.localeCompare(b.path) ||
+        a.method.localeCompare(b.method),
+    )
     .map(
       ({ method, path, schema }) =>
         `  { method: '${method}', pattern: /${pathPattern(path)}/, schema: ${zodOf(schema, lazy)} },`,
@@ -226,6 +240,26 @@ const lines = [
   '];',
   '',
 ];
+// Self-check: a call to each endpoint must find its own entry first — no other path may shadow it.
+const sorted = [...operations].sort(
+  (a, b) =>
+    specificity(b.path).localeCompare(specificity(a.path)) ||
+    a.path.localeCompare(b.path) ||
+    a.method.localeCompare(b.method),
+);
+for (const operation of sorted) {
+  const sample = operation.path.replace(/\{[^}]+\}/g, 'sample-id');
+  const first = sorted.find(
+    (entry) =>
+      entry.method === operation.method && new RegExp(pathPattern(entry.path)).test(sample),
+  );
+  if (first !== operation) {
+    throw new Error(
+      `${operation.method.toUpperCase()} ${operation.path} is shadowed by ${first?.path ?? 'nothing'}`,
+    );
+  }
+}
+
 writeFileSync(OUTPUT, lines.join('\n'));
 process.stdout.write(
   `api schemas: ${String(ordered.length)} schemas, ${String(operations.length)} endpoints → ${OUTPUT}\n`,
