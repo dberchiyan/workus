@@ -1,4 +1,4 @@
-import type { SecurityLog } from '@/features/auth';
+import type { SecurityCategory, SecurityLog } from '@/features/auth';
 import { apiClient } from '@/shared/api/client';
 import type {
   ActivityPage,
@@ -39,11 +39,16 @@ export const employeeApi = {
     (await apiClient.get<EmployeeProfile>(`/api/v1/employees/${encodeURIComponent(employeeId)}`))
       .data,
   /** The employee's security log (sign-ins, password changes…), newest first. */
-  securityLog: async (employeeId: string, page: number, size: number): Promise<SecurityLog> =>
+  securityLog: async (
+    employeeId: string,
+    category: SecurityCategory | undefined,
+    page: number,
+    size: number,
+  ): Promise<SecurityLog> =>
     (
       await apiClient.get<SecurityLog>(
         `/api/v1/employees/${encodeURIComponent(employeeId)}/security-log`,
-        { params: { page, size } },
+        { params: { category, page, size } },
       )
     ).data,
   /** Newest first; `page` is 0-based. */

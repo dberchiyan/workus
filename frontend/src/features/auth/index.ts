@@ -16,12 +16,14 @@ export {
   useOwnSecurityLog,
   useSessions,
 } from './hooks/useAccount';
-export { SecurityEventList } from './components/SecurityEventList';
+export { SecurityLogView } from './components/SecurityLogView';
+export { isSecurityCategory, nextSecurityLogPage } from './securityLog';
 export { describeUserAgent } from './userAgent';
 export { AUTH_SESSION_ENDPOINTS } from './api/authApi';
 export type {
   ChangePasswordRequest,
   CurrentUser,
+  SecurityCategory,
   SecurityEvent,
   SecurityLog,
   UserSession,

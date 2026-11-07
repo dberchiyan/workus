@@ -1,7 +1,14 @@
-import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import {
+  keepPreviousData,
+  useInfiniteQuery,
+  useMutation,
+  useQuery,
+  useQueryClient,
+} from '@tanstack/react-query';
 import type { ApiError } from '@/shared/api/apiError';
 import { accountApi } from '../api/accountApi';
-import type { ChangePasswordRequest } from '../types';
+import { nextSecurityLogPage } from '../securityLog';
+import type { ChangePasswordRequest, SecurityCategory } from '../types';
 import { authKeys } from './queryKeys';
 
 /** Another page keeps the previous rows on screen until the new ones arrive. */
@@ -43,10 +50,13 @@ export const useEndOtherSessions = () => {
   });
 };
 
-/** Own security log, a page at a time (the previous page stays while the next loads). */
-export const useOwnSecurityLog = (page: number) =>
-  useQuery({
-    queryKey: authKeys.securityLog(page),
-    queryFn: () => accountApi.securityLog(page),
+/** Own security log, newest first, filtered by category; "Show more" loads the next page. */
+export const useOwnSecurityLog = (category: SecurityCategory | undefined) =>
+  useInfiniteQuery({
+    queryKey: authKeys.securityLog(category),
+    queryFn: ({ pageParam }) => accountApi.securityLog(category, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: nextSecurityLogPage,
+    // Another filter keeps the current rows on screen until its own arrive.
     placeholderData: keepPreviousData,
   });

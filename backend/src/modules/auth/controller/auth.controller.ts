@@ -7,6 +7,7 @@ import {
   HttpStatus,
   Post,
   Put,
+  Query,
   Req,
   Res,
 } from '@nestjs/common';
@@ -24,7 +25,7 @@ import { clientIp, clientUserAgent, readCookie } from '../../../common/security/
 import { Authorize, Public } from '../../../common/security/security.decorators';
 import { ApiPageable, type Pageable, PageableQuery } from '../../../common/dto/pageable';
 import { UuidParam } from '../../../common/dto/uuid-param';
-import { toSecurityEventPage } from '../../../common/dto/security-event.response';
+import { SecurityLogQuery, toSecurityEventPage } from '../../../common/dto/security-event.response';
 import { AUDIT_EVENT_PAGEABLE, type AuditEventSortField } from '../../audit/service/audit-sort';
 import { AuthService } from '../service/auth.service';
 import { SessionService } from '../service/session.service';
@@ -193,8 +194,11 @@ export class AuthController {
   @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED')
   async securityLog(
     @CurrentPrincipal() principal: Principal,
+    @Query() query: SecurityLogQuery,
     @PageableQuery(AUDIT_EVENT_PAGEABLE) pageable: Pageable<AuditEventSortField>,
   ): Promise<SecurityLogResponse> {
-    return toSecurityEventPage(await this.authService.securityLog(principal.userId, pageable));
+    return toSecurityEventPage(
+      await this.authService.securityLog(principal.userId, query.category ?? null, pageable),
+    );
   }
 }

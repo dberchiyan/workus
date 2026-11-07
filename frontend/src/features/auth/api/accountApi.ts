@@ -1,10 +1,10 @@
 import { apiClient } from '@/shared/api/client';
-import type { ChangePasswordRequest, SecurityLog, UserSessions } from '../types';
+import type { ChangePasswordRequest, SecurityCategory, SecurityLog, UserSessions } from '../types';
 
 /** Other sessions per page in Settings. */
 export const SESSIONS_PAGE_SIZE = 5;
-/** Security-log entries per page. */
-export const SECURITY_LOG_PAGE_SIZE = 10;
+/** Security-log entries per "Show more" (grouped on screen, so a page shows fewer rows). */
+export const SECURITY_LOG_PAGE_SIZE = 25;
 
 const BASE = '/api/v1/auth';
 
@@ -21,10 +21,10 @@ export const accountApi = {
       })
     ).data,
   /** Own security log, newest first. */
-  securityLog: async (page: number): Promise<SecurityLog> =>
+  securityLog: async (category: SecurityCategory | undefined, page: number): Promise<SecurityLog> =>
     (
       await apiClient.get<SecurityLog>(`${BASE}/security-log`, {
-        params: { page, size: SECURITY_LOG_PAGE_SIZE },
+        params: { category, page, size: SECURITY_LOG_PAGE_SIZE },
       })
     ).data,
   endSession: async (sessionId: string): Promise<void> => {

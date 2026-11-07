@@ -667,6 +667,20 @@
         "operationId": "AuthController_securityLog",
         "parameters": [
           {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SIGN_INS",
+                "FAILED",
+                "PASSWORD",
+                "SESSIONS"
+              ]
+            }
+          },
+          {
             "name": "page",
             "required": false,
             "in": "query",
@@ -1353,6 +1367,20 @@
       "get": {
         "operationId": "EmployeeSecurityLogController_list",
         "parameters": [
+          {
+            "name": "category",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "enum": [
+                "SIGN_INS",
+                "FAILED",
+                "PASSWORD",
+                "SESSIONS"
+              ]
+            }
+          },
           {
             "name": "page",
             "required": false,
@@ -4975,6 +5003,9 @@
               "string",
               "null"
             ]
+          },
+          "newDevice": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -4982,7 +5013,8 @@
           "action",
           "occurredAt",
           "ip",
-          "userAgent"
+          "userAgent",
+          "newDevice"
         ],
         "additionalProperties": false
       },

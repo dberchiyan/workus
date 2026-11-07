@@ -1,4 +1,6 @@
+import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+import { SECURITY_CATEGORIES } from '../../modules/audit/service/security-category';
 import { pageResponseSchema } from './page.response';
 
 /** Security-log actions (auth.*) as the API names them. */
@@ -26,6 +28,8 @@ export const SecurityEventSchema = z
     ip: z.string().nullable(),
     /** As the browser sent it; the client turns it into "Chrome on macOS". */
     userAgent: z.string().nullable(),
+    /** A sign-in from a device the user had not signed in from before. */
+    newDevice: z.boolean(),
   })
   .meta({ id: 'SecurityEvent' });
 
@@ -41,6 +45,7 @@ export const toSecurityEventPage = (page: {
     action: string;
     ipAddress: string | null;
     userAgent: string | null;
+    newDevice: boolean;
   }[];
   totalElements: number;
 }): SecurityEventPageBody => ({
@@ -53,9 +58,16 @@ export const toSecurityEventPage = (page: {
             occurredAt: event.occurredAt.toISOString(),
             ip: event.ipAddress,
             userAgent: event.userAgent,
+            newDevice: event.newDevice,
           },
         ]
       : [],
   ),
   totalElements: page.totalElements,
 });
+
+/** `?category=` of both security-log endpoints; absent = every event. */
+export const SecurityLogQuerySchema = z.object({
+  category: z.enum(SECURITY_CATEGORIES, { error: 'validation.invalid' }).optional(),
+});
+export class SecurityLogQuery extends createZodDto(SecurityLogQuerySchema) {}

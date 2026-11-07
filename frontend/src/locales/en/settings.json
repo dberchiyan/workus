@@ -68,8 +68,6 @@
   },
   "security": {
     "title": "Security log",
-    "description": "Sign-ins, failed attempts, password changes and signed-out sessions on your account. If you don’t recognise something, change your password.",
-    "error": "Couldn’t load your security log",
-    "retry": "Try again"
+    "description": "Sign-ins, failed attempts, password changes and signed-out sessions on your account. If you don’t recognise something, change your password."
   }
 }

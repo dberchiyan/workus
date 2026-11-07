@@ -1,8 +1,11 @@
-import { Controller, Get, HttpStatus } from '@nestjs/common';
+import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { ApiPageable, type Pageable, PageableQuery } from '../../../../common/dto/pageable';
-import { toSecurityEventPage } from '../../../../common/dto/security-event.response';
+import {
+  SecurityLogQuery,
+  toSecurityEventPage,
+} from '../../../../common/dto/security-event.response';
 import { UuidParam } from '../../../../common/dto/uuid-param';
 import { ApiErrors } from '../../../../common/exception/api-errors.decorator';
 import { can } from '../../../../common/security/policies';
@@ -33,8 +36,11 @@ export class EmployeeSecurityLogController {
   )
   async list(
     @UuidParam('employeeId') employeeId: string,
+    @Query() query: SecurityLogQuery,
     @PageableQuery(AUDIT_EVENT_PAGEABLE) pageable: Pageable<AuditEventSortField>,
   ): Promise<EmployeeSecurityLogResponse> {
-    return toSecurityEventPage(await this.employeeService.findSecurityLog(employeeId, pageable));
+    return toSecurityEventPage(
+      await this.employeeService.findSecurityLog(employeeId, query.category ?? null, pageable),
+    );
   }
 }

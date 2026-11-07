@@ -17,6 +17,7 @@ import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
 import type { AuditEventSortField } from '../../audit/service/audit-sort';
 import { AuditService } from '../../audit/service/audit.service';
 import type { SecurityEventPage } from '../../audit/service/audit.types';
+import type { SecurityCategory } from '../../audit/service/security-category';
 import { UserService } from '../../user/service/user.service';
 import type { UserProfile } from '../../user/service/user.types';
 import { PasswordHasher } from './password-hasher.service';
@@ -207,8 +208,12 @@ export class AuthService {
   }
 
   /** The caller's security log, newest first. */
-  securityLog(userId: string, pageable: Pageable<AuditEventSortField>): Promise<SecurityEventPage> {
-    return this.auditService.findSecurityPage(userId, pageable);
+  securityLog(
+    userId: string,
+    category: SecurityCategory | null,
+    pageable: Pageable<AuditEventSortField>,
+  ): Promise<SecurityEventPage> {
+    return this.auditService.findSecurityPage(userId, category, pageable);
   }
 
   /** One security-log entry about `userId`; IP and browser come from the request context. */

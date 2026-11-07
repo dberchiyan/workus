@@ -947,6 +947,7 @@ export interface components {
             occurredAt: string;
             ip: string | null;
             userAgent: string | null;
+            newDevice: boolean;
         };
         SecurityLogResponse_Output: {
             content: components["schemas"]["SecurityEvent_Output"][];
@@ -2678,6 +2679,7 @@ export interface operations {
     AuthController_securityLog: {
         parameters: {
             query?: {
+                category?: "SIGN_INS" | "FAILED" | "PASSWORD" | "SESSIONS";
                 page?: number;
                 size?: number;
                 /** @description One of: occurredAt,asc|desc */
@@ -3143,6 +3145,7 @@ export interface operations {
     EmployeeSecurityLogController_list: {
         parameters: {
             query?: {
+                category?: "SIGN_INS" | "FAILED" | "PASSWORD" | "SESSIONS";
                 page?: number;
                 size?: number;
                 /** @description One of: occurredAt,asc|desc */

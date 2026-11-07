@@ -1,12 +1,13 @@
 import { TransactionHost } from '@nestjs-cls/transactional';
 import type { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { Injectable } from '@nestjs/common';
+import { z } from 'zod';
 import type { Pageable } from '../../../common/dto/pageable';
 import { toPrismaPage } from '../../../common/persistence/pageable';
 import type { PrismaService } from '../../../common/persistence/prisma.service';
-import type { Prisma } from '../../../generated/prisma/client';
+import { Prisma } from '../../../generated/prisma/client';
 import type { AuditEventSortField } from '../service/audit-sort';
-import { AuditTargetType } from '../service/audit-action';
+import { AuditAction, AuditTargetType } from '../service/audit-action';
 import {
   auditEventSelect,
   type AuditEventRecord,
@@ -64,14 +65,16 @@ export class AuditEventRepository {
     return { content, totalElements };
   }
 
-  /** A user's security log, newest first. */
+  /** A user's security log, newest first; `actions` narrows it to some actions. */
   async findSecurityPage(
     userId: string,
+    actions: readonly string[] | null,
     pageable: Pageable<AuditEventSortField>,
   ): Promise<{ content: SecurityEventRecord[]; totalElements: number }> {
     const where = {
       targetType: AuditTargetType.USER,
       targetId: userId,
+      ...(actions ? { action: { in: [...actions] } } : {}),
     } satisfies Prisma.AuditEventWhereInput;
     const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
     // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
@@ -80,6 +83,30 @@ export class AuditEventRepository {
       this.txHost.tx.auditEvent.findMany({ where, select: securityEventSelect, ...page }),
     ]);
     return { content, totalElements };
+  }
+
+  /**
+   * Of these events, the sign-ins from a device the user had not signed in from before: no
+   * earlier sign-in with the same browser string, version numbers ignored (an update is not a
+   * new device). Raw SQL — Prisma cannot compare a column with a function of another row.
+   */
+  async findNewDeviceSignIns(userId: string, eventIds: readonly string[]): Promise<Set<string>> {
+    if (eventIds.length === 0) {
+      return new Set();
+    }
+    const rows = await this.txHost.tx.$queryRaw<unknown[]>`
+      SELECT e.id FROM audit_events e
+      WHERE e.id = ANY(${[...eventIds]}::uuid[])
+        AND e.target_type = ${AuditTargetType.USER} AND e.target_id = ${userId}::uuid
+        AND e.action = ${AuditAction.AUTH_SIGNED_IN} AND e.user_agent IS NOT NULL
+        AND NOT EXISTS (
+          SELECT 1 FROM audit_events p
+          WHERE p.target_type = e.target_type AND p.target_id = e.target_id
+            AND p.action = e.action AND p.user_agent IS NOT NULL
+            AND (p.occurred_at, p.id) < (e.occurred_at, e.id)
+            AND regexp_replace(p.user_agent, '[0-9]+', '', 'g')
+              = regexp_replace(e.user_agent, '[0-9]+', '', 'g'))`;
+    return new Set(idRowsSchema.parse(rows).map((row) => row.id));
   }
 
   /** Oldest first; bounded (a request has a handful of events). */
@@ -94,3 +121,5 @@ export class AuditEventRepository {
 }
 
 const MAX_EVENTS_PER_TARGET = 20;
+
+const idRowsSchema = z.array(z.object({ id: z.string() }));

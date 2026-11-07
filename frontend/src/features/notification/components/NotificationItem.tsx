@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { InitialsAvatar } from '@/shared/components/InitialsAvatar';
 import { cn } from '@/shared/lib/cn';
-import { formatAgo } from '../format';
+import { formatAgo } from '@/shared/lib/formatAgo';
 import type { NotificationView } from '../hooks/useNotificationView';
 import type { AppNotification } from '../types';
 

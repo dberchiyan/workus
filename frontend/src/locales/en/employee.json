@@ -275,9 +275,7 @@
     },
     "security": {
       "title": "Security log",
-      "description": "Sign-ins, failed attempts, password changes and signed-out sessions of this person’s account.",
-      "error": "Couldn’t load the security log",
-      "retry": "Try again"
+      "description": "Sign-ins, failed attempts, password changes and signed-out sessions of this person’s account."
     }
   },
   "termination": {

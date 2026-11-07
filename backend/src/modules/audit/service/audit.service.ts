@@ -14,6 +14,7 @@ import {
 import { AuditChangesSchema } from './audit-change';
 import type { AuditEvent, AuditEventPage, NewAuditEvent, SecurityEventPage } from './audit.types';
 import type { AuditEventSortField } from './audit-sort';
+import { SECURITY_CATEGORY_ACTIONS, type SecurityCategory } from './security-category';
 
 const isAction = (value: string): value is AuditAction =>
   (AUDIT_ACTIONS as readonly string[]).includes(value);
@@ -74,9 +75,18 @@ export class AuditService {
   /** A user's security log (sign-ins, password changes, ended sessions), newest first. */
   async findSecurityPage(
     userId: string,
+    category: SecurityCategory | null,
     pageable: Pageable<AuditEventSortField>,
   ): Promise<SecurityEventPage> {
-    const page = await this.auditEventRepository.findSecurityPage(userId, pageable);
+    const page = await this.auditEventRepository.findSecurityPage(
+      userId,
+      category ? SECURITY_CATEGORY_ACTIONS[category] : null,
+      pageable,
+    );
+    const newDevices = await this.auditEventRepository.findNewDeviceSignIns(
+      userId,
+      page.content.map((record) => record.id),
+    );
     return {
       content: page.content.flatMap((record) =>
         isAction(record.action)
@@ -87,6 +97,7 @@ export class AuditService {
                 action: record.action,
                 ipAddress: record.ipAddress,
                 userAgent: record.userAgent,
+                newDevice: newDevices.has(record.id),
               },
             ]
           : [],
