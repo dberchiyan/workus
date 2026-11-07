@@ -1,5 +1,6 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
+import { env } from '@/shared/config/env';
 import enAuth from '@/locales/en/auth.json';
 import enCommon from '@/locales/en/common.json';
 import enEmployee from '@/locales/en/employee.json';
@@ -35,7 +36,7 @@ i18n.on('languageChanged', (language) => {
 
 await i18n.use(initReactI18next).init({
   resources,
-  lng: import.meta.env.VITE_DEFAULT_LOCALE || SUPPORTED_LOCALES[0],
+  lng: env.VITE_DEFAULT_LOCALE,
   fallbackLng: SUPPORTED_LOCALES[0],
   supportedLngs: SUPPORTED_LOCALES,
   ns: Object.keys(resources.en),

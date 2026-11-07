@@ -16,7 +16,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "i18n:check": "node scripts/i18n-check.ts",
-    "generate:api": "openapi-typescript ../backend/openapi.json -o src/shared/types/api.ts",
+    "generate:api": "openapi-typescript ../backend/openapi.json -o src/shared/types/api.ts && node scripts/generate-api-schemas.ts",
     "theme:generate": "node scripts/generate-tailwind-theme.ts",
     "prepare": "cd .. && husky frontend/.husky"
   },

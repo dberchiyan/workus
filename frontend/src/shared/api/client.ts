@@ -1,7 +1,9 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import i18n from 'i18next';
+import { env } from '@/shared/config/env';
 import type { ErrorCode, ErrorResponse } from '@/shared/types';
 import { ApiError } from './apiError';
+import { checkResponseContract } from './responseContract';
 
 const TIMEOUT_MS = 15_000;
 const CSRF_COOKIE = 'XSRF-TOKEN';
@@ -34,7 +36,7 @@ export const setSessionLostHandler = (handler: SessionLostHandler): void => {
 };
 
 export const apiClient = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL,
+  baseURL: env.VITE_API_BASE_URL,
   withCredentials: true,
   timeout: TIMEOUT_MS,
   headers: { 'Content-Type': 'application/json' },
@@ -51,7 +53,8 @@ apiClient.interceptors.request.use((config) => {
   return config;
 });
 
-apiClient.interceptors.response.use(undefined, (error: unknown) => {
+// Every JSON answer is checked against the contract the types come from (runtime safety net).
+apiClient.interceptors.response.use(checkResponseContract, (error: unknown) => {
   if (!(error instanceof AxiosError)) {
     return Promise.reject(error instanceof Error ? error : new Error('Unknown error'));
   }

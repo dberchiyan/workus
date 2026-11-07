@@ -27,4 +27,12 @@ export class ApiError extends Error {
   }
 }
 
+/** A response that breaks the OpenAPI contract — the same answer would come again. */
+export class ApiContractError extends ApiError {
+  constructor(status: number, message: string, details: readonly ApiErrorDetail[]) {
+    super(status, 'INTERNAL_ERROR', message, details, undefined);
+    this.name = 'ApiContractError';
+  }
+}
+
 export const isApiError = (error: unknown): error is ApiError => error instanceof ApiError;

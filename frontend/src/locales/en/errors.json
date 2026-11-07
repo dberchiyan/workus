@@ -16,5 +16,6 @@
   "UNSUPPORTED_MEDIA_TYPE": "Only JSON requests are accepted",
   "RATE_LIMIT_EXCEEDED": "Too many attempts — try again later",
   "UPSTREAM_UNAVAILABLE": "Can't reach the server — check your connection and try again",
-  "INTERNAL_ERROR": "Something went wrong on our side — try again later"
+  "INTERNAL_ERROR": "Something went wrong on our side — try again later",
+  "CONTRACT_MISMATCH": "The server sent data this page doesn’t understand — reload, and contact support if it keeps happening"
 }

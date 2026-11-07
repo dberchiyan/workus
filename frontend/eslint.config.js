@@ -7,8 +7,40 @@ import reactRefresh from 'eslint-plugin-react-refresh';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
+const RESTRICTED_SYNTAX = [
+  { selector: 'TSEnumDeclaration', message: 'Use an `as const` object.' },
+  {
+    selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
+    message: 'Forbidden (architecture.md).',
+  },
+  {
+    // MUI 9 Typography silently ignores "text.secondary"; the value is "textSecondary".
+    selector: "JSXAttribute[name.name='color'] Literal[value=/^text[.]/]",
+    message: 'Use color="textSecondary" / "textPrimary" / "textDisabled".',
+  },
+  {
+    // What a role may use is decided once, in features/auth/access.ts.
+    selector: "BinaryExpression[operator=/^[!=]==$/] > MemberExpression[property.name='role']",
+    message: 'Decide by role through ACCESS / useAccess() (features/auth/access.ts).',
+  },
+];
+
+/** Configuration is read once, checked, from `@/shared/config/env`. */
+const IMPORT_META_ENV = {
+  selector: "MemberExpression[object.type='MetaProperty'][property.name='env']",
+  message: 'Read configuration from `@/shared/config/env` (checked against a schema).',
+};
+
 export default tseslint.config(
-  { ignores: ['dist/**', 'node_modules/**', 'src/shared/types/api.ts', 'eslint.config.js'] },
+  {
+    ignores: [
+      'dist/**',
+      'node_modules/**',
+      'src/shared/types/api.ts',
+      'src/shared/api/schemas.generated.ts',
+      'eslint.config.js',
+    ],
+  },
   eslint.configs.recommended,
   ...tseslint.configs.strictTypeChecked,
   jsxA11y.flatConfigs.strict,
@@ -38,19 +70,7 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'error',
       '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
       '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
-      'no-restricted-syntax': [
-        'error',
-        { selector: 'TSEnumDeclaration', message: 'Use an `as const` object.' },
-        {
-          selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
-          message: 'Forbidden (architecture.md).',
-        },
-        {
-          // MUI 9 Typography silently ignores "text.secondary"; the value is "textSecondary".
-          selector: "JSXAttribute[name.name='color'] Literal[value=/^text[.]/]",
-          message: 'Use color="textSecondary" / "textPrimary" / "textDisabled".',
-        },
-      ],
+      'no-restricted-syntax': ['error', ...RESTRICTED_SYNTAX, IMPORT_META_ENV],
       'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
       'boundaries/dependencies': [
         'error',
@@ -141,5 +161,10 @@ export default tseslint.config(
   {
     files: ['vite.config.ts', 'scripts/**/*.ts'],
     languageOptions: { globals: { ...globals.node } },
+  },
+  {
+    // The one place that reads the raw values.
+    files: ['src/shared/config/env.ts'],
+    rules: { 'no-restricted-syntax': ['error', ...RESTRICTED_SYNTAX] },
   },
 );
