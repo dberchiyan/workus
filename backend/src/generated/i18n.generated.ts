@@ -40,6 +40,13 @@ export type I18nTranslations = {
         "holiday": {
             "dateTaken": string;
         };
+        "organisation": {
+            "lastOwner": string;
+            "notAdministrator": string;
+        };
+        "registration": {
+            "emailTaken": string;
+        };
         "review": {
             "responsibleNotFound": string;
             "startingNotDeletable": string;
@@ -177,6 +184,13 @@ export type I18nTranslations = {
             "date": string;
             "nameRequired": string;
             "nameTooLong": string;
+        };
+        "organisationName": {
+            "required": string;
+            "tooLong": string;
+        };
+        "role": {
+            "invalid": string;
         };
     };
 };

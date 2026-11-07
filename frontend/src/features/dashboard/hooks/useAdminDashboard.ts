@@ -2,7 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { dashboardApi } from '../api/dashboardApi';
 import type { DateRange, LocalDay } from '../types';
 
-/** No tenant: one company per installation. */
+/** No tenant id: the organisation comes from the session (see auth queryKeys). */
 export const dashboardKeys = {
   all: ['dashboard'] as const,
   admin: () => [...dashboardKeys.all, 'admin'] as const,

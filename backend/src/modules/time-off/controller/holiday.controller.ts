@@ -46,8 +46,15 @@ export class HolidayController {
   @ApiOperation({ summary: 'The company holidays of one year, by date' })
   @ZodResponse({ status: HttpStatus.OK, type: HolidayListResponse })
   @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED')
-  async list(@Query() query: HolidayYearQuery): Promise<HolidayListResponse> {
-    return { content: (await this.holidayService.findYear(query.year)).map(toHolidayResponse) };
+  async list(
+    @CurrentPrincipal() principal: Principal,
+    @Query() query: HolidayYearQuery,
+  ): Promise<HolidayListResponse> {
+    return {
+      content: (await this.holidayService.findYear(principal.organisationId, query.year)).map(
+        toHolidayResponse,
+      ),
+    };
   }
 
   @Post()
@@ -63,7 +70,9 @@ export class HolidayController {
     @Body() request: CreateHolidayRequest,
     @CurrentPrincipal() principal: Principal,
   ): Promise<HolidayResponse> {
-    return toHolidayResponse(await this.holidayService.create(request, principal.userId));
+    return toHolidayResponse(
+      await this.holidayService.create(principal.organisationId, request, principal.userId),
+    );
   }
 
   @Put(':holidayId')
@@ -77,7 +86,12 @@ export class HolidayController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<HolidayResponse> {
     return toHolidayResponse(
-      await this.holidayService.update(holidayId, request, principal.userId),
+      await this.holidayService.update(
+        principal.organisationId,
+        holidayId,
+        request,
+        principal.userId,
+      ),
     );
   }
 
@@ -92,7 +106,10 @@ export class HolidayController {
     'FORBIDDEN',
     'RESOURCE_NOT_FOUND',
   )
-  async remove(@UuidParam('holidayId') holidayId: string): Promise<void> {
-    await this.holidayService.remove(holidayId);
+  async remove(
+    @CurrentPrincipal() principal: Principal,
+    @UuidParam('holidayId') holidayId: string,
+  ): Promise<void> {
+    await this.holidayService.remove(principal.organisationId, holidayId);
   }
 }

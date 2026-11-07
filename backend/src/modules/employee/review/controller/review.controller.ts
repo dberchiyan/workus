@@ -29,8 +29,13 @@ export class ReviewController {
     'FORBIDDEN',
     'RESOURCE_NOT_FOUND',
   )
-  async list(@UuidParam('employeeId') employeeId: string): Promise<EmployeeReviewsResponse> {
-    return toEmployeeReviewsResponse(await this.reviewService.findForEmployee(employeeId));
+  async list(
+    @CurrentPrincipal() principal: Principal,
+    @UuidParam('employeeId') employeeId: string,
+  ): Promise<EmployeeReviewsResponse> {
+    return toEmployeeReviewsResponse(
+      await this.reviewService.findForEmployee(principal.organisationId, employeeId),
+    );
   }
 
   @Post()
@@ -55,6 +60,7 @@ export class ReviewController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<ReviewResponse> {
     const review = await this.reviewService.create(
+      principal.organisationId,
       employeeId,
       toCommand(request),
       principal.userId,
@@ -74,10 +80,11 @@ export class ReviewController {
     'RESOURCE_NOT_FOUND',
   )
   async findOne(
+    @CurrentPrincipal() principal: Principal,
     @UuidParam('employeeId') _employeeId: string,
     @UuidParam('reviewId') reviewId: string,
   ): Promise<ReviewResponse> {
-    return toReviewResponse(await this.reviewService.findOne(reviewId));
+    return toReviewResponse(await this.reviewService.findOne(principal.organisationId, reviewId));
   }
 
   @Put(':reviewId')
@@ -101,6 +108,7 @@ export class ReviewController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<ReviewResponse> {
     const review = await this.reviewService.update(
+      principal.organisationId,
       employeeId,
       reviewId,
       { ...toCommand(request), version: request.version },
@@ -122,10 +130,11 @@ export class ReviewController {
     'BUSINESS_RULE_VIOLATION',
   )
   async remove(
+    @CurrentPrincipal() principal: Principal,
     @UuidParam('employeeId') employeeId: string,
     @UuidParam('reviewId') reviewId: string,
   ): Promise<void> {
-    await this.reviewService.delete(employeeId, reviewId);
+    await this.reviewService.delete(principal.organisationId, employeeId, reviewId);
   }
 }
 

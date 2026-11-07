@@ -67,11 +67,13 @@ export class EmployeeService {
   ) {}
 
   async findPage(
+    organisationId: string,
     query: EmployeeListQuery,
     pageable: Pageable<EmployeeSortField>,
   ): Promise<EmployeePage> {
     const today = todayUtc();
     const page = await this.employeeRepository.findPage(
+      organisationId,
       {
         searchTerms: toSearchTerms(query.search),
         status: query.status,
@@ -87,7 +89,7 @@ export class EmployeeService {
    * Active headcount, hires of the last 30 days, terminations of the last 90, mean tenure of
    * active employees and active employees nobody is responsible for.
    */
-  async summary(): Promise<EmployeeSummary> {
+  async summary(organisationId: string): Promise<EmployeeSummary> {
     const today = todayUtc();
     const [
       totalActive,
@@ -96,14 +98,19 @@ export class EmployeeService {
       averageTenureDays,
       withoutResponsible,
     ] = await Promise.all([
-      this.employeeRepository.countActive(today),
-      this.employeeRepository.countStartedBetween(minusDays(today, NEW_HIRE_WINDOW_DAYS), today),
+      this.employeeRepository.countActive(organisationId, today),
+      this.employeeRepository.countStartedBetween(
+        organisationId,
+        minusDays(today, NEW_HIRE_WINDOW_DAYS),
+        today,
+      ),
       this.employeeRepository.countTerminatedBetween(
+        organisationId,
         minusDays(today, TERMINATION_WINDOW_DAYS),
         today,
       ),
-      this.employeeRepository.averageTenureDays(today),
-      this.employeeRepository.countActiveWithoutResponsible(today),
+      this.employeeRepository.averageTenureDays(organisationId, today),
+      this.employeeRepository.countActiveWithoutResponsible(organisationId, today),
     ]);
     return {
       totalActive,
@@ -120,8 +127,13 @@ export class EmployeeService {
    * starting salary in the same transaction.
    */
   @Transactional()
-  async create(command: CreateEmployeeCommand, actorId: string): Promise<EmployeeListItemRecord> {
+  async create(
+    organisationId: string,
+    command: CreateEmployeeCommand,
+    actorId: string,
+  ): Promise<EmployeeListItemRecord> {
     const email = command.email.toLowerCase();
+    // Emails are unique across organisations: one sign-in, one account, one tenant.
     if (await this.userService.existsByEmail(email)) {
       throw new BusinessConflictException('errors.employee.emailTaken', { email }, 'email');
     }
@@ -131,8 +143,10 @@ export class EmployeeService {
     const responsibleUserIds = [...new Set(command.responsibleUserIds)];
     if (
       responsibleUserIds.length > 0 &&
-      (await this.employeeRepository.countResponsibleCandidates(responsibleUserIds)) !==
-        responsibleUserIds.length
+      (await this.employeeRepository.countResponsibleCandidates(
+        organisationId,
+        responsibleUserIds,
+      )) !== responsibleUserIds.length
     ) {
       throw new BusinessRuleException(
         'errors.employee.responsibleNotFound',
@@ -141,6 +155,7 @@ export class EmployeeService {
       );
     }
     const userId = await this.userService.createWithoutPassword({
+      organisationId,
       email,
       firstName: command.firstName,
       lastName: command.lastName,
@@ -148,6 +163,7 @@ export class EmployeeService {
       createdBy: actorId,
     });
     const employeeId = await this.employeeRepository.create({
+      organisationId,
       userId,
       positionId: command.positionId,
       startDate: new Date(`${command.startDate}T00:00:00Z`),
@@ -161,8 +177,8 @@ export class EmployeeService {
       createdBy: actorId,
     });
     const [employee, profile] = await Promise.all([
-      this.employeeRepository.findListItemById(employeeId),
-      this.employeeRepository.findProfileById(employeeId),
+      this.employeeRepository.findListItemById(organisationId, employeeId),
+      this.employeeRepository.findProfileById(organisationId, employeeId),
     ]);
     if (!employee || !profile) {
       throw new Error('Created employee not found in the same transaction');
@@ -203,11 +219,12 @@ export class EmployeeService {
    */
   @Transactional()
   async updateResponsibles(
+    organisationId: string,
     employeeId: string,
     command: { responsibleUserIds: string[]; version: number },
     actorId: string,
   ): Promise<EmployeeProfile> {
-    const before = await this.employeeRepository.findProfileById(employeeId);
+    const before = await this.employeeRepository.findProfileById(organisationId, employeeId);
     if (!before) {
       throw new ResourceNotFoundException();
     }
@@ -218,7 +235,7 @@ export class EmployeeService {
     if (responsibleUserIds.includes(before.user.id)) {
       throw new BusinessRuleException('errors.employee.selfResponsible', {}, 'responsibleUserIds');
     }
-    if (!(await this.areResponsibleCandidates(responsibleUserIds))) {
+    if (!(await this.areResponsibleCandidates(organisationId, responsibleUserIds))) {
       throw new BusinessRuleException(
         'errors.employee.responsibleNotFound',
         {},
@@ -233,6 +250,7 @@ export class EmployeeService {
     }
     if (
       !(await this.employeeRepository.replaceResponsibles(
+        organisationId,
         employeeId,
         command.version,
         responsibleUserIds,
@@ -241,7 +259,7 @@ export class EmployeeService {
     ) {
       throw new ConcurrentModificationException();
     }
-    const after = await this.employeeRepository.findProfileById(employeeId);
+    const after = await this.employeeRepository.findProfileById(organisationId, employeeId);
     if (!after) {
       throw new Error('Updated employee not found in the same transaction');
     }
@@ -265,11 +283,12 @@ export class EmployeeService {
    */
   @Transactional()
   async update(
+    organisationId: string,
     employeeId: string,
     command: UpdateEmployeeCommand,
     actorId: string,
   ): Promise<{ before: EmployeeProfileRecord; after: EmployeeProfileRecord }> {
-    const before = await this.requireProfile(employeeId, command.version);
+    const before = await this.requireProfile(organisationId, employeeId, command.version);
     const email = command.email.toLowerCase();
     if (await this.userService.isEmailTakenByOther(email, before.user.id)) {
       throw new BusinessConflictException('errors.employee.emailTaken', { email }, 'email');
@@ -331,11 +350,17 @@ export class EmployeeService {
       );
     }
     if (
-      !(await this.employeeRepository.updateDetails(employeeId, command.version, details, actorId))
+      !(await this.employeeRepository.updateDetails(
+        organisationId,
+        employeeId,
+        command.version,
+        details,
+        actorId,
+      ))
     ) {
       throw new ConcurrentModificationException();
     }
-    const after = await this.requireProfile(employeeId);
+    const after = await this.requireProfile(organisationId, employeeId);
     await this.auditService.record({
       action: AuditAction.EMPLOYEE_UPDATED,
       employeeId,
@@ -379,11 +404,12 @@ export class EmployeeService {
    */
   @Transactional()
   async terminate(
+    organisationId: string,
     employeeId: string,
     command: TerminateEmployeeCommand,
     actorId: string,
   ): Promise<{ before: EmployeeProfileRecord; after: EmployeeProfileRecord }> {
-    const before = await this.requireProfile(employeeId, command.version);
+    const before = await this.requireProfile(organisationId, employeeId, command.version);
     const terminatedOn = new Date(`${command.date}T00:00:00Z`);
     if (terminatedOn < before.startDate) {
       throw new BusinessRuleException('errors.employee.terminationBeforeStart', {}, 'date');
@@ -414,6 +440,7 @@ export class EmployeeService {
     }
     if (
       !(await this.employeeRepository.updateTermination(
+        organisationId,
         employeeId,
         command.version,
         { terminatedOn, reason: command.reason, comment },
@@ -422,7 +449,7 @@ export class EmployeeService {
     ) {
       throw new ConcurrentModificationException();
     }
-    const after = await this.requireProfile(employeeId);
+    const after = await this.requireProfile(organisationId, employeeId);
     await this.auditService.record({
       action: AuditAction.EMPLOYEE_TERMINATED,
       employeeId,
@@ -435,15 +462,24 @@ export class EmployeeService {
   /** Takes a termination back (the employee is active again). Not terminated → nothing to do. */
   @Transactional()
   async cancelTermination(
+    organisationId: string,
     employeeId: string,
     version: number,
     actorId: string,
   ): Promise<EmployeeProfileRecord> {
-    const before = await this.requireProfile(employeeId, version);
+    const before = await this.requireProfile(organisationId, employeeId, version);
     if (!before.terminatedOn) {
       return before;
     }
-    if (!(await this.employeeRepository.updateTermination(employeeId, version, null, actorId))) {
+    if (
+      !(await this.employeeRepository.updateTermination(
+        organisationId,
+        employeeId,
+        version,
+        null,
+        actorId,
+      ))
+    ) {
       throw new ConcurrentModificationException();
     }
     await this.auditService.record({
@@ -468,15 +504,16 @@ export class EmployeeService {
           : []),
       ],
     });
-    return this.requireProfile(employeeId);
+    return this.requireProfile(organisationId, employeeId);
   }
 
   /** 404 for an unknown employee; with `version`, 409 when it is not the current one. */
   private async requireProfile(
+    organisationId: string,
     employeeId: string,
     version?: number,
   ): Promise<EmployeeProfileRecord> {
-    const employee = await this.employeeRepository.findProfileById(employeeId);
+    const employee = await this.employeeRepository.findProfileById(organisationId, employeeId);
     if (!employee) {
       throw new ResourceNotFoundException();
     }
@@ -488,30 +525,32 @@ export class EmployeeService {
 
   /** The employee's change history, newest first; 404 for an unknown employee. */
   async findActivity(
+    organisationId: string,
     employeeId: string,
     pageable: Pageable<AuditEventSortField>,
   ): Promise<AuditEventPage> {
-    if (!(await this.employeeRepository.existsById(employeeId))) {
+    if (!(await this.employeeRepository.existsById(organisationId, employeeId))) {
       throw new ResourceNotFoundException();
     }
-    return this.auditService.findPageByEmployee(employeeId, pageable);
+    return this.auditService.findPageByEmployee(organisationId, employeeId, pageable);
   }
 
   /** The employee's security log (their account's sign-ins, password changes…), for admins. */
   async findSecurityLog(
+    organisationId: string,
     employeeId: string,
     category: SecurityCategory | null,
     pageable: Pageable<AuditEventSortField>,
   ): Promise<SecurityEventPage> {
-    const userId = await this.employeeRepository.findUserIdById(employeeId);
+    const userId = await this.employeeRepository.findUserIdById(organisationId, employeeId);
     if (!userId) {
       throw new ResourceNotFoundException();
     }
-    return this.auditService.findSecurityPage(userId, category, pageable);
+    return this.auditService.findSecurityPage(organisationId, userId, category, pageable);
   }
 
-  async findProfile(id: string): Promise<EmployeeProfile> {
-    const employee = await this.employeeRepository.findProfileById(id);
+  async findProfile(organisationId: string, id: string): Promise<EmployeeProfile> {
+    const employee = await this.employeeRepository.findProfileById(organisationId, id);
     if (!employee) {
       throw new ResourceNotFoundException();
     }
@@ -533,10 +572,13 @@ export class EmployeeService {
     return employee?.terminatedOn != null && employee.terminatedOn <= todayUtc();
   }
 
-  /** For other modules (auth): users whose employment ended in the last `days` days, today included. */
-  usersWhoLeftWithin(days: number): Promise<string[]> {
+  /**
+   * For other modules (auth, a system job over every organisation): users whose employment ended
+   * in the last `days` days, today included.
+   */
+  usersWhoLeftWithin(days: number): Promise<{ userId: string; organisationId: string }[]> {
     const today = todayUtc();
-    return this.employeeRepository.findUserIdsTerminatedBetween(
+    return this.employeeRepository.findUsersTerminatedBetween(
       minusDays(today, days - 1),
       today,
       MAX_ROSTER,
@@ -544,19 +586,24 @@ export class EmployeeService {
   }
 
   /** For other modules (time off): one employee; null when unknown. */
-  async findForTimeOff(employeeId: string): Promise<EmployeeForTimeOff | null> {
-    const employee = await this.employeeRepository.findTimeOffById(employeeId);
+  async findForTimeOff(
+    organisationId: string,
+    employeeId: string,
+  ): Promise<EmployeeForTimeOff | null> {
+    const employee = await this.employeeRepository.findTimeOffById(organisationId, employeeId);
     return employee ? toTimeOff(employee) : null;
   }
 
   /** For other modules (time-off calendar): people employed on at least one day of [from, to]. */
   async findCalendarPage(
+    organisationId: string,
     search: string | undefined,
     from: Date,
     to: Date,
     pageable: Pageable<EmployeeSortField>,
   ): Promise<EmployeeCalendarPage> {
     const page = await this.employeeRepository.findCalendarPage(
+      organisationId,
       { searchTerms: toSearchTerms(search), from, to },
       pageable,
     );
@@ -580,6 +627,7 @@ export class EmployeeService {
    * without one.
    */
   async birthdays(
+    organisationId: string,
     range: { from: Date; to: Date },
     page: { page: number; size: number },
   ): Promise<EmployeeBirthdays> {
@@ -595,6 +643,7 @@ export class EmployeeService {
       days.push(29);
     }
     const result = await this.employeeRepository.findBirthdays(
+      organisationId,
       { from, to, month, days },
       { offset: page.page * page.size, limit: page.size },
     );
@@ -608,8 +657,8 @@ export class EmployeeService {
    * For other modules (insights): everyone who ever worked here, with dates and position. One
    * company is small; bounded defensively.
    */
-  async roster(): Promise<RosterEmployee[]> {
-    const rows = await this.employeeRepository.findRoster(MAX_ROSTER);
+  async roster(organisationId: string): Promise<RosterEmployee[]> {
+    const rows = await this.employeeRepository.findRoster(organisationId, MAX_ROSTER);
     return rows.map((row) => ({
       id: row.id,
       userId: row.user.id,
@@ -623,11 +672,11 @@ export class EmployeeService {
   }
 
   /** For other modules (dashboard): who starts and who leaves in the next `days` days. */
-  async movements(today: Date, days: number): Promise<EmployeeMovements> {
+  async movements(organisationId: string, today: Date, days: number): Promise<EmployeeMovements> {
     const until = new Date(today.getTime() + days * 86_400_000);
     const [joining, leaving] = await Promise.all([
-      this.employeeRepository.findStartingBetween(today, until),
-      this.employeeRepository.findLeavingBetween(today, until),
+      this.employeeRepository.findStartingBetween(organisationId, today, until),
+      this.employeeRepository.findLeavingBetween(organisationId, today, until),
     ]);
     const events: EmployeeMovement[] = [
       ...joining.map((employee) => movementOf('JOINING', employee.startDate, employee)),
@@ -639,16 +688,17 @@ export class EmployeeService {
   }
 
   /** For other modules: does the employee exist? */
-  exists(id: string): Promise<boolean> {
-    return this.employeeRepository.existsById(id);
+  exists(organisationId: string, id: string): Promise<boolean> {
+    return this.employeeRepository.existsById(organisationId, id);
   }
 
-  /** For other modules: are all these users admins (possible responsibles)? */
-  async areResponsibleCandidates(userIds: string[]): Promise<boolean> {
+  /** For other modules: are all these users admins of the organisation (possible responsibles)? */
+  async areResponsibleCandidates(organisationId: string, userIds: string[]): Promise<boolean> {
     const unique = [...new Set(userIds)];
     return (
       unique.length === 0 ||
-      (await this.employeeRepository.countResponsibleCandidates(unique)) === unique.length
+      (await this.employeeRepository.countResponsibleCandidates(organisationId, unique)) ===
+        unique.length
     );
   }
 
@@ -656,8 +706,8 @@ export class EmployeeService {
     return this.employeeRepository.findPositionOptions();
   }
 
-  responsibleCandidates(search: string | undefined) {
-    return this.employeeRepository.findResponsibleCandidates(toSearchTerms(search));
+  responsibleCandidates(organisationId: string, search: string | undefined) {
+    return this.employeeRepository.findResponsibleCandidates(organisationId, toSearchTerms(search));
   }
 }
 

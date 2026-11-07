@@ -1,4 +1,6 @@
 import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
+import type { Principal } from '../../../common/security/principal';
+import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { ApiPageable, type Pageable, PageableQuery } from '../../../common/dto/pageable';
@@ -38,8 +40,10 @@ export class DashboardController {
   })
   @ZodResponse({ status: HttpStatus.OK, type: AdminDashboardResponse })
   @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
-  async admin(): Promise<AdminDashboardResponse> {
-    return toAdminDashboardResponse(await this.dashboardService.adminDashboard());
+  async admin(@CurrentPrincipal() principal: Principal): Promise<AdminDashboardResponse> {
+    return toAdminDashboardResponse(
+      await this.dashboardService.adminDashboard(principal.organisationId),
+    );
   }
 
   @Get('admin/requests')
@@ -49,9 +53,16 @@ export class DashboardController {
   })
   @ZodResponse({ status: HttpStatus.OK, type: DashboardRequestsResponse })
   @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
-  async requests(@Query() query: InstantRangeQuery): Promise<DashboardRequestsResponse> {
+  async requests(
+    @CurrentPrincipal() principal: Principal,
+    @Query() query: InstantRangeQuery,
+  ): Promise<DashboardRequestsResponse> {
     return toDashboardRequestsResponse(
-      await this.dashboardService.requestsMadeBetween(query.from, query.to),
+      await this.dashboardService.requestsMadeBetween(
+        principal.organisationId,
+        query.from,
+        query.to,
+      ),
     );
   }
 
@@ -70,10 +81,13 @@ export class DashboardController {
     'FORBIDDEN',
   )
   async reviews(
+    @CurrentPrincipal() principal: Principal,
     @Query() query: DateRangeQuery,
     @PageableQuery(EVENTS_PAGEABLE) pageable: Pageable<EventsSortField>,
   ): Promise<DashboardReviewsResponse> {
-    return toDashboardReviewsResponse(await this.dashboardService.reviews(query, pageable));
+    return toDashboardReviewsResponse(
+      await this.dashboardService.reviews(principal.organisationId, query, pageable),
+    );
   }
 
   @Get('admin/birthdays')
@@ -92,9 +106,12 @@ export class DashboardController {
     'FORBIDDEN',
   )
   async birthdays(
+    @CurrentPrincipal() principal: Principal,
     @Query() query: DateRangeQuery,
     @PageableQuery(EVENTS_PAGEABLE) pageable: Pageable<EventsSortField>,
   ): Promise<DashboardBirthdaysResponse> {
-    return toDashboardBirthdaysResponse(await this.dashboardService.birthdays(query, pageable));
+    return toDashboardBirthdaysResponse(
+      await this.dashboardService.birthdays(principal.organisationId, query, pageable),
+    );
   }
 }

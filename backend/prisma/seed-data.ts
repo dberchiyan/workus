@@ -6,9 +6,24 @@
  */
 export const SEED_PASSWORD = 'Workus-Dev-2026!';
 
-export const ADMINS = [
-  { firstName: 'Olivia', lastName: 'Bennett', email: 'olivia.bennett@workus.dev' },
-  { firstName: 'Marcus', lastName: 'Reid', email: 'marcus.reid@workus.dev' },
+export interface SeedPerson {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
+/** OSDB: the first organisation (its id is fixed by the tenancy migration). */
+export const OSDB_ID = '01960000-0000-7000-8000-000000000001';
+/** Vortex: a second, smaller company — nothing is shared with OSDB. */
+export const VORTEX_ID = '01960000-0000-7000-8000-000000000002';
+
+export const OSDB_OWNERS: SeedPerson[] = [
+  { firstName: 'Sophia', lastName: 'Carter', email: 'sophia.carter@osdb.io' },
+];
+
+export const ADMINS: SeedPerson[] = [
+  { firstName: 'Olivia', lastName: 'Bennett', email: 'olivia.bennett@osdb.io' },
+  { firstName: 'Marcus', lastName: 'Reid', email: 'marcus.reid@osdb.io' },
 ];
 
 /** Tab order follows sort_order. */
@@ -54,119 +69,119 @@ export const EMPLOYEES: SeedEmployee[] = [
   {
     firstName: 'Ava',
     lastName: 'Thompson',
-    email: 'ava.thompson@workus.dev',
+    email: 'ava.thompson@osdb.io',
     position: 'Frontend Developer',
     startedDaysAgo: 2100,
   },
   {
     firstName: 'Liam',
     lastName: 'Carter',
-    email: 'liam.carter@workus.dev',
+    email: 'liam.carter@osdb.io',
     position: 'Backend Developer',
     startedDaysAgo: 1828,
   },
   {
     firstName: 'Sofia',
     lastName: 'Martinez',
-    email: 'sofia.martinez@workus.dev',
+    email: 'sofia.martinez@osdb.io',
     position: 'Product Designer',
     startedDaysAgo: 1535,
   },
   {
     firstName: 'Noah',
     lastName: 'Kim',
-    email: 'noah.kim@workus.dev',
+    email: 'noah.kim@osdb.io',
     position: 'Machine Learning Engineer',
     startedDaysAgo: 1432,
   },
   {
     firstName: 'Emma',
     lastName: 'Novak',
-    email: 'emma.novak@workus.dev',
+    email: 'emma.novak@osdb.io',
     position: 'QA Engineer',
     startedDaysAgo: 1291,
   },
   {
     firstName: 'Lucas',
     lastName: 'Fischer',
-    email: 'lucas.fischer@workus.dev',
+    email: 'lucas.fischer@osdb.io',
     position: 'Project Manager',
     startedDaysAgo: 2365,
   },
   {
     firstName: 'Mia',
     lastName: 'Rossi',
-    email: 'mia.rossi@workus.dev',
+    email: 'mia.rossi@osdb.io',
     position: 'Full Stack Developer',
     startedDaysAgo: 1147,
   },
   {
     firstName: 'Ethan',
     lastName: 'Walsh',
-    email: 'ethan.walsh@workus.dev',
+    email: 'ethan.walsh@osdb.io',
     position: 'Mobile Developer',
     startedDaysAgo: 150,
   },
   {
     firstName: 'Chloe',
     lastName: 'Dubois',
-    email: 'chloe.dubois@workus.dev',
+    email: 'chloe.dubois@osdb.io',
     position: 'UI/UX Designer',
     startedDaysAgo: 95,
   },
   {
     firstName: 'Daniel',
     lastName: 'Kowalski',
-    email: 'daniel.kowalski@workus.dev',
+    email: 'daniel.kowalski@osdb.io',
     position: 'QA Automation Engineer',
     startedDaysAgo: 12,
   },
   {
     firstName: 'Isabella',
     lastName: 'Moreau',
-    email: 'isabella.moreau@workus.dev',
+    email: 'isabella.moreau@osdb.io',
     position: 'Delivery Manager',
     startedDaysAgo: 2555,
   },
   {
     firstName: 'James',
     lastName: 'Okafor',
-    email: 'james.okafor@workus.dev',
+    email: 'james.okafor@osdb.io',
     position: 'Backend Developer',
     startedDaysAgo: 2428,
   },
   {
     firstName: 'Grace',
     lastName: 'Lindqvist',
-    email: 'grace.lindqvist@workus.dev',
+    email: 'grace.lindqvist@osdb.io',
     position: 'Project Manager',
     startedDaysAgo: 2017,
   },
   {
     firstName: 'Henry',
     lastName: 'Silva',
-    email: 'henry.silva@workus.dev',
+    email: 'henry.silva@osdb.io',
     position: 'Frontend Developer',
     startedDaysAgo: 1922,
   },
   {
     firstName: 'Zoe',
     lastName: 'Hartmann',
-    email: 'zoe.hartmann@workus.dev',
+    email: 'zoe.hartmann@osdb.io',
     position: 'AI Engineer',
     startedDaysAgo: 1638,
   },
   {
     firstName: 'Samuel',
     lastName: 'Petrov',
-    email: 'samuel.petrov@workus.dev',
+    email: 'samuel.petrov@osdb.io',
     position: 'Full Stack Developer',
     startedDaysAgo: 1574,
   },
   {
     firstName: 'Lily',
     lastName: 'Andersen',
-    email: 'lily.andersen@workus.dev',
+    email: 'lily.andersen@osdb.io',
     position: 'QA Engineer',
     startedDaysAgo: 1559,
     terminatedDaysAgo: 60,
@@ -176,21 +191,21 @@ export const EMPLOYEES: SeedEmployee[] = [
   {
     firstName: 'Oliver',
     lastName: 'Nakamura',
-    email: 'oliver.nakamura@workus.dev',
+    email: 'oliver.nakamura@osdb.io',
     position: 'Data Scientist',
     startedDaysAgo: 1495,
   },
   {
     firstName: 'Amelia',
     lastName: 'Costa',
-    email: 'amelia.costa@workus.dev',
+    email: 'amelia.costa@osdb.io',
     position: 'Product Designer',
     startedDaysAgo: 1464,
   },
   {
     firstName: 'Benjamin',
     lastName: 'Varga',
-    email: 'benjamin.varga@workus.dev',
+    email: 'benjamin.varga@osdb.io',
     position: 'Backend Developer',
     startedDaysAgo: 1393,
     terminatedDaysAgo: 20,
@@ -199,35 +214,35 @@ export const EMPLOYEES: SeedEmployee[] = [
   {
     firstName: 'Harper',
     lastName: 'Jensen',
-    email: 'harper.jensen@workus.dev',
+    email: 'harper.jensen@osdb.io',
     position: 'QA Automation Engineer',
     startedDaysAgo: 1353,
   },
   {
     firstName: 'Elijah',
     lastName: 'Brooks',
-    email: 'elijah.brooks@workus.dev',
+    email: 'elijah.brooks@osdb.io',
     position: 'Mobile Developer',
     startedDaysAgo: 1337,
   },
   {
     firstName: 'Evelyn',
     lastName: 'Horvat',
-    email: 'evelyn.horvat@workus.dev',
+    email: 'evelyn.horvat@osdb.io',
     position: 'Machine Learning Engineer',
     startedDaysAgo: 1274,
   },
   {
     firstName: 'Alexander',
     lastName: 'Byrne',
-    email: 'alexander.byrne@workus.dev',
+    email: 'alexander.byrne@osdb.io',
     position: 'Frontend Developer',
     startedDaysAgo: 1250,
   },
   {
     firstName: 'Ella',
     lastName: 'Marchetti',
-    email: 'ella.marchetti@workus.dev',
+    email: 'ella.marchetti@osdb.io',
     position: 'UI/UX Designer',
     startedDaysAgo: 1227,
     terminatedDaysAgo: 110,
@@ -237,35 +252,35 @@ export const EMPLOYEES: SeedEmployee[] = [
   {
     firstName: 'William',
     lastName: 'Ferreira',
-    email: 'william.ferreira@workus.dev',
+    email: 'william.ferreira@osdb.io',
     position: 'QA Engineer',
     startedDaysAgo: 1195,
   },
   {
     firstName: 'Scarlett',
     lastName: 'Novotny',
-    email: 'scarlett.novotny@workus.dev',
+    email: 'scarlett.novotny@osdb.io',
     position: 'Project Manager',
     startedDaysAgo: 1179,
   },
   {
     firstName: 'Jack',
     lastName: 'Lambert',
-    email: 'jack.lambert@workus.dev',
+    email: 'jack.lambert@osdb.io',
     position: 'Backend Developer',
     startedDaysAgo: 1132,
   },
   {
     firstName: 'Aria',
     lastName: 'Sato',
-    email: 'aria.sato@workus.dev',
+    email: 'aria.sato@osdb.io',
     position: 'AI Engineer',
     startedDaysAgo: 1100,
   },
   {
     firstName: 'Mateo',
     lastName: 'Gruber',
-    email: 'mateo.gruber@workus.dev',
+    email: 'mateo.gruber@osdb.io',
     position: 'Full Stack Developer',
     startedDaysAgo: 165,
     terminatedDaysAgo: 5,
@@ -275,14 +290,14 @@ export const EMPLOYEES: SeedEmployee[] = [
   {
     firstName: 'Nora',
     lastName: 'Kovac',
-    email: 'nora.kovac@workus.dev',
+    email: 'nora.kovac@osdb.io',
     position: 'QA Automation Engineer',
     startedDaysAgo: 140,
   },
   {
     firstName: 'Leo',
     lastName: 'Duarte',
-    email: 'leo.duarte@workus.dev',
+    email: 'leo.duarte@osdb.io',
     position: 'Frontend Developer',
     startedDaysAgo: 120,
     isUnassigned: true,
@@ -290,7 +305,7 @@ export const EMPLOYEES: SeedEmployee[] = [
   {
     firstName: 'Hannah',
     lastName: 'Becker',
-    email: 'hannah.becker@workus.dev',
+    email: 'hannah.becker@osdb.io',
     position: 'Product Designer',
     startedDaysAgo: 88,
     isUnassigned: true,
@@ -298,49 +313,49 @@ export const EMPLOYEES: SeedEmployee[] = [
   {
     firstName: 'Gabriel',
     lastName: 'Mendes',
-    email: 'gabriel.mendes@workus.dev',
+    email: 'gabriel.mendes@osdb.io',
     position: 'Data Scientist',
     startedDaysAgo: 70,
   },
   {
     firstName: 'Layla',
     lastName: 'Haddad',
-    email: 'layla.haddad@workus.dev',
+    email: 'layla.haddad@osdb.io',
     position: 'QA Engineer',
     startedDaysAgo: 45,
   },
   {
     firstName: 'Ryan',
     lastName: "O'Connell",
-    email: 'ryan.oconnell@workus.dev',
+    email: 'ryan.oconnell@osdb.io',
     position: 'Backend Developer',
     startedDaysAgo: 28,
   },
   {
     firstName: 'Mila',
     lastName: 'Popescu',
-    email: 'mila.popescu@workus.dev',
+    email: 'mila.popescu@osdb.io',
     position: 'Mobile Developer',
     startedDaysAgo: 21,
   },
   {
     firstName: 'Adam',
     lastName: 'Schulz',
-    email: 'adam.schulz@workus.dev',
+    email: 'adam.schulz@osdb.io',
     position: 'Machine Learning Engineer',
     startedDaysAgo: 14,
   },
   {
     firstName: 'Victoria',
     lastName: 'Lund',
-    email: 'victoria.lund@workus.dev',
+    email: 'victoria.lund@osdb.io',
     position: 'QA Engineer',
     startedDaysAgo: 7,
   },
   {
     firstName: 'Theo',
     lastName: 'Ivanov',
-    email: 'theo.ivanov@workus.dev',
+    email: 'theo.ivanov@osdb.io',
     position: 'Frontend Developer',
     startedDaysAgo: 3,
   },
@@ -348,21 +363,21 @@ export const EMPLOYEES: SeedEmployee[] = [
   {
     firstName: 'Nora',
     lastName: 'Starling',
-    email: 'nora.starling@workus.dev',
+    email: 'nora.starling@osdb.io',
     position: 'Product Designer',
     startedDaysAgo: -9,
   },
   {
     firstName: 'Felix',
     lastName: 'Brandt',
-    email: 'felix.brandt@workus.dev',
+    email: 'felix.brandt@osdb.io',
     position: 'Backend Developer',
     startedDaysAgo: -23,
   },
   {
     firstName: 'Clara',
     lastName: 'Weiss',
-    email: 'clara.weiss@workus.dev',
+    email: 'clara.weiss@osdb.io',
     position: 'Data Scientist',
     startedDaysAgo: 1460,
     terminatedDaysAgo: -18,
@@ -411,3 +426,86 @@ export const contactsFor = (employee: SeedEmployee, index: number): SeedContacts
         : `${String(3 + ((index * 11) % 90))} ${place.street}, ${place.postcode} ${place.city}`,
   };
 };
+
+export const VORTEX_OWNERS: SeedPerson[] = [
+  { firstName: 'Liam', lastName: 'Foster', email: 'liam.foster@vortex.io' },
+];
+
+export const VORTEX_ADMINS: SeedPerson[] = [
+  { firstName: 'Hannah', lastName: 'Brooks', email: 'hannah.brooks@vortex.io' },
+];
+
+export const VORTEX_EMPLOYEES: SeedEmployee[] = [
+  {
+    firstName: 'Ethan',
+    lastName: 'Cole',
+    email: 'ethan.cole@vortex.io',
+    position: 'Backend Developer',
+    startedDaysAgo: 1500,
+  },
+  {
+    firstName: 'Grace',
+    lastName: 'Turner',
+    email: 'grace.turner@vortex.io',
+    position: 'Product Designer',
+    startedDaysAgo: 1100,
+  },
+  {
+    firstName: 'Oliver',
+    lastName: 'Hayes',
+    email: 'oliver.hayes@vortex.io',
+    position: 'Frontend Developer',
+    startedDaysAgo: 900,
+  },
+  {
+    firstName: 'Mia',
+    lastName: 'Sullivan',
+    email: 'mia.sullivan@vortex.io',
+    position: 'QA Engineer',
+    startedDaysAgo: 700,
+  },
+  {
+    firstName: 'Lucas',
+    lastName: 'Ward',
+    email: 'lucas.ward@vortex.io',
+    position: 'Data Scientist',
+    startedDaysAgo: 450,
+  },
+  {
+    firstName: 'Chloe',
+    lastName: 'Price',
+    email: 'chloe.price@vortex.io',
+    position: 'Project Manager',
+    startedDaysAgo: 1300,
+    terminatedDaysAgo: 40,
+    terminationReason: 'RESIGNATION',
+  },
+  {
+    firstName: 'Owen',
+    lastName: 'Bishop',
+    email: 'owen.bishop@vortex.io',
+    position: 'Mobile Developer',
+    startedDaysAgo: 20,
+    isUnassigned: true,
+  },
+];
+
+export interface SeedOrganisation {
+  id: string;
+  name: string;
+  owners: SeedPerson[];
+  /** Responsible for the employees, in turns. */
+  admins: SeedPerson[];
+  employees: SeedEmployee[];
+}
+
+export const ORGANISATIONS: SeedOrganisation[] = [
+  { id: OSDB_ID, name: 'OSDB', owners: OSDB_OWNERS, admins: ADMINS, employees: EMPLOYEES },
+  {
+    id: VORTEX_ID,
+    name: 'Vortex',
+    owners: VORTEX_OWNERS,
+    admins: VORTEX_ADMINS,
+    employees: VORTEX_EMPLOYEES,
+  },
+];

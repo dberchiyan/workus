@@ -76,19 +76,24 @@ export class TimeOffDecisionService {
   ) {}
 
   async findPage(
+    organisationId: string,
     criteria: TimeOffRequestCriteria,
     pageable: Pageable<ManagedRequestSortField>,
     viewerId: string,
   ): Promise<ManagedTimeOffRequestPage> {
-    const page = await this.requestRepository.findManagedPage(criteria, pageable);
+    const page = await this.requestRepository.findManagedPage(organisationId, criteria, pageable);
     return {
-      content: await this.withHistory(page.content, viewerId),
+      content: await this.withHistory(organisationId, page.content, viewerId),
       totalElements: page.totalElements,
     };
   }
 
-  async findOne(requestId: string, viewerId: string): Promise<ManagedTimeOffRequestView> {
-    return this.viewOf(await this.require(requestId), viewerId);
+  async findOne(
+    organisationId: string,
+    requestId: string,
+    viewerId: string,
+  ): Promise<ManagedTimeOffRequestView> {
+    return this.viewOf(organisationId, await this.require(organisationId, requestId), viewerId);
   }
 
   /**
@@ -97,6 +102,7 @@ export class TimeOffDecisionService {
    */
   @Transactional()
   async decide(
+    organisationId: string,
     requestId: string,
     decision: TimeOffDecision,
     actorId: string,
@@ -104,18 +110,19 @@ export class TimeOffDecisionService {
     comment?: string,
   ): Promise<ManagedTimeOffRequestView> {
     const rule = DECISIONS[decision];
-    const request = await this.requestRepository.findStateById(requestId);
+    const request = await this.requestRepository.findStateById(organisationId, requestId);
     if (!request) {
       throw new ResourceNotFoundException();
     }
     if (request.status === rule.to) {
-      return this.viewOf(await this.require(requestId), actorId);
+      return this.viewOf(organisationId, await this.require(organisationId, requestId), actorId);
     }
     if (!(rule.from as readonly string[]).includes(request.status)) {
       throw new BusinessRuleException(rule.refusal);
     }
     if (
       !(await this.requestRepository.changeStatus(
+        organisationId,
         requestId,
         request.status,
         rule.to,
@@ -145,8 +152,8 @@ export class TimeOffDecisionService {
           : []),
       ],
     });
-    await this.notifier.notify(requestId, rule.notice, actorId, 'employee');
-    return this.viewOf(await this.require(requestId), actorId);
+    await this.notifier.notify(organisationId, requestId, rule.notice, actorId, 'employee');
+    return this.viewOf(organisationId, await this.require(organisationId, requestId), actorId);
   }
 
   /**
@@ -155,16 +162,17 @@ export class TimeOffDecisionService {
    */
   @Transactional()
   async updateResponsibles(
+    organisationId: string,
     requestId: string,
     responsibleUserIds: string[],
     actorId: string,
   ): Promise<ManagedTimeOffRequestView> {
-    const before = await this.require(requestId);
+    const before = await this.require(organisationId, requestId);
     if (before.status !== TimeOffStatus.PENDING) {
       throw new BusinessRuleException('errors.timeOff.notPending');
     }
     const next = [...new Set(responsibleUserIds)];
-    if (!(await this.employeeService.areResponsibleCandidates(next))) {
+    if (!(await this.employeeService.areResponsibleCandidates(organisationId, next))) {
       throw new BusinessRuleException(
         'errors.employee.responsibleNotFound',
         {},
@@ -173,12 +181,14 @@ export class TimeOffDecisionService {
     }
     const current = before.responsibles.map(({ responsible }) => responsible.id);
     if (current.length === next.length && next.every((id) => current.includes(id))) {
-      return this.viewOf(before, actorId);
+      return this.viewOf(organisationId, before, actorId);
     }
-    if (!(await this.requestRepository.replaceResponsibles(requestId, next, actorId))) {
+    if (
+      !(await this.requestRepository.replaceResponsibles(organisationId, requestId, next, actorId))
+    ) {
       throw new ConcurrentModificationException();
     }
-    const after = await this.require(requestId);
+    const after = await this.require(organisationId, requestId);
     await this.auditService.record({
       action: AuditAction.TIME_OFF_REQUEST_UPDATED,
       employeeId: after.employeeId,
@@ -187,16 +197,20 @@ export class TimeOffDecisionService {
     });
     // Only the people newly made responsible hear of it.
     await this.notifier.notify(
+      organisationId,
       requestId,
       NotificationType.TIME_OFF_ASSIGNED,
       actorId,
       next.filter((id) => !current.includes(id)),
     );
-    return this.viewOf(after, actorId);
+    return this.viewOf(organisationId, after, actorId);
   }
 
-  private async require(requestId: string): Promise<ManagedTimeOffRequestRecord> {
-    const request = await this.requestRepository.findManagedById(requestId);
+  private async require(
+    organisationId: string,
+    requestId: string,
+  ): Promise<ManagedTimeOffRequestRecord> {
+    const request = await this.requestRepository.findManagedById(organisationId, requestId);
     if (!request) {
       throw new ResourceNotFoundException();
     }
@@ -204,10 +218,11 @@ export class TimeOffDecisionService {
   }
 
   private async viewOf(
+    organisationId: string,
     request: ManagedTimeOffRequestRecord,
     viewerId: string,
   ): Promise<ManagedTimeOffRequestView> {
-    const [view] = await this.withHistory([request], viewerId);
+    const [view] = await this.withHistory(organisationId, [request], viewerId);
     if (!view) {
       throw new Error('Request lost its view');
     }
@@ -216,10 +231,14 @@ export class TimeOffDecisionService {
 
   /** One history query for the whole page; what the viewer may do with each request. */
   private async withHistory(
+    organisationId: string,
     requests: ManagedTimeOffRequestRecord[],
     viewerId: string,
   ): Promise<ManagedTimeOffRequestView[]> {
-    const events = await this.auditService.findByTargets(requests.map((request) => request.id));
+    const events = await this.auditService.findByTargets(
+      organisationId,
+      requests.map((request) => request.id),
+    );
     return requests.map((request) => {
       const responsible = isResponsible(request, viewerId);
       const allows = (decision: TimeOffDecision) =>

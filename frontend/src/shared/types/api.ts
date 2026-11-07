@@ -381,6 +381,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/registrations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Register a company: create the organisation and its owner, and sign the owner in */
+        post: operations["RegistrationController_register"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organisation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Return the caller's organisation */
+        get: operations["OrganisationController_find"];
+        /** Rename the caller's organisation (owners only) */
+        put: operations["OrganisationController_rename"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organisation/administrators": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** List the owners and admins of the organisation */
+        get: operations["OrganisationController_administrators"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/organisation/administrators/{userId}/role": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Make an admin an owner or an owner an admin (owners only); the last owner stays */
+        put: operations["OrganisationController_changeRole"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/employees/{employeeId}/reviews": {
         parameters: {
             query?: never;
@@ -905,7 +974,7 @@ export interface components {
             password: string;
         };
         /** @enum {string} */
-        UserRole_Output: "ADMIN" | "MANAGER" | "EMPLOYEE";
+        UserRole_Output: "OWNER" | "ADMIN" | "MANAGER" | "EMPLOYEE";
         CurrentUserResponse_Output: {
             /** Format: uuid */
             id: string;
@@ -913,6 +982,11 @@ export interface components {
             firstName: string;
             lastName: string;
             role: components["schemas"]["UserRole_Output"];
+            organisation: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+            };
             idleTimeoutMinutes: number;
         };
         ChangePasswordRequest: {
@@ -1008,7 +1082,7 @@ export interface components {
             lastName: string;
             email: string;
             /** @enum {string} */
-            role: "ADMIN" | "MANAGER" | "EMPLOYEE";
+            role: "OWNER" | "ADMIN" | "MANAGER" | "EMPLOYEE";
             position: {
                 /** Format: uuid */
                 id: string;
@@ -1044,7 +1118,7 @@ export interface components {
                 lastName: string;
                 email: string;
                 /** @enum {string} */
-                role: "ADMIN" | "MANAGER" | "EMPLOYEE";
+                role: "OWNER" | "ADMIN" | "MANAGER" | "EMPLOYEE";
                 positionTitle: string | null;
             }[];
             /** Format: date-time */
@@ -1075,14 +1149,14 @@ export interface components {
                 } | null;
                 target: {
                     /** @enum {string} */
-                    type: "employee" | "review" | "time_off_request" | "holiday" | "user";
+                    type: "employee" | "review" | "time_off_request" | "holiday" | "user" | "organisation";
                     /** Format: uuid */
                     id: string;
                     label: string;
                 };
                 changes: {
                     /** @enum {string} */
-                    field: "title" | "date" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startDate" | "firstName" | "lastName" | "email" | "mobile" | "personalEmail" | "linkedinUrl" | "telegram" | "address" | "dateOfBirth" | "terminationDate" | "terminationReason" | "terminationComment" | "timeOffType" | "periodStart" | "periodEnd" | "days" | "note" | "decisionComment" | "name" | "recurring";
+                    field: "title" | "date" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startDate" | "firstName" | "lastName" | "email" | "mobile" | "personalEmail" | "linkedinUrl" | "telegram" | "address" | "dateOfBirth" | "terminationDate" | "terminationReason" | "terminationComment" | "timeOffType" | "periodStart" | "periodEnd" | "days" | "note" | "decisionComment" | "name" | "recurring" | "role";
                     from: ({
                         /** @enum {string} */
                         kind: "text";
@@ -1226,9 +1300,55 @@ export interface components {
                 lastName: string;
                 email: string;
                 /** @enum {string} */
-                role: "ADMIN" | "MANAGER" | "EMPLOYEE";
+                role: "OWNER" | "ADMIN" | "MANAGER" | "EMPLOYEE";
                 positionTitle: string | null;
             }[];
+        };
+        RegistrationRequest: {
+            organisationName: string;
+            firstName: string;
+            lastName: string;
+            email: string;
+            password: unknown & unknown & unknown & unknown;
+        };
+        OrganisationResponse_Output: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+            version: number;
+        };
+        UpdateOrganisationRequest: {
+            name: string;
+            version: number;
+        };
+        Administrator_Output: {
+            /** Format: uuid */
+            id: string;
+            firstName: string;
+            lastName: string;
+            email: string;
+            role: components["schemas"]["AdministratorRole_Output"];
+            version: number;
+        };
+        /** @enum {string} */
+        AdministratorRole_Output: "OWNER" | "ADMIN";
+        AdministratorPageResponse_Output: {
+            content: components["schemas"]["Administrator_Output"][];
+            totalElements: number;
+        };
+        ChangeRoleRequest: {
+            /** @enum {string} */
+            role: "OWNER" | "ADMIN";
+            version: number;
+        };
+        AdministratorResponse_Output: {
+            /** Format: uuid */
+            id: string;
+            firstName: string;
+            lastName: string;
+            email: string;
+            role: components["schemas"]["AdministratorRole_Output"];
+            version: number;
         };
         Review_Output: {
             /** Format: uuid */
@@ -3328,6 +3448,272 @@ export interface operations {
             };
             /** @description FORBIDDEN */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    RegistrationController_register: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegistrationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganisationResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | MALFORMED_REQUEST */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RATE_LIMIT_EXCEEDED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganisationController_find: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganisationResponse_Output"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganisationController_rename: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOrganisationRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["OrganisationResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONCURRENT_MODIFICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganisationController_administrators: {
+        parameters: {
+            query?: {
+                search?: string;
+                page?: number;
+                size?: number;
+                /** @description One of: name,asc|desc */
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdministratorPageResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganisationController_changeRole: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangeRoleRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AdministratorResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONCURRENT_MODIFICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
                 headers: {
                     [name: string]: unknown;
                 };

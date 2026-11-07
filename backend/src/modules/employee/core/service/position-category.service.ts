@@ -15,12 +15,13 @@ export class PositionCategoryService {
 
   /** Categories from the database with how many employees match the current search and status. */
   async countEmployees(
+    organisationId: string,
     search: string | undefined,
     status: EmployeeStatus,
   ): Promise<CategoryCounts> {
     const [categories, countByPosition] = await Promise.all([
       this.positionCategoryRepository.findAllOrdered(),
-      this.employeeRepository.countByPosition({
+      this.employeeRepository.countByPosition(organisationId, {
         searchTerms: toSearchTerms(search),
         status,
         today: todayUtc(),

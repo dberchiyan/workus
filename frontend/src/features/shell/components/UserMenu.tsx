@@ -24,8 +24,8 @@ const LINKS = [
 ] as const;
 
 /**
- * Name, role and avatar; opens the account panel: who is signed in, the theme, links into
- * Settings and Sign out. A dialog rather than a menu, because it holds more than menu items.
+ * Name, role and avatar; opens the account panel: who is signed in (and in which company), the
+ * theme, links into Settings and Sign out. A dialog rather than a menu, because it holds more than menu items.
  */
 export function UserMenu() {
   const { t } = useTranslation('shell');
@@ -98,8 +98,8 @@ export function UserMenu() {
             <Typography variant="body2" color="textSecondary" className="truncate">
               {user.email}
             </Typography>
-            <Typography variant="caption" color="textSecondary">
-              {role}
+            <Typography variant="caption" color="textSecondary" className="truncate">
+              {t('account.roleAt', { role, organisation: user.organisation.name })}
             </Typography>
           </div>
         </div>

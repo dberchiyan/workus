@@ -6,6 +6,7 @@ import { EmployeeProfilePage, EmployeesPage } from '@/features/employee/core';
 import { AppLayout } from '@/features/shell';
 import { SettingsPage } from '@/features/settings';
 import { InsightsPage } from '@/features/insights';
+import { SignupPage } from '@/features/organisation';
 import { CalendarPage, RequestsPage } from '@/features/time-off';
 import { PageLoader } from '@/shared/components/PageLoader';
 import { RouteErrorBoundary } from '@/shared/components/RouteErrorBoundary';
@@ -19,6 +20,7 @@ const route = (element: ReactNode): ReactNode => (
 
 export const router = createBrowserRouter([
   { path: PATHS.login, element: route(<LoginPage />) },
+  { path: PATHS.signup, element: route(<SignupPage />) },
   {
     element: <RequireAuth />,
     children: [

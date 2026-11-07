@@ -1,6 +1,9 @@
 import type { SecurityCategory } from '../types';
 
-/** No tenant: one company per installation, roles are global. */
+/**
+ * No tenant id: a user belongs to one organisation (it comes from the session) and the cache is
+ * cleared on sign-out, so one cache never holds two organisations' data.
+ */
 export const authKeys = {
   all: ['auth'] as const,
   me: () => [...authKeys.all, 'me'] as const,

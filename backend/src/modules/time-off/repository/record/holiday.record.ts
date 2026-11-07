@@ -2,6 +2,7 @@ import type { Prisma } from '../../../../generated/prisma/client';
 
 export const holidaySelect = {
   id: true,
+  organisationId: true,
   date: true,
   name: true,
   recurring: true,

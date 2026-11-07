@@ -80,6 +80,7 @@ const REVIEW_INTERVAL_MONTHS = 6;
  */
 export const seedReviews = async (
   prisma: PrismaClient,
+  organisationId: string,
   employees: SeedReviewEmployee[],
   fallbackResponsibleId: string,
 ): Promise<number> => {
@@ -88,7 +89,7 @@ export const seedReviews = async (
     (
       await prisma.employeeReview.groupBy({
         by: ['employeeId'],
-        where: { employeeId: { in: employees.map((e) => e.id) } },
+        where: { organisationId, employeeId: { in: employees.map((e) => e.id) } },
         orderBy: { employeeId: 'asc' },
       })
     ).map((group) => group.employeeId),
@@ -108,7 +109,7 @@ export const seedReviews = async (
     let salary = new Prisma.Decimal(BASE_SALARY[employee.categoryName] ?? 3000).plus(
       (index % 5) * 100,
     );
-    const reviews: Prisma.EmployeeReviewCreateManyInput[] = [
+    const reviews: Omit<Prisma.EmployeeReviewCreateManyInput, 'organisationId'>[] = [
       {
         employeeId: employee.id,
         kind: ReviewKind.STARTING,
@@ -173,6 +174,7 @@ export const seedReviews = async (
       await prisma.employeeReview.create({
         data: {
           ...review,
+          organisationId,
           responsibles: {
             create: responsibleUserIds.map((responsibleUserId) => ({ responsibleUserId })),
           },

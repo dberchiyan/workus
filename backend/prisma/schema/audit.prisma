@@ -2,14 +2,17 @@
 /// a trigger rejects both. Targets are referenced by type + id without a FK — a deleted review
 /// keeps its history.
 model AuditEvent {
-  id          String    @id(map: "pk_audit_events") @default(dbgenerated("uuidv7()")) @db.Uuid
-  occurredAt  DateTime  @default(now()) @map("occurred_at") @db.Timestamptz(3)
+  id             String       @id(map: "pk_audit_events") @default(dbgenerated("uuidv7()")) @db.Uuid
+  occurredAt     DateTime     @default(now()) @map("occurred_at") @db.Timestamptz(3)
+  organisationId String       @map("organisation_id") @db.Uuid
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_audit_events_organisation_id")
+
   action      String    @db.VarChar(64) // <resource>.<past_tense> — CHECK in migration
   actorUserId String?   @map("actor_user_id") @db.Uuid // null = the system
   actor       User?     @relation("AuditEventActor", fields: [actorUserId], references: [id], onDelete: Restrict, map: "fk_audit_events_actor_user_id")
   /// The employee whose history shows the event.
   employeeId  String?   @map("employee_id") @db.Uuid
-  employee    Employee? @relation(fields: [employeeId], references: [id], onDelete: Restrict, map: "fk_audit_events_employee_id")
+  employee    Employee? @relation(fields: [organisationId, employeeId], references: [organisationId, id], onDelete: Restrict, map: "fk_audit_events_employee_id")
   targetType  String    @map("target_type") @db.VarChar(32) // employee | review — CHECK in migration
   targetId    String    @map("target_id") @db.Uuid
   /// Name of the target at the time (e.g. the review title).
@@ -22,6 +25,7 @@ model AuditEvent {
 
   @@index([employeeId, occurredAt], map: "idx_audit_events_employee_id_occurred_at")
   @@index([actorUserId], map: "idx_audit_events_actor_user_id")
+  @@index([organisationId, occurredAt], map: "idx_audit_events_organisation_id_occurred_at")
   @@index([targetId, occurredAt], map: "idx_audit_events_target_id_occurred_at")
   @@map("audit_events")
 }

@@ -18,6 +18,7 @@ import type { AuditEventSortField } from '../../audit/service/audit-sort';
 import { AuditService } from '../../audit/service/audit.service';
 import type { SecurityEventPage } from '../../audit/service/audit.types';
 import type { SecurityCategory } from '../../audit/service/security-category';
+import { authoritiesFor, type UserRole } from '../../user/service/user-role';
 import { UserService } from '../../user/service/user.service';
 import type { UserProfile } from '../../user/service/user.types';
 import { PasswordHasher } from './password-hasher.service';
@@ -67,7 +68,12 @@ export class AuthService {
     }
     if (!(await this.passwordHasher.verify(credentials.passwordHash, command.password))) {
       // A wrong password for a real account goes to its owner's security log.
-      await this.security(AuditAction.AUTH_SIGN_IN_FAILED, credentials.id, null);
+      await this.security(
+        AuditAction.AUTH_SIGN_IN_FAILED,
+        credentials.id,
+        null,
+        credentials.organisationId,
+      );
       // That was the last allowed try from this IP: sign-in is now blocked there for a while.
       if (
         await this.rateLimitService.isExhausted(
@@ -75,14 +81,24 @@ export class AuthService {
           loginRateLimitKey(command.ip, command.email),
         )
       ) {
-        await this.security(AuditAction.AUTH_SIGN_IN_LOCKED, credentials.id, null);
+        await this.security(
+          AuditAction.AUTH_SIGN_IN_LOCKED,
+          credentials.id,
+          null,
+          credentials.organisationId,
+        );
       }
       throw this.loginFailed(command);
     }
     // Checked only after the password, so it tells nothing to someone who does not know it.
     if (await this.employeeService.hasAccessEnded(credentials.id)) {
       this.logger.warn({ userId: credentials.id, ip: command.ip }, 'Login refused: access ended');
-      await this.security(AuditAction.AUTH_SIGN_IN_REFUSED, credentials.id, credentials.id);
+      await this.security(
+        AuditAction.AUTH_SIGN_IN_REFUSED,
+        credentials.id,
+        credentials.id,
+        credentials.organisationId,
+      );
       throw new AccessEndedException();
     }
     if (this.passwordHasher.needsRehash(credentials.passwordHash)) {
@@ -91,7 +107,7 @@ export class AuthService {
         await this.passwordHasher.hash(command.password),
       );
     }
-    const session = await this.startSession(credentials.id, credentials.role, command);
+    const session = await this.startSession(credentials, command);
     const user = await this.currentUser(credentials.id);
     await this.rateLimitService.reset(
       RateLimitName.LOGIN,
@@ -134,23 +150,25 @@ export class AuthService {
     return session;
   }
 
-  /** The session and its security-log entry, together. */
+  /**
+   * The session and its security-log entry, together (sign-in, and a new organisation's first
+   * session — the caller's transaction is joined).
+   */
   @Transactional()
-  private async startSession(
-    userId: string,
-    role: string,
-    command: LoginCommand,
+  async startSession(
+    user: { id: string; organisationId: string; role: UserRole },
+    command: Pick<LoginCommand, 'ip' | 'userAgent' | 'presentedToken'>,
   ): Promise<StartedSession> {
     const session = await this.sessionService.start({
-      userId,
-      authorities: [role],
+      userId: user.id,
+      authorities: authoritiesFor(user.role),
       ip: command.ip,
       userAgent: command.userAgent,
       presentedToken: command.presentedToken,
     });
-    await this.security(AuditAction.AUTH_SIGNED_IN, userId, userId);
+    await this.security(AuditAction.AUTH_SIGNED_IN, user.id, user.id, user.organisationId);
     if (session.evicted > 0) {
-      await this.security(AuditAction.AUTH_SESSION_EVICTED, userId, userId);
+      await this.security(AuditAction.AUTH_SESSION_EVICTED, user.id, user.id, user.organisationId);
     }
     return session;
   }
@@ -159,7 +177,7 @@ export class AuthService {
   @Transactional()
   private async replacePassword(
     userId: string,
-    role: string,
+    role: UserRole,
     passwordHash: string,
     command: ChangePasswordCommand,
   ): Promise<StartedSession> {
@@ -167,7 +185,7 @@ export class AuthService {
     await this.sessionService.endAllForUsers([userId]);
     const session = await this.sessionService.start({
       userId,
-      authorities: [role],
+      authorities: authoritiesFor(role),
       ip: command.ip,
       userAgent: command.userAgent,
       presentedToken: undefined,
@@ -209,18 +227,32 @@ export class AuthService {
 
   /** The caller's security log, newest first. */
   securityLog(
-    userId: string,
+    principal: Principal,
     category: SecurityCategory | null,
     pageable: Pageable<AuditEventSortField>,
   ): Promise<SecurityEventPage> {
-    return this.auditService.findSecurityPage(userId, category, pageable);
+    return this.auditService.findSecurityPage(
+      principal.organisationId,
+      principal.userId,
+      category,
+      pageable,
+    );
   }
 
-  /** One security-log entry about `userId`; IP and browser come from the request context. */
-  private security(action: AuditAction, userId: string, actorUserId: string | null): Promise<void> {
+  /**
+   * One security-log entry about `userId`; IP and browser come from the request context. The
+   * organisation defaults to the principal's (there is none yet while signing in).
+   */
+  private security(
+    action: AuditAction,
+    userId: string,
+    actorUserId: string | null,
+    organisationId?: string,
+  ): Promise<void> {
     return this.auditService.record({
       action,
       actorUserId,
+      ...(organisationId === undefined ? {} : { organisationId }),
       employeeId: null,
       target: { type: AuditTargetType.USER, id: userId, label: 'account' },
       changes: [],

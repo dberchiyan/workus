@@ -1,0 +1,74 @@
+{
+  "signup": {
+    "pageTitle": "Create a company",
+    "title": "Create your company",
+    "subtitle": "Start a Workus space for your team. You become its owner.",
+    "step": "Step {{current}} of {{total}}",
+    "company": {
+      "title": "Your company",
+      "name": "Company name"
+    },
+    "owner": {
+      "title": "You, the owner",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "email": "Work email",
+      "emailHint": "You will sign in with it",
+      "password": "Password"
+    },
+    "continue": "Continue",
+    "back": "Back",
+    "submit": "Create company",
+    "haveAccount": "Already have an account?",
+    "signIn": "Sign in"
+  },
+  "settings": {
+    "retry": "Try again",
+    "loading": "Loading",
+    "organisation": {
+      "title": "Company",
+      "description": "The name everyone in your company sees.",
+      "name": "Company name",
+      "submit": "Save",
+      "done": "Company name saved.",
+      "error": "The company could not be loaded."
+    },
+    "administrators": {
+      "title": "Administrators",
+      "description": "The owners and admins of your company. Owners change who is an owner.",
+      "descriptionOwner": "Owners manage the company and its administrators. A company always keeps at least one owner.",
+      "search": "Search by name or email",
+      "empty": "No administrators match the search.",
+      "error": "The administrators could not be loaded.",
+      "you": "(you)",
+      "count_one": "{{formatted}} administrator",
+      "count_other": "{{formatted}} administrators",
+      "pages": "Administrator pages",
+      "roles": {
+        "OWNER": "Owner",
+        "ADMIN": "Admin"
+      },
+      "make": {
+        "OWNER": "Make owner",
+        "ADMIN": "Make admin"
+      },
+      "makeFor": {
+        "OWNER": "Make {{name}} an owner",
+        "ADMIN": "Make {{name}} an admin"
+      },
+      "dialog": {
+        "title": {
+          "OWNER": "Make {{name}} an owner?",
+          "ADMIN": "Make {{name}} an admin?"
+        },
+        "text": {
+          "OWNER": "Owners can rename the company and change who is an owner.",
+          "ADMIN": "Admins keep everything else but can no longer rename the company or change roles."
+        },
+        "signedOutText": "{{name}} will be signed out on every device and will sign in again with the new role.",
+        "selfText": "You stay signed in here with the new role.",
+        "cancel": "Cancel"
+      }
+    }
+  }
+}

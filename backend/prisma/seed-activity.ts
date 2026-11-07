@@ -33,10 +33,14 @@ const FEEDBACK_COLUMNS = [
  * every seventh person also has a check-in that was added and deleted. Admins take turns.
  * Skips employees that already have history.
  */
-export const seedActivity = async (prisma: PrismaClient, adminIds: string[]): Promise<number> => {
+export const seedActivity = async (
+  prisma: PrismaClient,
+  organisationId: string,
+  adminIds: string[],
+): Promise<number> => {
   const now = new Date();
   const employees = await prisma.employee.findMany({
-    where: { auditEvents: { none: {} } },
+    where: { organisationId, auditEvents: { none: {} } },
     select: {
       id: true,
       startDate: true,
@@ -85,6 +89,7 @@ export const seedActivity = async (prisma: PrismaClient, adminIds: string[]): Pr
     changes: AuditChange[],
   ): void => {
     events.push({
+      organisationId,
       occurredAt,
       action,
       actorUserId: actor(n),

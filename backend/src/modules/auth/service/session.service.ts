@@ -109,6 +109,7 @@ export class SessionService extends SessionAuthenticator {
       result: SessionLookup.VALID,
       principal: new Principal(
         session.userId,
+        session.user.organisationId,
         session.id,
         session.authorities,
         session.clientType === ClientType.MOBILE ? ClientType.MOBILE : ClientType.WEB,
@@ -151,19 +152,44 @@ export class SessionService extends SessionAuthenticator {
   }
 
   /**
+   * A role changed: authorities are a snapshot, so the person's sessions end (security.md). When
+   * people change their own role, the session they did it from stays, with the new authorities.
+   */
+  @Transactional()
+  async applyRoleChange(
+    userId: string,
+    authorities: string[],
+    keepSessionId: string | null,
+  ): Promise<void> {
+    if (keepSessionId === null) {
+      await this.sessionRepository.deleteByUserIds([userId]);
+      return;
+    }
+    await this.sessionRepository.deleteByUserIdExcept(userId, keepSessionId);
+    await this.sessionRepository.updateAuthorities(keepSessionId, authorities);
+  }
+
+  /**
    * Their employment has ended: every session of these users ends, and each one who had any
    * gets a security-log entry (actor: the admin terminating, or nobody for the daily job).
    */
   @Transactional()
-  async endForTermination(userIds: string[], actorUserId?: string | null): Promise<number> {
-    const signedIn = await this.sessionRepository.findUserIdsWithSessions(userIds);
-    if (signedIn.length === 0) {
+  async endForTermination(
+    users: { userId: string; organisationId: string }[],
+    actorUserId?: string | null,
+  ): Promise<number> {
+    const signedIn = new Set(
+      await this.sessionRepository.findUserIdsWithSessions(users.map((user) => user.userId)),
+    );
+    const leavers = users.filter((user) => signedIn.has(user.userId));
+    if (leavers.length === 0) {
       return 0;
     }
-    const count = await this.sessionRepository.deleteByUserIds(signedIn);
+    const count = await this.sessionRepository.deleteByUserIds([...signedIn]);
     await this.auditService.recordMany(
-      signedIn.map((userId) => ({
+      leavers.map(({ userId, organisationId }) => ({
         action: AuditAction.AUTH_SESSIONS_ENDED_ON_TERMINATION,
+        organisationId,
         ...(actorUserId === undefined ? {} : { actorUserId }),
         employeeId: null,
         target: { type: AuditTargetType.USER, id: userId, label: 'account' },

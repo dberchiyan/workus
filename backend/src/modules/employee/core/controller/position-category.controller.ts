@@ -1,4 +1,6 @@
 import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
+import type { Principal } from '../../../../common/security/principal';
+import { CurrentPrincipal } from '../../../../common/security/current-principal.decorator';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { ApiErrors } from '../../../../common/exception/api-errors.decorator';
@@ -18,7 +20,14 @@ export class PositionCategoryController {
   @ApiOperation({ summary: 'List position categories with matching employee counts' })
   @ZodResponse({ status: HttpStatus.OK, type: PositionCategoryCountsResponse })
   @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
-  list(@Query() query: PositionCategoryFilterQuery): Promise<PositionCategoryCountsResponse> {
-    return this.positionCategoryService.countEmployees(query.search, query.status);
+  list(
+    @CurrentPrincipal() principal: Principal,
+    @Query() query: PositionCategoryFilterQuery,
+  ): Promise<PositionCategoryCountsResponse> {
+    return this.positionCategoryService.countEmployees(
+      principal.organisationId,
+      query.search,
+      query.status,
+    );
   }
 }

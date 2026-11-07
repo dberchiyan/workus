@@ -13,13 +13,17 @@ const isoDay = (date: Date): string => date.toISOString().slice(0, 10);
  * would have sent for the seeded requests. Pending requests told their responsible people;
  * recent decisions told the employee.
  */
-export const seedNotifications = async (prisma: PrismaClient): Promise<number> => {
-  if ((await prisma.notification.count()) > 0) {
+export const seedNotifications = async (
+  prisma: PrismaClient,
+  organisationId: string,
+): Promise<number> => {
+  if ((await prisma.notification.count({ where: { organisationId } })) > 0) {
     return 0;
   }
   const now = Date.now();
   const requests = await prisma.timeOffRequest.findMany({
     where: {
+      organisationId,
       OR: [
         { status: 'PENDING' },
         {
@@ -56,7 +60,12 @@ export const seedNotifications = async (prisma: PrismaClient): Promise<number> =
         lastName: request.employee.user.lastName,
       },
     };
-    const subject = { subjectType: 'time_off_request', subjectId: request.id, params };
+    const subject = {
+      organisationId,
+      subjectType: 'time_off_request',
+      subjectId: request.id,
+      params,
+    };
     if (request.status === 'PENDING') {
       return request.responsibles.map(({ responsibleUserId }) => ({
         ...subject,

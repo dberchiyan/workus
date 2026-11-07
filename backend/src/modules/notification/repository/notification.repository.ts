@@ -9,6 +9,7 @@ import type { NotificationSortField } from '../service/notification-sort';
 import { type NotificationRecord, notificationSelect } from './record/notification.record';
 
 export interface NewNotificationRow {
+  organisationId: string;
   recipientUserId: string;
   type: string;
   actorUserId: string | null;
@@ -36,10 +37,11 @@ export class NotificationRepository {
   }
 
   async findPageByRecipient(
+    organisationId: string,
     recipientUserId: string,
     pageable: Pageable<NotificationSortField>,
   ): Promise<{ content: NotificationRecord[]; totalElements: number }> {
-    const where = { recipientUserId } satisfies Prisma.NotificationWhereInput;
+    const where = { organisationId, recipientUserId } satisfies Prisma.NotificationWhereInput;
     const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
     // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
     const [totalElements, content] = await Promise.all([
@@ -49,29 +51,32 @@ export class NotificationRepository {
     return { content, totalElements };
   }
 
-  countUnread(recipientUserId: string): Promise<number> {
-    return this.txHost.tx.notification.count({ where: { recipientUserId, readAt: null } });
+  countUnread(organisationId: string, recipientUserId: string): Promise<number> {
+    return this.txHost.tx.notification.count({
+      where: { organisationId, recipientUserId, readAt: null },
+    });
   }
 
   /** Marks one of the recipient's notifications read (an earlier read time is kept). */
   async markRead(
+    organisationId: string,
     id: string,
     recipientUserId: string,
     at: Date,
   ): Promise<NotificationRecord | null> {
     await this.txHost.tx.notification.updateMany({
-      where: { id, recipientUserId, readAt: null },
+      where: { id, organisationId, recipientUserId, readAt: null },
       data: { readAt: at },
     });
     return this.txHost.tx.notification.findFirst({
-      where: { id, recipientUserId },
+      where: { id, organisationId, recipientUserId },
       select: notificationSelect,
     });
   }
 
-  async markAllRead(recipientUserId: string, at: Date): Promise<number> {
+  async markAllRead(organisationId: string, recipientUserId: string, at: Date): Promise<number> {
     const { count } = await this.txHost.tx.notification.updateMany({
-      where: { recipientUserId, readAt: null },
+      where: { organisationId, recipientUserId, readAt: null },
       data: { readAt: at },
     });
     return count;

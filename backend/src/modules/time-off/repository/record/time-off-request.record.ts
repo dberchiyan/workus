@@ -145,6 +145,7 @@ export type AbsenceDaysRecord = Prisma.TimeOffRequestGetPayload<{
 /** What a notification about a request needs: its summary, whose it is, who decides it. */
 export const requestNoticeSelect = {
   id: true,
+  organisationId: true,
   type: true,
   startDate: true,
   endDate: true,

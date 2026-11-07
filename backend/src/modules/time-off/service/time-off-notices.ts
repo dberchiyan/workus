@@ -20,6 +20,7 @@ export const requestNotice = (
   recipientUserIds: readonly string[],
   waitingDays?: number,
 ): Notice => ({
+  organisationId: request.organisationId,
   type,
   actorUserId,
   recipientUserIds,

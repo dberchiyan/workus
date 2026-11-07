@@ -97,27 +97,32 @@ export class ReviewService {
     private readonly auditService: AuditService,
   ) {}
 
-  async findForEmployee(employeeId: string): Promise<EmployeeReviews> {
-    await this.requireEmployee(employeeId);
-    const reviews = await this.reviewRepository.findByEmployee(employeeId);
+  async findForEmployee(organisationId: string, employeeId: string): Promise<EmployeeReviews> {
+    await this.requireEmployee(organisationId, employeeId);
+    const reviews = await this.reviewRepository.findByEmployee(organisationId, employeeId);
     return { reviews, salary: salaryOverview(reviews) };
   }
 
   /** For other modules (dashboard): scheduled reviews in the next `days` and overdue ones. */
-  async dueSummary(today: Date, days: number): Promise<{ upcoming: number; overdue: number }> {
+  async dueSummary(
+    organisationId: string,
+    today: Date,
+    days: number,
+  ): Promise<{ upcoming: number; overdue: number }> {
     const until = new Date(today.getTime() + days * 86_400_000);
     const [upcoming, overdue] = await Promise.all([
-      this.reviewRepository.countScheduledBetween(today, until),
-      this.reviewRepository.countScheduledBefore(today),
+      this.reviewRepository.countScheduledBetween(organisationId, today, until),
+      this.reviewRepository.countScheduledBefore(organisationId, today),
     ]);
     return { upcoming, overdue };
   }
 
   /** For other modules (insights): each employee's salary as of `asOf` (latest completed review). */
   async salariesAsOf(
+    organisationId: string,
     asOf: Date,
   ): Promise<{ employeeId: string; amount: Decimal; currency: string }[]> {
-    const rows = await this.reviewRepository.findLatestSalaries(asOf, MAX_SALARIES);
+    const rows = await this.reviewRepository.findLatestSalaries(organisationId, asOf, MAX_SALARIES);
     return rows.flatMap((row) =>
       row.salaryAmount && row.salaryCurrency
         ? [{ employeeId: row.employeeId, amount: row.salaryAmount, currency: row.salaryCurrency }]
@@ -127,14 +132,20 @@ export class ReviewService {
 
   /** For other modules (dashboard): scheduled and completed regular reviews in [from, to]. */
   async reviewsBetween(
+    organisationId: string,
     from: Date,
     to: Date,
     pageRequest: { page: number; size: number },
   ): Promise<DashboardReviews> {
-    const page = await this.reviewRepository.findScheduledOrCompletedBetween(from, to, {
-      offset: pageRequest.page * pageRequest.size,
-      limit: pageRequest.size,
-    });
+    const page = await this.reviewRepository.findScheduledOrCompletedBetween(
+      organisationId,
+      from,
+      to,
+      {
+        offset: pageRequest.page * pageRequest.size,
+        limit: pageRequest.size,
+      },
+    );
     return {
       content: page.content.map((review) => ({
         id: review.id,
@@ -154,8 +165,8 @@ export class ReviewService {
   }
 
   /** The policy has already checked that the review belongs to the employee in the path. */
-  async findOne(reviewId: string): Promise<ReviewRecord> {
-    const review = await this.reviewRepository.findById(reviewId);
+  async findOne(organisationId: string, reviewId: string): Promise<ReviewRecord> {
+    const review = await this.reviewRepository.findById(organisationId, reviewId);
     if (!review) {
       throw new ResourceNotFoundException();
     }
@@ -164,12 +175,13 @@ export class ReviewService {
 
   @Transactional()
   async create(
+    organisationId: string,
     employeeId: string,
     command: CreateReviewCommand,
     actorId: string,
   ): Promise<ReviewRecord> {
-    await this.requireEmployee(employeeId);
-    return this.insert(employeeId, ReviewKind.REGULAR, command, actorId);
+    await this.requireEmployee(organisationId, employeeId);
+    return this.insert(organisationId, employeeId, ReviewKind.REGULAR, command, actorId);
   }
 
   /**
@@ -178,12 +190,14 @@ export class ReviewService {
    */
   @Transactional()
   async createStarting(
+    organisationId: string,
     employeeId: string,
     command: StartingReviewCommand,
     actorId: string,
   ): Promise<ReviewRecord> {
-    await this.requireEmployee(employeeId);
+    await this.requireEmployee(organisationId, employeeId);
     return this.insert(
+      organisationId,
       employeeId,
       ReviewKind.STARTING,
       {
@@ -204,16 +218,21 @@ export class ReviewService {
    * transaction.
    */
   @Transactional()
-  async moveStarting(employeeId: string, startDate: string, actorId: string): Promise<void> {
+  async moveStarting(
+    organisationId: string,
+    employeeId: string,
+    startDate: string,
+    actorId: string,
+  ): Promise<void> {
     const date = new Date(`${startDate}T00:00:00Z`);
-    if (await this.reviewRepository.existsRegularBefore(employeeId, date)) {
+    if (await this.reviewRepository.existsRegularBefore(organisationId, employeeId, date)) {
       throw new BusinessRuleException('errors.review.reviewsBeforeStart', {}, 'startDate');
     }
-    const starting = await this.reviewRepository.findStarting(employeeId);
+    const starting = await this.reviewRepository.findStarting(organisationId, employeeId);
     if (!starting || starting.reviewDate.getTime() === date.getTime()) {
       return;
     }
-    await this.reviewRepository.moveDate(starting.id, date, actorId);
+    await this.reviewRepository.moveDate(organisationId, starting.id, date, actorId);
     await this.auditService.record({
       action: AuditAction.REVIEW_UPDATED,
       employeeId,
@@ -231,8 +250,14 @@ export class ReviewService {
    * it are canceled (each recorded). Part of the caller's transaction. Returns how many.
    */
   @Transactional()
-  async cancelScheduledAfter(employeeId: string, date: string, actorId: string): Promise<number> {
+  async cancelScheduledAfter(
+    organisationId: string,
+    employeeId: string,
+    date: string,
+    actorId: string,
+  ): Promise<number> {
     const reviews = await this.reviewRepository.findScheduledAfter(
+      organisationId,
       employeeId,
       new Date(`${date}T00:00:00Z`),
     );
@@ -240,6 +265,7 @@ export class ReviewService {
       return 0;
     }
     await this.reviewRepository.cancelMany(
+      organisationId,
       reviews.map((review) => review.id),
       actorId,
     );
@@ -259,13 +285,18 @@ export class ReviewService {
   }
 
   private async insert(
+    organisationId: string,
     employeeId: string,
     kind: ReviewKind,
     command: CreateReviewCommand,
     actorId: string,
   ): Promise<ReviewRecord> {
-    const responsibleUserIds = await this.checkedResponsibles(command.responsibleUserIds);
+    const responsibleUserIds = await this.checkedResponsibles(
+      organisationId,
+      command.responsibleUserIds,
+    );
     const review = await this.reviewRepository.create({
+      organisationId,
       employeeId,
       kind,
       ...toColumns(command),
@@ -283,25 +314,34 @@ export class ReviewService {
 
   @Transactional()
   async update(
+    organisationId: string,
     employeeId: string,
     reviewId: string,
     command: UpdateReviewCommand,
     actorId: string,
   ): Promise<ReviewRecord> {
-    const before = await this.findOne(reviewId);
+    const before = await this.findOne(organisationId, reviewId);
     if (before.kind === ReviewKind.STARTING) {
       lockStarting(before, command);
     }
-    const responsibleUserIds = await this.checkedResponsibles(command.responsibleUserIds);
-    const isUpdated = await this.reviewRepository.update(reviewId, command.version, {
-      ...toColumns(command),
-      responsibleUserIds,
-      updatedBy: actorId,
-    });
+    const responsibleUserIds = await this.checkedResponsibles(
+      organisationId,
+      command.responsibleUserIds,
+    );
+    const isUpdated = await this.reviewRepository.update(
+      organisationId,
+      reviewId,
+      command.version,
+      {
+        ...toColumns(command),
+        responsibleUserIds,
+        updatedBy: actorId,
+      },
+    );
     if (!isUpdated) {
       throw new ConcurrentModificationException();
     }
-    const after = await this.findOne(reviewId);
+    const after = await this.findOne(organisationId, reviewId);
     const changes = reviewUpdatedChanges(before, after);
     // A save without edits changes nothing worth a history entry.
     if (changes.length > 0) {
@@ -316,13 +356,13 @@ export class ReviewService {
   }
 
   @Transactional()
-  async delete(employeeId: string, reviewId: string): Promise<void> {
-    const review = await this.findOne(reviewId);
+  async delete(organisationId: string, employeeId: string, reviewId: string): Promise<void> {
+    const review = await this.findOne(organisationId, reviewId);
     if (review.kind === ReviewKind.STARTING) {
       // The salary history starts here; edit it instead.
       throw new BusinessRuleException('errors.review.startingNotDeletable');
     }
-    await this.reviewRepository.delete(reviewId);
+    await this.reviewRepository.delete(organisationId, reviewId);
     await this.auditService.record({
       action: AuditAction.REVIEW_DELETED,
       employeeId,
@@ -331,9 +371,9 @@ export class ReviewService {
     });
   }
 
-  private async checkedResponsibles(userIds: string[]): Promise<string[]> {
+  private async checkedResponsibles(organisationId: string, userIds: string[]): Promise<string[]> {
     const unique = [...new Set(userIds)];
-    if (!(await this.employeeService.areResponsibleCandidates(unique))) {
+    if (!(await this.employeeService.areResponsibleCandidates(organisationId, unique))) {
       throw new BusinessRuleException(
         'errors.review.responsibleNotFound',
         {},
@@ -343,8 +383,8 @@ export class ReviewService {
     return unique;
   }
 
-  private async requireEmployee(employeeId: string): Promise<void> {
-    if (!(await this.employeeService.exists(employeeId))) {
+  private async requireEmployee(organisationId: string, employeeId: string): Promise<void> {
+    if (!(await this.employeeService.exists(organisationId, employeeId))) {
       throw new ResourceNotFoundException();
     }
   }

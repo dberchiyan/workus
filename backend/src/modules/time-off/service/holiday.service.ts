@@ -29,6 +29,12 @@ export interface HolidayInput {
 
 const asDate = (iso: string): Date => new Date(`${iso}T00:00:00Z`);
 
+/** A holiday as the day it takes from requests of its organisation. */
+const dayOf = (holiday: HolidayRecord): { organisationId: string; day: string } => ({
+  organisationId: holiday.organisationId,
+  day: isoDay(holiday.date),
+});
+
 /** The same day a year later; 29 February becomes 28 February. */
 const sameDayNextYear = (date: Date): Date => {
   const year = date.getUTCFullYear() + 1;
@@ -72,42 +78,48 @@ export class HolidayService implements OnApplicationBootstrap {
   ) {}
 
   /** One year's holidays, by date. */
-  findYear(year: number): Promise<HolidayRecord[]> {
+  findYear(organisationId: string, year: number): Promise<HolidayRecord[]> {
     return this.holidayRepository.findBetween(
+      organisationId,
       new Date(Date.UTC(year, 0, 1)),
       new Date(Date.UTC(year, 11, 31)),
     );
   }
 
   /** Holidays (day and name) in [from, to] — the calendar. */
-  daysBetween(from: Date, to: Date): Promise<HolidayDayRecord[]> {
-    return this.holidayRepository.findDaysBetween(from, to);
+  daysBetween(organisationId: string, from: Date, to: Date): Promise<HolidayDayRecord[]> {
+    return this.holidayRepository.findDaysBetween(organisationId, from, to);
   }
 
   /** `YYYY-MM-DD` of the holidays in [from, to] — working-day counts. */
-  async datesBetween(from: Date, to: Date): Promise<Set<string>> {
-    const days = await this.holidayRepository.findDaysBetween(from, to);
+  async datesBetween(organisationId: string, from: Date, to: Date): Promise<Set<string>> {
+    const days = await this.holidayRepository.findDaysBetween(organisationId, from, to);
     return new Set(days.map((day) => isoDay(day.date)));
   }
 
   @Transactional()
-  async create(input: HolidayInput, actorId: string): Promise<HolidayRecord> {
+  async create(
+    organisationId: string,
+    input: HolidayInput,
+    actorId: string,
+  ): Promise<HolidayRecord> {
     const holiday = { date: asDate(input.date), name: input.name, recurring: input.recurring };
-    await this.requireFreeDate(holiday.date);
-    const created = await this.holidayRepository.create(holiday, actorId);
-    await this.requestRepository.shiftDaysForHolidays([isoDay(created.date)], -1);
+    await this.requireFreeDate(organisationId, holiday.date);
+    const created = await this.holidayRepository.create(organisationId, holiday, actorId);
+    await this.requestRepository.shiftDaysForHolidays([dayOf(created)], -1);
     await this.auditService.record(this.event(AuditAction.HOLIDAY_CREATED, created, null, created));
-    await this.carryOver(actorId);
-    return (await this.holidayRepository.findById(created.id)) ?? created;
+    await this.carryOver(organisationId, actorId);
+    return (await this.holidayRepository.findById(organisationId, created.id)) ?? created;
   }
 
   @Transactional()
   async update(
+    organisationId: string,
     id: string,
     input: HolidayInput & { version: number },
     actorId: string,
   ): Promise<HolidayRecord> {
-    const before = await this.holidayRepository.findById(id);
+    const before = await this.holidayRepository.findById(organisationId, id);
     if (!before) {
       throw new ResourceNotFoundException();
     }
@@ -117,15 +129,21 @@ export class HolidayService implements OnApplicationBootstrap {
       recurring: input.recurring,
     };
     if (isoDay(holiday.date) !== isoDay(before.date)) {
-      await this.requireFreeDate(holiday.date, id);
+      await this.requireFreeDate(organisationId, holiday.date, id);
     }
-    const after = await this.holidayRepository.update(id, input.version, holiday, actorId);
+    const after = await this.holidayRepository.update(
+      organisationId,
+      id,
+      input.version,
+      holiday,
+      actorId,
+    );
     if (!after) {
       throw new ConcurrentModificationException();
     }
     if (isoDay(after.date) !== isoDay(before.date)) {
-      await this.requestRepository.shiftDaysForHolidays([isoDay(before.date)], 1);
-      await this.requestRepository.shiftDaysForHolidays([isoDay(after.date)], -1);
+      await this.requestRepository.shiftDaysForHolidays([dayOf(before)], 1);
+      await this.requestRepository.shiftDaysForHolidays([dayOf(after)], -1);
     }
     const changes = changesBetween(before, after);
     if (changes.length > 0) {
@@ -135,29 +153,31 @@ export class HolidayService implements OnApplicationBootstrap {
       });
     }
     // Made recurring in a year that has come: its copy for the next year is due now.
-    await this.carryOver(actorId);
-    return (await this.holidayRepository.findById(id)) ?? after;
+    await this.carryOver(organisationId, actorId);
+    return (await this.holidayRepository.findById(organisationId, id)) ?? after;
   }
 
   @Transactional()
-  async remove(id: string): Promise<void> {
-    const holiday = await this.holidayRepository.findById(id);
-    if (!holiday || !(await this.holidayRepository.delete(id))) {
+  async remove(organisationId: string, id: string): Promise<void> {
+    const holiday = await this.holidayRepository.findById(organisationId, id);
+    if (!holiday || !(await this.holidayRepository.delete(organisationId, id))) {
       throw new ResourceNotFoundException();
     }
-    await this.requestRepository.shiftDaysForHolidays([isoDay(holiday.date)], 1);
+    await this.requestRepository.shiftDaysForHolidays([dayOf(holiday)], 1);
     await this.auditService.record(this.event(AuditAction.HOLIDAY_DELETED, holiday, holiday, null));
   }
 
   /**
    * Copies every recurring holiday of a year that has come (up to this year) to the next year,
-   * once. A date already taken there is skipped. Runs after each change and daily, so a new
-   * year gets the following year's holidays on its first day. Returns how many were copied.
+   * once. A date already taken there is skipped. Runs after each change (that organisation) and
+   * daily (every organisation — null), so a new year gets the following year's holidays on its
+   * first day. Returns how many were copied.
    */
   @Transactional()
-  async carryOver(actorId: string | null): Promise<number> {
+  async carryOver(organisationId: string | null, actorId: string | null): Promise<number> {
     const today = todayUtc();
     const sources = await this.holidayRepository.findToCarryOver(
+      organisationId,
       new Date(Date.UTC(today.getUTCFullYear(), 11, 31)),
     );
     if (sources.length === 0) {
@@ -165,6 +185,7 @@ export class HolidayService implements OnApplicationBootstrap {
     }
     const copies = await this.holidayRepository.createCopies(
       sources.map((source) => ({
+        organisationId: source.organisationId,
         date: sameDayNextYear(source.date),
         name: source.name,
         recurring: true,
@@ -172,10 +193,7 @@ export class HolidayService implements OnApplicationBootstrap {
       actorId,
     );
     await this.holidayRepository.markCarriedOver(sources.map((source) => source.id));
-    await this.requestRepository.shiftDaysForHolidays(
-      copies.map((copy) => isoDay(copy.date)),
-      -1,
-    );
+    await this.requestRepository.shiftDaysForHolidays(copies.map(dayOf), -1);
     await this.auditService.recordMany(
       copies.map((copy) => ({
         ...this.event(AuditAction.HOLIDAY_CREATED, copy, null, copy),
@@ -192,14 +210,18 @@ export class HolidayService implements OnApplicationBootstrap {
 
   @Cron(CronExpression.EVERY_DAY_AT_MIDNIGHT, { timeZone: 'UTC' })
   async carryOverDaily(): Promise<void> {
-    const count = await this.carryOver(null);
+    const count = await this.carryOver(null, null);
     if (count > 0) {
       this.logger.info({ count }, 'Recurring holidays copied to the next year');
     }
   }
 
-  private async requireFreeDate(date: Date, exceptId?: string): Promise<void> {
-    if (await this.holidayRepository.existsOnDate(date, exceptId)) {
+  private async requireFreeDate(
+    organisationId: string,
+    date: Date,
+    exceptId?: string,
+  ): Promise<void> {
+    if (await this.holidayRepository.existsOnDate(organisationId, date, exceptId)) {
       throw new BusinessConflictException('errors.holiday.dateTaken', {}, 'date');
     }
   }
@@ -212,6 +234,8 @@ export class HolidayService implements OnApplicationBootstrap {
   ): NewAuditEvent {
     return {
       action,
+      // The holiday's own organisation: the daily job has no principal.
+      organisationId: target.organisationId,
       employeeId: null,
       target: { type: AuditTargetType.HOLIDAY, id: target.id, label: target.name },
       changes: changesBetween(before, after),

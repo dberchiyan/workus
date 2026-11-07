@@ -19,3 +19,7 @@ export const SECURITY_CATEGORY_ACTIONS: Record<SecurityCategory, readonly AuditA
     AuditAction.AUTH_SESSIONS_ENDED_ON_TERMINATION,
   ],
 };
+
+/** Every security-log action: the log never shows other events about the account (e.g. a role change). */
+export const ALL_SECURITY_ACTIONS: readonly AuditAction[] =
+  Object.values(SECURITY_CATEGORY_ACTIONS).flat();

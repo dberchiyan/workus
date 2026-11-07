@@ -110,12 +110,13 @@ const plansFor = (index: number): Plan[] => [
  */
 export const seedTimeOff = async (
   prisma: PrismaClient,
+  organisationId: string,
   fallbackResponsibleId: string,
 ): Promise<number> => {
   const today = todayUtc();
   const now = new Date();
   const employees = await prisma.employee.findMany({
-    where: { timeOffRequests: { none: {} } },
+    where: { organisationId, timeOffRequests: { none: {} } },
     select: {
       id: true,
       userId: true,
@@ -167,6 +168,7 @@ export const seedTimeOff = async (
           : null;
       const request = await prisma.timeOffRequest.create({
         data: {
+          organisationId,
           employeeId: employee.id,
           type: plan.type,
           startDate: start,
@@ -190,6 +192,7 @@ export const seedTimeOff = async (
       });
       created += 1;
       const target = {
+        organisationId,
         targetType: AuditTargetType.TIME_OFF_REQUEST,
         targetId: request.id,
         targetLabel: timeOffLabel({ type: plan.type, startDate: start, endDate: end }),
@@ -296,11 +299,13 @@ const pendingSlot = (
 };
 
 const decisionEvent = (
+  organisationId: string,
   request: { id: string; employeeId: string; type: string; startDate: Date; endDate: Date },
   status: 'APPROVED' | 'REJECTED',
   actorUserId: string | null,
   occurredAt: Date,
 ): Prisma.AuditEventCreateManyInput => ({
+  organisationId,
   targetType: AuditTargetType.TIME_OFF_REQUEST,
   targetId: request.id,
   targetLabel: timeOffLabel(request),
@@ -330,12 +335,13 @@ const decisionEvent = (
  */
 export const seedPendingRequests = async (
   prisma: PrismaClient,
+  organisationId: string,
   fallbackResponsibleId: string,
 ): Promise<{ decided: number; created: number }> => {
   const today = todayUtc();
   const now = Date.now();
   const pending = await prisma.timeOffRequest.findMany({
-    where: { status: 'PENDING' },
+    where: { organisationId, status: 'PENDING' },
     select: {
       id: true,
       employeeId: true,
@@ -376,7 +382,7 @@ export const seedPendingRequests = async (
       },
       select: { id: true },
     });
-    events.push(decisionEvent(request, status, decider, decidedAt));
+    events.push(decisionEvent(organisationId, request, status, decider, decidedAt));
   }
 
   const busy = new Set(
@@ -385,6 +391,7 @@ export const seedPendingRequests = async (
   const candidates = (
     await prisma.employee.findMany({
       where: {
+        organisationId,
         startDate: { lte: plusDays(today, -30) },
         OR: [{ terminatedOn: null }, { terminatedOn: { gt: plusDays(today, 60) } }],
       },
@@ -443,6 +450,7 @@ export const seedPendingRequests = async (
           : [fallbackResponsibleId];
       const request = await prisma.timeOffRequest.create({
         data: {
+          organisationId,
           employeeId: employee.id,
           type,
           startDate: slot.start,
@@ -462,6 +470,7 @@ export const seedPendingRequests = async (
       });
       created += 1;
       events.push({
+        organisationId,
         targetType: AuditTargetType.TIME_OFF_REQUEST,
         targetId: request.id,
         targetLabel: timeOffLabel({ type, startDate: slot.start, endDate: slot.end }),
@@ -491,11 +500,15 @@ export const seedPendingRequests = async (
  * Only admins are responsible: pending requests made when others could be get the employee's
  * current responsible people instead (dev data only; decided requests keep theirs).
  */
-export const alignPendingResponsibles = async (prisma: PrismaClient): Promise<number> => {
+export const alignPendingResponsibles = async (
+  prisma: PrismaClient,
+  organisationId: string,
+): Promise<number> => {
   const requests = await prisma.timeOffRequest.findMany({
     where: {
+      organisationId,
       status: 'PENDING',
-      responsibles: { some: { responsible: { role: { not: 'ADMIN' } } } },
+      responsibles: { some: { responsible: { role: { notIn: ['OWNER', 'ADMIN'] } } } },
     },
     select: {
       id: true,
@@ -507,6 +520,7 @@ export const alignPendingResponsibles = async (prisma: PrismaClient): Promise<nu
   await prisma.timeOffRequestResponsible.createMany({
     data: requests.flatMap((request) =>
       request.employee.responsibles.map(({ responsibleUserId }) => ({
+        organisationId,
         requestId: request.id,
         responsibleUserId,
       })),
@@ -525,13 +539,17 @@ const COMMENTS = [
 /** A few admin comments on the oldest pending requests, once (dev only). */
 export const seedTimeOffComments = async (
   prisma: PrismaClient,
+  organisationId: string,
   admins: string[],
 ): Promise<number> => {
-  if ((await prisma.timeOffRequestComment.count()) > 0 || admins.length === 0) {
+  if (
+    (await prisma.timeOffRequestComment.count({ where: { organisationId } })) > 0 ||
+    admins.length === 0
+  ) {
     return 0;
   }
   const requests = await prisma.timeOffRequest.findMany({
-    where: { status: 'PENDING' },
+    where: { organisationId, status: 'PENDING' },
     select: { id: true, createdAt: true },
     orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
     take: 8,
@@ -540,6 +558,7 @@ export const seedTimeOffComments = async (
   const { count } = await prisma.timeOffRequestComment.createMany({
     data: requests.flatMap((request, index) =>
       COMMENTS.slice(0, 1 + (index % 2)).map((body, offset) => ({
+        organisationId,
         requestId: request.id,
         authorId: admins[(index + offset) % admins.length] ?? '',
         body: COMMENTS[(index + offset) % COMMENTS.length] ?? body,

@@ -9,6 +9,9 @@ export { useAccess } from './hooks/useAccess';
 export { ACCESS, type AccessPart, type UserRole } from './access';
 export { useLogout } from './hooks/useLogout';
 export { useCurrentUser } from './hooks/useCurrentUser';
+export { authKeys } from './hooks/queryKeys';
+export { PageShell } from './components/PageShell';
+export { BrandLogo } from './components/BrandLogo';
 export {
   useChangePassword,
   useEndOtherSessions,

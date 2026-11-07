@@ -78,6 +78,7 @@ export class ManagedTimeOffController {
   ): Promise<ManagedTimeOffRequestPageResponse> {
     return toManagedTimeOffRequestPageResponse(
       await this.decisionService.findPage(
+        principal.organisationId,
         {
           state: query.state,
           status: query.state === 'CLOSED' ? query.status : undefined,
@@ -107,7 +108,7 @@ export class ManagedTimeOffController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<ManagedTimeOffRequestResponse> {
     return toManagedTimeOffRequestResponse(
-      await this.decisionService.findOne(requestId, principal.userId),
+      await this.decisionService.findOne(principal.organisationId, requestId, principal.userId),
     );
   }
 
@@ -140,7 +141,13 @@ export class ManagedTimeOffController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<ManagedTimeOffRequestResponse> {
     return toManagedTimeOffRequestResponse(
-      await this.decisionService.decide(requestId, 'reject', principal.userId, request.comment),
+      await this.decisionService.decide(
+        principal.organisationId,
+        requestId,
+        'reject',
+        principal.userId,
+        request.comment,
+      ),
     );
   }
 
@@ -184,6 +191,7 @@ export class ManagedTimeOffController {
   ): Promise<ManagedTimeOffRequestResponse> {
     return toManagedTimeOffRequestResponse(
       await this.decisionService.updateResponsibles(
+        principal.organisationId,
         requestId,
         request.responsibleUserIds,
         principal.userId,
@@ -212,7 +220,12 @@ export class ManagedTimeOffController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<TimeOffCommentResponse> {
     return toTimeOffCommentResponse(
-      await this.commentService.add(requestId, request.body, principal.userId),
+      await this.commentService.add(
+        principal.organisationId,
+        requestId,
+        request.body,
+        principal.userId,
+      ),
     );
   }
 
@@ -235,7 +248,13 @@ export class ManagedTimeOffController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<TimeOffCommentResponse> {
     return toTimeOffCommentResponse(
-      await this.commentService.edit(requestId, commentId, request.body, principal.userId),
+      await this.commentService.edit(
+        principal.organisationId,
+        requestId,
+        commentId,
+        request.body,
+        principal.userId,
+      ),
     );
   }
 
@@ -255,7 +274,12 @@ export class ManagedTimeOffController {
     @UuidParam('commentId') commentId: string,
     @CurrentPrincipal() principal: Principal,
   ): Promise<void> {
-    await this.commentService.remove(requestId, commentId, principal.userId);
+    await this.commentService.remove(
+      principal.organisationId,
+      requestId,
+      commentId,
+      principal.userId,
+    );
   }
 
   private async decide(
@@ -264,7 +288,12 @@ export class ManagedTimeOffController {
     principal: Principal,
   ): Promise<ManagedTimeOffRequestResponse> {
     return toManagedTimeOffRequestResponse(
-      await this.decisionService.decide(requestId, decision, principal.userId),
+      await this.decisionService.decide(
+        principal.organisationId,
+        requestId,
+        decision,
+        principal.userId,
+      ),
     );
   }
 }

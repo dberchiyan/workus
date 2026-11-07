@@ -40,7 +40,7 @@ import {
 import { SecurityLogResponse } from './dto/security-log.response';
 import { toCurrentUserResponse } from './mapper/current-user.mapper';
 import { toSessionsResponse } from './mapper/session.mapper';
-import { SessionCookies } from './session-cookies';
+import { SessionCookies } from '../../../common/security/session-cookies';
 
 @ApiTags('Auth')
 @Controller('api/v1/auth')
@@ -198,7 +198,7 @@ export class AuthController {
     @PageableQuery(AUDIT_EVENT_PAGEABLE) pageable: Pageable<AuditEventSortField>,
   ): Promise<SecurityLogResponse> {
     return toSecurityEventPage(
-      await this.authService.securityLog(principal.userId, query.category ?? null, pageable),
+      await this.authService.securityLog(principal, query.category ?? null, pageable),
     );
   }
 }

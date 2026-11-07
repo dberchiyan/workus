@@ -1,4 +1,6 @@
 import { Controller, Get, HttpStatus } from '@nestjs/common';
+import type { Principal } from '../../../common/security/principal';
+import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { UuidParam } from '../../../common/dto/uuid-param';
@@ -26,7 +28,12 @@ export class EmployeeTimeOffController {
     'FORBIDDEN',
     'RESOURCE_NOT_FOUND',
   )
-  async balances(@UuidParam('employeeId') employeeId: string): Promise<LeaveBalancesResponse> {
-    return toLeaveBalancesResponse(await this.timeOffService.findBalances(employeeId));
+  async balances(
+    @CurrentPrincipal() principal: Principal,
+    @UuidParam('employeeId') employeeId: string,
+  ): Promise<LeaveBalancesResponse> {
+    return toLeaveBalancesResponse(
+      await this.timeOffService.findBalances(principal.organisationId, employeeId),
+    );
   }
 }

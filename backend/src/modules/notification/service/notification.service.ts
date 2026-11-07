@@ -15,6 +15,8 @@ import {
 
 /** One event to tell several people about. */
 export interface Notice {
+  /** The subject's organisation — every recipient belongs to it. */
+  organisationId: string;
   type: NotificationType;
   /** Null = the system. Never notified of their own action. */
   actorUserId: string | null;
@@ -46,6 +48,7 @@ export class NotificationService {
         return [...new Set(notice.recipientUserIds)]
           .filter((recipientUserId) => recipientUserId !== notice.actorUserId)
           .map((recipientUserId) => ({
+            organisationId: notice.organisationId,
             recipientUserId,
             type: notice.type,
             actorUserId: notice.actorUserId,
@@ -85,19 +88,25 @@ export class NotificationService {
   }
 
   findPage(
+    organisationId: string,
     userId: string,
     pageable: Pageable<NotificationSortField>,
   ): Promise<{ content: NotificationRecord[]; totalElements: number }> {
-    return this.notificationRepository.findPageByRecipient(userId, pageable);
+    return this.notificationRepository.findPageByRecipient(organisationId, userId, pageable);
   }
 
-  countUnread(userId: string): Promise<number> {
-    return this.notificationRepository.countUnread(userId);
+  countUnread(organisationId: string, userId: string): Promise<number> {
+    return this.notificationRepository.countUnread(organisationId, userId);
   }
 
   /** The policy has checked it is the caller's; reading it again changes nothing. */
-  async markRead(userId: string, notificationId: string): Promise<NotificationRecord> {
+  async markRead(
+    organisationId: string,
+    userId: string,
+    notificationId: string,
+  ): Promise<NotificationRecord> {
     const notification = await this.notificationRepository.markRead(
+      organisationId,
       notificationId,
       userId,
       new Date(),
@@ -108,8 +117,8 @@ export class NotificationService {
     return notification;
   }
 
-  markAllRead(userId: string): Promise<number> {
-    return this.notificationRepository.markAllRead(userId, new Date());
+  markAllRead(organisationId: string, userId: string): Promise<number> {
+    return this.notificationRepository.markAllRead(organisationId, userId, new Date());
   }
 
   @Cron(CronExpression.EVERY_DAY_AT_3AM, { timeZone: 'UTC' })

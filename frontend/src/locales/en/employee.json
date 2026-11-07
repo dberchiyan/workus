@@ -97,6 +97,7 @@
       "noOptions": "No one found",
       "loading": "Searching…",
       "roles": {
+        "OWNER": "Owner",
         "ADMIN": "Administrator",
         "MANAGER": "Manager",
         "EMPLOYEE": "Employee"
@@ -159,6 +160,7 @@
       "lessThanMonth": "less than a month"
     },
     "roles": {
+      "OWNER": "Owner",
       "ADMIN": "Administrator",
       "MANAGER": "Manager",
       "EMPLOYEE": "Employee"
@@ -237,7 +239,8 @@
         "decisionComment": "Reason",
         "dateOfBirth": "Date of birth",
         "name": "Name",
-        "recurring": "Repeats every year"
+        "recurring": "Repeats every year",
+        "role": "Role"
       },
       "previous": "Before:",
       "current": "After:",

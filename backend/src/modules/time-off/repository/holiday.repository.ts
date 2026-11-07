@@ -25,9 +25,9 @@ export class HolidayRepository {
   ) {}
 
   /** Holidays in [from, to], by date. */
-  findBetween(from: Date, to: Date): Promise<HolidayRecord[]> {
+  findBetween(organisationId: string, from: Date, to: Date): Promise<HolidayRecord[]> {
     return this.txHost.tx.companyHoliday.findMany({
-      where: { date: { gte: from, lte: to } },
+      where: { organisationId, date: { gte: from, lte: to } },
       select: holidaySelect,
       orderBy: { date: 'asc' },
       take: MAX_HOLIDAYS,
@@ -35,64 +35,85 @@ export class HolidayRepository {
   }
 
   /** Their days and names only (calendar, working-day counts). */
-  findDaysBetween(from: Date, to: Date): Promise<HolidayDayRecord[]> {
+  findDaysBetween(organisationId: string, from: Date, to: Date): Promise<HolidayDayRecord[]> {
     return this.txHost.tx.companyHoliday.findMany({
-      where: { date: { gte: from, lte: to } },
+      where: { organisationId, date: { gte: from, lte: to } },
       select: holidayDaySelect,
       orderBy: { date: 'asc' },
       take: MAX_HOLIDAYS,
     });
   }
 
-  findById(id: string): Promise<HolidayRecord | null> {
-    return this.txHost.tx.companyHoliday.findUnique({ where: { id }, select: holidaySelect });
+  findById(organisationId: string, id: string): Promise<HolidayRecord | null> {
+    return this.txHost.tx.companyHoliday.findUnique({
+      where: { id, organisationId },
+      select: holidaySelect,
+    });
   }
 
-  async existsOnDate(date: Date, exceptId?: string): Promise<boolean> {
+  async existsOnDate(organisationId: string, date: Date, exceptId?: string): Promise<boolean> {
     const count = await this.txHost.tx.companyHoliday.count({
-      where: { date, ...(exceptId ? { id: { not: exceptId } } : {}) },
+      where: { organisationId, date, ...(exceptId ? { id: { not: exceptId } } : {}) },
     });
     return count > 0;
   }
 
-  create(holiday: NewHoliday, createdBy: string | null): Promise<HolidayRecord> {
+  create(
+    organisationId: string,
+    holiday: NewHoliday,
+    createdBy: string | null,
+  ): Promise<HolidayRecord> {
     return this.txHost.tx.companyHoliday.create({
-      data: { ...holiday, createdBy, updatedBy: createdBy },
+      data: { ...holiday, organisationId, createdBy, updatedBy: createdBy },
       select: holidaySelect,
     });
   }
 
   /** Optimistic lock: null when the version is stale or the holiday is gone. */
   async update(
+    organisationId: string,
     id: string,
     version: number,
     holiday: NewHoliday,
     updatedBy: string,
   ): Promise<HolidayRecord | null> {
     const { count } = await this.txHost.tx.companyHoliday.updateMany({
-      where: { id, version },
+      where: { id, organisationId, version },
       data: { ...holiday, updatedBy, version: { increment: 1 } },
     });
-    return count === 0 ? null : this.findById(id);
+    return count === 0 ? null : this.findById(organisationId, id);
   }
 
-  async delete(id: string): Promise<boolean> {
-    const { count } = await this.txHost.tx.companyHoliday.deleteMany({ where: { id } });
+  async delete(organisationId: string, id: string): Promise<boolean> {
+    const { count } = await this.txHost.tx.companyHoliday.deleteMany({
+      where: { id, organisationId },
+    });
     return count > 0;
   }
 
-  /** Recurring holidays up to `until` whose copy for the next year has not been made. */
-  findToCarryOver(until: Date): Promise<HolidayRecord[]> {
+  /**
+   * Recurring holidays up to `until` whose copy for the next year has not been made — of one
+   * organisation, or of every one (null, the daily job; bounded per run, the rest next run).
+   */
+  findToCarryOver(organisationId: string | null, until: Date): Promise<HolidayRecord[]> {
     return this.txHost.tx.companyHoliday.findMany({
-      where: { recurring: true, carriedOver: false, date: { lte: until } },
+      where: {
+        ...(organisationId ? { organisationId } : {}),
+        recurring: true,
+        carriedOver: false,
+        date: { lte: until },
+      },
       select: holidaySelect,
-      orderBy: { date: 'asc' },
+      orderBy: [{ date: 'asc' }, { id: 'asc' }],
       take: MAX_HOLIDAYS,
     });
   }
 
   /** Inserts the copies; a date already taken is skipped. Returns the ones inserted. */
-  createCopies(holidays: NewHoliday[], createdBy: string | null): Promise<HolidayRecord[]> {
+  createCopies(
+    holidays: (NewHoliday & { organisationId: string })[],
+    createdBy: string | null,
+  ): Promise<HolidayRecord[]> {
     return this.txHost.tx.companyHoliday.createManyAndReturn({
       data: holidays.map((holiday) => ({ ...holiday, createdBy, updatedBy: createdBy })),
       skipDuplicates: true,

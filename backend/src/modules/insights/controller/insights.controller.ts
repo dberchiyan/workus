@@ -1,4 +1,6 @@
 import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
+import type { Principal } from '../../../common/security/principal';
+import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { ApiErrors } from '../../../common/exception/api-errors.decorator';
@@ -23,7 +25,10 @@ export class InsightsController {
   })
   @ZodResponse({ status: HttpStatus.OK, type: InsightsResponse })
   @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
-  async insights(@Query() query: InsightsFilterQuery): Promise<InsightsResponse> {
-    return toInsightsResponse(await this.insightsService.overview(query));
+  async insights(
+    @CurrentPrincipal() principal: Principal,
+    @Query() query: InsightsFilterQuery,
+  ): Promise<InsightsResponse> {
+    return toInsightsResponse(await this.insightsService.overview(principal.organisationId, query));
   }
 }

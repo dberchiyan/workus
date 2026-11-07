@@ -19,14 +19,25 @@ export class TimeOffCommentService {
   ) {}
 
   @Transactional()
-  async add(requestId: string, body: string, authorId: string): Promise<TimeOffCommentRecord> {
-    if (!(await this.requestRepository.findStateById(requestId))) {
+  async add(
+    organisationId: string,
+    requestId: string,
+    body: string,
+    authorId: string,
+  ): Promise<TimeOffCommentRecord> {
+    if (!(await this.requestRepository.findStateById(organisationId, requestId))) {
       throw new ResourceNotFoundException();
     }
-    const comment = await this.requestRepository.addComment(requestId, authorId, body);
-    await this.requestRepository.touch(requestId, authorId);
+    const comment = await this.requestRepository.addComment(
+      organisationId,
+      requestId,
+      authorId,
+      body,
+    );
+    await this.requestRepository.touch(organisationId, requestId, authorId);
     // The employee and the responsible people hear of it; edits and deletions are quiet.
     await this.notifier.notify(
+      organisationId,
       requestId,
       NotificationType.TIME_OFF_COMMENTED,
       authorId,
@@ -37,24 +48,38 @@ export class TimeOffCommentService {
 
   @Transactional()
   async edit(
+    organisationId: string,
     requestId: string,
     commentId: string,
     body: string,
     authorId: string,
   ): Promise<TimeOffCommentRecord> {
-    const comment = await this.requestRepository.editComment(commentId, requestId, authorId, body);
+    const comment = await this.requestRepository.editComment(
+      organisationId,
+      commentId,
+      requestId,
+      authorId,
+      body,
+    );
     if (!comment) {
       throw new ResourceNotFoundException();
     }
-    await this.requestRepository.touch(requestId, authorId);
+    await this.requestRepository.touch(organisationId, requestId, authorId);
     return comment;
   }
 
   @Transactional()
-  async remove(requestId: string, commentId: string, authorId: string): Promise<void> {
-    if (!(await this.requestRepository.deleteComment(commentId, requestId, authorId))) {
+  async remove(
+    organisationId: string,
+    requestId: string,
+    commentId: string,
+    authorId: string,
+  ): Promise<void> {
+    if (
+      !(await this.requestRepository.deleteComment(organisationId, commentId, requestId, authorId))
+    ) {
       throw new ResourceNotFoundException();
     }
-    await this.requestRepository.touch(requestId, authorId);
+    await this.requestRepository.touch(organisationId, requestId, authorId);
   }
 }

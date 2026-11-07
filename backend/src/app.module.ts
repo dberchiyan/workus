@@ -28,6 +28,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { InsightsModule } from './modules/insights/insights.module';
 import { UserModule } from './modules/user/user.module';
 import { NotificationModule } from './modules/notification/notification.module';
+import { OrganisationModule } from './modules/organisation/organisation.module';
 
 @Module({
   imports: [
@@ -45,6 +46,7 @@ import { NotificationModule } from './modules/notification/notification.module';
     UserModule,
     NotificationModule,
     AuthModule,
+    OrganisationModule,
     EmployeeModule,
     ReviewModule,
     EmploymentModule,

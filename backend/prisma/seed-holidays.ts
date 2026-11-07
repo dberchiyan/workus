@@ -20,9 +20,16 @@ const HOLIDAYS: readonly { date: string; name: string; recurring: boolean }[] = 
  * Adds the holidays not there yet and takes their working days from held requests that cover
  * them (the statement the app uses — TimeOffRequestRepository.shiftDaysForHolidays).
  */
-export const seedHolidays = async (prisma: PrismaClient): Promise<number> => {
+export const seedHolidays = async (
+  prisma: PrismaClient,
+  organisationId: string,
+): Promise<number> => {
   const added = await prisma.companyHoliday.createManyAndReturn({
-    data: HOLIDAYS.map((holiday) => ({ ...holiday, date: new Date(`${holiday.date}T00:00:00Z`) })),
+    data: HOLIDAYS.map((holiday) => ({
+      ...holiday,
+      organisationId,
+      date: new Date(`${holiday.date}T00:00:00Z`),
+    })),
     skipDuplicates: true,
     select: { date: true },
   });
@@ -34,7 +41,8 @@ export const seedHolidays = async (prisma: PrismaClient): Promise<number> => {
         SELECT count(*)::int FROM unnest(${days}::date[]) AS h(day)
         WHERE h.day BETWEEN r."start_date" AND r."end_date" AND EXTRACT(ISODOW FROM h.day) < 6
       ))
-      WHERE r."status" IN ('PENDING', 'APPROVED')
+      WHERE r."organisation_id" = ${organisationId}::uuid
+        AND r."status" IN ('PENDING', 'APPROVED')
         AND EXISTS (
           SELECT 1 FROM unnest(${days}::date[]) AS h(day)
           WHERE h.day BETWEEN r."start_date" AND r."end_date" AND EXTRACT(ISODOW FROM h.day) < 6

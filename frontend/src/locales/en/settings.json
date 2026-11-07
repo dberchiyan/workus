@@ -7,7 +7,9 @@
     "account": "Account",
     "sessions": "Sessions",
     "security": "Security log",
-    "holidays": "Holidays"
+    "holidays": "Holidays",
+    "organisation": "Company",
+    "administrators": "Administrators"
   },
   "account": {
     "profile": {
@@ -24,20 +26,10 @@
       "new": "New password",
       "confirm": "Repeat the new password",
       "submit": "Change password",
-      "show": "Show password",
-      "hide": "Hide password",
       "done": "Password changed. You were signed out on your other devices.",
       "rules": {
-        "title": "Your new password needs",
-        "length": "{{min}} to {{max}} characters",
-        "uppercase": "An upper-case letter (A–Z)",
-        "lowercase": "A lower-case letter (a–z)",
-        "digit": "A digit (0–9)",
-        "symbol": "A symbol, such as ! # % or -",
         "different": "To differ from the current password",
-        "match": "The same in both new-password fields",
-        "met": "— done",
-        "notMet": "— not yet"
+        "match": "The same in both new-password fields"
       }
     }
   },

@@ -15,11 +15,15 @@ import {
   reviewSelect,
 } from './record/review.record';
 
-export type ReviewChanges = Omit<NewReview, 'employeeId' | 'kind' | 'createdBy'> & {
+export type ReviewChanges = Omit<
+  NewReview,
+  'organisationId' | 'employeeId' | 'kind' | 'createdBy'
+> & {
   updatedBy: string;
 };
 
 export interface NewReview {
+  organisationId: string;
   employeeId: string;
   kind: string;
   title: string;
@@ -46,9 +50,9 @@ export class ReviewRepository {
   ) {}
 
   /** Newest first. */
-  findByEmployee(employeeId: string): Promise<ReviewRecord[]> {
+  findByEmployee(organisationId: string, employeeId: string): Promise<ReviewRecord[]> {
     return this.txHost.tx.employeeReview.findMany({
-      where: { employeeId },
+      where: { organisationId, employeeId },
       select: reviewSelect,
       orderBy: [{ reviewDate: 'desc' }, { id: 'desc' }],
       take: MAX_REVIEWS,
@@ -58,6 +62,7 @@ export class ReviewRepository {
   async create(review: NewReview): Promise<ReviewRecord> {
     return this.txHost.tx.employeeReview.create({
       data: {
+        organisationId: review.organisationId,
         employeeId: review.employeeId,
         kind: review.kind,
         title: review.title,
@@ -82,17 +87,22 @@ export class ReviewRepository {
     });
   }
 
-  findById(reviewId: string): Promise<ReviewRecord | null> {
+  findById(organisationId: string, reviewId: string): Promise<ReviewRecord | null> {
     return this.txHost.tx.employeeReview.findUnique({
-      where: { id: reviewId },
+      where: { id: reviewId, organisationId },
       select: reviewSelect,
     });
   }
 
   /** Optimistic lock: updates only if `version` still matches; false → someone changed it first. */
-  async update(reviewId: string, version: number, changes: ReviewChanges): Promise<boolean> {
+  async update(
+    organisationId: string,
+    reviewId: string,
+    version: number,
+    changes: ReviewChanges,
+  ): Promise<boolean> {
     const { count } = await this.txHost.tx.employeeReview.updateMany({
-      where: { id: reviewId, version },
+      where: { id: reviewId, organisationId, version },
       data: {
         title: changes.title,
         reviewDate: changes.reviewDate,
@@ -111,9 +121,12 @@ export class ReviewRepository {
       return false;
     }
     // Responsibles are replaced as a set.
-    await this.txHost.tx.employeeReviewResponsible.deleteMany({ where: { reviewId } });
+    await this.txHost.tx.employeeReviewResponsible.deleteMany({
+      where: { organisationId, reviewId },
+    });
     await this.txHost.tx.employeeReviewResponsible.createMany({
       data: changes.responsibleUserIds.map((responsibleUserId) => ({
+        organisationId,
         reviewId,
         responsibleUserId,
         createdBy: changes.updatedBy,
@@ -122,74 +135,100 @@ export class ReviewRepository {
     return true;
   }
 
-  async delete(reviewId: string): Promise<void> {
-    await this.txHost.tx.employeeReview.deleteMany({ where: { id: reviewId } });
+  async delete(organisationId: string, reviewId: string): Promise<void> {
+    await this.txHost.tx.employeeReview.deleteMany({ where: { id: reviewId, organisationId } });
   }
 
   findStarting(
+    organisationId: string,
     employeeId: string,
   ): Promise<{ id: string; title: string; reviewDate: Date } | null> {
     return this.txHost.tx.employeeReview.findFirst({
-      where: { employeeId, kind: ReviewKind.STARTING },
+      where: { organisationId, employeeId, kind: ReviewKind.STARTING },
       select: { id: true, title: true, reviewDate: true },
     });
   }
 
   /** Any other review dated before `date`? */
-  async existsRegularBefore(employeeId: string, date: Date): Promise<boolean> {
+  async existsRegularBefore(
+    organisationId: string,
+    employeeId: string,
+    date: Date,
+  ): Promise<boolean> {
     return (
       (await this.txHost.tx.employeeReview.count({
-        where: { employeeId, kind: { not: ReviewKind.STARTING }, reviewDate: { lt: date } },
+        where: {
+          organisationId,
+          employeeId,
+          kind: { not: ReviewKind.STARTING },
+          reviewDate: { lt: date },
+        },
       })) > 0
     );
   }
 
-  async moveDate(reviewId: string, reviewDate: Date, updatedBy: string): Promise<void> {
+  async moveDate(
+    organisationId: string,
+    reviewId: string,
+    reviewDate: Date,
+    updatedBy: string,
+  ): Promise<void> {
     await this.txHost.tx.employeeReview.update({
-      where: { id: reviewId },
+      where: { id: reviewId, organisationId },
       data: { reviewDate, updatedBy, version: { increment: 1 } },
       select: { id: true },
     });
   }
 
   /** Scheduled reviews dated after `date` (bounded like every list). */
-  findScheduledAfter(employeeId: string, date: Date): Promise<{ id: string; title: string }[]> {
+  findScheduledAfter(
+    organisationId: string,
+    employeeId: string,
+    date: Date,
+  ): Promise<{ id: string; title: string }[]> {
     return this.txHost.tx.employeeReview.findMany({
-      where: { employeeId, status: ReviewStatus.SCHEDULED, reviewDate: { gt: date } },
+      where: {
+        organisationId,
+        employeeId,
+        status: ReviewStatus.SCHEDULED,
+        reviewDate: { gt: date },
+      },
       select: { id: true, title: true },
       orderBy: { reviewDate: 'asc' },
       take: MAX_REVIEWS,
     });
   }
 
-  async cancelMany(reviewIds: string[], updatedBy: string): Promise<void> {
+  async cancelMany(organisationId: string, reviewIds: string[], updatedBy: string): Promise<void> {
     await this.txHost.tx.employeeReview.updateMany({
-      where: { id: { in: reviewIds }, status: ReviewStatus.SCHEDULED },
+      where: { organisationId, id: { in: reviewIds }, status: ReviewStatus.SCHEDULED },
       data: { status: ReviewStatus.CANCELED, updatedBy, version: { increment: 1 } },
     });
   }
 
   /** Scheduled reviews dated in [from, to]. */
-  countScheduledBetween(from: Date, to: Date): Promise<number> {
+  countScheduledBetween(organisationId: string, from: Date, to: Date): Promise<number> {
     return this.txHost.tx.employeeReview.count({
-      where: { status: ReviewStatus.SCHEDULED, reviewDate: { gte: from, lte: to } },
+      where: { organisationId, status: ReviewStatus.SCHEDULED, reviewDate: { gte: from, lte: to } },
     });
   }
 
   /** Scheduled reviews whose date has passed (never completed or canceled). */
-  countScheduledBefore(date: Date): Promise<number> {
+  countScheduledBefore(organisationId: string, date: Date): Promise<number> {
     return this.txHost.tx.employeeReview.count({
-      where: { status: ReviewStatus.SCHEDULED, reviewDate: { lt: date } },
+      where: { organisationId, status: ReviewStatus.SCHEDULED, reviewDate: { lt: date } },
     });
   }
 
   /** Scheduled and completed regular reviews dated in [from, to], by date then name, a page at a time. */
   async findScheduledOrCompletedBetween(
+    organisationId: string,
     from: Date,
     to: Date,
     page: { offset: number; limit: number },
   ): Promise<{ content: DashboardReviewRecord[]; totalElements: number }> {
     const where: Prisma.EmployeeReviewWhereInput = {
+      organisationId,
       kind: ReviewKind.REGULAR,
       status: { in: [ReviewStatus.SCHEDULED, ReviewStatus.COMPLETED] },
       reviewDate: { gte: from, lte: to },
@@ -213,6 +252,7 @@ export class ReviewRepository {
 
   /** Each employee's latest completed salary on or before `asOf` (bounded). */
   findLatestSalaries(
+    organisationId: string,
     asOf: Date,
     limit: number,
   ): Promise<
@@ -220,6 +260,7 @@ export class ReviewRepository {
   > {
     return this.txHost.tx.employeeReview.findMany({
       where: {
+        organisationId,
         status: ReviewStatus.COMPLETED,
         reviewDate: { lte: asOf },
         salaryAmount: { not: null },

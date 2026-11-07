@@ -1,8 +1,10 @@
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
+import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
-import { Navigate } from 'react-router';
+import { Navigate, Link as RouterLink } from 'react-router';
+import { PATHS } from '@/shared/lib/paths';
 import { PageLoader } from '@/shared/components/PageLoader';
 import { PageShell } from '../components/PageShell';
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
@@ -46,6 +48,12 @@ export default function LoginPage() {
               <LoginForm />
             </CardContent>
           </Card>
+          <Typography variant="body2" color="textSecondary" className="text-center">
+            {t('login.noAccount')}{' '}
+            <Link component={RouterLink} to={PATHS.signup}>
+              {t('login.createCompany')}
+            </Link>
+          </Typography>
         </div>
         <AppPreview />
       </div>

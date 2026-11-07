@@ -4,6 +4,8 @@ export const RateLimitName = {
   LOGIN: 'LOGIN',
   /** Changing one's password: guesses at the current one, per user. */
   PASSWORD_CHANGE: 'PASSWORD_CHANGE',
+  /** Registering a company (an account and an organisation), per IP. */
+  REGISTRATION: 'REGISTRATION',
 } as const;
 export type RateLimitName = (typeof RateLimitName)[keyof typeof RateLimitName];
 

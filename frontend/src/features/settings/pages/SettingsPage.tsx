@@ -3,6 +3,7 @@ import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, NavLink, useParams } from 'react-router';
 import { useAccess } from '@/features/auth';
+import { AdministratorsSection, OrganisationSection } from '@/features/organisation';
 import { HolidaysSection } from '@/features/time-off';
 import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
@@ -11,9 +12,12 @@ import { settingsPath } from '@/shared/lib/paths';
 import { AccountSection } from '../components/AccountSection';
 import { SecuritySection } from '../components/SecuritySection';
 import { SessionsSection } from '../components/SessionsSection';
-import { isSettingsSection, SETTINGS_SECTIONS } from '../sections';
+import { isSettingsSection, sectionAccessPart, SETTINGS_SECTIONS } from '../sections';
 
-/** Your account, sessions and security log — one section at a time, each with its own URL. */
+/**
+ * Your account, sessions and security log, and (by role) holidays, the company and its
+ * administrators — one section at a time, each with its own URL.
+ */
 export default function SettingsPage() {
   const { t } = useTranslation('settings');
   const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
@@ -29,9 +33,10 @@ export default function SettingsPage() {
   }, [section]);
   useDocumentTitle(t('pageTitle'));
 
-  const sections = SETTINGS_SECTIONS.filter(
-    ({ key }) => key !== 'holidays' || can('settings.holidays'),
-  );
+  const sections = SETTINGS_SECTIONS.filter(({ key }) => {
+    const part = sectionAccessPart(key);
+    return part === undefined || can(part);
+  });
   if (!isSettingsSection(section) || !sections.some(({ key }) => key === section)) {
     return <Navigate to={settingsPath('account')} replace />;
   }
@@ -82,6 +87,8 @@ export default function SettingsPage() {
           {section === 'sessions' && <SessionsSection />}
           {section === 'security' && <SecuritySection />}
           {section === 'holidays' && <HolidaysSection />}
+          {section === 'organisation' && <OrganisationSection />}
+          {section === 'administrators' && <AdministratorsSection />}
         </div>
       </div>
     </div>

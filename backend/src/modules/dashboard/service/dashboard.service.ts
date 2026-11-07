@@ -29,34 +29,54 @@ export class DashboardService {
     private readonly employeeService: EmployeeService,
   ) {}
 
-  async adminDashboard(): Promise<AdminDashboard> {
+  async adminDashboard(organisationId: string): Promise<AdminDashboard> {
     const today = todayUtc();
     const [timeOff, reviews, movements] = await Promise.all([
-      this.timeOffService.overview(today),
-      this.reviewService.dueSummary(today, WINDOW_DAYS),
-      this.employeeService.movements(today, WINDOW_DAYS),
+      this.timeOffService.overview(organisationId, today),
+      this.reviewService.dueSummary(organisationId, today, WINDOW_DAYS),
+      this.employeeService.movements(organisationId, today, WINDOW_DAYS),
     ]);
     return { today, timeOff, reviews, movements };
   }
 
   /** Requests made between `from` and `to` (today, UTC), newest first. */
-  requestsMadeBetween(from: string, to: string): Promise<DashboardRequests> {
-    return this.timeOffService.requestsCreatedBetween(new Date(from), new Date(to), MAX_REQUESTS);
+  requestsMadeBetween(
+    organisationId: string,
+    from: string,
+    to: string,
+  ): Promise<DashboardRequests> {
+    return this.timeOffService.requestsCreatedBetween(
+      organisationId,
+      new Date(from),
+      new Date(to),
+      MAX_REQUESTS,
+    );
   }
 
   /** Scheduled and completed reviews dated in [from, to], a page at a time. */
   reviews(
+    organisationId: string,
     range: { from: string; to: string },
     page: { page: number; size: number },
   ): Promise<DashboardReviews> {
-    return this.reviewService.reviewsBetween(asDate(range.from), asDate(range.to), page);
+    return this.reviewService.reviewsBetween(
+      organisationId,
+      asDate(range.from),
+      asDate(range.to),
+      page,
+    );
   }
 
   /** Birthdays in [from, to] (one month) of people employed then, a page at a time. */
   birthdays(
+    organisationId: string,
     range: { from: string; to: string },
     page: { page: number; size: number },
   ): Promise<EmployeeBirthdays> {
-    return this.employeeService.birthdays({ from: asDate(range.from), to: asDate(range.to) }, page);
+    return this.employeeService.birthdays(
+      organisationId,
+      { from: asDate(range.from), to: asDate(range.to) },
+      page,
+    );
   }
 }

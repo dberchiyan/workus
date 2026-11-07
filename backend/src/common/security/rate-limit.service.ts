@@ -16,6 +16,8 @@ const LIMITS: Readonly<Record<LimiterName, { points: number; durationSeconds: nu
   [RateLimitName.LOGIN]: { points: 5, durationSeconds: 15 * 60 },
   // Same budget for guesses at the current password, keyed by user.
   [RateLimitName.PASSWORD_CHANGE]: { points: 5, durationSeconds: 15 * 60 },
+  // security.md: registration 3 / h per IP.
+  [RateLimitName.REGISTRATION]: { points: 3, durationSeconds: 60 * 60 },
   // Per-session ceiling on everything else.
   [SESSION_LIMIT]: { points: 300, durationSeconds: 60 },
 };

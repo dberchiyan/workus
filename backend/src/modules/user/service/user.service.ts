@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
+import type { Pageable } from '../../../common/dto/pageable';
+import type { AdministratorRecord } from '../repository/record/user.record';
 import { UserRepository } from '../repository/user.repository';
-import { isUserRole, type UserRole } from './user-role';
-import type { NewUser, UserCredentials, UserProfile } from './user.types';
+import type { AdministratorSortField } from './administrator-sort';
+import { isUserRole, UserRole } from './user-role';
+import type { Administrator, NewOwner, NewUser, UserCredentials, UserProfile } from './user.types';
 
 const toRole = (role: string): UserRole => {
   if (!isUserRole(role)) {
@@ -60,4 +63,53 @@ export class UserService {
   updatePasswordHash(id: string, passwordHash: string): Promise<void> {
     return this.userRepository.updatePasswordHash(id, passwordHash);
   }
+
+  /** Returns the new owner's id. Email is stored lower-case. */
+  createOwner(owner: NewOwner): Promise<string> {
+    return this.userRepository.createOwner({
+      ...owner,
+      email: owner.email.toLowerCase(),
+      role: UserRole.OWNER,
+    });
+  }
+
+  /** Owners and admins of the organisation; `searchTerms` each match name or email. */
+  async findAdministratorPage(
+    organisationId: string,
+    searchTerms: string[],
+    pageable: Pageable<AdministratorSortField>,
+  ): Promise<{ content: Administrator[]; totalElements: number }> {
+    const page = await this.userRepository.findAdministratorPage(
+      organisationId,
+      searchTerms,
+      pageable,
+    );
+    return { content: page.content.map(toAdministrator), totalElements: page.totalElements };
+  }
+
+  /** A user of the organisation with their role (any role); null when unknown there. */
+  async findAdministrator(organisationId: string, userId: string): Promise<Administrator | null> {
+    const user = await this.userRepository.findAdministrator(organisationId, userId);
+    return user ? toAdministrator(user) : null;
+  }
+
+  countOwners(organisationId: string): Promise<number> {
+    return this.userRepository.countByRole(organisationId, UserRole.OWNER);
+  }
+
+  /** False when the version is stale. */
+  updateRole(
+    organisationId: string,
+    userId: string,
+    version: number,
+    role: UserRole,
+    updatedBy: string,
+  ): Promise<boolean> {
+    return this.userRepository.updateRole(organisationId, userId, version, role, updatedBy);
+  }
 }
+
+const toAdministrator = (user: AdministratorRecord): Administrator => ({
+  ...user,
+  role: toRole(user.role),
+});

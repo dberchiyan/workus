@@ -22,9 +22,11 @@
     "theme": "Theme",
     "profile": "Account",
     "securityDevices": "Security & devices",
-    "settings": "Settings"
+    "settings": "Settings",
+    "roleAt": "{{role}} · {{organisation}}"
   },
   "role": {
+    "OWNER": "Owner",
     "ADMIN": "Administrator",
     "MANAGER": "Manager",
     "EMPLOYEE": "Employee"

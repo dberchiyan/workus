@@ -2,8 +2,10 @@ import type { CurrentUser } from './types';
 
 export type UserRole = CurrentUser['role'];
 
-const EVERYONE = ['ADMIN', 'MANAGER', 'EMPLOYEE'] as const satisfies readonly UserRole[];
-const ADMINS = ['ADMIN'] as const satisfies readonly UserRole[];
+const EVERYONE = ['OWNER', 'ADMIN', 'MANAGER', 'EMPLOYEE'] as const satisfies readonly UserRole[];
+/** Owners can do everything admins can. */
+const ADMINS = ['OWNER', 'ADMIN'] as const satisfies readonly UserRole[];
+const OWNERS = ['OWNER'] as const satisfies readonly UserRole[];
 
 /**
  * Which roles use which parts of the interface — the one place the UI decides by role. Hiding is
@@ -26,6 +28,11 @@ export const ACCESS = {
   'calendar.openProfile': ADMINS,
   /** Settings: the company holidays are kept by admins. */
   'settings.holidays': ADMINS,
+  /** Settings: the organisation's name — owners. */
+  'settings.organisation': OWNERS,
+  /** Settings: who runs the organisation — admins see it, owners change roles. */
+  'settings.administrators': ADMINS,
+  'administrators.changeRole': OWNERS,
 } as const satisfies Record<string, readonly UserRole[]>;
 
 export type AccessPart = keyof typeof ACCESS;

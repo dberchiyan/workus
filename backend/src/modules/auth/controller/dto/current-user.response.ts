@@ -10,6 +10,8 @@ export const CurrentUserResponseSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   role: UserRoleSchema,
+  /** The caller's organisation (a user belongs to one). */
+  organisation: z.object({ id: z.uuid(), name: z.string().max(100) }),
   /** Minutes without activity after which the session ends (the client warns before). */
   idleTimeoutMinutes: z.number().int().min(1),
 });

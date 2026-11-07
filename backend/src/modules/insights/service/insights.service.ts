@@ -79,12 +79,12 @@ export class InsightsService {
    * Every figure for the year in one go: the roster is read once; approved time off and salaries
    * (this year and last) are read in parallel.
    */
-  async overview(filter: InsightFilter): Promise<Insights> {
+  async overview(organisationId: string, filter: InsightFilter): Promise<Insights> {
     const today = todayUtc();
-    const people = await this.people(filter);
+    const people = await this.people(organisationId, filter);
     const [absence, salary] = await Promise.all([
-      this.absence(filter, people, today),
-      this.salary(filter, people, today),
+      this.absence(organisationId, filter, people, today),
+      this.salary(organisationId, filter, people, today),
     ]);
     return {
       headcount: this.headcount(filter, people, today),
@@ -211,6 +211,7 @@ export class InsightsService {
 
   /** Who took the most approved working days off this year (up to today), and the average. */
   private async absence(
+    organisationId: string,
     filter: InsightFilter,
     people: RosterEmployee[],
     today: Date,
@@ -219,6 +220,7 @@ export class InsightsService {
     const tally = async (year: number) => {
       const day = referenceDay(year, today);
       const rows = await this.timeOffService.approvedDaysBetween(
+        organisationId,
         new Date(Date.UTC(year, 0, 1)),
         day,
       );
@@ -270,6 +272,7 @@ export class InsightsService {
 
   /** Average monthly salary (latest completed review) of the people employed at the end of the year. */
   private async salary(
+    organisationId: string,
     filter: InsightFilter,
     people: RosterEmployee[],
     today: Date,
@@ -277,7 +280,7 @@ export class InsightsService {
     const groupOf = this.grouping(filter);
     const measure = async (day: Date) => {
       const salaries = new Map(
-        (await this.reviewService.salariesAsOf(day))
+        (await this.reviewService.salariesAsOf(organisationId, day))
           .filter((row) => row.currency === Currency.USD)
           .map((row) => [row.employeeId, row.amount]),
       );
@@ -310,8 +313,8 @@ export class InsightsService {
     };
   }
 
-  private async people(filter: InsightFilter): Promise<RosterEmployee[]> {
-    const roster = await this.employeeService.roster();
+  private async people(organisationId: string, filter: InsightFilter): Promise<RosterEmployee[]> {
+    const roster = await this.employeeService.roster(organisationId);
     return filter.categoryId
       ? roster.filter((person) => person.category.id === filter.categoryId)
       : roster;

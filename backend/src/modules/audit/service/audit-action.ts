@@ -16,6 +16,10 @@ export const AuditAction = {
   HOLIDAY_CREATED: 'holiday.created',
   HOLIDAY_UPDATED: 'holiday.updated',
   HOLIDAY_DELETED: 'holiday.deleted',
+  /** The organisation itself (target type `organisation`) and people's roles (target `user`). */
+  ORGANISATION_CREATED: 'organisation.created',
+  ORGANISATION_UPDATED: 'organisation.updated',
+  USER_ROLE_CHANGED: 'user.role_changed',
   /** Security log — target type `user`, no employee (never in the Activity tab). */
   AUTH_SIGNED_IN: 'auth.signed_in',
   AUTH_SIGN_IN_FAILED: 'auth.sign_in_failed',
@@ -41,6 +45,7 @@ export const AuditTargetType = {
   TIME_OFF_REQUEST: 'time_off_request',
   HOLIDAY: 'holiday',
   USER: 'user',
+  ORGANISATION: 'organisation',
 } as const;
 export type AuditTargetType = (typeof AuditTargetType)[keyof typeof AuditTargetType];
 export const AUDIT_TARGET_TYPES = Object.values(AuditTargetType) as [
@@ -48,10 +53,17 @@ export const AUDIT_TARGET_TYPES = Object.values(AuditTargetType) as [
   ...AuditTargetType[],
 ];
 
-/** Not in any employee's history: the security log (auth.*) and company holidays (holiday.*). */
-type CompanyAction = Extract<AuditAction, `auth.${string}` | `holiday.${string}`>;
+/**
+ * Not in any employee's history: the security log (auth.*), company holidays (holiday.*), the
+ * organisation (organisation.*) and roles (user.*).
+ */
+type CompanyAction = Extract<
+  AuditAction,
+  `auth.${string}` | `holiday.${string}` | `organisation.${string}` | `user.${string}`
+>;
+const COMPANY_PREFIXES = ['auth.', 'holiday.', 'organisation.', 'user.'] as const;
 const isCompanyAction = (action: AuditAction): action is CompanyAction =>
-  action.startsWith('auth.') || action.startsWith('holiday.');
+  COMPANY_PREFIXES.some((prefix) => action.startsWith(prefix));
 
 /** Actions of the records' history (Activity). */
 export const RECORD_ACTIONS = AUDIT_ACTIONS.filter(

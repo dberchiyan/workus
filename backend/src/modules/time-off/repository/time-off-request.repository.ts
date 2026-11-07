@@ -32,6 +32,7 @@ import {
 } from './record/time-off-request.record';
 
 export interface NewTimeOffRequest {
+  organisationId: string;
   employeeId: string;
   type: string;
   startDate: Date;
@@ -45,7 +46,11 @@ export interface NewTimeOffRequest {
 /** Requests in one window are few; bounded defensively. */
 const MAX_HELD_ROWS = 500;
 
-const managedWhere = (criteria: TimeOffRequestCriteria): Prisma.TimeOffRequestWhereInput => ({
+const managedWhere = (
+  organisationId: string,
+  criteria: TimeOffRequestCriteria,
+): Prisma.TimeOffRequestWhereInput => ({
+  organisationId,
   AND: [
     criteria.state === RequestState.PENDING
       ? { status: TimeOffStatus.PENDING }
@@ -85,11 +90,13 @@ export class TimeOffRequestRepository {
 
   /** With `changedSince`: pending ones, plus any changed at or after that instant. */
   async findPageByEmployee(
+    organisationId: string,
     employeeId: string,
     changedSince: Date | undefined,
     pageable: Pageable<TimeOffRequestSortField>,
   ): Promise<{ content: TimeOffRequestRecord[]; totalElements: number }> {
     const where = {
+      organisationId,
       employeeId,
       ...(changedSince
         ? { OR: [{ status: TimeOffStatus.PENDING }, { updatedAt: { gte: changedSince } }] }
@@ -106,10 +113,11 @@ export class TimeOffRequestRepository {
 
   /** Every employee's requests (admin), filtered. */
   async findManagedPage(
+    organisationId: string,
     criteria: TimeOffRequestCriteria,
     pageable: Pageable<ManagedRequestSortField>,
   ): Promise<{ content: ManagedTimeOffRequestRecord[]; totalElements: number }> {
-    const where = managedWhere(criteria);
+    const where = managedWhere(organisationId, criteria);
     const page = toPrismaPage(pageable, managedOrderByFor, (direction) => ({ id: direction }));
     // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
     const [totalElements, content] = await Promise.all([
@@ -123,18 +131,21 @@ export class TimeOffRequestRepository {
     return { content, totalElements };
   }
 
-  findManagedById(id: string): Promise<ManagedTimeOffRequestRecord | null> {
+  findManagedById(organisationId: string, id: string): Promise<ManagedTimeOffRequestRecord | null> {
     return this.txHost.tx.timeOffRequest.findUnique({
-      where: { id },
+      where: { id, organisationId },
       select: managedTimeOffRequestSelect,
     });
   }
 
-  findNoticeById(id: string): Promise<RequestNoticeRecord | null> {
-    return this.txHost.tx.timeOffRequest.findUnique({ where: { id }, select: requestNoticeSelect });
+  findNoticeById(organisationId: string, id: string): Promise<RequestNoticeRecord | null> {
+    return this.txHost.tx.timeOffRequest.findUnique({
+      where: { id, organisationId },
+      select: requestNoticeSelect,
+    });
   }
 
-  /** Pending requests made before the instant, oldest first (reminders). */
+  /** Pending requests (of every organisation) made before the instant, oldest first (reminders). */
   findPendingCreatedBefore(before: Date, limit: number): Promise<RequestNoticeRecord[]> {
     return this.txHost.tx.timeOffRequest.findMany({
       where: { status: TimeOffStatus.PENDING, createdAt: { lt: before } },
@@ -144,13 +155,21 @@ export class TimeOffRequestRepository {
     });
   }
 
-  findStateById(id: string): Promise<RequestStateRecord | null> {
-    return this.txHost.tx.timeOffRequest.findUnique({ where: { id }, select: requestStateSelect });
+  findStateById(organisationId: string, id: string): Promise<RequestStateRecord | null> {
+    return this.txHost.tx.timeOffRequest.findUnique({
+      where: { id, organisationId },
+      select: requestStateSelect,
+    });
   }
 
-  addComment(requestId: string, authorId: string, body: string): Promise<TimeOffCommentRecord> {
+  addComment(
+    organisationId: string,
+    requestId: string,
+    authorId: string,
+    body: string,
+  ): Promise<TimeOffCommentRecord> {
     return this.txHost.tx.timeOffRequestComment.create({
-      data: { requestId, authorId, body },
+      data: { organisationId, requestId, authorId, body },
       select: timeOffCommentSelect,
     });
   }
@@ -159,20 +178,24 @@ export class TimeOffRequestRepository {
    * Replaces who decides a pending request; optimistic on its status (false → no longer pending).
    */
   async replaceResponsibles(
+    organisationId: string,
     id: string,
     responsibleUserIds: string[],
     updatedBy: string,
   ): Promise<boolean> {
     const { count } = await this.txHost.tx.timeOffRequest.updateMany({
-      where: { id, status: TimeOffStatus.PENDING },
+      where: { id, organisationId, status: TimeOffStatus.PENDING },
       data: { updatedBy, version: { increment: 1 } },
     });
     if (count === 0) {
       return false;
     }
-    await this.txHost.tx.timeOffRequestResponsible.deleteMany({ where: { requestId: id } });
+    await this.txHost.tx.timeOffRequestResponsible.deleteMany({
+      where: { organisationId, requestId: id },
+    });
     await this.txHost.tx.timeOffRequestResponsible.createMany({
       data: responsibleUserIds.map((responsibleUserId) => ({
+        organisationId,
         requestId: id,
         responsibleUserId,
         createdBy: updatedBy,
@@ -183,73 +206,93 @@ export class TimeOffRequestRepository {
 
   /** The author's own comment on this request, edited; null when it is not theirs (or gone). */
   async editComment(
+    organisationId: string,
     commentId: string,
     requestId: string,
     authorId: string,
     body: string,
   ): Promise<TimeOffCommentRecord | null> {
     const { count } = await this.txHost.tx.timeOffRequestComment.updateMany({
-      where: { id: commentId, requestId, authorId },
+      where: { id: commentId, organisationId, requestId, authorId },
       data: { body, editedAt: new Date() },
     });
     return count === 0
       ? null
       : this.txHost.tx.timeOffRequestComment.findUnique({
-          where: { id: commentId },
+          where: { id: commentId, organisationId },
           select: timeOffCommentSelect,
         });
   }
 
   /** Deletes the author's own comment on this request; false when it is not theirs (or gone). */
-  async deleteComment(commentId: string, requestId: string, authorId: string): Promise<boolean> {
+  async deleteComment(
+    organisationId: string,
+    commentId: string,
+    requestId: string,
+    authorId: string,
+  ): Promise<boolean> {
     const { count } = await this.txHost.tx.timeOffRequestComment.deleteMany({
-      where: { id: commentId, requestId, authorId },
+      where: { id: commentId, organisationId, requestId, authorId },
     });
     return count > 0;
   }
 
   /**
-   * Keeps held (pending, approved) requests in step with holidays: each of `days` (YYYY-MM-DD)
-   * that is a weekday inside a request's range gives (`delta` +1, holiday removed) or takes
+   * Keeps held (pending, approved) requests in step with holidays: each holiday (its
+   * organisation and YYYY-MM-DD) that is a weekday inside a request of that organisation gives (`delta` +1, holiday removed) or takes
    * (`delta` −1, holiday added) one working day. One statement; never below zero.
    */
-  async shiftDaysForHolidays(days: string[], delta: 1 | -1): Promise<number> {
-    if (days.length === 0) {
+  async shiftDaysForHolidays(
+    holidays: { organisationId: string; day: string }[],
+    delta: 1 | -1,
+  ): Promise<number> {
+    if (holidays.length === 0) {
       return 0;
     }
+    // Pairs, so a holiday of one organisation never touches another's requests.
+    const organisationIds = holidays.map((holiday) => holiday.organisationId);
+    const days = holidays.map((holiday) => holiday.day);
     return this.txHost.tx.$executeRaw`
       UPDATE "time_off_requests" AS r
       SET "days" = GREATEST(0, r."days" + ${delta}::int * (
-        SELECT count(*)::int FROM unnest(${days}::date[]) AS h(day)
-        WHERE h.day BETWEEN r."start_date" AND r."end_date" AND EXTRACT(ISODOW FROM h.day) < 6
+        SELECT count(*)::int FROM unnest(${organisationIds}::uuid[], ${days}::date[]) AS h(org, day)
+        WHERE h.org = r."organisation_id"
+          AND h.day BETWEEN r."start_date" AND r."end_date" AND EXTRACT(ISODOW FROM h.day) < 6
       ))
       WHERE r."status" IN (${TimeOffStatus.PENDING}, ${TimeOffStatus.APPROVED})
         AND EXISTS (
-          SELECT 1 FROM unnest(${days}::date[]) AS h(day)
-          WHERE h.day BETWEEN r."start_date" AND r."end_date" AND EXTRACT(ISODOW FROM h.day) < 6
+          SELECT 1 FROM unnest(${organisationIds}::uuid[], ${days}::date[]) AS h(org, day)
+          WHERE h.org = r."organisation_id"
+            AND h.day BETWEEN r."start_date" AND r."end_date" AND EXTRACT(ISODOW FROM h.day) < 6
         )`;
   }
 
   /** Comments mark the request as changed, so "changed today" lists pick them up. */
-  async touch(id: string, updatedBy: string): Promise<void> {
+  async touch(organisationId: string, id: string, updatedBy: string): Promise<void> {
     await this.txHost.tx.timeOffRequest.update({
-      where: { id },
+      where: { id, organisationId },
       data: { updatedBy },
       select: { id: true },
     });
   }
 
-  findById(id: string): Promise<TimeOffRequestRecord | null> {
+  findById(organisationId: string, id: string): Promise<TimeOffRequestRecord | null> {
     return this.txHost.tx.timeOffRequest.findUnique({
-      where: { id },
+      where: { id, organisationId },
       select: timeOffRequestSelect,
     });
   }
 
   /** Pending and approved requests starting in [from, to] — what balances are made of. */
-  findHeldStartingBetween(employeeId: string, from: Date, to: Date): Promise<HeldDaysRecord[]> {
+  findHeldStartingBetween(
+    organisationId: string,
+    employeeId: string,
+    from: Date,
+    to: Date,
+  ): Promise<HeldDaysRecord[]> {
     return this.txHost.tx.timeOffRequest.findMany({
       where: {
+        organisationId,
         employeeId,
         status: { in: [...HOLDING_STATUSES] },
         startDate: { gte: from, lte: to },
@@ -261,10 +304,16 @@ export class TimeOffRequestRepository {
   }
 
   /** Does a pending or approved request share a day with [start, end]? */
-  async existsHeldOverlapping(employeeId: string, start: Date, end: Date): Promise<boolean> {
+  async existsHeldOverlapping(
+    organisationId: string,
+    employeeId: string,
+    start: Date,
+    end: Date,
+  ): Promise<boolean> {
     return (
       (await this.txHost.tx.timeOffRequest.count({
         where: {
+          organisationId,
           employeeId,
           status: { in: [...HOLDING_STATUSES] },
           startDate: { lte: end },
@@ -277,6 +326,7 @@ export class TimeOffRequestRepository {
   async create(request: NewTimeOffRequest): Promise<TimeOffRequestRecord> {
     return this.txHost.tx.timeOffRequest.create({
       data: {
+        organisationId: request.organisationId,
         employeeId: request.employeeId,
         type: request.type,
         startDate: request.startDate,
@@ -302,6 +352,7 @@ export class TimeOffRequestRepository {
    * `decided` records the actor as the one who approved or rejected it.
    */
   async changeStatus(
+    organisationId: string,
     id: string,
     fromStatus: string,
     toStatus: string,
@@ -310,7 +361,7 @@ export class TimeOffRequestRepository {
     decisionComment: string | null = null,
   ): Promise<boolean> {
     const { count } = await this.txHost.tx.timeOffRequest.updateMany({
-      where: { id, status: fromStatus },
+      where: { id, organisationId, status: fromStatus },
       data: {
         status: toStatus,
         updatedBy,
@@ -321,10 +372,12 @@ export class TimeOffRequestRepository {
     return count > 0;
   }
 
-  /** Company-wide: how many wait for a decision, and since when the oldest one waits. */
-  async pendingSummary(): Promise<{ count: number; oldestCreatedAt: Date | null }> {
+  /** Organisation-wide: how many wait for a decision, and since when the oldest one waits. */
+  async pendingSummary(
+    organisationId: string,
+  ): Promise<{ count: number; oldestCreatedAt: Date | null }> {
     const result = await this.txHost.tx.timeOffRequest.aggregate({
-      where: { status: TimeOffStatus.PENDING },
+      where: { organisationId, status: TimeOffStatus.PENDING },
       _count: { _all: true },
       _min: { createdAt: true },
     });
@@ -332,9 +385,18 @@ export class TimeOffRequestRepository {
   }
 
   /** Approved requests covering any day of [from, to], with their type (bounded). */
-  findApprovedWithTypeOverlapping(from: Date, to: Date): Promise<AbsenceDaysRecord[]> {
+  findApprovedWithTypeOverlapping(
+    organisationId: string,
+    from: Date,
+    to: Date,
+  ): Promise<AbsenceDaysRecord[]> {
     return this.txHost.tx.timeOffRequest.findMany({
-      where: { status: TimeOffStatus.APPROVED, startDate: { lte: to }, endDate: { gte: from } },
+      where: {
+        organisationId,
+        status: TimeOffStatus.APPROVED,
+        startDate: { lte: to },
+        endDate: { gte: from },
+      },
       select: absenceDaysSelect,
       orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
       take: MAX_YEAR_ABSENCES,
@@ -342,9 +404,14 @@ export class TimeOffRequestRepository {
   }
 
   /** Approved requests covering any day of [from, to]; who (bounded) and their dates. */
-  findApprovedOverlapping(from: Date, to: Date): Promise<AbsenceRecord[]> {
+  findApprovedOverlapping(organisationId: string, from: Date, to: Date): Promise<AbsenceRecord[]> {
     return this.txHost.tx.timeOffRequest.findMany({
-      where: { status: TimeOffStatus.APPROVED, startDate: { lte: to }, endDate: { gte: from } },
+      where: {
+        organisationId,
+        status: TimeOffStatus.APPROVED,
+        startDate: { lte: to },
+        endDate: { gte: from },
+      },
       select: absenceSelect,
       orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
       take: MAX_ABSENCES,
@@ -356,6 +423,7 @@ export class TimeOffRequestRepository {
    * Holding requests of one person never overlap, so a month holds at most one per day each.
    */
   findCalendarRequests(
+    organisationId: string,
     employeeIds: string[],
     from: Date,
     to: Date,
@@ -366,6 +434,7 @@ export class TimeOffRequestRepository {
     }
     return this.txHost.tx.timeOffRequest.findMany({
       where: {
+        organisationId,
         employeeId: { in: employeeIds },
         status: { in: [...HOLDING_STATUSES] },
         type: { in: [...types] },
@@ -380,11 +449,15 @@ export class TimeOffRequestRepository {
 
   /** Requests made in [from, to) of any status, newest first. */
   async findCreatedBetween(
+    organisationId: string,
     from: Date,
     to: Date,
     limit: number,
   ): Promise<{ content: DashboardRequestRecord[]; totalElements: number }> {
-    const where: Prisma.TimeOffRequestWhereInput = { createdAt: { gte: from, lt: to } };
+    const where: Prisma.TimeOffRequestWhereInput = {
+      organisationId,
+      createdAt: { gte: from, lt: to },
+    };
     const [totalElements, content] = await Promise.all([
       this.txHost.tx.timeOffRequest.count({ where }),
       this.txHost.tx.timeOffRequest.findMany({

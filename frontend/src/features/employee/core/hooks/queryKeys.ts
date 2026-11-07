@@ -1,7 +1,7 @@
 import type { SecurityCategory } from '@/features/auth';
 import type { EmployeeFilters, EmployeeListParams } from '../types';
 
-/** No tenant: one company per installation, roles are global. */
+/** No tenant id: the organisation comes from the session (see auth queryKeys). */
 export const employeeKeys = {
   all: ['employees'] as const,
   lists: () => [...employeeKeys.all, 'list'] as const,

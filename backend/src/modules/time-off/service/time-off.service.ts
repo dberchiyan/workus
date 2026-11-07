@@ -62,6 +62,7 @@ export class TimeOffService {
    * requests of the given types. Every signed-in user sees everyone's (product decision).
    */
   async calendar(
+    organisationId: string,
     query: {
       year: number;
       month: number;
@@ -73,10 +74,11 @@ export class TimeOffService {
     const from = new Date(Date.UTC(query.year, query.month - 1, 1));
     const to = new Date(Date.UTC(query.year, query.month, 0));
     const [people, holidays] = await Promise.all([
-      this.employeeService.findCalendarPage(query.search, from, to, pageable),
-      this.holidayService.daysBetween(from, to),
+      this.employeeService.findCalendarPage(organisationId, query.search, from, to, pageable),
+      this.holidayService.daysBetween(organisationId, from, to),
     ]);
     const requests = await this.requestRepository.findCalendarRequests(
+      organisationId,
       people.content.map((employee) => employee.id),
       from,
       to,
@@ -99,12 +101,13 @@ export class TimeOffService {
    * (each request clipped to the range).
    */
   async approvedDaysBetween(
+    organisationId: string,
     from: Date,
     to: Date,
   ): Promise<{ employeeId: string; type: TimeOffType; days: number }[]> {
     const [requests, holidays] = await Promise.all([
-      this.requestRepository.findApprovedWithTypeOverlapping(from, to),
-      this.holidayService.datesBetween(from, to),
+      this.requestRepository.findApprovedWithTypeOverlapping(organisationId, from, to),
+      this.holidayService.datesBetween(organisationId, from, to),
     ]);
     return requests.map((request) => ({
       employeeId: request.employeeId,
@@ -119,8 +122,13 @@ export class TimeOffService {
   }
 
   /** For other modules (dashboard): requests made in [from, to), newest first. */
-  async requestsCreatedBetween(from: Date, to: Date, limit: number): Promise<DashboardRequests> {
-    const page = await this.requestRepository.findCreatedBetween(from, to, limit);
+  async requestsCreatedBetween(
+    organisationId: string,
+    from: Date,
+    to: Date,
+    limit: number,
+  ): Promise<DashboardRequests> {
+    const page = await this.requestRepository.findCreatedBetween(organisationId, from, to, limit);
     return {
       content: page.content.map((request) => ({
         id: request.id,
@@ -144,25 +152,25 @@ export class TimeOffService {
   }
 
   /** The caller's balances; 404 when the caller has no employee record (admins). */
-  async findOwnBalances(userId: string): Promise<LeaveBalance[]> {
-    return this.balancesOf(await this.requireSelf(userId), todayUtc());
+  async findOwnBalances(organisationId: string, userId: string): Promise<LeaveBalance[]> {
+    return this.balancesOf(organisationId, await this.requireSelf(userId), todayUtc());
   }
 
   /** One employee's balances (admin). */
-  async findBalances(employeeId: string): Promise<LeaveBalance[]> {
-    const employee = await this.employeeService.findForTimeOff(employeeId);
+  async findBalances(organisationId: string, employeeId: string): Promise<LeaveBalance[]> {
+    const employee = await this.employeeService.findForTimeOff(organisationId, employeeId);
     if (!employee) {
       throw new ResourceNotFoundException();
     }
-    return this.balancesOf(employee, todayUtc());
+    return this.balancesOf(organisationId, employee, todayUtc());
   }
 
   /** For other modules (dashboard): pending requests and who is off today / this week. */
-  async overview(today: Date): Promise<TimeOffOverview> {
+  async overview(organisationId: string, today: Date): Promise<TimeOffOverview> {
     const weekEnd = plusDays(today, (7 - today.getUTCDay()) % 7);
     const [pending, absences] = await Promise.all([
-      this.requestRepository.pendingSummary(),
-      this.requestRepository.findApprovedOverlapping(today, weekEnd),
+      this.requestRepository.pendingSummary(organisationId),
+      this.requestRepository.findApprovedOverlapping(organisationId, today, weekEnd),
     ]);
     const offToday = new Map<string, AbsentPerson>();
     const offLater = new Set<string>();
@@ -187,17 +195,22 @@ export class TimeOffService {
 
   /** The caller's requests, newest first, each with its history. */
   async findOwnRequests(
+    organisationId: string,
     userId: string,
     changedSince: Date | undefined,
     pageable: Pageable<TimeOffRequestSortField>,
   ): Promise<TimeOffRequestPage> {
     const employee = await this.requireSelf(userId);
     const page = await this.requestRepository.findPageByEmployee(
+      organisationId,
       employee.id,
       changedSince,
       pageable,
     );
-    return { content: await this.withHistory(page.content), totalElements: page.totalElements };
+    return {
+      content: await this.withHistory(organisationId, page.content),
+      totalElements: page.totalElements,
+    };
   }
 
   /**
@@ -206,7 +219,11 @@ export class TimeOffService {
    * the employee's responsible people, so the employee needs at least one.
    */
   @Transactional()
-  async create(userId: string, command: CreateTimeOffCommand): Promise<TimeOffRequestView> {
+  async create(
+    organisationId: string,
+    userId: string,
+    command: CreateTimeOffCommand,
+  ): Promise<TimeOffRequestView> {
     const employee = await this.requireSelf(userId);
     const startDate = asDate(command.startDate);
     const endDate = asDate(command.endDate);
@@ -219,15 +236,22 @@ export class TimeOffService {
     const days = workingDaysBetween(
       startDate,
       endDate,
-      await this.holidayService.datesBetween(startDate, endDate),
+      await this.holidayService.datesBetween(organisationId, startDate, endDate),
     );
     if (days === 0) {
       throw new BusinessRuleException('errors.timeOff.noWorkingDays', {}, 'endDate');
     }
-    if (await this.requestRepository.existsHeldOverlapping(employee.id, startDate, endDate)) {
+    if (
+      await this.requestRepository.existsHeldOverlapping(
+        organisationId,
+        employee.id,
+        startDate,
+        endDate,
+      )
+    ) {
       throw new BusinessRuleException('errors.timeOff.overlaps', {}, 'startDate');
     }
-    const balance = (await this.balancesOf(employee, startDate)).find(
+    const balance = (await this.balancesOf(organisationId, employee, startDate)).find(
       (item) => item.type === command.type,
     );
     if (balance?.available !== null && balance !== undefined && days > balance.available) {
@@ -241,6 +265,7 @@ export class TimeOffService {
       throw new BusinessRuleException('errors.timeOff.noResponsible');
     }
     const request = await this.requestRepository.create({
+      organisationId,
       employeeId: employee.id,
       type: command.type,
       startDate,
@@ -267,12 +292,13 @@ export class TimeOffService {
       ],
     });
     await this.notifier.notify(
+      organisationId,
       request.id,
       NotificationType.TIME_OFF_REQUESTED,
       userId,
       'responsibles',
     );
-    const [view] = await this.withHistory([request]);
+    const [view] = await this.withHistory(organisationId, [request]);
     if (!view) {
       throw new Error('Created request lost its view');
     }
@@ -281,20 +307,25 @@ export class TimeOffService {
 
   /** The policy has checked the request is the caller's. Pending, or approved and not started. */
   @Transactional()
-  async cancel(userId: string, requestId: string): Promise<TimeOffRequestView> {
-    const request = await this.requestRepository.findById(requestId);
+  async cancel(
+    organisationId: string,
+    userId: string,
+    requestId: string,
+  ): Promise<TimeOffRequestView> {
+    const request = await this.requestRepository.findById(organisationId, requestId);
     if (!request) {
       throw new ResourceNotFoundException();
     }
     if (request.status === TimeOffStatus.CANCELED) {
       // Canceling again changes nothing.
-      return this.viewOf(request);
+      return this.viewOf(organisationId, request);
     }
     if (!isCancelable(request, todayUtc())) {
       throw new BusinessRuleException('errors.timeOff.notCancelable');
     }
     if (
       !(await this.requestRepository.changeStatus(
+        organisationId,
         requestId,
         request.status,
         TimeOffStatus.CANCELED,
@@ -319,20 +350,24 @@ export class TimeOffService {
       ),
     });
     await this.notifier.notify(
+      organisationId,
       requestId,
       NotificationType.TIME_OFF_WITHDRAWN,
       userId,
       'responsibles',
     );
-    const after = await this.requestRepository.findById(requestId);
+    const after = await this.requestRepository.findById(organisationId, requestId);
     if (!after) {
       throw new Error('Canceled request not found in the same transaction');
     }
-    return this.viewOf(after);
+    return this.viewOf(organisationId, after);
   }
 
-  private async viewOf(request: TimeOffRequestRecord): Promise<TimeOffRequestView> {
-    const [view] = await this.withHistory([request]);
+  private async viewOf(
+    organisationId: string,
+    request: TimeOffRequestRecord,
+  ): Promise<TimeOffRequestView> {
+    const [view] = await this.withHistory(organisationId, [request]);
     if (!view) {
       throw new Error('Request lost its view');
     }
@@ -340,8 +375,14 @@ export class TimeOffService {
   }
 
   /** One history query for the whole page. */
-  private async withHistory(requests: TimeOffRequestRecord[]): Promise<TimeOffRequestView[]> {
-    const events = await this.auditService.findByTargets(requests.map((request) => request.id));
+  private async withHistory(
+    organisationId: string,
+    requests: TimeOffRequestRecord[],
+  ): Promise<TimeOffRequestView[]> {
+    const events = await this.auditService.findByTargets(
+      organisationId,
+      requests.map((request) => request.id),
+    );
     const today = todayUtc();
     return requests.map((request) => ({
       request,
@@ -351,14 +392,23 @@ export class TimeOffService {
   }
 
   /** Balances for the cycles that hold `date`; one query for every type. */
-  private async balancesOf(employee: EmployeeForTimeOff, date: Date): Promise<LeaveBalance[]> {
+  private async balancesOf(
+    organisationId: string,
+    employee: EmployeeForTimeOff,
+    date: Date,
+  ): Promise<LeaveBalance[]> {
     const cycles = TIME_OFF_TYPES.map((type) => ({
       type,
       ...cycleOf(employee.startDate, LEAVE_POLICY[type].cycleMonths, date),
     }));
     const from = new Date(Math.min(...cycles.map((cycle) => cycle.start.getTime())));
     const to = new Date(Math.max(...cycles.map((cycle) => cycle.end.getTime())));
-    const held = await this.requestRepository.findHeldStartingBetween(employee.id, from, to);
+    const held = await this.requestRepository.findHeldStartingBetween(
+      organisationId,
+      employee.id,
+      from,
+      to,
+    );
     return cycles.map(({ type, start, end }) => {
       const inCycle = held.filter(
         (request) =>

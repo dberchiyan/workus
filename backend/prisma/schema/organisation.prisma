@@ -1,0 +1,25 @@
+/// The tenant: a company with its own people and data. Every user belongs to exactly one
+/// organisation; every tenant-owned row carries `organisation_id`. Child rows reference their
+/// parents by (organisation_id, id), so rows of two organisations can never be linked.
+model Organisation {
+  id                         String                      @id(map: "pk_organisations") @default(dbgenerated("uuidv7()")) @db.Uuid
+  name                       String                      @db.VarChar(100)
+  createdAt                  DateTime                    @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt                  DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy                  String?                     @map("created_by") @db.Uuid
+  updatedBy                  String?                     @map("updated_by") @db.Uuid
+  version                    Int                         @default(0)
+  users                      User[]
+  employees                  Employee[]
+  employeeResponsibles       EmployeeResponsible[]
+  employeeReviews            EmployeeReview[]
+  employeeReviewResponsibles EmployeeReviewResponsible[]
+  timeOffRequests            TimeOffRequest[]
+  timeOffRequestResponsibles TimeOffRequestResponsible[]
+  timeOffRequestComments     TimeOffRequestComment[]
+  companyHolidays            CompanyHoliday[]
+  notifications              Notification[]
+  auditEvents                AuditEvent[]
+
+  @@map("organisations")
+}

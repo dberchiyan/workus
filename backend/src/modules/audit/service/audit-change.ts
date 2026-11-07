@@ -60,6 +60,7 @@ export const AuditField = {
   DECISION_COMMENT: 'decisionComment',
   NAME: 'name',
   RECURRING: 'recurring',
+  ROLE: 'role',
 } as const;
 export type AuditField = (typeof AuditField)[keyof typeof AuditField];
 export const AUDIT_FIELDS = Object.values(AuditField) as [AuditField, ...AuditField[]];

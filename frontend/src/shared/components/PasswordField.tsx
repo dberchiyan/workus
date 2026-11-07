@@ -15,7 +15,7 @@ export type PasswordFieldProps = Omit<TextFieldProps, 'type' | 'slotProps'> & {
 /** A password input with a show / hide button. */
 export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
   function PasswordField({ autoComplete, describedBy, ...props }, ref) {
-    const { t } = useTranslation('settings');
+    const { t } = useTranslation('common');
     const [visible, setVisible] = useState(false);
     return (
       <TextField
@@ -33,7 +33,7 @@ export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
             endAdornment: (
               <InputAdornment position="end">
                 <IconButton
-                  aria-label={visible ? t('account.password.hide') : t('account.password.show')}
+                  aria-label={visible ? t('password.hide') : t('password.show')}
                   onClick={() => {
                     setVisible((value) => !value);
                   }}

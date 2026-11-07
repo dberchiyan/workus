@@ -1,4 +1,6 @@
 import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
+import type { Principal } from '../../../../common/security/principal';
+import { CurrentPrincipal } from '../../../../common/security/current-principal.decorator';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { ApiPageable, type Pageable, PageableQuery } from '../../../../common/dto/pageable';
@@ -35,12 +37,18 @@ export class EmployeeSecurityLogController {
     'RESOURCE_NOT_FOUND',
   )
   async list(
+    @CurrentPrincipal() principal: Principal,
     @UuidParam('employeeId') employeeId: string,
     @Query() query: SecurityLogQuery,
     @PageableQuery(AUDIT_EVENT_PAGEABLE) pageable: Pageable<AuditEventSortField>,
   ): Promise<EmployeeSecurityLogResponse> {
     return toSecurityEventPage(
-      await this.employeeService.findSecurityLog(employeeId, query.category ?? null, pageable),
+      await this.employeeService.findSecurityLog(
+        principal.organisationId,
+        employeeId,
+        query.category ?? null,
+        pageable,
+      ),
     );
   }
 }

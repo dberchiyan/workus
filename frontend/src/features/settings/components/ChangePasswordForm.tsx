@@ -8,9 +8,10 @@ import { useTranslation } from 'react-i18next';
 import { useChangePassword } from '@/features/auth';
 import { isApiError } from '@/shared/api/apiError';
 import type { ErrorCode } from '@/shared/types';
-import { type ChangePasswordValues, changePasswordSchema, PASSWORD_LIMITS } from '../schemas';
-import { PasswordField } from './PasswordField';
-import { PasswordRules } from './PasswordRules';
+import { PasswordField } from '@/shared/components/PasswordField';
+import { PasswordRules } from '@/shared/components/PasswordRules';
+import { PASSWORD_LIMITS } from '@/shared/lib/passwordRules';
+import { type ChangePasswordValues, changePasswordSchema } from '../schemas';
 
 /** Keeps every helper line's height while it is empty, so the form never shifts. */
 const RESERVED_LINE = ' ';
@@ -146,9 +147,19 @@ export function ChangePasswordForm() {
       </div>
       <PasswordRules
         id={rulesId}
-        newPassword={newPassword}
-        confirmPassword={confirmPassword}
-        currentPassword={currentPassword}
+        password={newPassword}
+        extraRules={[
+          {
+            key: 'different',
+            label: t('account.password.rules.different'),
+            met: newPassword !== '' && newPassword !== currentPassword,
+          },
+          {
+            key: 'match',
+            label: t('account.password.rules.match'),
+            met: newPassword !== '' && newPassword === confirmPassword,
+          },
+        ]}
       />
     </form>
   );

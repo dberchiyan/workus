@@ -119,6 +119,11 @@ export class SessionRepository {
     await this.txHost.tx.session.updateMany({ where: { id }, data: { lastSeenAt, idleExpiresAt } });
   }
 
+  /** The authorities snapshot of one session (the caller's own, after their role changed). */
+  async updateAuthorities(id: string, authorities: string[]): Promise<void> {
+    await this.txHost.tx.session.updateMany({ where: { id }, data: { authorities } });
+  }
+
   async deleteById(id: string): Promise<void> {
     await this.txHost.tx.session.deleteMany({ where: { id } });
   }

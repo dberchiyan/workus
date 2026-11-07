@@ -35,11 +35,13 @@ export class EmployeeController {
     'FORBIDDEN',
   )
   async list(
+    @CurrentPrincipal() principal: Principal,
     @Query() query: EmployeeFilterQuery,
     @PageableQuery(EMPLOYEE_PAGEABLE) pageable: Pageable<EmployeeSortField>,
   ): Promise<EmployeePageResponse> {
     return toEmployeePageResponse(
       await this.employeeService.findPage(
+        principal.organisationId,
         { search: query.search, status: query.status, categoryId: query.categoryId },
         pageable,
       ),
@@ -54,8 +56,8 @@ export class EmployeeController {
   })
   @ZodResponse({ status: HttpStatus.OK, type: EmployeeSummaryResponse })
   @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
-  summary(): Promise<EmployeeSummaryResponse> {
-    return this.employeeService.summary();
+  summary(@CurrentPrincipal() principal: Principal): Promise<EmployeeSummaryResponse> {
+    return this.employeeService.summary(principal.organisationId);
   }
 
   // Declared after the static `summary` route, so ":employeeId" never captures it.
@@ -70,8 +72,14 @@ export class EmployeeController {
     'FORBIDDEN',
     'RESOURCE_NOT_FOUND',
   )
-  async profile(@UuidParam('employeeId') employeeId: string): Promise<EmployeeProfileResponse> {
-    const { employee, today } = await this.employeeService.findProfile(employeeId);
+  async profile(
+    @CurrentPrincipal() principal: Principal,
+    @UuidParam('employeeId') employeeId: string,
+  ): Promise<EmployeeProfileResponse> {
+    const { employee, today } = await this.employeeService.findProfile(
+      principal.organisationId,
+      employeeId,
+    );
     return toEmployeeProfileResponse(employee, today);
   }
 
@@ -97,6 +105,7 @@ export class EmployeeController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<EmployeeProfileResponse> {
     const { employee, today } = await this.employeeService.updateResponsibles(
+      principal.organisationId,
       employeeId,
       { responsibleUserIds: request.responsibleUserIds, version: request.version },
       principal.userId,

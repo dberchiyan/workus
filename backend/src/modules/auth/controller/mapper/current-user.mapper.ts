@@ -10,5 +10,6 @@ export const toCurrentUserResponse = (
   firstName: user.firstName,
   lastName: user.lastName,
   role: user.role,
+  organisation: { id: user.organisation.id, name: user.organisation.name },
   idleTimeoutMinutes,
 });

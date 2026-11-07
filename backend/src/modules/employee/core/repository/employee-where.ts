@@ -24,10 +24,12 @@ export const employedBetween = (from: Date, to: Date): Prisma.EmployeeWhereInput
   OR: [{ terminatedOn: null }, { terminatedOn: { gt: from } }],
 });
 
-/** Tenant-free (one company per installation); filters are applied in the query, never after. */
+/** Scoped to the organisation; filters are applied in the query, never after. */
 export const employeeWhere = (
+  organisationId: string,
   criteria: Omit<EmployeeCriteria, 'categoryId'> & { categoryId?: string | undefined },
 ): Prisma.EmployeeWhereInput => ({
+  organisationId,
   AND: [
     criteria.status === EmployeeStatus.ACTIVE
       ? activeOn(criteria.today)

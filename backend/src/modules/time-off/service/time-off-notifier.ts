@@ -28,12 +28,13 @@ export class TimeOffNotifier {
   ) {}
 
   async notify(
+    organisationId: string,
     requestId: string,
     type: NotificationType,
     actorUserId: string,
     audience: NoticeAudience,
   ): Promise<void> {
-    const request = await this.requestRepository.findNoticeById(requestId);
+    const request = await this.requestRepository.findNoticeById(organisationId, requestId);
     if (!request) {
       return;
     }

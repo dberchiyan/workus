@@ -33,8 +33,10 @@ model Position {
 /// HR record of a user with the EMPLOYEE (or MANAGER) role; admins have none.
 model Employee {
   id                 String                @id(map: "pk_employees") @default(dbgenerated("uuidv7()")) @db.Uuid
+  organisationId     String                @map("organisation_id") @db.Uuid
+  organisation       Organisation          @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_employees_organisation_id")
   userId             String                @map("user_id") @db.Uuid
-  user               User                  @relation("EmployeeUser", fields: [userId], references: [id], onDelete: Restrict, map: "fk_employees_user_id")
+  user               User                  @relation("EmployeeUser", fields: [organisationId, userId], references: [organisationId, id], onDelete: Restrict, map: "fk_employees_user_id")
   positionId         String                @map("position_id") @db.Uuid
   position           Position              @relation(fields: [positionId], references: [id], onDelete: Restrict, map: "fk_employees_position_id")
   startDate          DateTime              @map("start_date") @db.Date
@@ -60,7 +62,9 @@ model Employee {
   auditEvents        AuditEvent[]
   timeOffRequests    TimeOffRequest[]
 
-  @@unique([userId], map: "uq_employees_user_id")
+  /// One HR record per user (a user belongs to one organisation, so this is also unique by user).
+  @@unique([organisationId, userId], map: "uq_employees_organisation_id_user_id")
+  @@unique([organisationId, id], map: "uq_employees_organisation_id_id")
   @@index([positionId], map: "idx_employees_position_id")
   @@index([startDate], map: "idx_employees_start_date")
   @@index([terminatedOn], map: "idx_employees_terminated_on")
@@ -69,15 +73,18 @@ model Employee {
 
 /// People responsible for an employee (any user, e.g. an admin or a project manager).
 model EmployeeResponsible {
-  employeeId        String   @map("employee_id") @db.Uuid
+  organisationId    String       @map("organisation_id") @db.Uuid
+  organisation      Organisation @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_employee_responsibles_organisation_id")
+  employeeId        String       @map("employee_id") @db.Uuid
   // The assignment means nothing without the employee.
-  employee          Employee @relation(fields: [employeeId], references: [id], onDelete: Cascade, map: "fk_employee_responsibles_employee_id")
-  responsibleUserId String   @map("responsible_user_id") @db.Uuid
-  responsible       User     @relation("EmployeeResponsibleUser", fields: [responsibleUserId], references: [id], onDelete: Restrict, map: "fk_employee_responsibles_responsible_user_id")
-  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
-  createdBy         String?  @map("created_by") @db.Uuid
+  employee          Employee     @relation(fields: [organisationId, employeeId], references: [organisationId, id], onDelete: Cascade, map: "fk_employee_responsibles_employee_id")
+  responsibleUserId String       @map("responsible_user_id") @db.Uuid
+  responsible       User         @relation("EmployeeResponsibleUser", fields: [organisationId, responsibleUserId], references: [organisationId, id], onDelete: Restrict, map: "fk_employee_responsibles_responsible_user_id")
+  createdAt         DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  createdBy         String?      @map("created_by") @db.Uuid
 
   @@id([employeeId, responsibleUserId], map: "pk_employee_responsibles")
   @@index([responsibleUserId], map: "idx_employee_responsibles_responsible_user_id")
+  @@index([organisationId], map: "idx_employee_responsibles_organisation_id")
   @@map("employee_responsibles")
 }

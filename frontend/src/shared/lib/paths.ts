@@ -1,6 +1,7 @@
 /** Route paths — one module for the router and every link. */
 export const PATHS = {
   login: '/login',
+  signup: '/signup',
   dashboard: '/',
   employees: '/employees',
   employeeProfile: '/employees/:employeeId',

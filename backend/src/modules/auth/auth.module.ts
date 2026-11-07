@@ -4,7 +4,6 @@ import { AuditModule } from '../audit/audit.module';
 import { EmployeeModule } from '../employee/core/employee.module';
 import { UserModule } from '../user/user.module';
 import { AuthController } from './controller/auth.controller';
-import { SessionCookies } from './controller/session-cookies';
 import { SessionRepository } from './repository/session.repository';
 import { AuthService } from './service/auth.service';
 import { PasswordHasher } from './service/password-hasher.service';
@@ -18,10 +17,10 @@ import { SessionService } from './service/session.service';
     SessionService,
     PasswordHasher,
     SessionRepository,
-    SessionCookies,
     { provide: SessionAuthenticator, useExisting: SessionService },
   ],
-  // SessionService: other modules sign people out (a termination that takes effect today).
-  exports: [SessionAuthenticator, SessionService],
+  // SessionService: other modules sign people out (a termination that takes effect today, a role
+  // change). AuthService and PasswordHasher: registration starts the new owner's first session.
+  exports: [SessionAuthenticator, SessionService, AuthService, PasswordHasher],
 })
 export class AuthModule {}

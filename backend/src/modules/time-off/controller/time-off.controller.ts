@@ -43,7 +43,9 @@ export class TimeOffController {
   @ZodResponse({ status: HttpStatus.OK, type: LeaveBalancesResponse })
   @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'RESOURCE_NOT_FOUND')
   async balances(@CurrentPrincipal() principal: Principal): Promise<LeaveBalancesResponse> {
-    return toLeaveBalancesResponse(await this.timeOffService.findOwnBalances(principal.userId));
+    return toLeaveBalancesResponse(
+      await this.timeOffService.findOwnBalances(principal.organisationId, principal.userId),
+    );
   }
 
   @Get('requests')
@@ -68,6 +70,7 @@ export class TimeOffController {
   ): Promise<TimeOffRequestPageResponse> {
     return toTimeOffRequestPageResponse(
       await this.timeOffService.findOwnRequests(
+        principal.organisationId,
         principal.userId,
         query.changedSince ? new Date(query.changedSince) : undefined,
         pageable,
@@ -94,7 +97,7 @@ export class TimeOffController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<TimeOffRequestResponse> {
     return toTimeOffRequestResponse(
-      await this.timeOffService.create(principal.userId, {
+      await this.timeOffService.create(principal.organisationId, principal.userId, {
         type: request.type,
         startDate: request.startDate,
         endDate: request.endDate,
@@ -122,7 +125,9 @@ export class TimeOffController {
     @UuidParam('requestId') requestId: string,
     @CurrentPrincipal() principal: Principal,
   ): Promise<TimeOffRequestResponse> {
-    return toTimeOffRequestResponse(await this.timeOffService.cancel(principal.userId, requestId));
+    return toTimeOffRequestResponse(
+      await this.timeOffService.cancel(principal.organisationId, principal.userId, requestId),
+    );
   }
 
   @Post('requests/:requestId/comments')
@@ -146,7 +151,12 @@ export class TimeOffController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<TimeOffCommentResponse> {
     return toTimeOffCommentResponse(
-      await this.commentService.add(requestId, request.body, principal.userId),
+      await this.commentService.add(
+        principal.organisationId,
+        requestId,
+        request.body,
+        principal.userId,
+      ),
     );
   }
 }

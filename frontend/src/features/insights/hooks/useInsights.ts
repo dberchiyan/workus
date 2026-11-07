@@ -2,7 +2,7 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { insightsApi } from '../api/insightsApi';
 import type { Insights, InsightsFilter } from '../types';
 
-/** No tenant: one company per installation. */
+/** No tenant id: the organisation comes from the session (see auth queryKeys). */
 export const insightsKeys = {
   all: ['insights'] as const,
   year: (filter: InsightsFilter) => [...insightsKeys.all, 'year', filter] as const,

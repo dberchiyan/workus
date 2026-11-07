@@ -1,15 +1,24 @@
 import { Injectable } from '@nestjs/common';
 import type { CookieOptions, Response } from 'express';
-import { AppConfigService } from '../../../common/config/app-config.service';
-import { CSRF_COOKIE_NAME } from '../../../common/security/csrf.guard';
-import type { StartedSession } from '../service/session.service';
+import { AppConfigService } from '../config/app-config.service';
+import { CSRF_COOKIE_NAME } from './csrf.guard';
 
-/** Writes and clears the session and CSRF cookies (security.md → Sessions, CSRF). */
+/** What a started session gives the browser. */
+export interface IssuedSession {
+  token: string;
+  csrfToken: string;
+  absoluteExpiresAt: Date;
+}
+
+/**
+ * Writes and clears the session and CSRF cookies (security.md → Sessions, CSRF) — for every
+ * endpoint that starts a session (sign-in, registration).
+ */
 @Injectable()
 export class SessionCookies {
   constructor(private readonly config: AppConfigService) {}
 
-  write(response: Response, session: StartedSession): void {
+  write(response: Response, session: IssuedSession): void {
     const maxAge = Math.max(0, session.absoluteExpiresAt.getTime() - Date.now());
     response.cookie(this.config.get('SESSION_COOKIE_NAME'), session.token, {
       ...this.baseOptions(),

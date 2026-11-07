@@ -4,7 +4,7 @@ import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import type { Pageable } from '../../../common/dto/pageable';
 import type { RequestContext } from '../../../common/context/request-context';
 import type { AuditEventRecord } from '../repository/record/audit-event.record';
-import { AuditEventRepository } from '../repository/audit-event.repository';
+import { AuditEventRepository, type NewAuditEventRow } from '../repository/audit-event.repository';
 import {
   AUDIT_ACTIONS,
   AUDIT_TARGET_TYPES,
@@ -14,7 +14,11 @@ import {
 import { AuditChangesSchema } from './audit-change';
 import type { AuditEvent, AuditEventPage, NewAuditEvent, SecurityEventPage } from './audit.types';
 import type { AuditEventSortField } from './audit-sort';
-import { SECURITY_CATEGORY_ACTIONS, type SecurityCategory } from './security-category';
+import {
+  ALL_SECURITY_ACTIONS,
+  SECURITY_CATEGORY_ACTIONS,
+  type SecurityCategory,
+} from './security-category';
 
 const isAction = (value: string): value is AuditAction =>
   (AUDIT_ACTIONS as readonly string[]).includes(value);
@@ -42,8 +46,14 @@ export class AuditService {
     await this.auditEventRepository.createMany(events.map((event) => this.toRow(event)));
   }
 
-  private toRow(event: NewAuditEvent) {
+  private toRow(event: NewAuditEvent): NewAuditEventRow {
+    const organisationId = event.organisationId ?? this.cls.get('principal')?.organisationId;
+    if (!organisationId) {
+      // A programming error: an event outside a request must name its organisation.
+      throw new Error('Audit event without an organisation');
+    }
     return {
+      organisationId,
       action: event.action,
       actorUserId:
         event.actorUserId !== undefined
@@ -62,10 +72,15 @@ export class AuditService {
 
   /** Newest first. */
   async findPageByEmployee(
+    organisationId: string,
     employeeId: string,
     pageable: Pageable<AuditEventSortField>,
   ): Promise<AuditEventPage> {
-    const page = await this.auditEventRepository.findPageByEmployee(employeeId, pageable);
+    const page = await this.auditEventRepository.findPageByEmployee(
+      organisationId,
+      employeeId,
+      pageable,
+    );
     return {
       content: page.content.flatMap((record) => this.toEvent(record)),
       totalElements: page.totalElements,
@@ -74,13 +89,15 @@ export class AuditService {
 
   /** A user's security log (sign-ins, password changes, ended sessions), newest first. */
   async findSecurityPage(
+    organisationId: string,
     userId: string,
     category: SecurityCategory | null,
     pageable: Pageable<AuditEventSortField>,
   ): Promise<SecurityEventPage> {
     const page = await this.auditEventRepository.findSecurityPage(
+      organisationId,
       userId,
-      category ? SECURITY_CATEGORY_ACTIONS[category] : null,
+      category ? SECURITY_CATEGORY_ACTIONS[category] : ALL_SECURITY_ACTIONS,
       pageable,
     );
     const newDevices = await this.auditEventRepository.findNewDeviceSignIns(
@@ -107,11 +124,11 @@ export class AuditService {
   }
 
   /** History of several targets (e.g. a page of requests), oldest first. */
-  async findByTargets(targetIds: string[]): Promise<AuditEvent[]> {
+  async findByTargets(organisationId: string, targetIds: string[]): Promise<AuditEvent[]> {
     if (targetIds.length === 0) {
       return [];
     }
-    const records = await this.auditEventRepository.findByTargets(targetIds);
+    const records = await this.auditEventRepository.findByTargets(organisationId, targetIds);
     return records.flatMap((record) => this.toEvent(record));
   }
 

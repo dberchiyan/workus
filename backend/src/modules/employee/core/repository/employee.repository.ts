@@ -6,6 +6,7 @@ import type { Pageable, SortDirection } from '../../../../common/dto/pageable';
 import { toPrismaPage } from '../../../../common/persistence/pageable';
 import type { PrismaService } from '../../../../common/persistence/prisma.service';
 import { Prisma } from '../../../../generated/prisma/client';
+import { ADMIN_ROLES } from '../../../user/service/user-role';
 import type { EmployeeSortField } from '../service/employee-sort';
 import type { EmployeeCriteria } from '../service/filter/employee.criteria';
 import { activeOn, employedBetween, employeeWhere, searchWhere } from './employee-where';
@@ -41,6 +42,7 @@ const MAX_POSITIONS = 200;
 const MAX_CANDIDATES = 20;
 
 export interface NewEmployee {
+  organisationId: string;
   userId: string;
   positionId: string;
   startDate: Date;
@@ -54,8 +56,11 @@ export interface NewEmployee {
   createdBy: string;
 }
 
-/** Only admins can be responsible. */
-const responsibleCandidateWhere: Prisma.UserWhereInput = { role: 'ADMIN' };
+/** Only admins (and owners) of the organisation can be responsible. */
+const responsibleCandidateWhere = (organisationId: string): Prisma.UserWhereInput => ({
+  organisationId,
+  role: { in: [...ADMIN_ROLES] },
+});
 
 const averageRowsSchema = z.array(z.object({ days: z.number() }));
 
@@ -80,10 +85,11 @@ export class EmployeeRepository {
   ) {}
 
   async findPage(
+    organisationId: string,
     criteria: EmployeeCriteria,
     pageable: Pageable<EmployeeSortField>,
   ): Promise<{ content: EmployeeListItemRecord[]; totalElements: number }> {
-    const where = employeeWhere(criteria);
+    const where = employeeWhere(organisationId, criteria);
     const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
     // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
     const [totalElements, content] = await Promise.all([
@@ -95,10 +101,12 @@ export class EmployeeRepository {
 
   /** People employed on at least one day of [from, to], matching every search term. */
   async findCalendarPage(
+    organisationId: string,
     criteria: { searchTerms: string[]; from: Date; to: Date },
     pageable: Pageable<EmployeeSortField>,
   ): Promise<{ content: EmployeeCalendarRecord[]; totalElements: number }> {
     const where: Prisma.EmployeeWhereInput = {
+      organisationId,
       AND: [employedBetween(criteria.from, criteria.to), ...searchWhere(criteria.searchTerms)],
     };
     const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
@@ -115,11 +123,13 @@ export class EmployeeRepository {
    * `days`, by day then name, a page at a time. Prisma cannot filter by a date's month — raw SQL.
    */
   async findBirthdays(
+    organisationId: string,
     criteria: { from: Date; to: Date; month: number; days: number[] },
     page: { offset: number; limit: number },
   ): Promise<{ content: BirthdayRow[]; totalElements: number }> {
     const where = Prisma.sql`
-      WHERE e.date_of_birth IS NOT NULL
+      WHERE e.organisation_id = ${organisationId}::uuid
+        AND e.date_of_birth IS NOT NULL
         AND e.start_date <= ${criteria.to}::date
         AND (e.terminated_on IS NULL OR e.terminated_on > ${criteria.from}::date)
         AND EXTRACT(MONTH FROM e.date_of_birth) = ${criteria.month}
@@ -145,51 +155,58 @@ export class EmployeeRepository {
   }
 
   /** Everyone who ever worked here (bounded), by start date. */
-  findRoster(limit: number): Promise<EmployeeRosterRecord[]> {
+  findRoster(organisationId: string, limit: number): Promise<EmployeeRosterRecord[]> {
     return this.txHost.tx.employee.findMany({
+      where: { organisationId },
       select: employeeRosterSelect,
       orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
       take: limit,
     });
   }
 
-  countActive(today: Date): Promise<number> {
-    return this.txHost.tx.employee.count({ where: activeOn(today) });
+  countActive(organisationId: string, today: Date): Promise<number> {
+    return this.txHost.tx.employee.count({ where: { organisationId, ...activeOn(today) } });
   }
 
   /** Hires with a start date in (from, to]. */
-  countStartedBetween(from: Date, to: Date): Promise<number> {
-    return this.txHost.tx.employee.count({ where: { startDate: { gt: from, lte: to } } });
+  countStartedBetween(organisationId: string, from: Date, to: Date): Promise<number> {
+    return this.txHost.tx.employee.count({
+      where: { organisationId, startDate: { gt: from, lte: to } },
+    });
   }
 
   /** Mean days since start over active employees; 0 when there are none. AVG over dates is raw SQL. */
-  async averageTenureDays(today: Date): Promise<number> {
+  async averageTenureDays(organisationId: string, today: Date): Promise<number> {
     const rows = await this.txHost.tx.$queryRaw<unknown[]>`
       SELECT COALESCE(AVG(${today}::date - start_date), 0)::float8 AS days
       FROM employees
-      WHERE terminated_on IS NULL OR terminated_on > ${today}::date`;
+      WHERE organisation_id = ${organisationId}::uuid
+        AND (terminated_on IS NULL OR terminated_on > ${today}::date)`;
     const [row] = averageRowsSchema.parse(rows);
     return row?.days ?? 0;
   }
 
-  countActiveWithoutResponsible(today: Date): Promise<number> {
+  countActiveWithoutResponsible(organisationId: string, today: Date): Promise<number> {
     return this.txHost.tx.employee.count({
-      where: { AND: [activeOn(today), { responsibles: { none: {} } }] },
+      where: { organisationId, AND: [activeOn(today), { responsibles: { none: {} } }] },
     });
   }
 
   /** Terminations dated in (from, to]. */
-  countTerminatedBetween(from: Date, to: Date): Promise<number> {
-    return this.txHost.tx.employee.count({ where: { terminatedOn: { gt: from, lte: to } } });
+  countTerminatedBetween(organisationId: string, from: Date, to: Date): Promise<number> {
+    return this.txHost.tx.employee.count({
+      where: { organisationId, terminatedOn: { gt: from, lte: to } },
+    });
   }
 
   /** Matching employees per position (the tab counts are summed per category by the service). */
   async countByPosition(
+    organisationId: string,
     criteria: Omit<EmployeeCriteria, 'categoryId'>,
   ): Promise<Map<string, number>> {
     const groups = await this.txHost.tx.employee.groupBy({
       by: ['positionId'],
-      where: employeeWhere(criteria),
+      where: employeeWhere(organisationId, criteria),
       _count: { _all: true },
       orderBy: { positionId: 'asc' },
     });
@@ -199,6 +216,7 @@ export class EmployeeRepository {
   async create(employee: NewEmployee): Promise<string> {
     const { id } = await this.txHost.tx.employee.create({
       data: {
+        organisationId: employee.organisationId,
         userId: employee.userId,
         positionId: employee.positionId,
         startDate: employee.startDate,
@@ -227,21 +245,23 @@ export class EmployeeRepository {
    * false → someone changed the employee first.
    */
   async replaceResponsibles(
+    organisationId: string,
     employeeId: string,
     version: number,
     responsibleUserIds: string[],
     updatedBy: string,
   ): Promise<boolean> {
     const { count } = await this.txHost.tx.employee.updateMany({
-      where: { id: employeeId, version },
+      where: { id: employeeId, organisationId, version },
       data: { updatedBy, version: { increment: 1 } },
     });
     if (count === 0) {
       return false;
     }
-    await this.txHost.tx.employeeResponsible.deleteMany({ where: { employeeId } });
+    await this.txHost.tx.employeeResponsible.deleteMany({ where: { organisationId, employeeId } });
     await this.txHost.tx.employeeResponsible.createMany({
       data: responsibleUserIds.map((responsibleUserId) => ({
+        organisationId,
         employeeId,
         responsibleUserId,
         createdBy: updatedBy,
@@ -252,6 +272,7 @@ export class EmployeeRepository {
 
   /** Work facts and contacts; optimistic lock on `version` (false → changed by someone else). */
   async updateDetails(
+    organisationId: string,
     employeeId: string,
     version: number,
     details: {
@@ -267,7 +288,7 @@ export class EmployeeRepository {
     updatedBy: string,
   ): Promise<boolean> {
     const { count } = await this.txHost.tx.employee.updateMany({
-      where: { id: employeeId, version },
+      where: { id: employeeId, organisationId, version },
       data: { ...details, updatedBy, version: { increment: 1 } },
     });
     return count > 0;
@@ -275,13 +296,14 @@ export class EmployeeRepository {
 
   /** Sets (or, with null, clears) the termination; optimistic lock on `version`. */
   async updateTermination(
+    organisationId: string,
     employeeId: string,
     version: number,
     termination: { terminatedOn: Date; reason: string; comment: string | null } | null,
     updatedBy: string,
   ): Promise<boolean> {
     const { count } = await this.txHost.tx.employee.updateMany({
-      where: { id: employeeId, version },
+      where: { id: employeeId, organisationId, version },
       data: {
         terminatedOn: termination?.terminatedOn ?? null,
         terminationReason: termination?.reason ?? null,
@@ -293,38 +315,49 @@ export class EmployeeRepository {
     return count > 0;
   }
 
+  /** A user's HR record (a user belongs to one organisation, so the user id finds it). */
   findTimeOffByUserId(userId: string): Promise<EmployeeTimeOffRecord | null> {
-    return this.txHost.tx.employee.findUnique({ where: { userId }, select: employeeTimeOffSelect });
+    return this.txHost.tx.employee.findFirst({ where: { userId }, select: employeeTimeOffSelect });
   }
 
-  /** Users whose employment ended (terminated_on) in [from, to] (bounded). */
-  async findUserIdsTerminatedBetween(from: Date, to: Date, limit: number): Promise<string[]> {
-    const rows = await this.txHost.tx.employee.findMany({
+  /** Users (of every organisation) whose employment ended in [from, to] (bounded) — a system job. */
+  findUsersTerminatedBetween(
+    from: Date,
+    to: Date,
+    limit: number,
+  ): Promise<{ userId: string; organisationId: string }[]> {
+    return this.txHost.tx.employee.findMany({
       where: { terminatedOn: { gte: from, lte: to } },
-      select: { userId: true },
+      select: { userId: true, organisationId: true },
       orderBy: { id: 'asc' },
       take: limit,
     });
-    return rows.map((row) => row.userId);
   }
 
   /** The user account of an employee; null when unknown. */
-  async findUserIdById(id: string): Promise<string | null> {
+  async findUserIdById(organisationId: string, id: string): Promise<string | null> {
     const employee = await this.txHost.tx.employee.findUnique({
-      where: { id },
+      where: { id, organisationId },
       select: { userId: true },
     });
     return employee?.userId ?? null;
   }
 
-  findTimeOffById(id: string): Promise<EmployeeTimeOffRecord | null> {
-    return this.txHost.tx.employee.findUnique({ where: { id }, select: employeeTimeOffSelect });
+  findTimeOffById(organisationId: string, id: string): Promise<EmployeeTimeOffRecord | null> {
+    return this.txHost.tx.employee.findUnique({
+      where: { id, organisationId },
+      select: employeeTimeOffSelect,
+    });
   }
 
   /** People starting in (from, to], soonest first (bounded). */
-  findStartingBetween(from: Date, to: Date): Promise<EmployeeMovementRecord[]> {
+  findStartingBetween(
+    organisationId: string,
+    from: Date,
+    to: Date,
+  ): Promise<EmployeeMovementRecord[]> {
     return this.txHost.tx.employee.findMany({
-      where: { startDate: { gt: from, lte: to } },
+      where: { organisationId, startDate: { gt: from, lte: to } },
       select: employeeMovementSelect,
       orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
       take: MAX_MOVEMENTS,
@@ -332,27 +365,38 @@ export class EmployeeRepository {
   }
 
   /** People whose termination falls in (from, to], soonest first (bounded). */
-  findLeavingBetween(from: Date, to: Date): Promise<EmployeeMovementRecord[]> {
+  findLeavingBetween(
+    organisationId: string,
+    from: Date,
+    to: Date,
+  ): Promise<EmployeeMovementRecord[]> {
     return this.txHost.tx.employee.findMany({
-      where: { terminatedOn: { gt: from, lte: to } },
+      where: { organisationId, terminatedOn: { gt: from, lte: to } },
       select: employeeMovementSelect,
       orderBy: [{ terminatedOn: 'asc' }, { id: 'asc' }],
       take: MAX_MOVEMENTS,
     });
   }
 
-  findProfileById(id: string): Promise<EmployeeProfileRecord | null> {
-    return this.txHost.tx.employee.findUnique({ where: { id }, select: employeeProfileSelect });
+  findProfileById(organisationId: string, id: string): Promise<EmployeeProfileRecord | null> {
+    return this.txHost.tx.employee.findUnique({
+      where: { id, organisationId },
+      select: employeeProfileSelect,
+    });
   }
 
-  async existsById(id: string): Promise<boolean> {
-    return (await this.txHost.tx.employee.count({ where: { id } })) > 0;
+  async existsById(organisationId: string, id: string): Promise<boolean> {
+    return (await this.txHost.tx.employee.count({ where: { id, organisationId } })) > 0;
   }
 
-  findListItemById(id: string): Promise<EmployeeListItemRecord | null> {
-    return this.txHost.tx.employee.findUnique({ where: { id }, select: employeeListItemSelect });
+  findListItemById(organisationId: string, id: string): Promise<EmployeeListItemRecord | null> {
+    return this.txHost.tx.employee.findUnique({
+      where: { id, organisationId },
+      select: employeeListItemSelect,
+    });
   }
 
+  /** Positions are a shared catalogue of job titles (not tenant data). */
   async positionExists(id: string): Promise<boolean> {
     return (await this.txHost.tx.position.count({ where: { id } })) > 0;
   }
@@ -365,11 +409,14 @@ export class EmployeeRepository {
     });
   }
 
-  findResponsibleCandidates(searchTerms: string[]): Promise<ResponsibleCandidateRecord[]> {
+  findResponsibleCandidates(
+    organisationId: string,
+    searchTerms: string[],
+  ): Promise<ResponsibleCandidateRecord[]> {
     return this.txHost.tx.user.findMany({
       where: {
         AND: [
-          responsibleCandidateWhere,
+          responsibleCandidateWhere(organisationId),
           ...searchTerms.map((term): Prisma.UserWhereInput => ({
             OR: [
               { firstName: { contains: term, mode: 'insensitive' } },
@@ -385,9 +432,9 @@ export class EmployeeRepository {
     });
   }
 
-  async countResponsibleCandidates(userIds: string[]): Promise<number> {
+  async countResponsibleCandidates(organisationId: string, userIds: string[]): Promise<number> {
     return this.txHost.tx.user.count({
-      where: { AND: [{ id: { in: userIds } }, responsibleCandidateWhere] },
+      where: { AND: [{ id: { in: userIds } }, responsibleCandidateWhere(organisationId)] },
     });
   }
 }

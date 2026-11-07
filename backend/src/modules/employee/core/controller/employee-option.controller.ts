@@ -1,4 +1,6 @@
 import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
+import type { Principal } from '../../../../common/security/principal';
+import { CurrentPrincipal } from '../../../../common/security/current-principal.decorator';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { ApiErrors } from '../../../../common/exception/api-errors.decorator';
@@ -36,10 +38,11 @@ export class EmployeeOptionController {
   @ZodResponse({ status: HttpStatus.OK, type: ResponsibleCandidatesResponse })
   @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
   async responsibleCandidates(
+    @CurrentPrincipal() principal: Principal,
     @Query() query: ResponsibleCandidateQuery,
   ): Promise<ResponsibleCandidatesResponse> {
     return toResponsibleCandidatesResponse(
-      await this.employeeService.responsibleCandidates(query.search),
+      await this.employeeService.responsibleCandidates(principal.organisationId, query.search),
     );
   }
 }

@@ -33,6 +33,13 @@
   "holiday": {
     "dateTaken": "There is already a holiday on this date"
   },
+  "organisation": {
+    "lastOwner": "The company needs at least one owner — make someone else an owner first",
+    "notAdministrator": "Only administrators can be owners"
+  },
+  "registration": {
+    "emailTaken": "An account with this email already exists — sign in instead"
+  },
   "review": {
     "responsibleNotFound": "One of the chosen responsible people is no longer active — choose again",
     "startingNotDeletable": "The starting salary can’t be deleted — it starts the salary history. Edit it instead",

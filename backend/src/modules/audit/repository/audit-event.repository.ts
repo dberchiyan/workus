@@ -16,6 +16,7 @@ import {
 } from './record/audit-event.record';
 
 export interface NewAuditEventRow {
+  organisationId: string;
   action: string;
   actorUserId: string | null;
   employeeId: string | null;
@@ -52,10 +53,11 @@ export class AuditEventRepository {
   }
 
   async findPageByEmployee(
+    organisationId: string,
     employeeId: string,
     pageable: Pageable<AuditEventSortField>,
   ): Promise<{ content: AuditEventRecord[]; totalElements: number }> {
-    const where = { employeeId } satisfies Prisma.AuditEventWhereInput;
+    const where = { organisationId, employeeId } satisfies Prisma.AuditEventWhereInput;
     const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
     // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
     const [totalElements, content] = await Promise.all([
@@ -65,16 +67,18 @@ export class AuditEventRepository {
     return { content, totalElements };
   }
 
-  /** A user's security log, newest first; `actions` narrows it to some actions. */
+  /** A user's security log, newest first: events about the account with one of `actions`. */
   async findSecurityPage(
+    organisationId: string,
     userId: string,
-    actions: readonly string[] | null,
+    actions: readonly string[],
     pageable: Pageable<AuditEventSortField>,
   ): Promise<{ content: SecurityEventRecord[]; totalElements: number }> {
     const where = {
+      organisationId,
       targetType: AuditTargetType.USER,
       targetId: userId,
-      ...(actions ? { action: { in: [...actions] } } : {}),
+      action: { in: [...actions] },
     } satisfies Prisma.AuditEventWhereInput;
     const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
     // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
@@ -110,9 +114,9 @@ export class AuditEventRepository {
   }
 
   /** Oldest first; bounded (a request has a handful of events). */
-  findByTargets(targetIds: string[]): Promise<AuditEventRecord[]> {
+  findByTargets(organisationId: string, targetIds: string[]): Promise<AuditEventRecord[]> {
     return this.txHost.tx.auditEvent.findMany({
-      where: { targetId: { in: targetIds } },
+      where: { organisationId, targetId: { in: targetIds } },
       select: auditEventSelect,
       orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
       take: targetIds.length * MAX_EVENTS_PER_TARGET,

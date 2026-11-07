@@ -34,7 +34,11 @@ export class NotificationController {
     @CurrentPrincipal() principal: Principal,
     @PageableQuery(NOTIFICATION_PAGEABLE) pageable: Pageable<NotificationSortField>,
   ): Promise<NotificationPageResponse> {
-    const page = await this.notificationService.findPage(principal.userId, pageable);
+    const page = await this.notificationService.findPage(
+      principal.organisationId,
+      principal.userId,
+      pageable,
+    );
     return {
       content: page.content.flatMap((row) => toNotificationResponse(row) ?? []),
       totalElements: page.totalElements,
@@ -51,7 +55,9 @@ export class NotificationController {
   async unreadCount(
     @CurrentPrincipal() principal: Principal,
   ): Promise<UnreadNotificationsResponse> {
-    return { count: await this.notificationService.countUnread(principal.userId) };
+    return {
+      count: await this.notificationService.countUnread(principal.organisationId, principal.userId),
+    };
   }
 
   @Put('read')
@@ -64,8 +70,10 @@ export class NotificationController {
   async markAllRead(
     @CurrentPrincipal() principal: Principal,
   ): Promise<UnreadNotificationsResponse> {
-    await this.notificationService.markAllRead(principal.userId);
-    return { count: await this.notificationService.countUnread(principal.userId) };
+    await this.notificationService.markAllRead(principal.organisationId, principal.userId);
+    return {
+      count: await this.notificationService.countUnread(principal.organisationId, principal.userId),
+    };
   }
 
   @Put(':notificationId/read')
@@ -78,7 +86,11 @@ export class NotificationController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<NotificationResponse> {
     const notification = toNotificationResponse(
-      await this.notificationService.markRead(principal.userId, notificationId),
+      await this.notificationService.markRead(
+        principal.organisationId,
+        principal.userId,
+        notificationId,
+      ),
     );
     if (!notification) {
       throw new ResourceNotFoundException();

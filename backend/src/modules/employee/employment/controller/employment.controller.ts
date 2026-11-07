@@ -41,6 +41,7 @@ export class EmploymentController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<HiredEmployeeResponse> {
     return this.employmentService.hire(
+      principal.organisationId,
       {
         firstName: request.firstName,
         lastName: request.lastName,
@@ -84,6 +85,7 @@ export class EmploymentController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<void> {
     await this.employmentService.update(
+      principal.organisationId,
       employeeId,
       {
         firstName: request.firstName,
@@ -126,6 +128,7 @@ export class EmploymentController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<void> {
     await this.employmentService.terminate(
+      principal.organisationId,
       employeeId,
       {
         date: request.date,
@@ -156,6 +159,11 @@ export class EmploymentController {
     @Body() request: CancelTerminationRequest,
     @CurrentPrincipal() principal: Principal,
   ): Promise<void> {
-    await this.employmentService.cancelTermination(employeeId, request.version, principal.userId);
+    await this.employmentService.cancelTermination(
+      principal.organisationId,
+      employeeId,
+      request.version,
+      principal.userId,
+    );
   }
 }

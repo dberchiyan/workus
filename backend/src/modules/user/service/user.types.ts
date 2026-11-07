@@ -2,6 +2,7 @@ import type { UserRole } from './user-role';
 
 export interface UserCredentials {
   id: string;
+  organisationId: string;
   email: string;
   /** null → no password set yet (created by an admin); such an account cannot sign in. */
   passwordHash: string | null;
@@ -14,12 +15,31 @@ export interface UserProfile {
   firstName: string;
   lastName: string;
   role: UserRole;
+  organisation: { id: string; name: string };
 }
 
 export interface NewUser {
+  organisationId: string;
   email: string;
   firstName: string;
   lastName: string;
   role: UserRole;
   createdBy: string;
+}
+
+export interface NewOwner {
+  organisationId: string;
+  email: string;
+  firstName: string;
+  lastName: string;
+  passwordHash: string;
+}
+
+export interface Administrator {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: UserRole;
+  version: number;
 }

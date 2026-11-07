@@ -117,5 +117,12 @@
     "date": "Enter the date",
     "nameRequired": "Enter a name",
     "nameTooLong": "Name must be at most {max} characters"
+  },
+  "organisationName": {
+    "required": "Enter the company name",
+    "tooLong": "Company name must be at most {max} characters"
+  },
+  "role": {
+    "invalid": "Choose owner or admin"
   }
 }

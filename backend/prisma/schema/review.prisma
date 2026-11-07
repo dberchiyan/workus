@@ -1,8 +1,10 @@
 /// A performance/salary review of an employee. Salary = new monthly salary agreed in the review.
 model EmployeeReview {
   id             String                      @id(map: "pk_employee_reviews") @default(dbgenerated("uuidv7()")) @db.Uuid
+  organisationId String                      @map("organisation_id") @db.Uuid
+  organisation   Organisation                @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_employee_reviews_organisation_id")
   employeeId     String                      @map("employee_id") @db.Uuid
-  employee       Employee                    @relation(fields: [employeeId], references: [id], onDelete: Restrict, map: "fk_employee_reviews_employee_id")
+  employee       Employee                    @relation(fields: [organisationId, employeeId], references: [organisationId, id], onDelete: Restrict, map: "fk_employee_reviews_employee_id")
   /// STARTING = the salary agreed at hire (one per employee, dated the start date, always COMPLETED); REGULAR otherwise.
   kind           String                      @default("REGULAR") @db.VarChar(16) // STARTING | REGULAR — CHECK in migration
   title          String                      @db.VarChar(150)
@@ -22,20 +24,24 @@ model EmployeeReview {
   version        Int                         @default(0)
   responsibles   EmployeeReviewResponsible[]
 
+  @@unique([organisationId, id], map: "uq_employee_reviews_organisation_id_id")
   @@index([employeeId, reviewDate], map: "idx_employee_reviews_employee_id_review_date")
   @@map("employee_reviews")
 }
 
 model EmployeeReviewResponsible {
+  organisationId    String         @map("organisation_id") @db.Uuid
+  organisation      Organisation   @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_employee_review_responsibles_organisation_id")
   reviewId          String         @map("review_id") @db.Uuid
   // The assignment means nothing without the review.
-  review            EmployeeReview @relation(fields: [reviewId], references: [id], onDelete: Cascade, map: "fk_employee_review_responsibles_review_id")
+  review            EmployeeReview @relation(fields: [organisationId, reviewId], references: [organisationId, id], onDelete: Cascade, map: "fk_employee_review_responsibles_review_id")
   responsibleUserId String         @map("responsible_user_id") @db.Uuid
-  responsible       User           @relation("ReviewResponsibleUser", fields: [responsibleUserId], references: [id], onDelete: Restrict, map: "fk_employee_review_responsibles_responsible_user_id")
+  responsible       User           @relation("ReviewResponsibleUser", fields: [organisationId, responsibleUserId], references: [organisationId, id], onDelete: Restrict, map: "fk_employee_review_responsibles_responsible_user_id")
   createdAt         DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
   createdBy         String?        @map("created_by") @db.Uuid
 
   @@id([reviewId, responsibleUserId], map: "pk_employee_review_responsibles")
   @@index([responsibleUserId], map: "idx_employee_review_responsibles_responsible_user_id")
+  @@index([organisationId], map: "idx_employee_review_responsibles_organisation_id")
   @@map("employee_review_responsibles")
 }
