@@ -14,7 +14,8 @@ export interface StatCardProps {
 /** A titled number with a hint line under it (stat rows on Employees and the dashboard). */
 export function StatCard({ title, value, hint }: StatCardProps) {
   return (
-    <Card variant="outlined">
+    // Full height: cards in one grid row line up whatever their hints wrap to.
+    <Card variant="outlined" className="h-full">
       <CardContent className="flex flex-col gap-1 p-4">
         <Typography variant="subtitle2" component="h2" color="textSecondary">
           {title}

@@ -27,7 +27,8 @@ function Hint({
     <Typography
       variant="body2"
       color={isPositive ? undefined : 'textSecondary'}
-      className={isPositive ? 'flex items-center gap-1 text-success' : 'flex items-center gap-1'}
+      // items-start: in a narrow (two-column phone) card the text wraps beside the icon.
+      className={isPositive ? 'flex items-start gap-1 text-success' : 'flex items-start gap-1'}
     >
       {icon}
       {children}
@@ -44,7 +45,7 @@ export function EmployeeStatsCards() {
     isPending ? undefined : isError ? '—' : format(data);
 
   return (
-    <section aria-busy={isPending} className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <section aria-busy={isPending} className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
       <StatCard
         title={t('stats.total')}
         value={show((s) => formatCount(s.totalActive, locale))}

@@ -1,6 +1,6 @@
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
-import { useEffect, useRef } from 'react';
+import { type CSSProperties, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { monthDays } from '../calendar';
 import type { CalendarRow } from '../types';
@@ -54,15 +54,18 @@ export function CalendarGrid({
 
   return (
     // `isolate`: the sticky name column's z-index stays inside the grid, under the top bar.
-    <div ref={scrollRef} className="isolate overflow-x-auto">
+    // `relative`: absolutely positioned bits (the sr-only caption) are placed and clipped in
+    // here — otherwise they sit in the page, where the scrolled days are, and widen it.
+    <div ref={scrollRef} className="relative isolate overflow-x-auto">
       <table
-        className="w-full table-fixed border-separate border-spacing-0"
-        // One-off geometry: the name column plus 2rem per day before the days start scrolling.
-        style={{ minWidth: `calc(11rem + ${String(days.length * 2)}rem)` }}
+        // One-off geometry: the name column plus a width per day before the days start
+        // scrolling — 2.5rem on a phone (a one-day request stays a finger-sized target), 2rem up.
+        className="w-full min-w-[calc(10rem+var(--days)*2.5rem)] table-fixed border-separate border-spacing-0 sm:min-w-[calc(11rem+var(--days)*2rem)]"
+        style={{ '--days': days.length } as CSSProperties}
       >
         <caption className="sr-only">{t('calendar.page.caption')}</caption>
         <colgroup>
-          <col className="w-44 sm:w-64" />
+          <col className="w-40 sm:w-64" />
           {days.map((date) => (
             <col key={date} />
           ))}

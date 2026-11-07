@@ -56,7 +56,12 @@ export function CalendarToolbar({
         )}
       </div>
       <div className="flex flex-wrap items-center gap-2">
-        <div role="group" aria-label={t('calendar.page.types')} className="flex flex-wrap gap-2">
+        {/* On a phone the types stay on one line and scroll sideways, edge to edge. */}
+        <div
+          role="group"
+          aria-label={t('calendar.page.types')}
+          className="-mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto px-4 sm:mx-0 sm:w-auto sm:flex-wrap sm:overflow-visible sm:px-0"
+        >
           {TIME_OFF_TYPES.map((type) => {
             const { icon: Icon, tone } = TYPE_VISUALS[type];
             const selected = types.includes(type);
@@ -68,7 +73,7 @@ export function CalendarToolbar({
                 onChange={() => {
                   toggle(type);
                 }}
-                className="gap-2 py-1 pr-3 pl-1"
+                className="shrink-0 gap-2 py-1 pr-3 pl-1 whitespace-nowrap"
               >
                 <span
                   aria-hidden
@@ -90,7 +95,7 @@ export function CalendarToolbar({
           variant="body2"
           color="textSecondary"
           component="span"
-          className="flex items-center gap-2 px-2"
+          className="flex items-center gap-2 sm:px-2"
         >
           <span
             aria-hidden
@@ -104,7 +109,7 @@ export function CalendarToolbar({
           variant="body2"
           color="textSecondary"
           component="span"
-          className="flex items-center gap-2 px-2"
+          className="flex items-center gap-2 sm:px-2"
         >
           <span
             aria-hidden

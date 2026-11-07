@@ -31,30 +31,35 @@ export function RequestsFilters({
   return (
     <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
       <RequestSearchField value={search} onSearch={onSearch} />
-      <ToggleButtonGroup
-        exclusive
-        size="small"
-        value={type ?? ALL}
-        aria-label={t('manage.filters.type')}
-        onChange={(_event, value: string | null) => {
-          // Clicking the selected button again keeps it (one option is always on).
-          if (value !== null) {
-            onType(isTimeOffType(value) ? value : undefined);
-          }
-        }}
-        className="flex-wrap"
-      >
-        <ToggleButton value={ALL}>{t('manage.filters.allTypes')}</ToggleButton>
-        {TIME_OFF_TYPES.map((option) => {
-          const { icon: Icon, text } = TYPE_VISUALS[option];
-          return (
-            <ToggleButton key={option} value={option} className="gap-1.5">
-              <Icon aria-hidden fontSize="small" className={text} />
-              {t(`types.${option}`)}
-            </ToggleButton>
-          );
-        })}
-      </ToggleButtonGroup>
+      {/* On a phone the options stay on one line and scroll sideways, edge to edge. */}
+      <div className="-mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
+        <ToggleButtonGroup
+          exclusive
+          size="small"
+          value={type ?? ALL}
+          aria-label={t('manage.filters.type')}
+          onChange={(_event, value: string | null) => {
+            // Clicking the selected button again keeps it (one option is always on).
+            if (value !== null) {
+              onType(isTimeOffType(value) ? value : undefined);
+            }
+          }}
+          className="w-max"
+        >
+          <ToggleButton value={ALL} className="whitespace-nowrap">
+            {t('manage.filters.allTypes')}
+          </ToggleButton>
+          {TIME_OFF_TYPES.map((option) => {
+            const { icon: Icon, text } = TYPE_VISUALS[option];
+            return (
+              <ToggleButton key={option} value={option} className="gap-1.5 whitespace-nowrap">
+                <Icon aria-hidden fontSize="small" className={text} />
+                {t(`types.${option}`)}
+              </ToggleButton>
+            );
+          })}
+        </ToggleButtonGroup>
+      </div>
       <FormControlLabel
         className="m-0 lg:ml-auto"
         control={

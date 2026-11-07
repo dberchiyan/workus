@@ -54,6 +54,38 @@ export const theme = createTheme({
     MuiIconButton: {
       styleOverrides: { root: { minWidth: 44, minHeight: 44 } },
     },
+    // Touch targets ≥ 44 px (ux.md), like Button and IconButton above.
+    MuiToggleButton: {
+      styleOverrides: { root: { minHeight: 44 } },
+    },
+    // Page numbers stay compact under a mouse and grow to 44 px under a finger.
+    MuiPaginationItem: {
+      styleOverrides: {
+        root: { '@media (pointer: coarse)': { minWidth: 44, height: 44, borderRadius: 22 } },
+      },
+    },
+    // "Rows per page", the range and the page buttons wrap at phone width instead of overflowing.
+    MuiTablePagination: {
+      styleOverrides: {
+        toolbar: { flexWrap: 'wrap', justifyContent: 'flex-end', rowGap: 4 },
+        spacer: { display: 'none' },
+      },
+    },
+    // A centred dialog on a phone keeps a 16 px edge (MUI's 32 px leaves a narrow column).
+    MuiDialog: {
+      styleOverrides: {
+        paper: ({ theme: t, ownerState }) =>
+          ownerState.fullScreen
+            ? {}
+            : {
+                [t.breakpoints.down('sm')]: {
+                  margin: 16,
+                  width: 'calc(100% - 32px)',
+                  maxHeight: 'calc(100% - 32px)',
+                },
+              },
+      },
+    },
     MuiTableCell: {
       // Header row reads as chrome, not data: muted, smaller, on a light band with a rule below.
       styleOverrides: {

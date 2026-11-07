@@ -25,7 +25,8 @@ function Hint({ icon, tone, children }: { icon?: ReactNode; tone?: 'error'; chil
       variant="body2"
       component="div"
       color={tone === 'error' ? 'error' : 'textSecondary'}
-      className="flex min-h-6 flex-wrap items-center gap-1"
+      // No wrap: in a narrow (two-column phone) card the text wraps beside the icon, not under it.
+      className="flex min-h-6 items-start gap-1"
     >
       {icon}
       {children}
@@ -75,7 +76,7 @@ export function AdminOverview() {
 
   return (
     <ul
-      className="m-0 grid list-none grid-cols-1 gap-4 p-0 sm:grid-cols-2 lg:grid-cols-4"
+      className="m-0 grid list-none grid-cols-2 gap-3 p-0 sm:gap-4 lg:grid-cols-4"
       aria-busy={dashboard.isPending}
     >
       <li>

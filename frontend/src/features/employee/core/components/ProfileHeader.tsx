@@ -32,14 +32,15 @@ export function ProfileHeader({ employee, headingRef }: ProfileHeaderProps) {
       : null;
   return (
     <Card variant="outlined" className="flex-1">
-      <CardContent className="flex items-center gap-4 p-5 sm:p-6">
+      {/* Phone: avatar and actions on top, the text full width below; side by side from sm. */}
+      <CardContent className="flex flex-wrap items-start gap-4 p-5 sm:flex-nowrap sm:items-center sm:p-6">
         <InitialsAvatar
           id={employee.userId}
           firstName={employee.firstName}
           lastName={employee.lastName}
           size="lg"
         />
-        <div className="flex min-w-0 flex-1 flex-col gap-1">
+        <div className="order-3 flex min-w-0 basis-full flex-col gap-1 sm:order-none sm:flex-1 sm:basis-auto">
           <div className="flex flex-wrap items-center gap-2">
             <Typography
               ref={headingRef}
@@ -70,7 +71,7 @@ export function ProfileHeader({ employee, headingRef }: ProfileHeaderProps) {
             </Typography>
           )}
         </div>
-        <div className="-mt-1 -mr-2 ml-auto self-start">
+        <div className="order-2 -mt-1 -mr-2 ml-auto self-start sm:order-none">
           <ProfileActions employee={employee} />
         </div>
       </CardContent>

@@ -94,8 +94,6 @@ export default function CalendarPage() {
             <TablePagination
               component="div"
               className="border-t border-divider"
-              // Wraps at phone width instead of pushing the page buttons out of the card.
-              slotProps={{ toolbar: { className: 'flex-wrap justify-end' } }}
               count={data.totalElements}
               page={params.page}
               rowsPerPage={params.size}

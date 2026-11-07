@@ -23,6 +23,12 @@ export function LeaveBalanceCard({ balance, headingLevel }: LeaveBalanceCardProp
       : [{ key: 'available', label: t('balances.available'), value: balance.available }]),
     { key: 'used', label: t('balances.used'), value: balance.used },
   ];
+  const note =
+    balance.pending > 0
+      ? t('balances.pending', { count: balance.pending })
+      : balance.allowance === null
+        ? t('balances.noLimit')
+        : null;
   return (
     <Card variant="outlined" className="h-full">
       <CardContent className="flex h-full flex-col gap-3 p-5">
@@ -60,13 +66,14 @@ export function LeaveBalanceCard({ balance, headingLevel }: LeaveBalanceCardProp
             </div>
           ))}
         </dl>
-        {/* Reserved line, so cards in a row keep one height. */}
-        <Typography variant="caption" color="textSecondary" className="text-center">
-          {balance.pending > 0
-            ? t('balances.pending', { count: balance.pending })
-            : balance.allowance === null
-              ? t('balances.noLimit')
-              : '\u00A0'}
+        {/* Reserved line, so cards in a row keep one height; stacked on a phone, an empty one
+            would only leave a gap. */}
+        <Typography
+          variant="caption"
+          color="textSecondary"
+          className={cn('text-center', note === null && 'hidden sm:block')}
+        >
+          {note ?? '\u00A0'}
         </Typography>
       </CardContent>
     </Card>

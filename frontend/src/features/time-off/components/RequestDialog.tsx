@@ -57,7 +57,11 @@ export function RequestDialog({
       maxWidth="md"
       aria-labelledby={titleId}
     >
-      <DialogTitle id={titleId} component="div" className="flex items-center gap-3 pr-3">
+      <DialogTitle
+        id={titleId}
+        component="div"
+        className="flex items-start gap-3 pr-3 sm:items-center"
+      >
         {request ? (
           <>
             <InitialsAvatar
@@ -66,7 +70,8 @@ export function RequestDialog({
               lastName={request.employee.lastName}
             />
             <span className="flex min-w-0 flex-1 flex-col">
-              <Typography variant="h6" component="h2" className="truncate">
+              {/* A phone has no room to cut the name short: it wraps there, truncates from sm. */}
+              <Typography variant="h6" component="h2" className="sm:truncate">
                 {t('manage.dialog.title', { name: fullName(request.employee) })}
               </Typography>
               <Link
@@ -77,8 +82,14 @@ export function RequestDialog({
               >
                 {t('manage.dialog.profile', { position: request.employee.positionTitle })}
               </Link>
+              {/* Phone: the status goes under the name; from sm it sits beside it. */}
+              <span className="mt-1 sm:hidden">
+                <TimeOffStatusChip status={request.status} />
+              </span>
             </span>
-            <TimeOffStatusChip status={request.status} />
+            <span className="hidden sm:flex">
+              <TimeOffStatusChip status={request.status} />
+            </span>
           </>
         ) : (
           <Typography variant="h6" component="h2" className="flex-1">
