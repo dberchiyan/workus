@@ -5,8 +5,9 @@ import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
+import { previousDay, todayUtcIso } from '@/shared/lib/utcDay';
 import { isApiError } from '@/shared/api/apiError';
-import { formatDayHeading, localDayKey } from '../activityFormat';
+import { formatDayHeading, dayKey } from '../activityFormat';
 import { useEmployeeActivity } from '../hooks/useEmployeeActivity';
 import type { ActivityEvent } from '../types';
 import { ActivityEventItem } from './ActivityEventItem';
@@ -23,7 +24,7 @@ const groupByDay = (events: ActivityEvent[]): DayGroup[] => {
   const groups: DayGroup[] = [];
   for (const event of events) {
     const date = new Date(event.occurredAt);
-    const key = localDayKey(date);
+    const key = dayKey(date);
     const last = groups.at(-1);
     if (last?.key === key) {
       last.events.push(event);
@@ -34,15 +35,14 @@ const groupByDay = (events: ActivityEvent[]): DayGroup[] => {
   return groups;
 };
 
-/** "Today" / "Yesterday" / "Monday, 3 November 2026" in the viewer's time zone. */
+/** "Today" / "Yesterday" / "Monday, 3 November 2026" — days in UTC, as everywhere. */
 const useDayHeading = () => {
   const { t, i18n } = useTranslation('employee');
-  const today = new Date();
-  const yesterday = new Date(today.getFullYear(), today.getMonth(), today.getDate() - 1);
+  const today = todayUtcIso();
   return (group: DayGroup): string =>
-    group.key === localDayKey(today)
+    group.key === today
       ? t('profile.activity.today')
-      : group.key === localDayKey(yesterday)
+      : group.key === previousDay(today)
         ? t('profile.activity.yesterday')
         : formatDayHeading(group.date, i18n.language);
 };

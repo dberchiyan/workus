@@ -3,9 +3,8 @@ import { type Money, toUnits } from '@/shared/lib/money';
 export const fullName = (person: { firstName: string; lastName: string }): string =>
   `${person.firstName} ${person.lastName}`;
 
-/** Local calendar day of an instant, `YYYY-MM-DD` — groups events by the viewer's day. */
-export const localDayKey = (instant: Date): string =>
-  `${instant.getFullYear()}-${String(instant.getMonth() + 1).padStart(2, '0')}-${String(instant.getDate()).padStart(2, '0')}`;
+/** UTC calendar day of an instant, `YYYY-MM-DD` — groups events by day (UTC, as everywhere). */
+export const dayKey = (instant: Date): string => instant.toISOString().slice(0, 10);
 
 export const formatDayHeading = (instant: Date, locale: string): string =>
   new Intl.DateTimeFormat(locale, {
@@ -13,13 +12,16 @@ export const formatDayHeading = (instant: Date, locale: string): string =>
     day: 'numeric',
     month: 'long',
     year: 'numeric',
+    timeZone: 'UTC',
   }).format(instant);
 
 export const formatTime = (instant: Date, locale: string): string =>
-  new Intl.DateTimeFormat(locale, { timeStyle: 'short' }).format(instant);
+  new Intl.DateTimeFormat(locale, { timeStyle: 'short', timeZone: 'UTC' }).format(instant);
 
 export const formatDateTime = (instant: Date, locale: string): string =>
-  new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeStyle: 'short' }).format(instant);
+  new Intl.DateTimeFormat(locale, { dateStyle: 'full', timeStyle: 'long', timeZone: 'UTC' }).format(
+    instant,
+  );
 
 /**
  * Salary change as a signed percentage text ("+8.2%"); null across currencies or from zero.

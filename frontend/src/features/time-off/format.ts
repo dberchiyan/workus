@@ -21,11 +21,13 @@ export const formatPeriod = (start: string, end: string, locale: string): string
     : format.formatRange(from, new Date(`${end}T00:00:00Z`));
 };
 
-/** "17 Jun 2026, 1:54 AM" in the viewer's time zone. */
+/** "17 Jun 2026, 1:54 AM" in UTC (as every time in the app). */
 export const formatDateTime = (iso: string, locale: string): string =>
-  new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeStyle: 'short' }).format(
-    new Date(iso),
-  );
+  new Intl.DateTimeFormat(locale, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'UTC',
+  }).format(new Date(iso));
 
 export const formatCount = (value: number, locale: string): string =>
   new Intl.NumberFormat(locale).format(value);

@@ -5,7 +5,7 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/cn';
-import { currentMonthLocal } from '@/shared/lib/month';
+import { currentMonthUtc, todayUtcRange } from '@/shared/lib/utcDay';
 import { useEventBirthdays, useEventReviews, useTodayRequests } from '../hooks/useAdminDashboard';
 import { type EventsTab, useEventsParams } from '../hooks/useEventsParams';
 import type { DateRange, LocalDay } from '../types';
@@ -19,15 +19,6 @@ const EventsTabButton = styled(Tab)(({ theme }) => ({
   paddingInline: theme.spacing(1.5),
 }));
 
-/** The viewer's today, fixed for the visit (no clock in render). */
-const localDay = (): LocalDay => {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  const end = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-  const date = `${String(start.getFullYear())}-${String(start.getMonth() + 1).padStart(2, '0')}-${String(start.getDate()).padStart(2, '0')}`;
-  return { date, from: start.toISOString(), to: end.toISOString() };
-};
-
 /** First and last day of `YYYY-MM`. */
 const monthRange = (month: string): DateRange => {
   const [year = 0, index = 1] = month.split('-').map(Number);
@@ -38,8 +29,9 @@ const monthRange = (month: string): DateRange => {
 /** Today's events and events by month (admin dashboard, under the figures). */
 export function AdminEvents() {
   const { t, i18n } = useTranslation('dashboard');
-  const [day] = useState(localDay);
-  const [currentMonth] = useState(currentMonthLocal);
+  // Today (UTC, as everywhere), fixed for the visit (no clock in render).
+  const [day] = useState<LocalDay>(todayUtcRange);
+  const [currentMonth] = useState(currentMonthUtc);
   const { params, update } = useEventsParams(currentMonth);
   const onToday = params.tab === 'today';
   // The open tab's cards use the pages in the URL; the other tab's first pages give its count.

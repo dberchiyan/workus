@@ -1,5 +1,6 @@
 import { useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import type { ApiError } from '@/shared/api/apiError';
+import { todayUtcRange } from '@/shared/lib/utcDay';
 import { timeOffApi } from '../api/timeOffApi';
 import type { CreateTimeOffRequest, TimeOffRequest } from '../types';
 import { timeOffKeys } from './queryKeys';
@@ -15,11 +16,8 @@ export const useEmployeeBalances = (employeeId: string) =>
     queryFn: () => timeOffApi.employeeBalances(employeeId),
   });
 
-/** The start of the viewer's day, as an instant (their time zone decides what "today" is). */
-const startOfToday = (): string => {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate()).toISOString();
-};
+/** The start of today (UTC, as everywhere), as an instant. */
+const startOfToday = (): string => todayUtcRange().from;
 
 /**
  * Dashboard: pending requests and any changed today (any status), newest first, a page at a

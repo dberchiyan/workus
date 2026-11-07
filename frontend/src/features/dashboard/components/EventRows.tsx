@@ -24,9 +24,10 @@ export function RequestEventRow({ request }: { request: DashboardRequest }) {
     request.startDate === request.endDate
       ? dayMonth(request.startDate, i18n.language)
       : `${dayMonth(request.startDate, i18n.language)} – ${dayMonth(request.endDate, i18n.language)}`;
-  const madeAt = new Intl.DateTimeFormat(i18n.language, { timeStyle: 'short' }).format(
-    new Date(request.createdAt),
-  );
+  const madeAt = new Intl.DateTimeFormat(i18n.language, {
+    timeStyle: 'short',
+    timeZone: 'UTC',
+  }).format(new Date(request.createdAt));
   const name = `${request.employee.firstName} ${request.employee.lastName}`;
   return (
     <li className={ROW}>

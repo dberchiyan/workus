@@ -7,7 +7,7 @@ const DEFAULT_SIZE = 50;
 const MONTH = /^(19|20)\d{2}-(0[1-9]|1[0-2])$/;
 
 export interface CalendarParams {
-  /** `YYYY-MM`; absent → the viewer's current month. */
+  /** `YYYY-MM`; absent → the current month (UTC). */
   month: string;
   /** Never empty: at least one type stays on. */
   types: TimeOffType[];

@@ -5,10 +5,10 @@ import TablePagination from '@mui/material/TablePagination';
 import Typography from '@mui/material/Typography';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { todayUtcIso } from '@/shared/lib/utcDay';
 import { useCurrentUser } from '@/features/auth';
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
 import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
-import { todayIsoLocal } from '../calendar';
 import { CalendarGrid } from '../components/CalendarGrid';
 import { CalendarToolbar } from '../components/CalendarToolbar';
 import { formatCount } from '../format';
@@ -18,8 +18,8 @@ import { CALENDAR_PAGE_SIZES, useCalendarParams } from '../hooks/useCalendarPara
 /** Who is away and when: everyone's approved time off and requests still waiting (grey). */
 export default function CalendarPage() {
   const { t, i18n } = useTranslation('timeOff');
-  // The viewer's today, fixed for the visit (no clock in render).
-  const [today] = useState(todayIsoLocal);
+  // Today (UTC, as everywhere), fixed for the visit (no clock in render).
+  const [today] = useState(todayUtcIso);
   const currentMonth = today.slice(0, 7);
   const { params, update } = useCalendarParams(currentMonth);
   const calendar = useCalendar(params);

@@ -8,7 +8,7 @@ export type DashboardReviews = Schemas['DashboardReviewsResponse_Output'];
 export type DashboardBirthday = Schemas['DashboardBirthday_Output'];
 export type DashboardBirthdays = Schemas['DashboardBirthdaysResponse_Output'];
 
-/** The viewer's today: its date and the instants it starts and ends in their time zone. */
+/** Today (UTC): its date and the instants it starts and ends. */
 export interface LocalDay {
   date: string;
   from: string;

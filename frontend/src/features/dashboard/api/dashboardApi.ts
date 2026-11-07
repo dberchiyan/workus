@@ -15,7 +15,7 @@ const paged = (range: DateRange, page: number) => ({ ...range, page, size: EVENT
 
 export const dashboardApi = {
   admin: async (): Promise<AdminDashboard> => (await apiClient.get<AdminDashboard>(BASE)).data,
-  /** Requests made in the viewer's day (first 100). */
+  /** Requests made today (UTC) (first 100). */
   requests: async (day: LocalDay): Promise<DashboardRequests> =>
     (
       await apiClient.get<DashboardRequests>(`${BASE}/requests`, {

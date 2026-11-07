@@ -4,8 +4,9 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import { type KeyboardEvent, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { todayUtcIso } from '@/shared/lib/utcDay';
 import { cn } from '@/shared/lib/cn';
-import { addDaysIso, addMonthsIso, isWeekendIso, monthGrid, todayIsoLocal } from '../calendar';
+import { addDaysIso, addMonthsIso, isWeekendIso, monthGrid } from '../calendar';
 
 export interface DateRange {
   start: string;
@@ -33,7 +34,7 @@ export function RangeCalendar({ value, onChange }: RangeCalendarProps) {
   // Keyboard moves focus with the active day (also across months); clicks do not.
   const shouldMoveFocus = useRef(false);
   const gridRef = useRef<HTMLTableElement>(null);
-  const today = todayIsoLocal();
+  const today = todayUtcIso();
 
   useEffect(() => {
     if (shouldMoveFocus.current) {

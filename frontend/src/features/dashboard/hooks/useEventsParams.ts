@@ -6,7 +6,7 @@ const MONTH = /^(19|20)\d{2}-(0[1-9]|1[0-2])$/;
 
 export interface EventsParams {
   tab: EventsTab;
-  /** `YYYY-MM` of each month card; absent → the viewer's current month. */
+  /** `YYYY-MM` of each month card; absent → the current month (UTC). */
   reviewsMonth: string;
   birthdaysMonth: string;
   /** Zero-based page of each card in the open tab. */

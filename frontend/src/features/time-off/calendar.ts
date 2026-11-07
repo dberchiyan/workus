@@ -22,12 +22,6 @@ export const isWeekendIso = (iso: string): boolean => {
   return day === 0 || day === 6;
 };
 
-/** Today in the viewer's time zone. */
-export const todayIsoLocal = (): string => {
-  const now = new Date();
-  return toIso(new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate())));
-};
-
 /** Sunday-first for English (as in the US), Monday-first otherwise. */
 const firstDayOfWeek = (locale: string): number => (locale.startsWith('en') ? 0 : 1);
 
