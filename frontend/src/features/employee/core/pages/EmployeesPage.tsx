@@ -32,7 +32,8 @@ export default function EmployeesPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      {/* Top-aligned: the taller button must not push the heading below other pages' headings. */}
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <Typography
           ref={headingRef}
           tabIndex={-1}
