@@ -1,13 +1,30 @@
 # Workus
 
-Workus is a web app for a company's day-to-day HR work. Admins keep the employee directory and
-profiles, run reviews with salary and feedback, see each person's salary history and terminate
-employment; every change is kept in an append-only activity history.
+Workus is a web app for a company's day-to-day HR work: the employee directory, reviews and
+salaries, time off, a company calendar and yearly insights.
 
-Employees request vacation, sick days and days off, see their balances per cycle and follow each
-request until their responsible people decide. Dashboards show each role what matters today:
-admins see pending requests, who is out, reviews due and people joining or leaving; employees see
-their own time off.
+## Features
+
+### For admins
+
+| Area | What they do |
+|---|---|
+| **Dashboard** | See pending requests, who is out today, reviews due and people joining or leaving; below, today's events (requests made, reviews, birthdays) and events by month |
+| **Employees** | Search the directory by name, category and status; add people, edit profiles (contacts, date of birth, responsible admins), terminate or cancel a termination; read each person's leave balances and activity history |
+| **Reviews** | Schedule and complete reviews with salary and rich-text feedback; follow each person's salary history and its change |
+| **Requests** | Review pending requests and the rest; approve, reject or cancel those they are responsible for; comment on any request |
+| **Calendar** | See the whole company's approved and pending time off for a month, by person and day |
+| **Insights** | Read a year at a glance for the company or one category — headcount by month, staff turnover with the people behind it, average tenure, absence leaders, average salary — each compared with the previous year |
+
+### For employees
+
+| Area | What they do |
+|---|---|
+| **Dashboard** | See their vacation, sick-day and day-off balances for the current cycles (counted from their start date) and their requests with history and comments |
+| **Time off** | Request vacation, sick days or days off on a range calendar, and cancel a pending or upcoming request |
+| **Calendar** | See when colleagues are away — approved and pending time off for the month |
+
+Every change to an employee, a review or a request is kept in an append-only activity history.
 
 ## Tech stack
 
