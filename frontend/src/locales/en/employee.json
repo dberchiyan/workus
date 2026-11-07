@@ -91,7 +91,7 @@
       "startingSalary": "Starts the salary history"
     },
     "responsible": {
-      "intro": "Choose who looks after this employee. You can skip this and assign people later.",
+      "intro": "Choose the administrators who look after this employee. You can skip this and assign people later.",
       "label": "Responsible people",
       "noOptions": "No one found",
       "loading": "Searching…",
@@ -166,7 +166,7 @@
       "none": "Nobody is assigned yet",
       "edit": "Edit responsible people",
       "dialogTitle": "Responsible people",
-      "intro": "Choose who looks after {{name}}. Leave it empty if nobody is assigned yet.",
+      "intro": "Choose the administrators who look after {{name}}. Leave it empty if nobody is assigned yet.",
       "save": "Save",
       "saving": "Saving…",
       "cancel": "Cancel"
@@ -291,7 +291,7 @@
       "comment": "Comment"
     },
     "consequence": {
-      "now": "{{name}} will be terminated right away and drop out of the active list and responsible choices.",
+      "now": "{{name}} will be terminated right away and drop out of the active list.",
       "future": "{{name}} stays active until {{date}}, then is terminated.",
       "reviews": "Reviews scheduled after the termination date will be canceled."
     },

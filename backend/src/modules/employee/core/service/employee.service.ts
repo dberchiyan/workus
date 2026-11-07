@@ -110,7 +110,6 @@ export class EmployeeService {
    */
   @Transactional()
   async create(command: CreateEmployeeCommand, actorId: string): Promise<EmployeeListItemRecord> {
-    const today = todayUtc();
     const email = command.email.toLowerCase();
     if (await this.userService.existsByEmail(email)) {
       throw new BusinessConflictException('errors.employee.emailTaken', { email }, 'email');
@@ -121,7 +120,7 @@ export class EmployeeService {
     const responsibleUserIds = [...new Set(command.responsibleUserIds)];
     if (
       responsibleUserIds.length > 0 &&
-      (await this.employeeRepository.countResponsibleCandidates(responsibleUserIds, today)) !==
+      (await this.employeeRepository.countResponsibleCandidates(responsibleUserIds)) !==
         responsibleUserIds.length
     ) {
       throw new BusinessRuleException(
@@ -187,7 +186,7 @@ export class EmployeeService {
   }
 
   /**
-   * Replaces who is responsible for the employee (0–10 admins or active employees, never the
+   * Replaces who is responsible for the employee (0–10 admins, never the
    * employee themselves). Records the change; a save without one changes nothing.
    */
   @Transactional()
@@ -516,13 +515,12 @@ export class EmployeeService {
     return this.employeeRepository.existsById(id);
   }
 
-  /** For other modules: are all these users admins or active employees (possible responsibles)? */
+  /** For other modules: are all these users admins (possible responsibles)? */
   async areResponsibleCandidates(userIds: string[]): Promise<boolean> {
     const unique = [...new Set(userIds)];
     return (
       unique.length === 0 ||
-      (await this.employeeRepository.countResponsibleCandidates(unique, todayUtc())) ===
-        unique.length
+      (await this.employeeRepository.countResponsibleCandidates(unique)) === unique.length
     );
   }
 
@@ -531,7 +529,7 @@ export class EmployeeService {
   }
 
   responsibleCandidates(search: string | undefined) {
-    return this.employeeRepository.findResponsibleCandidates(toSearchTerms(search), todayUtc());
+    return this.employeeRepository.findResponsibleCandidates(toSearchTerms(search));
   }
 }
 

@@ -49,10 +49,8 @@ export interface NewEmployee {
   createdBy: string;
 }
 
-/** Admins, plus users whose employee record is active today. */
-const responsibleCandidateWhere = (today: Date): Prisma.UserWhereInput => ({
-  OR: [{ role: 'ADMIN' }, { employee: activeOn(today) }],
-});
+/** Only admins can be responsible. */
+const responsibleCandidateWhere: Prisma.UserWhereInput = { role: 'ADMIN' };
 
 const averageRowsSchema = z.array(z.object({ days: z.number() }));
 
@@ -266,14 +264,11 @@ export class EmployeeRepository {
     });
   }
 
-  findResponsibleCandidates(
-    searchTerms: string[],
-    today: Date,
-  ): Promise<ResponsibleCandidateRecord[]> {
+  findResponsibleCandidates(searchTerms: string[]): Promise<ResponsibleCandidateRecord[]> {
     return this.txHost.tx.user.findMany({
       where: {
         AND: [
-          responsibleCandidateWhere(today),
+          responsibleCandidateWhere,
           ...searchTerms.map((term): Prisma.UserWhereInput => ({
             OR: [
               { firstName: { contains: term, mode: 'insensitive' } },
@@ -289,9 +284,9 @@ export class EmployeeRepository {
     });
   }
 
-  async countResponsibleCandidates(userIds: string[], today: Date): Promise<number> {
+  async countResponsibleCandidates(userIds: string[]): Promise<number> {
     return this.txHost.tx.user.count({
-      where: { AND: [{ id: { in: userIds } }, responsibleCandidateWhere(today)] },
+      where: { AND: [{ id: { in: userIds } }, responsibleCandidateWhere] },
     });
   }
 }

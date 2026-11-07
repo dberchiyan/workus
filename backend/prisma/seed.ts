@@ -33,8 +33,6 @@ const daysAgo = (days: number): Date => {
   );
 };
 
-const MANAGER_POSITIONS = new Set(['Project Manager', 'Delivery Manager']);
-
 const seed = async (): Promise<void> => {
   try {
     process.loadEnvFile('.env');
@@ -118,11 +116,9 @@ const seed = async (): Promise<void> => {
       skipDuplicates: true,
     });
 
-    // Managers answer to an admin; everyone else to a manager (rotating) and every third also to an admin.
+    // Only admins are responsible: one each (rotating), every third person both. Responsibles who
+    // are not admins (left from earlier seeds) are removed; past reviews and requests keep theirs.
     const admins = ADMINS.map((admin) => idOf(userIdByEmail, admin.email));
-    const managers = EMPLOYEES.filter((e) => MANAGER_POSITIONS.has(e.position)).map((e) =>
-      idOf(userIdByEmail, e.email),
-    );
     const employeeIdByUserId = new Map(
       (await prisma.employee.findMany({ select: { id: true, userId: true } })).map((e) => [
         e.userId,
@@ -132,23 +128,19 @@ const seed = async (): Promise<void> => {
     const unassigned = EMPLOYEES.filter((e) => e.isUnassigned).map((e) =>
       idOf(employeeIdByUserId, idOf(userIdByEmail, e.email)),
     );
-    await prisma.employeeResponsible.deleteMany({ where: { employeeId: { in: unassigned } } });
+    await prisma.employeeResponsible.deleteMany({
+      where: {
+        OR: [{ employeeId: { in: unassigned } }, { responsible: { role: { not: 'ADMIN' } } }],
+      },
+    });
     const assignments = EMPLOYEES.flatMap((employee, index) => {
       if (employee.isUnassigned) {
         return [];
       }
       const employeeId = idOf(employeeIdByUserId, idOf(userIdByEmail, employee.email));
-      const admin = admins[index % admins.length] ?? '';
-      if (MANAGER_POSITIONS.has(employee.position)) {
-        return [{ employeeId, responsibleUserId: admin }];
-      }
-      const manager = managers[index % managers.length] ?? admin;
-      return index % 3 === 0
-        ? [
-            { employeeId, responsibleUserId: manager },
-            { employeeId, responsibleUserId: admin },
-          ]
-        : [{ employeeId, responsibleUserId: manager }];
+      return (index % 3 === 0 ? admins : [admins[index % admins.length] ?? '']).map(
+        (responsibleUserId) => ({ employeeId, responsibleUserId }),
+      );
     });
     const responsibles = await prisma.employeeResponsible.createMany({
       data: assignments,
