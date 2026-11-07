@@ -1,0 +1,40 @@
+{
+  "bell": {
+    "label": "Notifications",
+    "labelUnread_one": "Notifications, {{count}} unread",
+    "labelUnread_other": "Notifications, {{count}} unread"
+  },
+  "panel": {
+    "title": "Notifications",
+    "markAllRead": "Mark all as read",
+    "markAllReadError": "Couldn’t mark them as read — try again",
+    "loading": "Loading notifications",
+    "error": "Couldn’t load notifications",
+    "retry": "Retry",
+    "empty": "You’re all caught up",
+    "emptyHint": "New requests, decisions and comments will show up here",
+    "loadMore": "Show more",
+    "loadingMore": "Loading…",
+    "unread": "Unread",
+    "justNow": "Just now"
+  },
+  "message": {
+    "TIME_OFF_REQUESTED": "{{actor}} requested {{typeWithArticle}}",
+    "TIME_OFF_APPROVED": "{{actor}} approved your {{type}}",
+    "TIME_OFF_REJECTED": "{{actor}} rejected your {{type}} request",
+    "TIME_OFF_CANCELED": "{{actor}} canceled your {{type}}",
+    "TIME_OFF_WITHDRAWN": "{{actor}} canceled their {{type}} request",
+    "TIME_OFF_ASSIGNED": "{{actor}} made you responsible for {{employee}}’s {{type}} request",
+    "TIME_OFF_COMMENTED": "{{actor}} commented on {{employee}}’s {{type}} request",
+    "TIME_OFF_COMMENTED_own": "{{actor}} commented on your {{type}} request",
+    "TIME_OFF_REMINDER_one": "{{employee}}’s {{type}} request has waited {{count}} day for your decision",
+    "TIME_OFF_REMINDER_other": "{{employee}}’s {{type}} request has waited {{count}} days for your decision"
+  },
+  "type": {
+    "VACATION": { "plain": "vacation", "withArticle": "vacation" },
+    "SICK_DAY": { "plain": "sick day", "withArticle": "a sick day" },
+    "DAY_OFF": { "plain": "day off", "withArticle": "a day off" },
+    "OTHER": { "plain": "time-off", "withArticle": "time off" }
+  },
+  "someone": "Someone"
+}

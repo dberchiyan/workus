@@ -6,8 +6,9 @@ import Card from '@mui/material/Card';
 import Skeleton from '@mui/material/Skeleton';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useSearchParams } from 'react-router';
 import { useOwnBalances, useOwnRequests } from '../hooks/useTimeOffQueries';
 import type { TimeOffRequest } from '../types';
 import { CancelRequestDialog } from './CancelRequestDialog';
@@ -24,6 +25,14 @@ export function MyTimeOff() {
   const balances = useOwnBalances();
   const requests = useOwnRequests();
   const [expandedId, setExpandedId] = useState<string | null>(null);
+  // `?request=<id>` (a notification's link) opens that request and brings the list into view.
+  const [searchParams] = useSearchParams();
+  const linkedId = searchParams.get('request');
+  const [openedLink, setOpenedLink] = useState<string | null>(null);
+  if (linkedId && linkedId !== openedLink) {
+    setOpenedLink(linkedId);
+    setExpandedId(linkedId);
+  }
   const [isCreating, setIsCreating] = useState(false);
   const [creation, setCreation] = useState(0);
   const [canceling, setCanceling] = useState<{ request: TimeOffRequest; open: boolean } | null>(
@@ -38,6 +47,12 @@ export function MyTimeOff() {
   const [notice, setNotice] = useState<Notice | null>(null);
   const createRef = useRef<HTMLButtonElement>(null);
   const requestsHeadingRef = useRef<HTMLHeadingElement>(null);
+  useEffect(() => {
+    if (linkedId) {
+      requestsHeadingRef.current?.scrollIntoView({ block: 'start' });
+      requestsHeadingRef.current?.focus({ preventScroll: true });
+    }
+  }, [linkedId]);
 
   const items = requests.data?.pages.flatMap((page) => page.content) ?? [];
   const total = requests.data?.pages[0]?.totalElements ?? 0;

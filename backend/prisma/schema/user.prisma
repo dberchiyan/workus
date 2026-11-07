@@ -19,6 +19,8 @@ model User {
   reviewResponsibleFor  EmployeeReviewResponsible[] @relation("ReviewResponsibleUser")
   employee              Employee?                   @relation("EmployeeUser")
   responsibleFor        EmployeeResponsible[]       @relation("EmployeeResponsibleUser")
+  notifications         Notification[]              @relation("NotificationRecipient")
+  notificationsCaused   Notification[]              @relation("NotificationActor")
 
   @@unique([email], map: "uq_users_email")
   @@map("users")

@@ -9,9 +9,11 @@ import {
 import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
 import { AuditField, auditValue, changeOf } from '../../audit/service/audit-change';
 import { AuditService } from '../../audit/service/audit.service';
+import { NotificationType } from '../../notification/service/notification-type';
 import type { ManagedTimeOffRequestRecord } from '../repository/record/time-off-request.record';
 import { TimeOffRequestRepository } from '../repository/time-off-request.repository';
 import { timeOffLabel } from './time-off-label';
+import { TimeOffNotifier } from './time-off-notifier';
 import { EmployeeService } from '../../employee/core/service/employee.service';
 import type { TimeOffRequestCriteria } from './time-off-request.criteria';
 import type { ManagedRequestSortField } from './time-off-sort';
@@ -24,6 +26,7 @@ const DECISIONS = {
     from: [TimeOffStatus.PENDING],
     to: TimeOffStatus.APPROVED,
     action: AuditAction.TIME_OFF_REQUEST_APPROVED,
+    notice: NotificationType.TIME_OFF_APPROVED,
     decided: true,
     refusal: 'errors.timeOff.notPending',
   },
@@ -31,6 +34,7 @@ const DECISIONS = {
     from: [TimeOffStatus.PENDING],
     to: TimeOffStatus.REJECTED,
     action: AuditAction.TIME_OFF_REQUEST_REJECTED,
+    notice: NotificationType.TIME_OFF_REJECTED,
     decided: true,
     refusal: 'errors.timeOff.notPending',
   },
@@ -39,6 +43,7 @@ const DECISIONS = {
     from: [TimeOffStatus.PENDING, TimeOffStatus.APPROVED],
     to: TimeOffStatus.CANCELED,
     action: AuditAction.TIME_OFF_REQUEST_CANCELED,
+    notice: NotificationType.TIME_OFF_CANCELED,
     decided: false,
     refusal: 'errors.timeOff.notCancelable',
   },
@@ -67,6 +72,7 @@ export class TimeOffDecisionService {
     private readonly requestRepository: TimeOffRequestRepository,
     private readonly auditService: AuditService,
     private readonly employeeService: EmployeeService,
+    private readonly notifier: TimeOffNotifier,
   ) {}
 
   async findPage(
@@ -139,6 +145,7 @@ export class TimeOffDecisionService {
           : []),
       ],
     });
+    await this.notifier.notify(requestId, rule.notice, actorId, 'employee');
     return this.viewOf(await this.require(requestId), actorId);
   }
 
@@ -178,6 +185,13 @@ export class TimeOffDecisionService {
       target: { type: AuditTargetType.TIME_OFF_REQUEST, id: requestId, label: timeOffLabel(after) },
       changes: changeOf(AuditField.RESPONSIBLES, peopleOf(before), peopleOf(after)),
     });
+    // Only the people newly made responsible hear of it.
+    await this.notifier.notify(
+      requestId,
+      NotificationType.TIME_OFF_ASSIGNED,
+      actorId,
+      next.filter((id) => !current.includes(id)),
+    );
     return this.viewOf(after, actorId);
   }
 

@@ -1,0 +1,26 @@
+/// In-app notifications (the bell): one person's notice of one event. Only `read_at` ever
+/// changes, so the table has no updated_* / version columns. Not under a retention duty —
+/// deleted after 90 days.
+model Notification {
+  id              String    @id(map: "pk_notifications") @default(dbgenerated("uuidv7()")) @db.Uuid
+  recipientUserId String    @map("recipient_user_id") @db.Uuid
+  recipient       User      @relation("NotificationRecipient", fields: [recipientUserId], references: [id], onDelete: Cascade, map: "fk_notifications_recipient_user_id")
+  type            String    @db.VarChar(64) // TIME_OFF_REQUESTED | … — CHECK in migration
+  /// Who caused it; null = the system (reminders).
+  actorUserId     String?   @map("actor_user_id") @db.Uuid
+  actor           User?     @relation("NotificationActor", fields: [actorUserId], references: [id], onDelete: SetNull, map: "fk_notifications_actor_user_id")
+  subjectType     String    @map("subject_type") @db.VarChar(32) // time_off_request — CHECK in migration
+  /// What it is about; no FK (the subject's module owns it).
+  subjectId       String    @map("subject_id") @db.Uuid
+  /// What the text needs, as it was then (e.g. request type, dates, employee) — never secrets.
+  params          Json      @db.JsonB
+  createdAt       DateTime  @default(now()) @map("created_at") @db.Timestamptz(3)
+  readAt          DateTime? @map("read_at") @db.Timestamptz(3)
+
+  // Unread count: partial index on (recipient_user_id) WHERE read_at IS NULL, in the migration.
+  @@index([recipientUserId, createdAt], map: "idx_notifications_recipient_user_id_created_at")
+  @@index([actorUserId], map: "idx_notifications_actor_user_id")
+  @@index([subjectId, type], map: "idx_notifications_subject_id_type")
+  @@index([createdAt], map: "idx_notifications_created_at")
+  @@map("notifications")
+}

@@ -17,6 +17,14 @@ export class PermissionService {
     return count > 0;
   }
 
+  /** The notification is addressed to the user. */
+  async isOwnNotification(userId: string, notificationId: string): Promise<boolean> {
+    const count = await this.prisma.notification.count({
+      where: { id: notificationId, recipientUserId: userId },
+    });
+    return count > 0;
+  }
+
   /** The session is the user's own. */
   async isOwnSession(userId: string, sessionId: string): Promise<boolean> {
     const count = await this.prisma.session.count({ where: { id: sessionId, userId } });

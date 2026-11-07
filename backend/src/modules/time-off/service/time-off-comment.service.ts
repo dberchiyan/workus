@@ -2,7 +2,9 @@ import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
 import { ResourceNotFoundException } from '../../../common/exception/api.exception';
 import type { TimeOffCommentRecord } from '../repository/record/time-off-request.record';
+import { NotificationType } from '../../notification/service/notification-type';
 import { TimeOffRequestRepository } from '../repository/time-off-request.repository';
+import { TimeOffNotifier } from './time-off-notifier';
 
 /**
  * Comments on a request: any admin and the employee whose request it is write them; only the
@@ -11,7 +13,10 @@ import { TimeOffRequestRepository } from '../repository/time-off-request.reposit
  */
 @Injectable()
 export class TimeOffCommentService {
-  constructor(private readonly requestRepository: TimeOffRequestRepository) {}
+  constructor(
+    private readonly requestRepository: TimeOffRequestRepository,
+    private readonly notifier: TimeOffNotifier,
+  ) {}
 
   @Transactional()
   async add(requestId: string, body: string, authorId: string): Promise<TimeOffCommentRecord> {
@@ -20,6 +25,13 @@ export class TimeOffCommentService {
     }
     const comment = await this.requestRepository.addComment(requestId, authorId, body);
     await this.requestRepository.touch(requestId, authorId);
+    // The employee and the responsible people hear of it; edits and deletions are quiet.
+    await this.notifier.notify(
+      requestId,
+      NotificationType.TIME_OFF_COMMENTED,
+      authorId,
+      'everyone',
+    );
     return comment;
   }
 

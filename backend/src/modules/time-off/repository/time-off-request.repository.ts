@@ -21,6 +21,8 @@ import {
   heldDaysSelect,
   type ManagedTimeOffRequestRecord,
   managedTimeOffRequestSelect,
+  type RequestNoticeRecord,
+  requestNoticeSelect,
   type RequestStateRecord,
   requestStateSelect,
   type TimeOffCommentRecord,
@@ -125,6 +127,20 @@ export class TimeOffRequestRepository {
     return this.txHost.tx.timeOffRequest.findUnique({
       where: { id },
       select: managedTimeOffRequestSelect,
+    });
+  }
+
+  findNoticeById(id: string): Promise<RequestNoticeRecord | null> {
+    return this.txHost.tx.timeOffRequest.findUnique({ where: { id }, select: requestNoticeSelect });
+  }
+
+  /** Pending requests made before the instant, oldest first (reminders). */
+  findPendingCreatedBefore(before: Date, limit: number): Promise<RequestNoticeRecord[]> {
+    return this.txHost.tx.timeOffRequest.findMany({
+      where: { status: TimeOffStatus.PENDING, createdAt: { lt: before } },
+      select: requestNoticeSelect,
+      orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+      take: limit,
     });
   }
 

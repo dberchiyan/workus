@@ -38,6 +38,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/notifications": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** A page of the caller's notifications, newest first */
+        get: operations["NotificationController_findPage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/unread-count": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** How many of the caller's notifications are unread (the bell polls it) */
+        get: operations["NotificationController_unreadCount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mark all of the caller's notifications read; answers the unread count */
+        put: operations["NotificationController_markAllRead"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/{notificationId}/read": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Mark one of own notifications read (repeating changes nothing) */
+        put: operations["NotificationController_markRead"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/login": {
         parameters: {
             query?: never;
@@ -751,6 +819,85 @@ export interface components {
                 field: string;
                 message: string;
             }[];
+        };
+        Notification_Output: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            type: "TIME_OFF_REQUESTED" | "TIME_OFF_APPROVED" | "TIME_OFF_REJECTED" | "TIME_OFF_CANCELED" | "TIME_OFF_WITHDRAWN" | "TIME_OFF_ASSIGNED" | "TIME_OFF_COMMENTED" | "TIME_OFF_REMINDER";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            readAt: string | null;
+            actor: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+            } | null;
+            subject: {
+                /** @enum {string} */
+                type: "time_off_request";
+                /** Format: uuid */
+                id: string;
+            };
+            request: {
+                type: string;
+                /** Format: date */
+                startDate: string;
+                /** Format: date */
+                endDate: string;
+                employee: {
+                    /** Format: uuid */
+                    userId: string;
+                    firstName: string;
+                    lastName: string;
+                };
+                waitingDays: number | null;
+            };
+        };
+        NotificationPageResponse_Output: {
+            content: components["schemas"]["Notification_Output"][];
+            totalElements: number;
+        };
+        UnreadNotificationsResponse_Output: {
+            count: number;
+        };
+        NotificationResponse_Output: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            type: "TIME_OFF_REQUESTED" | "TIME_OFF_APPROVED" | "TIME_OFF_REJECTED" | "TIME_OFF_CANCELED" | "TIME_OFF_WITHDRAWN" | "TIME_OFF_ASSIGNED" | "TIME_OFF_COMMENTED" | "TIME_OFF_REMINDER";
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            readAt: string | null;
+            actor: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+            } | null;
+            subject: {
+                /** @enum {string} */
+                type: "time_off_request";
+                /** Format: uuid */
+                id: string;
+            };
+            request: {
+                type: string;
+                /** Format: date */
+                startDate: string;
+                /** Format: date */
+                endDate: string;
+                employee: {
+                    /** Format: uuid */
+                    userId: string;
+                    firstName: string;
+                    lastName: string;
+                };
+                waitingDays: number | null;
+            };
         };
         LoginRequest: {
             /** Format: email */
@@ -2074,6 +2221,159 @@ export interface operations {
             };
             /** @description UPSTREAM_UNAVAILABLE */
             503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    NotificationController_findPage: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+                /** @description One of: createdAt,asc|desc */
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationPageResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    NotificationController_unreadCount: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadNotificationsResponse_Output"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    NotificationController_markAllRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnreadNotificationsResponse_Output"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    NotificationController_markRead: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["NotificationResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

@@ -6,6 +6,7 @@ import enCommon from '@/locales/en/common.json';
 import enEmployee from '@/locales/en/employee.json';
 import enErrors from '@/locales/en/errors.json';
 import enInsights from '@/locales/en/insights.json';
+import enNotification from '@/locales/en/notification.json';
 import enDashboard from '@/locales/en/dashboard.json';
 import enReview from '@/locales/en/review.json';
 import enSettings from '@/locales/en/settings.json';
@@ -25,6 +26,7 @@ export const resources = {
     dashboard: enDashboard,
     employee: enEmployee,
     insights: enInsights,
+    notification: enNotification,
     review: enReview,
     settings: enSettings,
     shell: enShell,

@@ -1,6 +1,7 @@
 import MenuOutlined from '@mui/icons-material/MenuOutlined';
 import IconButton from '@mui/material/IconButton';
 import { useTranslation } from 'react-i18next';
+import { NotificationBell } from '@/features/notification';
 import { ThemeModeToggle } from '@/shared/components/ThemeModeToggle';
 import { UserMenu } from './UserMenu';
 
@@ -30,6 +31,7 @@ export function TopBar({ onOpenMenu, menuButtonId, isMenuOpen }: TopBarProps) {
           </IconButton>
         )}
         <div className="ml-auto flex items-center gap-1 sm:gap-2">
+          <NotificationBell />
           <ThemeModeToggle />
           <UserMenu />
         </div>

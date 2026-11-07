@@ -11,12 +11,14 @@ import { AuditField, auditValue, changeOf } from '../../audit/service/audit-chan
 import { AuditService } from '../../audit/service/audit.service';
 import type { EmployeeForTimeOff } from '../../employee/core/service/employee.types';
 import { EmployeeService } from '../../employee/core/service/employee.service';
+import { NotificationType } from '../../notification/service/notification-type';
 import type { TimeOffRequestRecord } from '../repository/record/time-off-request.record';
 import { TimeOffRequestRepository } from '../repository/time-off-request.repository';
 import { HolidayService } from './holiday.service';
 import { cycleOf, LEAVE_POLICY, plusDays, todayUtc, workingDaysBetween } from './leave-policy';
 import type { CalendarSortField, TimeOffRequestSortField } from './time-off-sort';
 import { timeOffLabel } from './time-off-label';
+import { TimeOffNotifier } from './time-off-notifier';
 import {
   isTimeOffStatus,
   isTimeOffType,
@@ -52,6 +54,7 @@ export class TimeOffService {
     private readonly employeeService: EmployeeService,
     private readonly auditService: AuditService,
     private readonly holidayService: HolidayService,
+    private readonly notifier: TimeOffNotifier,
   ) {}
 
   /**
@@ -263,6 +266,12 @@ export class TimeOffService {
         ...(request.note ? changeOf(AuditField.NOTE, null, auditValue.text(request.note)) : []),
       ],
     });
+    await this.notifier.notify(
+      request.id,
+      NotificationType.TIME_OFF_REQUESTED,
+      userId,
+      'responsibles',
+    );
     const [view] = await this.withHistory([request]);
     if (!view) {
       throw new Error('Created request lost its view');
@@ -309,6 +318,12 @@ export class TimeOffService {
         auditValue.timeOffStatus(TimeOffStatus.CANCELED),
       ),
     });
+    await this.notifier.notify(
+      requestId,
+      NotificationType.TIME_OFF_WITHDRAWN,
+      userId,
+      'responsibles',
+    );
     const after = await this.requestRepository.findById(requestId);
     if (!after) {
       throw new Error('Canceled request not found in the same transaction');

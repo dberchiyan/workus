@@ -141,3 +141,17 @@ export const absenceDaysSelect = {
 export type AbsenceDaysRecord = Prisma.TimeOffRequestGetPayload<{
   select: typeof absenceDaysSelect;
 }>;
+
+/** What a notification about a request needs: its summary, whose it is, who decides it. */
+export const requestNoticeSelect = {
+  id: true,
+  type: true,
+  startDate: true,
+  endDate: true,
+  createdAt: true,
+  employee: { select: { user: { select: { id: true, firstName: true, lastName: true } } } },
+  responsibles: { select: { responsibleUserId: true }, take: MAX_REQUEST_RESPONSIBLES },
+} satisfies Prisma.TimeOffRequestSelect;
+export type RequestNoticeRecord = Prisma.TimeOffRequestGetPayload<{
+  select: typeof requestNoticeSelect;
+}>;

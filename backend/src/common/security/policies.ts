@@ -5,6 +5,10 @@ export const can = {
   /** Caller's own account only: /auth/me, /auth/logout. */
   authenticated: policy([], () => true),
   admin: policy([], (principal) => principal.hasAuthority('ADMIN')),
+  /** One's own notifications only (the bell). */
+  readOwnNotification: policy(['notificationId'], (principal, args, permissions) =>
+    permissions.isOwnNotification(principal.userId, args.notificationId ?? ''),
+  ),
   /** One's own sessions only (Settings → Sessions). */
   endOwnSession: policy(['sessionId'], (principal, args, permissions) =>
     permissions.isOwnSession(principal.userId, args.sessionId ?? ''),

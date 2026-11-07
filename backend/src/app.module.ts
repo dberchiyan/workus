@@ -27,6 +27,7 @@ import { TimeOffModule } from './modules/time-off/time-off.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
 import { InsightsModule } from './modules/insights/insights.module';
 import { UserModule } from './modules/user/user.module';
+import { NotificationModule } from './modules/notification/notification.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { UserModule } from './modules/user/user.module';
     SecurityModule,
     ScheduleModule.forRoot(),
     UserModule,
+    NotificationModule,
     AuthModule,
     EmployeeModule,
     ReviewModule,

@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { AuditModule } from '../audit/audit.module';
+import { NotificationModule } from '../notification/notification.module';
 import { EmployeeModule } from '../employee/core/employee.module';
 import { EmployeeTimeOffController } from './controller/employee-time-off.controller';
 import { TimeOffCalendarController } from './controller/time-off-calendar.controller';
@@ -11,10 +12,11 @@ import { HolidayService } from './service/holiday.service';
 import { TimeOffRequestRepository } from './repository/time-off-request.repository';
 import { TimeOffCommentService } from './service/time-off-comment.service';
 import { TimeOffDecisionService } from './service/time-off-decision.service';
+import { TimeOffNotifier } from './service/time-off-notifier';
 import { TimeOffService } from './service/time-off.service';
 
 @Module({
-  imports: [EmployeeModule, AuditModule],
+  imports: [EmployeeModule, AuditModule, NotificationModule],
   controllers: [
     TimeOffController,
     TimeOffCalendarController,
@@ -27,6 +29,7 @@ import { TimeOffService } from './service/time-off.service';
     TimeOffService,
     TimeOffDecisionService,
     TimeOffCommentService,
+    TimeOffNotifier,
     TimeOffRequestRepository,
     HolidayService,
     HolidayRepository,
