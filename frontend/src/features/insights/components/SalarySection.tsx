@@ -3,6 +3,7 @@ import { m, useReducedMotion } from 'motion/react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { formatMoney, type Money, toUnits } from '@/shared/lib/money';
+import { signed } from '../chart';
 import { useSalary } from '../hooks/useInsights';
 import type { InsightsFilter } from '../types';
 import { ChartTable } from './ChartTable';
@@ -59,7 +60,7 @@ export function SalarySection({ filter }: { filter: InsightsFilter }) {
               tenths !== null && (
                 <DeltaLine
                   direction={tenths}
-                  change={`${tenths > 0 ? '+' : '−'}${new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 1 }).format(Math.abs(tenths) / 10)} %`}
+                  change={t('common.changePercent', { value: signed(tenths / 10, i18n.language) })}
                   previousYear={filter.year - 1}
                   better="up"
                 />

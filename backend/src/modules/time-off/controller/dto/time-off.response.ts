@@ -38,6 +38,9 @@ export const TimeOffCommentSchema = z
     id: z.uuid(),
     body: z.string(),
     createdAt: z.iso.datetime(),
+    /** Null until its author edits it. */
+    editedAt: z.iso.datetime().nullable(),
+    /** Only the author edits or deletes it. */
     author: PersonSchema,
   })
   .meta({ id: 'TimeOffComment' });
@@ -63,13 +66,14 @@ const requestShape = {
   history: z.array(
     z.object({
       id: z.uuid(),
-      action: z.enum(['CREATED', 'APPROVED', 'REJECTED', 'CANCELED']),
+      /** RESPONSIBLES_CHANGED — an admin changed who decides it. */
+      action: z.enum(['CREATED', 'APPROVED', 'REJECTED', 'CANCELED', 'RESPONSIBLES_CHANGED']),
       occurredAt: z.iso.datetime(),
       /** Null = the system. */
       actor: PersonSchema.nullable(),
     }),
   ),
-  /** Admins' comments, oldest first — the latest 50 when there are more (see commentCount). */
+  /** Comments (admins and the employee), oldest first — the latest 50 when there are more (see commentCount). */
   comments: z.array(TimeOffCommentSchema),
   commentCount: z.number().int(),
 };

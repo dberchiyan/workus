@@ -93,6 +93,12 @@ export default function RequestsPage() {
         />
       )}
       <ConfirmDecisionDialog
+        // A new request or decision starts with an empty reason.
+        key={
+          decisions.confirming
+            ? `${decisions.confirming.request.id}-${decisions.confirming.decision}`
+            : 'none'
+        }
         target={decisions.confirming}
         open={decisions.confirming?.open ?? false}
         busy={decisions.isPending}

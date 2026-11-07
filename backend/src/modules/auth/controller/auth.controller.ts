@@ -37,6 +37,7 @@ export class AuthController {
     'VALIDATION_FAILED',
     'MALFORMED_REQUEST',
     'INVALID_CREDENTIALS',
+    'ACCESS_ENDED',
     'FORBIDDEN',
     'RATE_LIMIT_EXCEEDED',
   )

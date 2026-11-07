@@ -10,6 +10,7 @@ import {
   SessionLookup,
 } from '../../../common/security/session-authenticator';
 import { generateToken, hashToken } from '../../../common/security/token-hash';
+import { EmployeeService } from '../../employee/core/service/employee.service';
 import { SessionRepository } from '../repository/session.repository';
 
 const MINUTE_MS = 60_000;
@@ -31,10 +32,14 @@ export interface StartedSession {
   absoluteExpiresAt: Date;
 }
 
+/** Days back the hourly job looks for terminations that took effect. */
+const LEAVER_WINDOW_DAYS = 7;
+
 @Injectable()
 export class SessionService extends SessionAuthenticator {
   constructor(
     private readonly sessionRepository: SessionRepository,
+    private readonly employeeService: EmployeeService,
     private readonly config: AppConfigService,
     @InjectPinoLogger(SessionService.name) private readonly logger: PinoLogger,
   ) {
@@ -97,6 +102,25 @@ export class SessionService extends SessionAuthenticator {
 
   end(sessionId: string): Promise<void> {
     return this.sessionRepository.deleteById(sessionId);
+  }
+
+  /** Signs these users out everywhere (e.g. their employment has ended). */
+  endAllForUsers(userIds: string[]): Promise<number> {
+    return this.sessionRepository.deleteByUserIds(userIds);
+  }
+
+  /**
+   * A termination dated ahead takes effect on its day: sessions of people whose employment ended
+   * in the last few days are ended (a missed run is caught up; sign-in refuses them anyway).
+   */
+  @Cron(CronExpression.EVERY_HOUR)
+  async endForLeavers(): Promise<void> {
+    const count = await this.endAllForUsers(
+      await this.employeeService.usersWhoLeftWithin(LEAVER_WINDOW_DAYS),
+    );
+    if (count > 0) {
+      this.logger.info({ count }, 'Sessions of people who left ended');
+    }
   }
 
   @Cron(CronExpression.EVERY_HOUR)

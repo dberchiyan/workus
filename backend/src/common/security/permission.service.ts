@@ -17,7 +17,19 @@ export class PermissionService {
     return count > 0;
   }
 
-  /** The user is one of the request's responsible people (as they were when it was made). */
+  /** The user wrote this comment, and it is on this request (the whole chain). */
+  async isTimeOffCommentAuthor(
+    userId: string,
+    requestId: string,
+    commentId: string,
+  ): Promise<boolean> {
+    const count = await this.prisma.timeOffRequestComment.count({
+      where: { id: commentId, requestId, authorId: userId },
+    });
+    return count > 0;
+  }
+
+  /** The user is one of the request's responsible people (set when made; admins may change them). */
   async isTimeOffRequestResponsible(userId: string, requestId: string): Promise<boolean> {
     const count = await this.prisma.timeOffRequestResponsible.count({
       where: { requestId, responsibleUserId: userId },

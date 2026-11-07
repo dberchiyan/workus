@@ -14,6 +14,7 @@ export const timeOffKeys = {
   managedLists: () => [...timeOffKeys.managed(), 'list'] as const,
   managedList: (query: ManagedRequestsQuery) => [...timeOffKeys.managedLists(), query] as const,
   managedRequest: (requestId: string) => [...timeOffKeys.managed(), 'request', requestId] as const,
+  candidates: (search: string) => [...timeOffKeys.all, 'candidates', search] as const,
   /** The company calendar (everyone's). */
   calendar: (query: CalendarQuery) => [...timeOffKeys.all, 'calendar', query] as const,
 };

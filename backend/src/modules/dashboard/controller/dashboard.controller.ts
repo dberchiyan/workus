@@ -45,7 +45,7 @@ export class DashboardController {
   @Get('admin/requests')
   @Authorize(can.admin)
   @ApiOperation({
-    summary: "Time-off requests made in the viewer's day (any status, newest first, first 100)",
+    summary: 'Time-off requests made in a day (today, UTC) (any status, newest first, first 100)',
   })
   @ZodResponse({ status: HttpStatus.OK, type: DashboardRequestsResponse })
   @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')

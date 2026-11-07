@@ -1,33 +1,18 @@
 import { apiClient } from '@/shared/api/client';
-import type {
-  Absence,
-  CategoryCounts,
-  Headcount,
-  InsightsFilter,
-  Salary,
-  Tenure,
-  Turnover,
-} from '../types';
-
-const BASE = '/api/v1/insights';
-
-const get = async <T>(path: string, filter: InsightsFilter): Promise<T> =>
-  (
-    await apiClient.get<T>(`${BASE}/${path}`, {
-      params: {
-        year: filter.year,
-        ...(filter.categoryId ? { categoryId: filter.categoryId } : {}),
-      },
-    })
-  ).data;
+import type { CategoryCounts, Insights, InsightsFilter } from '../types';
 
 /** Company figures for one year (admin). */
 export const insightsApi = {
-  headcount: (filter: InsightsFilter) => get<Headcount>('headcount', filter),
-  tenure: (filter: InsightsFilter) => get<Tenure>('tenure', filter),
-  turnover: (filter: InsightsFilter) => get<Turnover>('turnover', filter),
-  absence: (filter: InsightsFilter) => get<Absence>('absence', filter),
-  salary: (filter: InsightsFilter) => get<Salary>('salary', filter),
+  /** Every figure in one request (the server reads the roster once). */
+  get: async (filter: InsightsFilter): Promise<Insights> =>
+    (
+      await apiClient.get<Insights>('/api/v1/insights', {
+        params: {
+          year: filter.year,
+          ...(filter.categoryId ? { categoryId: filter.categoryId } : {}),
+        },
+      })
+    ).data,
   /** Position categories for the filter (with today's active counts). */
   categories: async (): Promise<CategoryCounts> =>
     (

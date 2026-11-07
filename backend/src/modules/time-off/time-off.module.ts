@@ -6,6 +6,7 @@ import { TimeOffCalendarController } from './controller/time-off-calendar.contro
 import { ManagedTimeOffController } from './controller/managed-time-off.controller';
 import { TimeOffController } from './controller/time-off.controller';
 import { TimeOffRequestRepository } from './repository/time-off-request.repository';
+import { TimeOffCommentService } from './service/time-off-comment.service';
 import { TimeOffDecisionService } from './service/time-off-decision.service';
 import { TimeOffService } from './service/time-off.service';
 
@@ -18,6 +19,11 @@ import { TimeOffService } from './service/time-off.service';
     ManagedTimeOffController,
   ],
   exports: [TimeOffService],
-  providers: [TimeOffService, TimeOffDecisionService, TimeOffRequestRepository],
+  providers: [
+    TimeOffService,
+    TimeOffDecisionService,
+    TimeOffCommentService,
+    TimeOffRequestRepository,
+  ],
 })
 export class TimeOffModule {}

@@ -45,3 +45,9 @@ export const yearsAndMonths = (months: number): { years: number; months: number 
   years: Math.floor(months / 12),
   months: months % 12,
 });
+
+/** A change with its sign from the locale ("+3", "−1.5"; zero unsigned), up to one decimal. */
+export const signed = (value: number, locale: string): string =>
+  new Intl.NumberFormat(locale, { signDisplay: 'exceptZero', maximumFractionDigits: 1 }).format(
+    value,
+  );

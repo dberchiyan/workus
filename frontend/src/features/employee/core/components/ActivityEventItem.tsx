@@ -65,6 +65,11 @@ const ACTION_STYLE = {
     icon: UndoOutlined,
     tone: 'bg-badge-neutral-background text-badge-neutral-text',
   },
+  'time_off_request.updated': {
+    headline: 'profile.activity.headline.timeOffUpdated',
+    icon: EditOutlined,
+    tone: 'bg-badge-active-background text-badge-active-text',
+  },
   'review.created': {
     headline: 'profile.activity.headline.reviewCreated',
     icon: AddOutlined,

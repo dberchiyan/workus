@@ -49,6 +49,7 @@ const HISTORY_ACTIONS = {
   [AuditAction.TIME_OFF_REQUEST_APPROVED]: 'APPROVED',
   [AuditAction.TIME_OFF_REQUEST_REJECTED]: 'REJECTED',
   [AuditAction.TIME_OFF_REQUEST_CANCELED]: 'CANCELED',
+  [AuditAction.TIME_OFF_REQUEST_UPDATED]: 'RESPONSIBLES_CHANGED',
 } as const;
 const isHistoryAction = (action: string): action is keyof typeof HISTORY_ACTIONS =>
   action in HISTORY_ACTIONS;
@@ -85,6 +86,7 @@ export const toTimeOffCommentResponse = (
   id: comment.id,
   body: comment.body,
   createdAt: comment.createdAt.toISOString(),
+  editedAt: comment.editedAt?.toISOString() ?? null,
   author: person(comment.author),
 });
 

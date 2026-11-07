@@ -297,6 +297,17 @@ export class EmployeeRepository {
     return this.txHost.tx.employee.findUnique({ where: { userId }, select: employeeTimeOffSelect });
   }
 
+  /** Users whose employment ended (terminated_on) in [from, to] (bounded). */
+  async findUserIdsTerminatedBetween(from: Date, to: Date, limit: number): Promise<string[]> {
+    const rows = await this.txHost.tx.employee.findMany({
+      where: { terminatedOn: { gte: from, lte: to } },
+      select: { userId: true },
+      orderBy: { id: 'asc' },
+      take: limit,
+    });
+    return rows.map((row) => row.userId);
+  }
+
   findTimeOffById(id: string): Promise<EmployeeTimeOffRecord | null> {
     return this.txHost.tx.employee.findUnique({ where: { id }, select: employeeTimeOffSelect });
   }

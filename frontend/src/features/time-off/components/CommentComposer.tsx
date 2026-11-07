@@ -5,13 +5,20 @@ import TextField from '@mui/material/TextField';
 import { useTranslation } from 'react-i18next';
 import { useCommentForm } from '../hooks/useCommentForm';
 import { RESERVED_LINE, useFieldMessage } from '../hooks/useFieldMessage';
+import type { CommentScope } from '../hooks/useManagedRequests';
 import { TIME_OFF_LIMITS } from '../schemas';
 
+export interface CommentComposerProps {
+  requestId: string;
+  /** The admin's Requests dialog, or the employee's own request. */
+  scope: CommentScope;
+}
+
 /** Write a comment; Ctrl/⌘ + Enter sends it. Every admin and the employee see it. */
-export function CommentComposer({ requestId }: { requestId: string }) {
+export function CommentComposer({ requestId, scope }: CommentComposerProps) {
   const { t } = useTranslation(['timeOff', 'errors']);
   const message = useFieldMessage();
-  const { form, submit, errorCode, isSubmitting } = useCommentForm(requestId);
+  const { form, submit, errorCode, isSubmitting } = useCommentForm(requestId, scope);
   const { errors } = form.formState;
 
   return (

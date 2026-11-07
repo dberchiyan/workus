@@ -3,6 +3,7 @@ import { domAnimation, LazyMotion } from 'motion/react';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
+import { nowUtc } from '@/shared/lib/utcDay';
 import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
 import { seriesClass } from '../chart';
 import { AbsenceSection } from '../components/AbsenceSection';
@@ -19,11 +20,8 @@ export default function InsightsPage() {
   const { t } = useTranslation('insights');
   useDocumentTitle(t('pageTitle'));
   const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
-  // The viewer's now, read once per visit (no clock in render).
-  const [now] = useState(() => {
-    const date = new Date();
-    return { year: date.getFullYear(), month: date.getMonth() + 1 };
-  });
+  // This year and month (UTC, as the figures), read once per visit (no clock in render).
+  const [now] = useState(nowUtc);
   const { filter, update } = useInsightsParams(now.year);
   const filterKey = `${String(filter.year)}-${filter.categoryId ?? 'all'}`;
   const categoryData = useInsightCategories().data;

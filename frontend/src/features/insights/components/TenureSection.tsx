@@ -3,7 +3,7 @@ import Typography from '@mui/material/Typography';
 import { m, useReducedMotion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/cn';
-import { yearsAndMonths } from '../chart';
+import { yearsAndMonths, signed } from '../chart';
 import { useTenure } from '../hooks/useInsights';
 import type { InsightsFilter } from '../types';
 import { DeltaLine } from './DeltaLine';
@@ -50,7 +50,10 @@ export function TenureSection({ filter, colorFor }: TenureSectionProps) {
               data.previousAverageMonths !== null && (
                 <DeltaLine
                   direction={data.averageMonths - data.previousAverageMonths}
-                  change={`${data.averageMonths - data.previousAverageMonths > 0 ? '+' : '−'}${t('common.months', { count: Math.abs(data.averageMonths - data.previousAverageMonths) })}`}
+                  change={t('common.changeMonths', {
+                    value: signed(data.averageMonths - data.previousAverageMonths, i18n.language),
+                    count: Math.abs(data.averageMonths - data.previousAverageMonths),
+                  })}
                   previousYear={filter.year - 1}
                   better="up"
                 />

@@ -105,8 +105,14 @@ export function RequestDialog({
               >
                 {t('manage.dialog.activity')}
               </Typography>
-              <RequestTimeline history={request.history} comments={request.comments} />
-              <CommentComposer key={request.id} requestId={request.id} />
+              <RequestTimeline
+                requestId={request.id}
+                history={request.history}
+                comments={request.comments}
+                decisionComment={request.decisionComment}
+                viewerId={viewerId}
+              />
+              <CommentComposer key={request.id} requestId={request.id} scope="managed" />
             </section>
           </div>
         ) : query.isError ? (

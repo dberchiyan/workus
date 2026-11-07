@@ -334,6 +334,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/time-off/requests/{requestId}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Comment on own request; the admins see it */
+        post: operations["TimeOffController_comment"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/time-off/calendar": {
         parameters: {
             query?: never;
@@ -428,7 +445,7 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Reject a pending request (its responsible people only) */
+        /** Reject a pending request, optionally saying why (its responsible people only) */
         post: operations["ManagedTimeOffController_reject"];
         delete?: never;
         options?: never;
@@ -453,6 +470,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/time-off-requests/{requestId}/responsibles": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Replace who decides a pending request (admins only); any admin may do it */
+        put: operations["ManagedTimeOffController_updateResponsibles"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/time-off-requests/{requestId}/comments": {
         parameters: {
             query?: never;
@@ -465,6 +499,24 @@ export interface paths {
         /** Comment on a request; every admin and the employee see it */
         post: operations["ManagedTimeOffController_comment"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/time-off-requests/{requestId}/comments/{commentId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Edit own comment on a request (its author only) */
+        put: operations["ManagedTimeOffController_editComment"];
+        post?: never;
+        /** Delete own comment on a request (its author only) */
+        delete: operations["ManagedTimeOffController_deleteComment"];
         options?: never;
         head?: never;
         patch?: never;
@@ -494,7 +546,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Time-off requests made in the viewer's day (any status, newest first, first 100) */
+        /** Time-off requests made in a day (today, UTC) (any status, newest first, first 100) */
         get: operations["DashboardController_requests"];
         put?: never;
         post?: never;
@@ -538,83 +590,15 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/insights/headcount": {
+    "/api/v1/insights": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** People employed at the end of each month, by category or position */
-        get: operations["InsightsController_headcount"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/insights/tenure": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Average months worked by the people employed at the end of the year */
-        get: operations["InsightsController_tenure"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/insights/turnover": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Starts and leaves per month, with the people, and the turnover rate */
-        get: operations["InsightsController_turnover"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/insights/absence": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** The ten people with the most approved days off, and the average */
-        get: operations["InsightsController_absence"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/insights/salary": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Average monthly salary by category or position, and overall */
-        get: operations["InsightsController_salary"];
+        /** Every figure for one year: headcount by month, tenure, turnover, absence leaders, average salary */
+        get: operations["InsightsController_insights"];
         put?: never;
         post?: never;
         delete?: never;
@@ -632,7 +616,7 @@ export interface components {
             status: "ok";
         };
         /** @enum {string} */
-        ErrorCode: "VALIDATION_FAILED" | "MALFORMED_REQUEST" | "INVALID_PARAMETER" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "SESSION_EXPIRED" | "FORBIDDEN" | "RESOURCE_NOT_FOUND" | "CONFLICT" | "CONCURRENT_MODIFICATION" | "IDEMPOTENCY_KEY_REUSED" | "BUSINESS_RULE_VIOLATION" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "RATE_LIMIT_EXCEEDED" | "UPSTREAM_UNAVAILABLE" | "INTERNAL_ERROR";
+        ErrorCode: "VALIDATION_FAILED" | "MALFORMED_REQUEST" | "INVALID_PARAMETER" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "SESSION_EXPIRED" | "FORBIDDEN" | "ACCESS_ENDED" | "RESOURCE_NOT_FOUND" | "CONFLICT" | "CONCURRENT_MODIFICATION" | "IDEMPOTENCY_KEY_REUSED" | "BUSINESS_RULE_VIOLATION" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "RATE_LIMIT_EXCEEDED" | "UPSTREAM_UNAVAILABLE" | "INTERNAL_ERROR";
         ErrorResponse: {
             /** Format: date-time */
             timestamp: string;
@@ -774,7 +758,7 @@ export interface components {
                 /** Format: date-time */
                 occurredAt: string;
                 /** @enum {string} */
-                action: "employee.created" | "employee.updated" | "employee.terminated" | "employee.termination_canceled" | "review.created" | "review.updated" | "review.deleted" | "time_off_request.created" | "time_off_request.approved" | "time_off_request.rejected" | "time_off_request.canceled";
+                action: "employee.created" | "employee.updated" | "employee.terminated" | "employee.termination_canceled" | "review.created" | "review.updated" | "review.deleted" | "time_off_request.created" | "time_off_request.approved" | "time_off_request.rejected" | "time_off_request.canceled" | "time_off_request.updated";
                 actor: {
                     /** Format: uuid */
                     id: string;
@@ -1337,7 +1321,7 @@ export interface components {
                 /** Format: uuid */
                 id: string;
                 /** @enum {string} */
-                action: "CREATED" | "APPROVED" | "REJECTED" | "CANCELED";
+                action: "CREATED" | "APPROVED" | "REJECTED" | "CANCELED" | "RESPONSIBLES_CHANGED";
                 /** Format: date-time */
                 occurredAt: string;
                 actor: {
@@ -1360,6 +1344,8 @@ export interface components {
             body: string;
             /** Format: date-time */
             createdAt: string;
+            /** Format: date-time */
+            editedAt: string | null;
             author: {
                 /** Format: uuid */
                 id: string;
@@ -1416,7 +1402,7 @@ export interface components {
                 /** Format: uuid */
                 id: string;
                 /** @enum {string} */
-                action: "CREATED" | "APPROVED" | "REJECTED" | "CANCELED";
+                action: "CREATED" | "APPROVED" | "REJECTED" | "CANCELED" | "RESPONSIBLES_CHANGED";
                 /** Format: date-time */
                 occurredAt: string;
                 actor: {
@@ -1430,6 +1416,25 @@ export interface components {
             comments: components["schemas"]["TimeOffComment_Output"][];
             commentCount: number;
             canCancel: boolean;
+        };
+        AddTimeOffCommentRequest: {
+            body: string;
+        };
+        TimeOffCommentResponse_Output: {
+            /** Format: uuid */
+            id: string;
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            editedAt: string | null;
+            author: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+                positionTitle: string | null;
+            };
         };
         TimeOffCalendarRow_Output: {
             employee: {
@@ -1499,7 +1504,7 @@ export interface components {
                 /** Format: uuid */
                 id: string;
                 /** @enum {string} */
-                action: "CREATED" | "APPROVED" | "REJECTED" | "CANCELED";
+                action: "CREATED" | "APPROVED" | "REJECTED" | "CANCELED" | "RESPONSIBLES_CHANGED";
                 /** Format: date-time */
                 occurredAt: string;
                 actor: {
@@ -1566,7 +1571,7 @@ export interface components {
                 /** Format: uuid */
                 id: string;
                 /** @enum {string} */
-                action: "CREATED" | "APPROVED" | "REJECTED" | "CANCELED";
+                action: "CREATED" | "APPROVED" | "REJECTED" | "CANCELED" | "RESPONSIBLES_CHANGED";
                 /** Format: date-time */
                 occurredAt: string;
                 actor: {
@@ -1595,22 +1600,11 @@ export interface components {
                 cancel: boolean;
             };
         };
-        AddTimeOffCommentRequest: {
-            body: string;
+        RejectTimeOffRequestRequest: {
+            comment?: string;
         };
-        TimeOffCommentResponse_Output: {
-            /** Format: uuid */
-            id: string;
-            body: string;
-            /** Format: date-time */
-            createdAt: string;
-            author: {
-                /** Format: uuid */
-                id: string;
-                firstName: string;
-                lastName: string;
-                positionTitle: string | null;
-            };
+        UpdateRequestResponsiblesRequest: {
+            responsibleUserIds: string[];
         };
         AdminDashboardResponse_Output: {
             /** Format: date */
@@ -1725,64 +1719,6 @@ export interface components {
             id: string;
             name: string;
         };
-        HeadcountResponse_Output: {
-            groups: components["schemas"]["InsightGroup_Output"][];
-            months: {
-                month: number;
-                counts: number[] | null;
-            }[];
-            current: number;
-            previous: number;
-        };
-        TenureResponse_Output: {
-            averageMonths: number | null;
-            previousAverageMonths: number | null;
-            groups: {
-                /** Format: uuid */
-                id: string;
-                name: string;
-                averageMonths: number;
-                employees: number;
-                items: {
-                    /** Format: uuid */
-                    id: string;
-                    name: string;
-                    averageMonths: number;
-                    employees: number;
-                }[];
-            }[];
-        };
-        TurnoverResponse_Output: {
-            months: {
-                month: number;
-                hired: {
-                    /** Format: uuid */
-                    employeeId: string;
-                    /** Format: uuid */
-                    userId: string;
-                    firstName: string;
-                    lastName: string;
-                    positionTitle: string;
-                    /** Format: date */
-                    date: string;
-                }[];
-                left: {
-                    /** Format: uuid */
-                    employeeId: string;
-                    /** Format: uuid */
-                    userId: string;
-                    firstName: string;
-                    lastName: string;
-                    positionTitle: string;
-                    /** Format: date */
-                    date: string;
-                }[];
-            }[];
-            hiredTotal: number;
-            leftTotal: number;
-            rate: number | null;
-            previousRate: number | null;
-        };
         InsightPerson_Output: {
             /** Format: uuid */
             employeeId: string;
@@ -1792,29 +1728,89 @@ export interface components {
             lastName: string;
             positionTitle: string;
         };
-        AbsenceResponse_Output: {
-            top: {
-                person: components["schemas"]["InsightPerson_Output"];
-                days: number;
-                byType: {
-                    VACATION: number;
-                    SICK_DAY: number;
-                    DAY_OFF: number;
-                };
-            }[];
-            averageDays: number | null;
-            previousAverageDays: number | null;
-        };
-        SalaryResponse_Output: {
-            average: components["schemas"]["Money_Output"] | null;
-            previousAverage: components["schemas"]["Money_Output"] | null;
-            groups: {
-                /** Format: uuid */
-                id: string;
-                name: string;
-                average: components["schemas"]["Money_Output"];
-                employees: number;
-            }[];
+        InsightsResponse_Output: {
+            headcount: {
+                groups: components["schemas"]["InsightGroup_Output"][];
+                months: {
+                    month: number;
+                    counts: number[] | null;
+                }[];
+                current: number;
+                previous: number;
+            };
+            tenure: {
+                averageMonths: number | null;
+                previousAverageMonths: number | null;
+                groups: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                    averageMonths: number;
+                    employees: number;
+                    items: {
+                        /** Format: uuid */
+                        id: string;
+                        name: string;
+                        averageMonths: number;
+                        employees: number;
+                    }[];
+                }[];
+            };
+            turnover: {
+                months: {
+                    month: number;
+                    hired: {
+                        /** Format: uuid */
+                        employeeId: string;
+                        /** Format: uuid */
+                        userId: string;
+                        firstName: string;
+                        lastName: string;
+                        positionTitle: string;
+                        /** Format: date */
+                        date: string;
+                    }[];
+                    left: {
+                        /** Format: uuid */
+                        employeeId: string;
+                        /** Format: uuid */
+                        userId: string;
+                        firstName: string;
+                        lastName: string;
+                        positionTitle: string;
+                        /** Format: date */
+                        date: string;
+                    }[];
+                }[];
+                hiredTotal: number;
+                leftTotal: number;
+                rate: number | null;
+                previousRate: number | null;
+            };
+            absence: {
+                top: {
+                    person: components["schemas"]["InsightPerson_Output"];
+                    days: number;
+                    byType: {
+                        VACATION: number;
+                        SICK_DAY: number;
+                        DAY_OFF: number;
+                    };
+                }[];
+                averageDays: number | null;
+                previousAverageDays: number | null;
+            };
+            salary: {
+                average: components["schemas"]["Money_Output"] | null;
+                previousAverage: components["schemas"]["Money_Output"] | null;
+                groups: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                    average: components["schemas"]["Money_Output"];
+                    employees: number;
+                }[];
+            };
         };
         /** @enum {string} */
         EmployeeStatus: "ACTIVE" | "TERMINATED";
@@ -1913,7 +1909,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description ACCESS_ENDED | FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3239,6 +3235,77 @@ export interface operations {
             };
         };
     };
+    TimeOffController_comment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per logical operation, reused on retry */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddTimeOffCommentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeOffCommentResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description IDEMPOTENCY_KEY_REUSED */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     TimeOffCalendarController_calendar: {
         parameters: {
             query: {
@@ -3530,7 +3597,11 @@ export interface operations {
             path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RejectTimeOffRequestRequest"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -3669,6 +3740,83 @@ export interface operations {
             };
         };
     };
+    ManagedTimeOffController_updateResponsibles: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateRequestResponsiblesRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManagedTimeOffRequestResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONCURRENT_MODIFICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     ManagedTimeOffController_comment: {
         parameters: {
             query?: never;
@@ -3731,6 +3879,112 @@ export interface operations {
             };
             /** @description IDEMPOTENCY_KEY_REUSED */
             409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ManagedTimeOffController_editComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddTimeOffCommentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeOffCommentResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ManagedTimeOffController_deleteComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -3932,7 +4186,7 @@ export interface operations {
             };
         };
     };
-    InsightsController_headcount: {
+    InsightsController_insights: {
         parameters: {
             query: {
                 year: number;
@@ -3949,203 +4203,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["HeadcountResponse_Output"];
-                };
-            };
-            /** @description VALIDATION_FAILED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description UNAUTHORIZED | SESSION_EXPIRED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description FORBIDDEN */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    InsightsController_tenure: {
-        parameters: {
-            query: {
-                year: number;
-                categoryId?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TenureResponse_Output"];
-                };
-            };
-            /** @description VALIDATION_FAILED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description UNAUTHORIZED | SESSION_EXPIRED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description FORBIDDEN */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    InsightsController_turnover: {
-        parameters: {
-            query: {
-                year: number;
-                categoryId?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["TurnoverResponse_Output"];
-                };
-            };
-            /** @description VALIDATION_FAILED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description UNAUTHORIZED | SESSION_EXPIRED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description FORBIDDEN */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    InsightsController_absence: {
-        parameters: {
-            query: {
-                year: number;
-                categoryId?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AbsenceResponse_Output"];
-                };
-            };
-            /** @description VALIDATION_FAILED */
-            400: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description UNAUTHORIZED | SESSION_EXPIRED */
-            401: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description FORBIDDEN */
-            403: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-        };
-    };
-    InsightsController_salary: {
-        parameters: {
-            query: {
-                year: number;
-                categoryId?: string;
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SalaryResponse_Output"];
+                    "application/json": components["schemas"]["InsightsResponse_Output"];
                 };
             };
             /** @description VALIDATION_FAILED */

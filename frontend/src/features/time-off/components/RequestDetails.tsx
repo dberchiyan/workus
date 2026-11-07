@@ -5,8 +5,11 @@ import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useCurrentUser } from '@/features/auth';
 import { formatDateTime, fullName } from '../format';
 import type { TimeOffRequest } from '../types';
+import { CommentComposer } from './CommentComposer';
+import { CommentItem } from './CommentItem';
 import { PersonLine } from './PersonLine';
 import { TimeOffStatusChip } from './TimeOffChips';
 
@@ -31,7 +34,7 @@ export interface RequestDetailsProps {
 /** Responsible people, status, history and comments of one request. */
 export function RequestDetails({ request, onCancel }: RequestDetailsProps) {
   const { t, i18n } = useTranslation('timeOff');
-  // The employee's note first, then the admins' comments, oldest first.
+  // The employee's note and the reason for a decision first; then the comments, oldest first.
   const comments = [
     ...(request.note ? [{ key: 'note', author: t('details.note'), text: request.note }] : []),
     ...(request.decisionComment && request.decidedBy
@@ -43,15 +46,8 @@ export function RequestDetails({ request, onCancel }: RequestDetailsProps) {
           },
         ]
       : []),
-    ...request.comments.map((comment) => ({
-      key: comment.id,
-      author: t('details.commentBy', {
-        name: fullName(comment.author),
-        date: formatDateTime(comment.createdAt, i18n.language),
-      }),
-      text: comment.body,
-    })),
   ];
+  const viewerId = useCurrentUser().data?.id;
   return (
     // One grid, row by row: Responsible | Status, then History | Comments — each row as tall
     // as its taller panel.
@@ -109,9 +105,9 @@ export function RequestDetails({ request, onCancel }: RequestDetailsProps) {
                   ) : (
                     <Typography variant="subtitle2">—</Typography>
                   )}
-                  {item.action === 'CREATED' ? (
+                  {item.action === 'CREATED' || item.action === 'RESPONSIBLES_CHANGED' ? (
                     <Typography variant="caption" color="primary">
-                      {t('details.actions.CREATED')}
+                      {t(`details.actions.${item.action}`)}
                     </Typography>
                   ) : (
                     <TimeOffStatusChip status={item.action} />
@@ -128,14 +124,15 @@ export function RequestDetails({ request, onCancel }: RequestDetailsProps) {
         </ol>
       </Panel>
       <Panel title={t('details.comments')}>
-        {comments.length === 0 ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-1 rounded-md border border-dashed border-divider p-6">
+        {comments.length === 0 && request.comments.length === 0 && (
+          <div className="flex flex-col items-center justify-center gap-1 rounded-md border border-dashed border-divider p-6">
             <ChatBubbleOutlineOutlined aria-hidden className="text-text-secondary" />
             <Typography variant="body2" color="textSecondary">
               {t('details.noComments')}
             </Typography>
           </div>
-        ) : (
+        )}
+        {comments.length > 0 && (
           <ul className="m-0 flex list-none flex-col gap-3 p-0">
             {comments.map((comment) => (
               <li key={comment.key} className="flex flex-col gap-0.5">
@@ -152,6 +149,16 @@ export function RequestDetails({ request, onCancel }: RequestDetailsProps) {
             ))}
           </ul>
         )}
+        {request.comments.length > 0 && (
+          <ul className="m-0 flex list-none flex-col gap-3 p-0">
+            {request.comments.map((comment) => (
+              <li key={comment.id}>
+                <CommentItem requestId={request.id} comment={comment} viewerId={viewerId} />
+              </li>
+            ))}
+          </ul>
+        )}
+        <CommentComposer key={request.id} requestId={request.id} scope="own" />
       </Panel>
     </div>
   );

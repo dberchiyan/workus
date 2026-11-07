@@ -26,7 +26,11 @@
     "month": "Month",
     "total": "Total",
     "monthsUnit_one": "month",
-    "monthsUnit_other": "months"
+    "monthsUnit_other": "months",
+    "changePoints": "{{value}} pp",
+    "changePercent": "{{value}} %",
+    "changeMonths_one": "{{value}} month",
+    "changeMonths_other": "{{value}} months"
   },
   "headcount": {
     "title": "Number of employees",

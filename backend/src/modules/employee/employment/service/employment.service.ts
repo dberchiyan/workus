@@ -1,5 +1,7 @@
 import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { SessionService } from '../../../auth/service/session.service';
+import { todayUtc } from '../../core/service/calendar-date';
 import { EmployeeService } from '../../core/service/employee.service';
 import { ReviewService } from '../../review/service/review.service';
 import type {
@@ -20,6 +22,7 @@ export class EmploymentService {
   constructor(
     private readonly employeeService: EmployeeService,
     private readonly reviewService: ReviewService,
+    private readonly sessionService: SessionService,
   ) {}
 
   /** One transaction: the employee never exists without a starting salary. */
@@ -61,8 +64,12 @@ export class EmploymentService {
     command: TerminateEmployeeCommand,
     actorId: string,
   ): Promise<void> {
-    await this.employeeService.terminate(employeeId, command, actorId);
+    const { after } = await this.employeeService.terminate(employeeId, command, actorId);
     await this.reviewService.cancelScheduledAfter(employeeId, command.date, actorId);
+    // Effective today or earlier: signed out now (a later date is handled on its day).
+    if (after.terminatedOn && after.terminatedOn <= todayUtc()) {
+      await this.sessionService.endAllForUsers([after.user.id]);
+    }
   }
 
   /** The employee is active again; reviews canceled by the termination stay canceled. */

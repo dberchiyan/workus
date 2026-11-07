@@ -139,6 +139,59 @@ export class TimeOffRequestRepository {
     });
   }
 
+  /**
+   * Replaces who decides a pending request; optimistic on its status (false → no longer pending).
+   */
+  async replaceResponsibles(
+    id: string,
+    responsibleUserIds: string[],
+    updatedBy: string,
+  ): Promise<boolean> {
+    const { count } = await this.txHost.tx.timeOffRequest.updateMany({
+      where: { id, status: TimeOffStatus.PENDING },
+      data: { updatedBy, version: { increment: 1 } },
+    });
+    if (count === 0) {
+      return false;
+    }
+    await this.txHost.tx.timeOffRequestResponsible.deleteMany({ where: { requestId: id } });
+    await this.txHost.tx.timeOffRequestResponsible.createMany({
+      data: responsibleUserIds.map((responsibleUserId) => ({
+        requestId: id,
+        responsibleUserId,
+        createdBy: updatedBy,
+      })),
+    });
+    return true;
+  }
+
+  /** The author's own comment on this request, edited; null when it is not theirs (or gone). */
+  async editComment(
+    commentId: string,
+    requestId: string,
+    authorId: string,
+    body: string,
+  ): Promise<TimeOffCommentRecord | null> {
+    const { count } = await this.txHost.tx.timeOffRequestComment.updateMany({
+      where: { id: commentId, requestId, authorId },
+      data: { body, editedAt: new Date() },
+    });
+    return count === 0
+      ? null
+      : this.txHost.tx.timeOffRequestComment.findUnique({
+          where: { id: commentId },
+          select: timeOffCommentSelect,
+        });
+  }
+
+  /** Deletes the author's own comment on this request; false when it is not theirs (or gone). */
+  async deleteComment(commentId: string, requestId: string, authorId: string): Promise<boolean> {
+    const { count } = await this.txHost.tx.timeOffRequestComment.deleteMany({
+      where: { id: commentId, requestId, authorId },
+    });
+    return count > 0;
+  }
+
   /** Comments mark the request as changed, so "changed today" lists pick them up. */
   async touch(id: string, updatedBy: string): Promise<void> {
     await this.txHost.tx.timeOffRequest.update({
@@ -216,6 +269,7 @@ export class TimeOffRequestRepository {
     toStatus: string,
     updatedBy: string,
     decided = false,
+    decisionComment: string | null = null,
   ): Promise<boolean> {
     const { count } = await this.txHost.tx.timeOffRequest.updateMany({
       where: { id, status: fromStatus },
@@ -223,7 +277,7 @@ export class TimeOffRequestRepository {
         status: toStatus,
         updatedBy,
         version: { increment: 1 },
-        ...(decided ? { decidedBy: updatedBy, decidedAt: new Date() } : {}),
+        ...(decided ? { decidedBy: updatedBy, decidedAt: new Date(), decisionComment } : {}),
       },
     });
     return count > 0;

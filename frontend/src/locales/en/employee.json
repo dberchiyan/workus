@@ -202,7 +202,8 @@
         "timeOffCreated": "<actor>{{actor}}</actor> requested time off <target>{{target}}</target>",
         "timeOffApproved": "<actor>{{actor}}</actor> approved the time off <target>{{target}}</target>",
         "timeOffRejected": "<actor>{{actor}}</actor> rejected the time off <target>{{target}}</target>",
-        "timeOffCanceled": "<actor>{{actor}}</actor> canceled the time off <target>{{target}}</target>"
+        "timeOffCanceled": "<actor>{{actor}}</actor> canceled the time off <target>{{target}}</target>",
+        "timeOffUpdated": "<actor>{{actor}}</actor> changed who decides the time off <target>{{target}}</target>"
       },
       "fields": {
         "title": "Title",

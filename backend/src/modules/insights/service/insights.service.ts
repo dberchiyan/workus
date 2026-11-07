@@ -10,6 +10,7 @@ import type {
   AbsenceLeader,
   Headcount,
   InsightGroup,
+  Insights,
   InsightPerson,
   Salary,
   SalaryGroup,
@@ -74,10 +75,28 @@ export class InsightsService {
     private readonly timeOffService: TimeOffService,
   ) {}
 
-  /** People employed at the end of each month (today for the current one), by group. */
-  async headcount(filter: InsightFilter): Promise<Headcount> {
+  /**
+   * Every figure for the year in one go: the roster is read once; approved time off and salaries
+   * (this year and last) are read in parallel.
+   */
+  async overview(filter: InsightFilter): Promise<Insights> {
     const today = todayUtc();
     const people = await this.people(filter);
+    const [absence, salary] = await Promise.all([
+      this.absence(filter, people, today),
+      this.salary(filter, people, today),
+    ]);
+    return {
+      headcount: this.headcount(filter, people, today),
+      tenure: this.tenure(filter, people, today),
+      turnover: this.turnover(filter, people, today),
+      absence,
+      salary,
+    };
+  }
+
+  /** People employed at the end of each month (today for the current one), by group. */
+  private headcount(filter: InsightFilter, people: RosterEmployee[], today: Date): Headcount {
     const groupOf = this.grouping(filter);
     const groups = this.groupsOf(people, groupOf);
     const months = Array.from({ length: 12 }, (_, index) => {
@@ -109,9 +128,7 @@ export class InsightsService {
   }
 
   /** Average whole months worked by the people employed at the end of the year. */
-  async tenure(filter: InsightFilter): Promise<Tenure> {
-    const today = todayUtc();
-    const people = await this.people(filter);
+  private tenure(filter: InsightFilter, people: RosterEmployee[], today: Date): Tenure {
     const figure = (group: InsightGroup, members: RosterEmployee[], day: Date): TenureFigure => ({
       ...group,
       employees: members.length,
@@ -150,9 +167,7 @@ export class InsightsService {
   }
 
   /** Starts and leaves per month (up to today), and the share of people who left. */
-  async turnover(filter: InsightFilter): Promise<Turnover> {
-    const today = todayUtc();
-    const people = await this.people(filter);
+  private turnover(filter: InsightFilter, people: RosterEmployee[], today: Date): Turnover {
     const inYear = (date: Date | null, year: number): date is Date =>
       date !== null && date.getUTCFullYear() === year && date <= today;
     const months: TurnoverMonth[] = Array.from({ length: 12 }, (_, index) => ({
@@ -195,9 +210,11 @@ export class InsightsService {
   }
 
   /** Who took the most approved working days off this year (up to today), and the average. */
-  async absence(filter: InsightFilter): Promise<Absence> {
-    const today = todayUtc();
-    const people = await this.people(filter);
+  private async absence(
+    filter: InsightFilter,
+    people: RosterEmployee[],
+    today: Date,
+  ): Promise<Absence> {
     const byId = new Map(people.map((person) => [person.id, person]));
     const tally = async (year: number) => {
       const day = referenceDay(year, today);
@@ -252,9 +269,11 @@ export class InsightsService {
   }
 
   /** Average monthly salary (latest completed review) of the people employed at the end of the year. */
-  async salary(filter: InsightFilter): Promise<Salary> {
-    const today = todayUtc();
-    const people = await this.people(filter);
+  private async salary(
+    filter: InsightFilter,
+    people: RosterEmployee[],
+    today: Date,
+  ): Promise<Salary> {
     const groupOf = this.grouping(filter);
     const measure = async (day: Date) => {
       const salaries = new Map(

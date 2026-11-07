@@ -29,6 +29,13 @@ export class InvalidCredentialsException extends ApiException {
   }
 }
 
+/** The password was right, but the person's employment has ended. */
+export class AccessEndedException extends ApiException {
+  constructor() {
+    super('ACCESS_ENDED', 'errors.ACCESS_ENDED');
+  }
+}
+
 export class SessionExpiredException extends ApiException {
   constructor() {
     super('SESSION_EXPIRED', 'errors.SESSION_EXPIRED');

@@ -61,6 +61,16 @@ export class SessionRepository {
     await this.txHost.tx.session.deleteMany({ where: { tokenHash } });
   }
 
+  async deleteByUserIds(userIds: string[]): Promise<number> {
+    if (userIds.length === 0) {
+      return 0;
+    }
+    const { count } = await this.txHost.tx.session.deleteMany({
+      where: { userId: { in: userIds } },
+    });
+    return count;
+  }
+
   async deleteExpired(now: Date): Promise<number> {
     const { count } = await this.txHost.tx.session.deleteMany({
       where: { OR: [{ idleExpiresAt: { lte: now } }, { absoluteExpiresAt: { lte: now } }] },

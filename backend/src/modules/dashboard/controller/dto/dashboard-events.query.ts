@@ -3,7 +3,7 @@ import { z } from 'zod';
 import { pageableOptions } from '../../../../common/dto/pageable';
 
 const HOUR_MS = 3_600_000;
-/** A local day is 23–25 hours long (daylight saving); a little slack, never more. */
+/** A day is 24 hours in UTC; a little slack, never more. */
 const MAX_DAY_HOURS = 26;
 
 /** Event lists: by date, then name — the order is fixed, only page and size apply. */
@@ -13,7 +13,7 @@ export const EVENTS_PAGEABLE = pageableOptions({
 });
 export type EventsSortField = (typeof EVENTS_PAGEABLE.sortable)[number];
 
-/** The instants the viewer's day starts and ends in their time zone. */
+/** The instants a day (today, UTC — days are UTC everywhere) starts and ends. */
 export const InstantRangeQuerySchema = z
   .object({
     from: z.iso.datetime({ offset: true, error: 'validation.invalid' }),

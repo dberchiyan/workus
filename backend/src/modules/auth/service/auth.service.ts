@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import {
+  AccessEndedException,
   InvalidCredentialsException,
   NotAuthenticatedException,
 } from '../../../common/exception/api.exception';
@@ -8,6 +9,7 @@ import { MetricsService } from '../../../common/observability/metrics.service';
 import type { Principal } from '../../../common/security/principal';
 import { loginRateLimitKey, RateLimitName } from '../../../common/security/rate-limit';
 import { RateLimitService } from '../../../common/security/rate-limit.service';
+import { EmployeeService } from '../../employee/core/service/employee.service';
 import { UserService } from '../../user/service/user.service';
 import type { UserProfile } from '../../user/service/user.types';
 import { PasswordHasher } from './password-hasher.service';
@@ -31,6 +33,7 @@ export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly sessionService: SessionService,
+    private readonly employeeService: EmployeeService,
     private readonly passwordHasher: PasswordHasher,
     private readonly rateLimitService: RateLimitService,
     private readonly metrics: MetricsService,
@@ -47,6 +50,11 @@ export class AuthService {
     }
     if (!(await this.passwordHasher.verify(credentials.passwordHash, command.password))) {
       throw this.loginFailed(command);
+    }
+    // Checked only after the password, so it tells nothing to someone who does not know it.
+    if (await this.employeeService.hasAccessEnded(credentials.id)) {
+      this.logger.warn({ userId: credentials.id, ip: command.ip }, 'Login refused: access ended');
+      throw new AccessEndedException();
     }
     if (this.passwordHasher.needsRehash(credentials.passwordHash)) {
       await this.userService.updatePasswordHash(

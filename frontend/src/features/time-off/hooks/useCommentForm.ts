@@ -4,14 +4,14 @@ import { useForm } from 'react-hook-form';
 import { isApiError } from '@/shared/api/apiError';
 import type { ErrorCode } from '@/shared/types';
 import { type CommentFormOutput, type CommentFormValues, commentSchema } from '../schemas';
-import { useAddComment } from './useManagedRequests';
+import { type CommentScope, useAddComment } from './useManagedRequests';
 
 /**
  * One Idempotency-Key per comment being written, reused on every retry of that send; a sent
  * comment clears the field and starts a new key.
  */
-export const useCommentForm = (requestId: string) => {
-  const add = useAddComment(requestId);
+export const useCommentForm = (requestId: string, scope: CommentScope) => {
+  const add = useAddComment(requestId, scope);
   const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());
   const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);
   const form = useForm<CommentFormValues, unknown, CommentFormOutput>({

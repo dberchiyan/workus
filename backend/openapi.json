@@ -101,7 +101,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "ACCESS_ENDED | FORBIDDEN",
             "content": {
               "application/json": {
                 "schema": {
@@ -1893,6 +1893,104 @@
         ]
       }
     },
+    "/api/v1/time-off/requests/{requestId}/comments": {
+      "post": {
+        "operationId": "TimeOffController_comment",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "UUID per logical operation, reused on retry",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTimeOffCommentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeOffCommentResponse_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_FAILED | INVALID_PARAMETER",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "RESOURCE_NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "IDEMPOTENCY_KEY_REUSED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "Comment on own request; the admins see it",
+        "tags": [
+          "Time off"
+        ]
+      }
+    },
     "/api/v1/time-off/calendar": {
       "get": {
         "operationId": "TimeOffCalendarController_calendar",
@@ -2367,6 +2465,16 @@
       "post": {
         "operationId": "ManagedTimeOffController_reject",
         "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectTimeOffRequestRequest"
+              }
+            }
+          }
+        },
         "responses": {
           "200": {
             "description": "",
@@ -2444,7 +2552,7 @@
             "session": []
           }
         ],
-        "summary": "Reject a pending request (its responsible people only)",
+        "summary": "Reject a pending request, optionally saying why (its responsible people only)",
         "tags": [
           "Time off"
         ]
@@ -2532,6 +2640,103 @@
           }
         ],
         "summary": "Cancel a pending or approved request, even a started one (its responsible people only)",
+        "tags": [
+          "Time off"
+        ]
+      }
+    },
+    "/api/v1/time-off-requests/{requestId}/responsibles": {
+      "put": {
+        "operationId": "ManagedTimeOffController_updateResponsibles",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRequestResponsiblesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ManagedTimeOffRequestResponse_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_FAILED | INVALID_PARAMETER",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "RESOURCE_NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "CONCURRENT_MODIFICATION",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "BUSINESS_RULE_VIOLATION",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "Replace who decides a pending request (admins only); any admin may do it",
         "tags": [
           "Time off"
         ]
@@ -2630,6 +2835,138 @@
           }
         ],
         "summary": "Comment on a request; every admin and the employee see it",
+        "tags": [
+          "Time off"
+        ]
+      }
+    },
+    "/api/v1/time-off-requests/{requestId}/comments/{commentId}": {
+      "put": {
+        "operationId": "ManagedTimeOffController_editComment",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddTimeOffCommentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TimeOffCommentResponse_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_FAILED | INVALID_PARAMETER",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "RESOURCE_NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "Edit own comment on a request (its author only)",
+        "tags": [
+          "Time off"
+        ]
+      },
+      "delete": {
+        "operationId": "ManagedTimeOffController_deleteComment",
+        "parameters": [],
+        "responses": {
+          "400": {
+            "description": "INVALID_PARAMETER",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "RESOURCE_NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "Delete own comment on a request (its author only)",
         "tags": [
           "Time off"
         ]
@@ -2754,7 +3091,7 @@
             "session": []
           }
         ],
-        "summary": "Time-off requests made in the viewer's day (any status, newest first, first 100)",
+        "summary": "Time-off requests made in a day (today, UTC) (any status, newest first, first 100)",
         "tags": [
           "Dashboard"
         ]
@@ -2978,9 +3315,9 @@
         ]
       }
     },
-    "/api/v1/insights/headcount": {
+    "/api/v1/insights": {
       "get": {
-        "operationId": "InsightsController_headcount",
+        "operationId": "InsightsController_insights",
         "parameters": [
           {
             "name": "year",
@@ -3009,7 +3346,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/HeadcountResponse_Output"
+                  "$ref": "#/components/schemas/InsightsResponse_Output"
                 }
               }
             }
@@ -3050,319 +3387,7 @@
             "session": []
           }
         ],
-        "summary": "People employed at the end of each month, by category or position",
-        "tags": [
-          "Insights"
-        ]
-      }
-    },
-    "/api/v1/insights/tenure": {
-      "get": {
-        "operationId": "InsightsController_tenure",
-        "parameters": [
-          {
-            "name": "year",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "minimum": 2000,
-              "maximum": 9007199254740991,
-              "type": "integer"
-            }
-          },
-          {
-            "name": "categoryId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TenureResponse_Output"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "VALIDATION_FAILED",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "UNAUTHORIZED | SESSION_EXPIRED",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "FORBIDDEN",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ],
-        "summary": "Average months worked by the people employed at the end of the year",
-        "tags": [
-          "Insights"
-        ]
-      }
-    },
-    "/api/v1/insights/turnover": {
-      "get": {
-        "operationId": "InsightsController_turnover",
-        "parameters": [
-          {
-            "name": "year",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "minimum": 2000,
-              "maximum": 9007199254740991,
-              "type": "integer"
-            }
-          },
-          {
-            "name": "categoryId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TurnoverResponse_Output"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "VALIDATION_FAILED",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "UNAUTHORIZED | SESSION_EXPIRED",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "FORBIDDEN",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ],
-        "summary": "Starts and leaves per month, with the people, and the turnover rate",
-        "tags": [
-          "Insights"
-        ]
-      }
-    },
-    "/api/v1/insights/absence": {
-      "get": {
-        "operationId": "InsightsController_absence",
-        "parameters": [
-          {
-            "name": "year",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "minimum": 2000,
-              "maximum": 9007199254740991,
-              "type": "integer"
-            }
-          },
-          {
-            "name": "categoryId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/AbsenceResponse_Output"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "VALIDATION_FAILED",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "UNAUTHORIZED | SESSION_EXPIRED",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "FORBIDDEN",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ],
-        "summary": "The ten people with the most approved days off, and the average",
-        "tags": [
-          "Insights"
-        ]
-      }
-    },
-    "/api/v1/insights/salary": {
-      "get": {
-        "operationId": "InsightsController_salary",
-        "parameters": [
-          {
-            "name": "year",
-            "required": true,
-            "in": "query",
-            "schema": {
-              "minimum": 2000,
-              "maximum": 9007199254740991,
-              "type": "integer"
-            }
-          },
-          {
-            "name": "categoryId",
-            "required": false,
-            "in": "query",
-            "schema": {
-              "format": "uuid",
-              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SalaryResponse_Output"
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "VALIDATION_FAILED",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "UNAUTHORIZED | SESSION_EXPIRED",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "403": {
-            "description": "FORBIDDEN",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "session": []
-          }
-        ],
-        "summary": "Average monthly salary by category or position, and overall",
+        "summary": "Every figure for one year: headcount by month, tenure, turnover, absence leaders, average salary",
         "tags": [
           "Insights"
         ]
@@ -3411,6 +3436,7 @@
           "INVALID_CREDENTIALS",
           "SESSION_EXPIRED",
           "FORBIDDEN",
+          "ACCESS_ENDED",
           "RESOURCE_NOT_FOUND",
           "CONFLICT",
           "CONCURRENT_MODIFICATION",
@@ -4028,7 +4054,8 @@
                     "time_off_request.created",
                     "time_off_request.approved",
                     "time_off_request.rejected",
-                    "time_off_request.canceled"
+                    "time_off_request.canceled",
+                    "time_off_request.updated"
                   ]
                 },
                 "actor": {
@@ -6733,7 +6760,8 @@
                     "CREATED",
                     "APPROVED",
                     "REJECTED",
-                    "CANCELED"
+                    "CANCELED",
+                    "RESPONSIBLES_CHANGED"
                   ]
                 },
                 "occurredAt": {
@@ -6841,6 +6869,12 @@
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
           },
+          "editedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "nullable": true
+          },
           "author": {
             "type": "object",
             "properties": {
@@ -6875,6 +6909,7 @@
           "id",
           "body",
           "createdAt",
+          "editedAt",
           "author"
         ],
         "additionalProperties": false
@@ -7065,7 +7100,8 @@
                     "CREATED",
                     "APPROVED",
                     "REJECTED",
-                    "CANCELED"
+                    "CANCELED",
+                    "RESPONSIBLES_CHANGED"
                   ]
                 },
                 "occurredAt": {
@@ -7145,6 +7181,80 @@
           "comments",
           "commentCount",
           "canCancel"
+        ],
+        "additionalProperties": false
+      },
+      "AddTimeOffCommentRequest": {
+        "type": "object",
+        "properties": {
+          "body": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 1000
+          }
+        },
+        "required": [
+          "body"
+        ]
+      },
+      "TimeOffCommentResponse_Output": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+          },
+          "body": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
+          },
+          "editedAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "nullable": true
+          },
+          "author": {
+            "type": "object",
+            "properties": {
+              "id": {
+                "type": "string",
+                "format": "uuid",
+                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+              },
+              "firstName": {
+                "type": "string"
+              },
+              "lastName": {
+                "type": "string"
+              },
+              "positionTitle": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              }
+            },
+            "required": [
+              "id",
+              "firstName",
+              "lastName",
+              "positionTitle"
+            ],
+            "additionalProperties": false
+          }
+        },
+        "required": [
+          "id",
+          "body",
+          "createdAt",
+          "editedAt",
+          "author"
         ],
         "additionalProperties": false
       },
@@ -7409,7 +7519,8 @@
                     "CREATED",
                     "APPROVED",
                     "REJECTED",
-                    "CANCELED"
+                    "CANCELED",
+                    "RESPONSIBLES_CHANGED"
                   ]
                 },
                 "occurredAt": {
@@ -7697,7 +7808,8 @@
                     "CREATED",
                     "APPROVED",
                     "REJECTED",
-                    "CANCELED"
+                    "CANCELED",
+                    "RESPONSIBLES_CHANGED"
                   ]
                 },
                 "occurredAt": {
@@ -7834,72 +7946,32 @@
         ],
         "additionalProperties": false
       },
-      "AddTimeOffCommentRequest": {
+      "RejectTimeOffRequestRequest": {
         "type": "object",
         "properties": {
-          "body": {
+          "comment": {
             "type": "string",
-            "minLength": 1,
-            "maxLength": 1000
+            "maxLength": 500
           }
-        },
-        "required": [
-          "body"
-        ]
+        }
       },
-      "TimeOffCommentResponse_Output": {
+      "UpdateRequestResponsiblesRequest": {
         "type": "object",
         "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-          },
-          "body": {
-            "type": "string"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$"
-          },
-          "author": {
-            "type": "object",
-            "properties": {
-              "id": {
-                "type": "string",
-                "format": "uuid",
-                "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-              },
-              "firstName": {
-                "type": "string"
-              },
-              "lastName": {
-                "type": "string"
-              },
-              "positionTitle": {
-                "type": [
-                  "string",
-                  "null"
-                ]
-              }
-            },
-            "required": [
-              "id",
-              "firstName",
-              "lastName",
-              "positionTitle"
-            ],
-            "additionalProperties": false
+          "responsibleUserIds": {
+            "minItems": 1,
+            "maxItems": 10,
+            "type": "array",
+            "items": {
+              "type": "string",
+              "format": "uuid",
+              "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+            }
           }
         },
         "required": [
-          "id",
-          "body",
-          "createdAt",
-          "author"
-        ],
-        "additionalProperties": false
+          "responsibleUserIds"
+        ]
       },
       "AdminDashboardResponse_Output": {
         "type": "object",
@@ -8368,285 +8440,6 @@
         ],
         "additionalProperties": false
       },
-      "HeadcountResponse_Output": {
-        "type": "object",
-        "properties": {
-          "groups": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/InsightGroup_Output"
-            }
-          },
-          "months": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "month": {
-                  "type": "integer",
-                  "minimum": -9007199254740991,
-                  "maximum": 9007199254740991
-                },
-                "counts": {
-                  "type": "array",
-                  "items": {
-                    "type": "integer",
-                    "minimum": -9007199254740991,
-                    "maximum": 9007199254740991
-                  },
-                  "nullable": true
-                }
-              },
-              "required": [
-                "month",
-                "counts"
-              ],
-              "additionalProperties": false
-            }
-          },
-          "current": {
-            "type": "integer",
-            "minimum": -9007199254740991,
-            "maximum": 9007199254740991
-          },
-          "previous": {
-            "type": "integer",
-            "minimum": -9007199254740991,
-            "maximum": 9007199254740991
-          }
-        },
-        "required": [
-          "groups",
-          "months",
-          "current",
-          "previous"
-        ],
-        "additionalProperties": false
-      },
-      "TenureResponse_Output": {
-        "type": "object",
-        "properties": {
-          "averageMonths": {
-            "type": "integer",
-            "minimum": -9007199254740991,
-            "maximum": 9007199254740991,
-            "nullable": true
-          },
-          "previousAverageMonths": {
-            "type": "integer",
-            "minimum": -9007199254740991,
-            "maximum": 9007199254740991,
-            "nullable": true
-          },
-          "groups": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "averageMonths": {
-                  "type": "integer",
-                  "minimum": -9007199254740991,
-                  "maximum": 9007199254740991
-                },
-                "employees": {
-                  "type": "integer",
-                  "minimum": -9007199254740991,
-                  "maximum": 9007199254740991
-                },
-                "items": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "id": {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
-                      "name": {
-                        "type": "string"
-                      },
-                      "averageMonths": {
-                        "type": "integer",
-                        "minimum": -9007199254740991,
-                        "maximum": 9007199254740991
-                      },
-                      "employees": {
-                        "type": "integer",
-                        "minimum": -9007199254740991,
-                        "maximum": 9007199254740991
-                      }
-                    },
-                    "required": [
-                      "id",
-                      "name",
-                      "averageMonths",
-                      "employees"
-                    ],
-                    "additionalProperties": false
-                  }
-                }
-              },
-              "required": [
-                "id",
-                "name",
-                "averageMonths",
-                "employees",
-                "items"
-              ],
-              "additionalProperties": false
-            }
-          }
-        },
-        "required": [
-          "averageMonths",
-          "previousAverageMonths",
-          "groups"
-        ],
-        "additionalProperties": false
-      },
-      "TurnoverResponse_Output": {
-        "type": "object",
-        "properties": {
-          "months": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "month": {
-                  "type": "integer",
-                  "minimum": -9007199254740991,
-                  "maximum": 9007199254740991
-                },
-                "hired": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "employeeId": {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
-                      "userId": {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
-                      "firstName": {
-                        "type": "string"
-                      },
-                      "lastName": {
-                        "type": "string"
-                      },
-                      "positionTitle": {
-                        "type": "string"
-                      },
-                      "date": {
-                        "type": "string",
-                        "format": "date",
-                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
-                      }
-                    },
-                    "required": [
-                      "employeeId",
-                      "userId",
-                      "firstName",
-                      "lastName",
-                      "positionTitle",
-                      "date"
-                    ],
-                    "additionalProperties": false
-                  }
-                },
-                "left": {
-                  "type": "array",
-                  "items": {
-                    "type": "object",
-                    "properties": {
-                      "employeeId": {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
-                      "userId": {
-                        "type": "string",
-                        "format": "uuid",
-                        "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                      },
-                      "firstName": {
-                        "type": "string"
-                      },
-                      "lastName": {
-                        "type": "string"
-                      },
-                      "positionTitle": {
-                        "type": "string"
-                      },
-                      "date": {
-                        "type": "string",
-                        "format": "date",
-                        "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
-                      }
-                    },
-                    "required": [
-                      "employeeId",
-                      "userId",
-                      "firstName",
-                      "lastName",
-                      "positionTitle",
-                      "date"
-                    ],
-                    "additionalProperties": false
-                  }
-                }
-              },
-              "required": [
-                "month",
-                "hired",
-                "left"
-              ],
-              "additionalProperties": false
-            }
-          },
-          "hiredTotal": {
-            "type": "integer",
-            "minimum": -9007199254740991,
-            "maximum": 9007199254740991
-          },
-          "leftTotal": {
-            "type": "integer",
-            "minimum": -9007199254740991,
-            "maximum": 9007199254740991
-          },
-          "rate": {
-            "type": "number",
-            "minimum": 0,
-            "nullable": true
-          },
-          "previousRate": {
-            "type": "number",
-            "minimum": 0,
-            "nullable": true
-          }
-        },
-        "required": [
-          "months",
-          "hiredTotal",
-          "leftTotal",
-          "rate",
-          "previousRate"
-        ],
-        "additionalProperties": false
-      },
       "InsightPerson_Output": {
         "type": "object",
         "properties": {
@@ -8679,130 +8472,422 @@
         ],
         "additionalProperties": false
       },
-      "AbsenceResponse_Output": {
+      "InsightsResponse_Output": {
         "type": "object",
         "properties": {
-          "top": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "person": {
-                  "$ref": "#/components/schemas/InsightPerson_Output"
-                },
-                "days": {
-                  "type": "integer",
-                  "minimum": -9007199254740991,
-                  "maximum": 9007199254740991
-                },
-                "byType": {
+          "headcount": {
+            "type": "object",
+            "properties": {
+              "groups": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/InsightGroup_Output"
+                }
+              },
+              "months": {
+                "type": "array",
+                "items": {
                   "type": "object",
                   "properties": {
-                    "VACATION": {
+                    "month": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "SICK_DAY": {
+                    "counts": {
+                      "type": "array",
+                      "items": {
+                        "type": "integer",
+                        "minimum": -9007199254740991,
+                        "maximum": 9007199254740991
+                      },
+                      "nullable": true
+                    }
+                  },
+                  "required": [
+                    "month",
+                    "counts"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "current": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "previous": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              }
+            },
+            "required": [
+              "groups",
+              "months",
+              "current",
+              "previous"
+            ],
+            "additionalProperties": false
+          },
+          "tenure": {
+            "type": "object",
+            "properties": {
+              "averageMonths": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991,
+                "nullable": true
+              },
+              "previousAverageMonths": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991,
+                "nullable": true
+              },
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "averageMonths": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     },
-                    "DAY_OFF": {
+                    "employees": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "id": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "name": {
+                            "type": "string"
+                          },
+                          "averageMonths": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          },
+                          "employees": {
+                            "type": "integer",
+                            "minimum": -9007199254740991,
+                            "maximum": 9007199254740991
+                          }
+                        },
+                        "required": [
+                          "id",
+                          "name",
+                          "averageMonths",
+                          "employees"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "id",
+                    "name",
+                    "averageMonths",
+                    "employees",
+                    "items"
+                  ],
+                  "additionalProperties": false
+                }
+              }
+            },
+            "required": [
+              "averageMonths",
+              "previousAverageMonths",
+              "groups"
+            ],
+            "additionalProperties": false
+          },
+          "turnover": {
+            "type": "object",
+            "properties": {
+              "months": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "month": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "hired": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "employeeId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "userId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "firstName": {
+                            "type": "string"
+                          },
+                          "lastName": {
+                            "type": "string"
+                          },
+                          "positionTitle": {
+                            "type": "string"
+                          },
+                          "date": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                          }
+                        },
+                        "required": [
+                          "employeeId",
+                          "userId",
+                          "firstName",
+                          "lastName",
+                          "positionTitle",
+                          "date"
+                        ],
+                        "additionalProperties": false
+                      }
+                    },
+                    "left": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "employeeId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "userId": {
+                            "type": "string",
+                            "format": "uuid",
+                            "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                          },
+                          "firstName": {
+                            "type": "string"
+                          },
+                          "lastName": {
+                            "type": "string"
+                          },
+                          "positionTitle": {
+                            "type": "string"
+                          },
+                          "date": {
+                            "type": "string",
+                            "format": "date",
+                            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
+                          }
+                        },
+                        "required": [
+                          "employeeId",
+                          "userId",
+                          "firstName",
+                          "lastName",
+                          "positionTitle",
+                          "date"
+                        ],
+                        "additionalProperties": false
+                      }
+                    }
+                  },
+                  "required": [
+                    "month",
+                    "hired",
+                    "left"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "hiredTotal": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "leftTotal": {
+                "type": "integer",
+                "minimum": -9007199254740991,
+                "maximum": 9007199254740991
+              },
+              "rate": {
+                "type": "number",
+                "minimum": 0,
+                "nullable": true
+              },
+              "previousRate": {
+                "type": "number",
+                "minimum": 0,
+                "nullable": true
+              }
+            },
+            "required": [
+              "months",
+              "hiredTotal",
+              "leftTotal",
+              "rate",
+              "previousRate"
+            ],
+            "additionalProperties": false
+          },
+          "absence": {
+            "type": "object",
+            "properties": {
+              "top": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "person": {
+                      "$ref": "#/components/schemas/InsightPerson_Output"
+                    },
+                    "days": {
+                      "type": "integer",
+                      "minimum": -9007199254740991,
+                      "maximum": 9007199254740991
+                    },
+                    "byType": {
+                      "type": "object",
+                      "properties": {
+                        "VACATION": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "SICK_DAY": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        },
+                        "DAY_OFF": {
+                          "type": "integer",
+                          "minimum": -9007199254740991,
+                          "maximum": 9007199254740991
+                        }
+                      },
+                      "required": [
+                        "VACATION",
+                        "SICK_DAY",
+                        "DAY_OFF"
+                      ],
+                      "additionalProperties": false
+                    }
+                  },
+                  "required": [
+                    "person",
+                    "days",
+                    "byType"
+                  ],
+                  "additionalProperties": false
+                }
+              },
+              "averageDays": {
+                "type": "number",
+                "minimum": 0,
+                "nullable": true
+              },
+              "previousAverageDays": {
+                "type": "number",
+                "minimum": 0,
+                "nullable": true
+              }
+            },
+            "required": [
+              "top",
+              "averageDays",
+              "previousAverageDays"
+            ],
+            "additionalProperties": false
+          },
+          "salary": {
+            "type": "object",
+            "properties": {
+              "average": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money_Output"
+                  }
+                ],
+                "nullable": true
+              },
+              "previousAverage": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/Money_Output"
+                  }
+                ],
+                "nullable": true
+              },
+              "groups": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "string",
+                      "format": "uuid",
+                      "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
+                    },
+                    "name": {
+                      "type": "string"
+                    },
+                    "average": {
+                      "$ref": "#/components/schemas/Money_Output"
+                    },
+                    "employees": {
                       "type": "integer",
                       "minimum": -9007199254740991,
                       "maximum": 9007199254740991
                     }
                   },
                   "required": [
-                    "VACATION",
-                    "SICK_DAY",
-                    "DAY_OFF"
+                    "id",
+                    "name",
+                    "average",
+                    "employees"
                   ],
                   "additionalProperties": false
                 }
-              },
-              "required": [
-                "person",
-                "days",
-                "byType"
-              ],
-              "additionalProperties": false
-            }
-          },
-          "averageDays": {
-            "type": "number",
-            "minimum": 0,
-            "nullable": true
-          },
-          "previousAverageDays": {
-            "type": "number",
-            "minimum": 0,
-            "nullable": true
+              }
+            },
+            "required": [
+              "average",
+              "previousAverage",
+              "groups"
+            ],
+            "additionalProperties": false
           }
         },
         "required": [
-          "top",
-          "averageDays",
-          "previousAverageDays"
-        ],
-        "additionalProperties": false
-      },
-      "SalaryResponse_Output": {
-        "type": "object",
-        "properties": {
-          "average": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Money_Output"
-              }
-            ],
-            "nullable": true
-          },
-          "previousAverage": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/Money_Output"
-              }
-            ],
-            "nullable": true
-          },
-          "groups": {
-            "type": "array",
-            "items": {
-              "type": "object",
-              "properties": {
-                "id": {
-                  "type": "string",
-                  "format": "uuid",
-                  "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
-                },
-                "name": {
-                  "type": "string"
-                },
-                "average": {
-                  "$ref": "#/components/schemas/Money_Output"
-                },
-                "employees": {
-                  "type": "integer",
-                  "minimum": -9007199254740991,
-                  "maximum": 9007199254740991
-                }
-              },
-              "required": [
-                "id",
-                "name",
-                "average",
-                "employees"
-              ],
-              "additionalProperties": false
-            }
-          }
-        },
-        "required": [
-          "average",
-          "previousAverage",
-          "groups"
+          "headcount",
+          "tenure",
+          "turnover",
+          "absence",
+          "salary"
         ],
         "additionalProperties": false
       },

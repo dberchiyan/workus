@@ -29,7 +29,13 @@ export const timeOffRequestSelect = {
     take: MAX_REQUEST_RESPONSIBLES,
   },
   comments: {
-    select: { id: true, body: true, createdAt: true, author: { select: personSelect } },
+    select: {
+      id: true,
+      body: true,
+      createdAt: true,
+      editedAt: true,
+      author: { select: personSelect },
+    },
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
     take: MAX_REQUEST_COMMENTS,
   },

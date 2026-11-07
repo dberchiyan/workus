@@ -17,6 +17,9 @@ export type ManagedRequestPage = Schemas['ManagedTimeOffRequestPageResponse_Outp
 export type TimeOffCalendar = Schemas['TimeOffCalendarResponse_Output'];
 export type CalendarRow = TimeOffCalendar['content'][number];
 export type CalendarRequest = CalendarRow['requests'][number];
+/** An admin who can decide requests (the people picker's options). */
+export type ResponsibleCandidate =
+  Schemas['ResponsibleCandidatesResponse_Output']['content'][number];
 export type TimeOffDecision = 'approve' | 'reject' | 'cancel';
 export type ClosedStatus = Exclude<TimeOffStatus, 'PENDING'>;
 export const CLOSED_STATUSES = [

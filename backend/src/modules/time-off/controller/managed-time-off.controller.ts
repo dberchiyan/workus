@@ -1,4 +1,14 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Put,
+  Query,
+  Delete,
+} from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { ApiPageable, type Pageable, PageableQuery } from '../../../common/dto/pageable';
@@ -11,8 +21,11 @@ import type { Principal } from '../../../common/security/principal';
 import { Authorize } from '../../../common/security/security.decorators';
 import { toSearchTerms } from '../../employee/core/service/filter/employee.criteria';
 import { TimeOffDecisionService, type TimeOffDecision } from '../service/time-off-decision.service';
+import { TimeOffCommentService } from '../service/time-off-comment.service';
 import { MANAGED_REQUEST_PAGEABLE, type ManagedRequestSortField } from '../service/time-off-sort';
 import { AddTimeOffCommentRequest } from './dto/add-time-off-comment.request';
+import { RejectTimeOffRequestRequest } from './dto/reject-time-off-request.request';
+import { UpdateRequestResponsiblesRequest } from './dto/update-request-responsibles.request';
 import { ManagedTimeOffRequestFilterQuery } from './dto/managed-time-off-request-filter.query';
 import {
   ManagedTimeOffRequestPageResponse,
@@ -39,7 +52,10 @@ const DECISION_ERRORS = [
 @ApiTags('Time off')
 @Controller('api/v1/time-off-requests')
 export class ManagedTimeOffController {
-  constructor(private readonly decisionService: TimeOffDecisionService) {}
+  constructor(
+    private readonly decisionService: TimeOffDecisionService,
+    private readonly commentService: TimeOffCommentService,
+  ) {}
 
   @Get()
   @Authorize(can.viewTimeOffRequests)
@@ -113,14 +129,19 @@ export class ManagedTimeOffController {
   @HttpCode(HttpStatus.OK)
   @Authorize(can.decideTimeOffRequest)
   @IdempotencyExempt('Rejecting a rejected request changes nothing')
-  @ApiOperation({ summary: 'Reject a pending request (its responsible people only)' })
+  @ApiOperation({
+    summary: 'Reject a pending request, optionally saying why (its responsible people only)',
+  })
   @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestResponse })
   @ApiErrors(...DECISION_ERRORS)
-  reject(
+  async reject(
     @UuidParam('requestId') requestId: string,
+    @Body() request: RejectTimeOffRequestRequest,
     @CurrentPrincipal() principal: Principal,
   ): Promise<ManagedTimeOffRequestResponse> {
-    return this.decide(requestId, 'reject', principal);
+    return toManagedTimeOffRequestResponse(
+      await this.decisionService.decide(requestId, 'reject', principal.userId, request.comment),
+    );
   }
 
   @Post(':requestId/cancellation')
@@ -138,6 +159,36 @@ export class ManagedTimeOffController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<ManagedTimeOffRequestResponse> {
     return this.decide(requestId, 'cancel', principal);
+  }
+
+  @Put(':requestId/responsibles')
+  @Authorize(can.manageTimeOffRequest)
+  @ApiOperation({
+    summary: 'Replace who decides a pending request (admins only); any admin may do it',
+  })
+  @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestResponse })
+  @ApiErrors(
+    'VALIDATION_FAILED',
+    'INVALID_PARAMETER',
+    'UNAUTHORIZED',
+    'SESSION_EXPIRED',
+    'FORBIDDEN',
+    'RESOURCE_NOT_FOUND',
+    'CONCURRENT_MODIFICATION',
+    'BUSINESS_RULE_VIOLATION',
+  )
+  async updateResponsibles(
+    @UuidParam('requestId') requestId: string,
+    @Body() request: UpdateRequestResponsiblesRequest,
+    @CurrentPrincipal() principal: Principal,
+  ): Promise<ManagedTimeOffRequestResponse> {
+    return toManagedTimeOffRequestResponse(
+      await this.decisionService.updateResponsibles(
+        requestId,
+        request.responsibleUserIds,
+        principal.userId,
+      ),
+    );
   }
 
   @Post(':requestId/comments')
@@ -161,8 +212,50 @@ export class ManagedTimeOffController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<TimeOffCommentResponse> {
     return toTimeOffCommentResponse(
-      await this.decisionService.comment(requestId, request.body, principal.userId),
+      await this.commentService.add(requestId, request.body, principal.userId),
     );
+  }
+
+  @Put(':requestId/comments/:commentId')
+  @Authorize(can.editTimeOffComment)
+  @ApiOperation({ summary: 'Edit own comment on a request (its author only)' })
+  @ZodResponse({ status: HttpStatus.OK, type: TimeOffCommentResponse })
+  @ApiErrors(
+    'VALIDATION_FAILED',
+    'INVALID_PARAMETER',
+    'UNAUTHORIZED',
+    'SESSION_EXPIRED',
+    'FORBIDDEN',
+    'RESOURCE_NOT_FOUND',
+  )
+  async editComment(
+    @UuidParam('requestId') requestId: string,
+    @UuidParam('commentId') commentId: string,
+    @Body() request: AddTimeOffCommentRequest,
+    @CurrentPrincipal() principal: Principal,
+  ): Promise<TimeOffCommentResponse> {
+    return toTimeOffCommentResponse(
+      await this.commentService.edit(requestId, commentId, request.body, principal.userId),
+    );
+  }
+
+  @Delete(':requestId/comments/:commentId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorize(can.editTimeOffComment)
+  @ApiOperation({ summary: 'Delete own comment on a request (its author only)' })
+  @ApiErrors(
+    'INVALID_PARAMETER',
+    'UNAUTHORIZED',
+    'SESSION_EXPIRED',
+    'FORBIDDEN',
+    'RESOURCE_NOT_FOUND',
+  )
+  async deleteComment(
+    @UuidParam('requestId') requestId: string,
+    @UuidParam('commentId') commentId: string,
+    @CurrentPrincipal() principal: Principal,
+  ): Promise<void> {
+    await this.commentService.remove(requestId, commentId, principal.userId);
   }
 
   private async decide(

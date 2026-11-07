@@ -1,5 +1,6 @@
 import Typography from '@mui/material/Typography';
 import { m, useReducedMotion } from 'motion/react';
+import { signed } from '../chart';
 import { useTranslation } from 'react-i18next';
 import { TIME_OFF_TYPE_VISUALS } from '@/features/time-off';
 import { cn } from '@/shared/lib/cn';
@@ -47,7 +48,7 @@ export function AbsenceSection({ filter }: { filter: InsightsFilter }) {
               data.previousAverageDays !== null && (
                 <DeltaLine
                   direction={Math.round((data.averageDays - data.previousAverageDays) * 10)}
-                  change={`${data.averageDays - data.previousAverageDays > 0 ? '+' : '−'}${decimal(Math.abs(data.averageDays - data.previousAverageDays))}`}
+                  change={signed(data.averageDays - data.previousAverageDays, i18n.language)}
                   previousYear={filter.year - 1}
                   better="down"
                 />

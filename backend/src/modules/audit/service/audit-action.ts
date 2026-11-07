@@ -11,6 +11,7 @@ export const AuditAction = {
   TIME_OFF_REQUEST_APPROVED: 'time_off_request.approved',
   TIME_OFF_REQUEST_REJECTED: 'time_off_request.rejected',
   TIME_OFF_REQUEST_CANCELED: 'time_off_request.canceled',
+  TIME_OFF_REQUEST_UPDATED: 'time_off_request.updated',
 } as const;
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];
 export const AUDIT_ACTIONS = Object.values(AuditAction) as [AuditAction, ...AuditAction[]];

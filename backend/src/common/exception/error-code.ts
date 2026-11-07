@@ -6,6 +6,8 @@ export const ErrorCode = {
   INVALID_CREDENTIALS: 401,
   SESSION_EXPIRED: 401,
   FORBIDDEN: 403,
+  /** Correct credentials of someone no longer employed. */
+  ACCESS_ENDED: 403,
   RESOURCE_NOT_FOUND: 404,
   CONFLICT: 409,
   CONCURRENT_MODIFICATION: 409,

@@ -1,7 +1,7 @@
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { monthLabels } from '../chart';
+import { monthLabels, signed } from '../chart';
 import { useTurnover } from '../hooks/useInsights';
 import type { InsightsFilter, TurnoverMovement } from '../types';
 import { ChartLegend } from './ChartLegend';
@@ -18,7 +18,7 @@ const LEFT = 'bg-chart-c2';
 /** Hires and leavers per month side by side; a month lists who joined and who left. */
 export interface TurnoverSectionProps {
   filter: InsightsFilter;
-  /** The viewer's current year and month, read once per visit. */
+  /** This year and month (UTC), read once per visit. */
   now: { year: number; month: number };
 }
 
@@ -101,7 +101,9 @@ export function TurnoverSection({ filter, now }: TurnoverSectionProps) {
               data.previousRate !== null && (
                 <DeltaLine
                   direction={Math.round((data.rate - data.previousRate) * 10)}
-                  change={`${data.rate - data.previousRate > 0 ? '+' : '−'}${percent(Math.abs(data.rate - data.previousRate))} pp`}
+                  change={t('common.changePoints', {
+                    value: signed(data.rate - data.previousRate, i18n.language),
+                  })}
                   previousYear={filter.year - 1}
                   better="down"
                 />

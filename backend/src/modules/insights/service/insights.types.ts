@@ -77,3 +77,11 @@ export interface Salary {
   previousAverage: Decimal | null;
   groups: SalaryGroup[];
 }
+
+export interface Insights {
+  headcount: Headcount;
+  tenure: Tenure;
+  turnover: Turnover;
+  absence: Absence;
+  salary: Salary;
+}

@@ -1,31 +1,30 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query';
 import { insightsApi } from '../api/insightsApi';
-import type { InsightsFilter } from '../types';
+import type { Insights, InsightsFilter } from '../types';
 
 /** No tenant: one company per installation. */
 export const insightsKeys = {
   all: ['insights'] as const,
-  figure: (name: string, filter: InsightsFilter) => [...insightsKeys.all, name, filter] as const,
+  year: (filter: InsightsFilter) => [...insightsKeys.all, 'year', filter] as const,
   categories: () => [...insightsKeys.all, 'categories'] as const,
 };
 
-/** Another year or category keeps the previous figures on screen until the new ones arrive. */
-const figure = <T>(name: string, filter: InsightsFilter, load: (f: InsightsFilter) => Promise<T>) =>
-  ({
-    queryKey: insightsKeys.figure(name, filter),
-    queryFn: () => load(filter),
+/**
+ * One figure of the year. Every section shares one request (same key, one cache entry) and
+ * selects its part; another year or category keeps the old figures until the new ones arrive.
+ */
+const useFigure = <K extends keyof Insights>(filter: InsightsFilter, figure: K) =>
+  useQuery({
+    queryKey: insightsKeys.year(filter),
+    queryFn: () => insightsApi.get(filter),
     placeholderData: keepPreviousData,
-  }) as const;
+    select: (insights: Insights): Insights[K] => insights[figure],
+  });
 
-export const useHeadcount = (filter: InsightsFilter) =>
-  useQuery(figure('headcount', filter, insightsApi.headcount));
-export const useTenure = (filter: InsightsFilter) =>
-  useQuery(figure('tenure', filter, insightsApi.tenure));
-export const useTurnover = (filter: InsightsFilter) =>
-  useQuery(figure('turnover', filter, insightsApi.turnover));
-export const useAbsence = (filter: InsightsFilter) =>
-  useQuery(figure('absence', filter, insightsApi.absence));
-export const useSalary = (filter: InsightsFilter) =>
-  useQuery(figure('salary', filter, insightsApi.salary));
+export const useHeadcount = (filter: InsightsFilter) => useFigure(filter, 'headcount');
+export const useTenure = (filter: InsightsFilter) => useFigure(filter, 'tenure');
+export const useTurnover = (filter: InsightsFilter) => useFigure(filter, 'turnover');
+export const useAbsence = (filter: InsightsFilter) => useFigure(filter, 'absence');
+export const useSalary = (filter: InsightsFilter) => useFigure(filter, 'salary');
 export const useInsightCategories = () =>
   useQuery({ queryKey: insightsKeys.categories(), queryFn: insightsApi.categories });

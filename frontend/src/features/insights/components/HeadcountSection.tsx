@@ -2,7 +2,7 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/cn';
-import { monthLabels } from '../chart';
+import { monthLabels, signed } from '../chart';
 import { useHeadcount } from '../hooks/useInsights';
 import type { InsightsFilter } from '../types';
 import { ChartLegend } from './ChartLegend';
@@ -69,7 +69,7 @@ export function HeadcountSection({ filter, colorFor }: HeadcountSectionProps) {
               selected === lastStarted && (
                 <DeltaLine
                   direction={data.current - data.previous}
-                  change={`${data.current - data.previous > 0 ? '+' : '−'}${number(Math.abs(data.current - data.previous))}`}
+                  change={signed(data.current - data.previous, i18n.language)}
                   previousYear={filter.year - 1}
                   better="up"
                 />

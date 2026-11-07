@@ -510,6 +510,25 @@ export class EmployeeService {
     return employee ? toTimeOff(employee) : null;
   }
 
+  /**
+   * For other modules (auth): has this user's employment ended (terminated on or before today)?
+   * Admins have no employee record — never.
+   */
+  async hasAccessEnded(userId: string): Promise<boolean> {
+    const employee = await this.employeeRepository.findTimeOffByUserId(userId);
+    return employee?.terminatedOn != null && employee.terminatedOn <= todayUtc();
+  }
+
+  /** For other modules (auth): users whose employment ended in the last `days` days, today included. */
+  usersWhoLeftWithin(days: number): Promise<string[]> {
+    const today = todayUtc();
+    return this.employeeRepository.findUserIdsTerminatedBetween(
+      minusDays(today, days - 1),
+      today,
+      MAX_ROSTER,
+    );
+  }
+
   /** For other modules (time off): one employee; null when unknown. */
   async findForTimeOff(employeeId: string): Promise<EmployeeForTimeOff | null> {
     const employee = await this.employeeRepository.findTimeOffById(employeeId);

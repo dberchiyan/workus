@@ -10,16 +10,20 @@ import { can } from '../../../common/security/policies';
 import type { Principal } from '../../../common/security/principal';
 import { Authorize } from '../../../common/security/security.decorators';
 import { TIME_OFF_REQUEST_PAGEABLE, type TimeOffRequestSortField } from '../service/time-off-sort';
+import { TimeOffCommentService } from '../service/time-off-comment.service';
 import { TimeOffService } from '../service/time-off.service';
+import { AddTimeOffCommentRequest } from './dto/add-time-off-comment.request';
 import { CreateTimeOffRequestRequest } from './dto/create-time-off-request.request';
 import { TimeOffRequestFilterQuery } from './dto/time-off-request-filter.query';
 import {
   LeaveBalancesResponse,
+  TimeOffCommentResponse,
   TimeOffRequestPageResponse,
   TimeOffRequestResponse,
 } from './dto/time-off.response';
 import {
   toLeaveBalancesResponse,
+  toTimeOffCommentResponse,
   toTimeOffRequestPageResponse,
   toTimeOffRequestResponse,
 } from './mapper/time-off.mapper';
@@ -28,7 +32,10 @@ import {
 @ApiTags('Time off')
 @Controller('api/v1/time-off')
 export class TimeOffController {
-  constructor(private readonly timeOffService: TimeOffService) {}
+  constructor(
+    private readonly timeOffService: TimeOffService,
+    private readonly commentService: TimeOffCommentService,
+  ) {}
 
   @Get('balances')
   @Authorize(can.authenticated)
@@ -116,5 +123,30 @@ export class TimeOffController {
     @CurrentPrincipal() principal: Principal,
   ): Promise<TimeOffRequestResponse> {
     return toTimeOffRequestResponse(await this.timeOffService.cancel(principal.userId, requestId));
+  }
+
+  @Post('requests/:requestId/comments')
+  @HttpCode(HttpStatus.OK)
+  @Authorize(can.commentOwnTimeOffRequest)
+  @Idempotent()
+  @ApiOperation({ summary: 'Comment on own request; the admins see it' })
+  @ZodResponse({ status: HttpStatus.OK, type: TimeOffCommentResponse })
+  @ApiErrors(
+    'VALIDATION_FAILED',
+    'INVALID_PARAMETER',
+    'UNAUTHORIZED',
+    'SESSION_EXPIRED',
+    'FORBIDDEN',
+    'RESOURCE_NOT_FOUND',
+    'IDEMPOTENCY_KEY_REUSED',
+  )
+  async comment(
+    @UuidParam('requestId') requestId: string,
+    @Body() request: AddTimeOffCommentRequest,
+    @CurrentPrincipal() principal: Principal,
+  ): Promise<TimeOffCommentResponse> {
+    return toTimeOffCommentResponse(
+      await this.commentService.add(requestId, request.body, principal.userId),
+    );
   }
 }

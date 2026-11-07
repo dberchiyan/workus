@@ -74,7 +74,8 @@
       "CREATED": "Created the request",
       "APPROVED": "Approved",
       "REJECTED": "Rejected",
-      "CANCELED": "Canceled"
+      "CANCELED": "Canceled",
+      "RESPONSIBLES_CHANGED": "Changed who decides"
     },
     "commentBy": "{{name}} · {{date}}"
   },
@@ -206,7 +207,8 @@
       "CREATED": "{{name}} sent the request",
       "APPROVED": "{{name}} approved it",
       "REJECTED": "{{name}} rejected it",
-      "CANCELED": "{{name}} canceled it"
+      "CANCELED": "{{name}} canceled it",
+      "RESPONSIBLES_CHANGED": "{{name}} changed who decides it"
     },
     "comment": {
       "label": "Comment",
@@ -221,7 +223,9 @@
       "reject": {
         "title": "Reject this request?",
         "description": "{{name}}’s {{type}} request for {{period}} will be rejected and the days return to the balance. This can’t be undone — they can send a new request.",
-        "confirm": "Reject request"
+        "confirm": "Reject request",
+        "reason": "Reason (optional)",
+        "reasonHint": "The employee sees it with the decision · {{count}}/{{max}}"
       },
       "cancel": {
         "title": "Cancel this request?",
@@ -233,6 +237,31 @@
       "approve": "Approved: {{name}}, {{type}} {{period}}",
       "reject": "Rejected: {{name}}, {{type}} {{period}}",
       "cancel": "Canceled: {{name}}, {{type}} {{period}}"
+    },
+    "responsibles": {
+      "edit": "Change who decides this request",
+      "editShort": "Change",
+      "title": "Who decides this request",
+      "intro": "Choose the administrators who decide {{name}}’s request. Any admin can change this while the request is pending.",
+      "label": "Responsible administrators",
+      "hint": "1 to {{max}} administrators",
+      "noOptions": "No administrators found",
+      "loading": "Searching…",
+      "admin": "Administrator",
+      "cancel": "Cancel",
+      "save": "Save"
     }
+  },
+  "comments": {
+    "edited": "edited",
+    "edit": "Edit comment",
+    "delete": "Delete comment",
+    "editLabel": "Edit your comment",
+    "cancel": "Cancel",
+    "save": "Save",
+    "deleteTitle": "Delete this comment?",
+    "deleteText": "Everyone who sees this request will no longer see it. This can’t be undone.",
+    "keep": "Keep it",
+    "deleteConfirm": "Delete comment"
   }
 }

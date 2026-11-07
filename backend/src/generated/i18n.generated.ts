@@ -12,6 +12,7 @@ export type I18nTranslations = {
         "UNAUTHORIZED": string;
         "INVALID_CREDENTIALS": string;
         "SESSION_EXPIRED": string;
+        "ACCESS_ENDED": string;
         "FORBIDDEN": string;
         "RESOURCE_NOT_FOUND": string;
         "CONFLICT": string;
@@ -150,6 +151,9 @@ export type I18nTranslations = {
         "dateOfBirth": {
             "invalid": string;
             "inFuture": string;
+        };
+        "decisionComment": {
+            "tooLong": string;
         };
     };
 };

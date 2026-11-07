@@ -39,7 +39,7 @@ export class DashboardService {
     return { today, timeOff, reviews, movements };
   }
 
-  /** Requests made between `from` and `to` (the viewer's local day), newest first. */
+  /** Requests made between `from` and `to` (today, UTC), newest first. */
   requestsMadeBetween(from: string, to: string): Promise<DashboardRequests> {
     return this.timeOffService.requestsCreatedBetween(new Date(from), new Date(to), MAX_REQUESTS);
   }

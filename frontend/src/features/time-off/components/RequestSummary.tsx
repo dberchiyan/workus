@@ -5,7 +5,7 @@ import { cn } from '@/shared/lib/cn';
 import { formatCount, formatDateTime, formatPeriod } from '../format';
 import { useEmployeeBalances } from '../hooks/useTimeOffQueries';
 import type { ManagedRequest } from '../types';
-import { PersonLine } from './PersonLine';
+import { RequestResponsibles } from './RequestResponsibles';
 import { TYPE_VISUALS } from './timeOffVisuals';
 
 function Fact({ label, children }: { label: string; children: ReactNode }) {
@@ -90,26 +90,7 @@ export function RequestSummary({ request, viewerId }: RequestSummaryProps) {
           </Typography>
         </div>
       )}
-      <div className="flex flex-col gap-3">
-        <Typography variant="overline" component="h3" color="textSecondary">
-          {t('details.responsible', { count: request.responsibles.length })}
-        </Typography>
-        <ul className="m-0 flex list-none flex-col gap-3 p-0">
-          {request.responsibles.map((person) => (
-            <li key={person.id} className="flex items-center justify-between gap-2">
-              <PersonLine person={person} />
-              {person.id === viewerId && (
-                <Typography
-                  variant="caption"
-                  className="rounded-full bg-badge-active-background px-2 text-badge-active-text"
-                >
-                  {t('manage.dialog.you')}
-                </Typography>
-              )}
-            </li>
-          ))}
-        </ul>
-      </div>
+      <RequestResponsibles request={request} viewerId={viewerId} />
     </div>
   );
 }

@@ -32,7 +32,8 @@ model TimeOffRequest {
   @@map("time_off_requests")
 }
 
-/// Who may decide the request: the employee's responsible people when it was made.
+/// Who may decide the request: the employee's responsible people when it was made; any admin may
+/// change them while it is pending.
 model TimeOffRequestResponsible {
   requestId         String         @map("request_id") @db.Uuid
   // The assignment means nothing without the request.
@@ -47,7 +48,7 @@ model TimeOffRequestResponsible {
   @@map("time_off_request_responsibles")
 }
 
-/// Admins' comments on a request, oldest first; written once, never edited.
+/// Comments on a request by admins and the employee; only the author edits or deletes one.
 model TimeOffRequestComment {
   id        String         @id(map: "pk_time_off_request_comments") @default(dbgenerated("uuidv7()")) @db.Uuid
   requestId String         @map("request_id") @db.Uuid
@@ -56,6 +57,8 @@ model TimeOffRequestComment {
   author    User           @relation("TimeOffRequestCommentAuthor", fields: [authorId], references: [id], onDelete: Restrict, map: "fk_time_off_request_comments_author_id")
   body      String         @db.VarChar(1000)
   createdAt DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+  /// Set when its author edits it (only the author edits or deletes a comment).
+  editedAt  DateTime?      @map("edited_at") @db.Timestamptz(3)
 
   @@index([requestId, createdAt], map: "idx_time_off_request_comments_request_id_created_at")
   @@index([authorId], map: "idx_time_off_request_comments_author_id")

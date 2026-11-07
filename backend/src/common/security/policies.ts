@@ -31,6 +31,18 @@ export const can = {
   /** Edit one employee (e.g. their responsible people): admin, for the employee in the path. */
   manageEmployee: policy(['employeeId'], (principal) => principal.hasAuthority('ADMIN')),
   /** One time-off request: the caller's own (the request belongs to their employee record). */
+  /** The employee comments on their own request. */
+  commentOwnTimeOffRequest: policy(['requestId'], (principal, args, permissions) =>
+    permissions.isOwnTimeOffRequest(principal.userId, args.requestId ?? ''),
+  ),
+  /** Only a comment's author (admin or employee) edits or deletes it. */
+  editTimeOffComment: policy(['requestId', 'commentId'], (principal, args, permissions) =>
+    permissions.isTimeOffCommentAuthor(
+      principal.userId,
+      args.requestId ?? '',
+      args.commentId ?? '',
+    ),
+  ),
   cancelOwnTimeOffRequest: policy(['requestId'], (principal, args, permissions) =>
     permissions.isOwnTimeOffRequest(principal.userId, args.requestId ?? ''),
   ),
@@ -41,6 +53,8 @@ export const can = {
   /** One request (no tenant): admin; the service answers 404 for an unknown id. */
   viewTimeOffRequest: policy(['requestId'], (principal) => principal.hasAuthority('ADMIN')),
   /** Any admin may comment on a request. */
+  /** Who decides a pending request: any admin may change it (so no request is left undecidable). */
+  manageTimeOffRequest: policy(['requestId'], (principal) => principal.hasAuthority('ADMIN')),
   commentTimeOffRequest: policy(['requestId'], (principal) => principal.hasAuthority('ADMIN')),
   /** Approve, reject, cancel: an admin who is one of the request's responsible people. */
   decideTimeOffRequest: policy(

@@ -12,8 +12,8 @@ export interface DecisionNotice {
 type Confirmable = { request: ManagedRequest; decision: 'reject' | 'cancel' };
 
 /**
- * Approve runs at once (it is what the request asks for); reject and cancel are confirmed
- * first. A failed approve is announced; a failed confirmation shows in its dialog.
+ * Approve runs at once (it is what the request asks for); reject (with an optional reason) and
+ * cancel are confirmed first. A failed approve is announced; a failed confirmation shows in its dialog.
  */
 export const useRequestDecisions = () => {
   const decide = useDecideRequest();
@@ -22,9 +22,17 @@ export const useRequestDecisions = () => {
   const [notice, setNotice] = useState<DecisionNotice | null>(null);
   const [failure, setFailure] = useState<ErrorCode | null>(null);
 
-  const run = async (request: ManagedRequest, decision: TimeOffDecision): Promise<boolean> => {
+  const run = async (
+    request: ManagedRequest,
+    decision: TimeOffDecision,
+    comment?: string,
+  ): Promise<boolean> => {
     try {
-      const updated = await decide.mutateAsync({ requestId: request.id, decision });
+      const updated = await decide.mutateAsync({
+        requestId: request.id,
+        decision,
+        ...(comment ? { comment } : {}),
+      });
       setNotice({ decision, request: updated });
       return true;
     } catch (error) {
@@ -55,8 +63,9 @@ export const useRequestDecisions = () => {
     setConfirming((current) => (current ? { ...current, open: false } : null));
   };
 
-  const confirm = async (): Promise<void> => {
-    if (confirming && (await run(confirming.request, confirming.decision))) {
+  /** `comment`: why it is rejected (optional; rejections only). */
+  const confirm = async (comment?: string): Promise<void> => {
+    if (confirming && (await run(confirming.request, confirming.decision, comment))) {
       closeConfirm();
     }
   };
@@ -67,7 +76,7 @@ export const useRequestDecisions = () => {
     isPending: decide.isPending,
     confirming,
     confirmError,
-    confirm: () => void confirm(),
+    confirm: (comment?: string) => void confirm(comment),
     closeConfirm,
     clearConfirm: () => {
       setConfirming(null);

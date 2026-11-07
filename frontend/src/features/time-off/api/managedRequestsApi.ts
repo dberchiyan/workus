@@ -3,6 +3,7 @@ import type {
   ClosedStatus,
   ManagedRequest,
   ManagedRequestPage,
+  ResponsibleCandidate,
   TimeOffComment,
   TimeOffDecision,
   TimeOffType,
@@ -49,9 +50,35 @@ export const managedRequestsApi = {
     ).data,
   get: async (requestId: string): Promise<ManagedRequest> =>
     (await apiClient.get<ManagedRequest>(requestUrl(requestId))).data,
-  decide: async (requestId: string, decision: TimeOffDecision): Promise<ManagedRequest> =>
-    (await apiClient.post<ManagedRequest>(`${requestUrl(requestId)}/${DECISION_PATHS[decision]}`))
-      .data,
+  /** A rejection may say why (the employee sees it). */
+  decide: async (
+    requestId: string,
+    decision: TimeOffDecision,
+    comment?: string,
+  ): Promise<ManagedRequest> =>
+    (
+      await apiClient.post<ManagedRequest>(
+        `${requestUrl(requestId)}/${DECISION_PATHS[decision]}`,
+        decision === 'reject' && comment ? { comment } : {},
+      )
+    ).data,
+  /** Any admin replaces who decides a pending request. */
+  updateResponsibles: async (
+    requestId: string,
+    responsibleUserIds: string[],
+  ): Promise<ManagedRequest> =>
+    (
+      await apiClient.put<ManagedRequest>(`${requestUrl(requestId)}/responsibles`, {
+        responsibleUserIds,
+      })
+    ).data,
+  /** Admins who can be responsible, matching the search. */
+  candidates: async (search: string): Promise<ResponsibleCandidate[]> =>
+    (
+      await apiClient.get<{ content: ResponsibleCandidate[] }>('/api/v1/responsible-candidates', {
+        params: search ? { search } : {},
+      })
+    ).data.content,
   /** The key identifies one logical "send" — reused on retry so it never posts twice. */
   comment: async (
     requestId: string,
