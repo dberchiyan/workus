@@ -15,6 +15,10 @@ export type ManagedRequest = Schemas['ManagedTimeOffRequest_Output'];
 export type ManagedRequestPage = Schemas['ManagedTimeOffRequestPageResponse_Output'];
 /** One month of the company calendar: people with their approved and pending requests. */
 export type TimeOffCalendar = Schemas['TimeOffCalendarResponse_Output'];
+export type CalendarHoliday = TimeOffCalendar['holidays'][number];
+export type Holiday = Schemas['Holiday_Output'];
+export type CreateHolidayRequest = Schemas['CreateHolidayRequest'];
+export type UpdateHolidayRequest = Schemas['UpdateHolidayRequest'];
 export type CalendarRow = TimeOffCalendar['content'][number];
 export type CalendarRequest = CalendarRow['requests'][number];
 /** An admin who can decide requests (the people picker's options). */

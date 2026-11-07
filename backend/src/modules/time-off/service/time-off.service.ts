@@ -13,6 +13,7 @@ import type { EmployeeForTimeOff } from '../../employee/core/service/employee.ty
 import { EmployeeService } from '../../employee/core/service/employee.service';
 import type { TimeOffRequestRecord } from '../repository/record/time-off-request.record';
 import { TimeOffRequestRepository } from '../repository/time-off-request.repository';
+import { HolidayService } from './holiday.service';
 import { cycleOf, LEAVE_POLICY, plusDays, todayUtc, workingDaysBetween } from './leave-policy';
 import type { CalendarSortField, TimeOffRequestSortField } from './time-off-sort';
 import { timeOffLabel } from './time-off-label';
@@ -50,6 +51,7 @@ export class TimeOffService {
     private readonly requestRepository: TimeOffRequestRepository,
     private readonly employeeService: EmployeeService,
     private readonly auditService: AuditService,
+    private readonly holidayService: HolidayService,
   ) {}
 
   /**
@@ -67,7 +69,10 @@ export class TimeOffService {
   ): Promise<TimeOffCalendar> {
     const from = new Date(Date.UTC(query.year, query.month - 1, 1));
     const to = new Date(Date.UTC(query.year, query.month, 0));
-    const people = await this.employeeService.findCalendarPage(query.search, from, to, pageable);
+    const [people, holidays] = await Promise.all([
+      this.employeeService.findCalendarPage(query.search, from, to, pageable),
+      this.holidayService.daysBetween(from, to),
+    ]);
     const requests = await this.requestRepository.findCalendarRequests(
       people.content.map((employee) => employee.id),
       from,
@@ -77,6 +82,7 @@ export class TimeOffService {
     return {
       from,
       to,
+      holidays,
       content: people.content.map((employee) => ({
         employee,
         requests: requests.filter((request) => request.employeeId === employee.id),
@@ -93,7 +99,10 @@ export class TimeOffService {
     from: Date,
     to: Date,
   ): Promise<{ employeeId: string; type: TimeOffType; days: number }[]> {
-    const requests = await this.requestRepository.findApprovedWithTypeOverlapping(from, to);
+    const [requests, holidays] = await Promise.all([
+      this.requestRepository.findApprovedWithTypeOverlapping(from, to),
+      this.holidayService.datesBetween(from, to),
+    ]);
     return requests.map((request) => ({
       employeeId: request.employeeId,
       // Guarded by ck_time_off_requests_type.
@@ -101,6 +110,7 @@ export class TimeOffService {
       days: workingDaysBetween(
         request.startDate > from ? request.startDate : from,
         request.endDate < to ? request.endDate : to,
+        holidays,
       ),
     }));
   }
@@ -203,7 +213,11 @@ export class TimeOffService {
     if (employee.terminatedOn && endDate >= employee.terminatedOn) {
       throw new BusinessRuleException('errors.timeOff.afterTermination', {}, 'endDate');
     }
-    const days = workingDaysBetween(startDate, endDate);
+    const days = workingDaysBetween(
+      startDate,
+      endDate,
+      await this.holidayService.datesBetween(startDate, endDate),
+    );
     if (days === 0) {
       throw new BusinessRuleException('errors.timeOff.noWorkingDays', {}, 'endDate');
     }

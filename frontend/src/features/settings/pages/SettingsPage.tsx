@@ -1,6 +1,9 @@
 import Typography from '@mui/material/Typography';
+import { useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, NavLink, useParams } from 'react-router';
+import { useAccess } from '@/features/auth';
+import { HolidaysSection } from '@/features/time-off';
 import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
 import { cn } from '@/shared/lib/cn';
@@ -16,9 +19,21 @@ export default function SettingsPage() {
   const { t } = useTranslation('settings');
   const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
   const { section } = useParams();
+  const can = useAccess();
+  const navRef = useRef<HTMLElement>(null);
+
+  // On a phone the menu is one scrolling row: keep the open section in view.
+  useEffect(() => {
+    navRef.current
+      ?.querySelector('[aria-current="page"]')
+      ?.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+  }, [section]);
   useDocumentTitle(t('pageTitle'));
 
-  if (!isSettingsSection(section)) {
+  const sections = SETTINGS_SECTIONS.filter(
+    ({ key }) => key !== 'holidays' || can('settings.holidays'),
+  );
+  if (!isSettingsSection(section) || !sections.some(({ key }) => key === section)) {
     return <Navigate to={settingsPath('account')} replace />;
   }
 
@@ -40,9 +55,9 @@ export default function SettingsPage() {
       </div>
       {/* One-off geometry: the section menu keeps a fixed width beside the content. */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[13rem_minmax(0,1fr)]">
-        <nav aria-label={t('menu')}>
+        <nav ref={navRef} aria-label={t('menu')}>
           <ul className="m-0 flex list-none gap-1 overflow-x-auto p-0 md:flex-col">
-            {SETTINGS_SECTIONS.map(({ key, icon: Icon }) => (
+            {sections.map(({ key, icon: Icon }) => (
               <li key={key} className="shrink-0">
                 <NavLink
                   to={settingsPath(key)}
@@ -68,6 +83,7 @@ export default function SettingsPage() {
           {section === 'sessions' && <SessionsSection />}
           {section === 'security' && <SecuritySection />}
           {section === 'preferences' && <PreferencesSection />}
+          {section === 'holidays' && <HolidaysSection />}
         </div>
       </div>
     </div>

@@ -7,6 +7,7 @@ import { UserRole } from '../src/modules/user/service/user-role';
 import { databaseUrl } from '../src/common/config/database-url';
 import { ADMINS, contactsFor, EMPLOYEES, POSITION_CATEGORIES, SEED_PASSWORD } from './seed-data';
 import { seedActivity } from './seed-activity';
+import { seedHolidays } from './seed-holidays';
 import { seedReviews } from './seed-reviews';
 import {
   alignPendingResponsibles,
@@ -217,9 +218,11 @@ const seed = async (): Promise<void> => {
     const pending = await seedPendingRequests(prisma, admins[0] ?? '');
     const realigned = await alignPendingResponsibles(prisma);
     const comments = await seedTimeOffComments(prisma, admins);
+    // After the requests, so the ones covering a new holiday give its working day back.
+    const holidays = await seedHolidays(prisma);
 
     process.stdout.write(
-      `Seeded ${timeOff} time-off requests (pending: ${pending.created} added, ${pending.decided} decided; ${realigned} pending realigned to admins, ${comments} comments), ${activity} activity events, ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}, dates of birth for ${birthDates}\n`,
+      `Seeded ${holidays} holidays, ${timeOff} time-off requests (pending: ${pending.created} added, ${pending.decided} decided; ${realigned} pending realigned to admins, ${comments} comments), ${activity} activity events, ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}, dates of birth for ${birthDates}\n`,
     );
   } finally {
     await prisma.$disconnect();

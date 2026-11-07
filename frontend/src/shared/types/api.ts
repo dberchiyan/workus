@@ -608,6 +608,42 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/holidays": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The company holidays of one year, by date */
+        get: operations["HolidayController_list"];
+        put?: never;
+        /** Add a holiday; held requests covering it give back a working day */
+        post: operations["HolidayController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/holidays/{holidayId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Change a holiday’s date, name or whether it repeats every year */
+        put: operations["HolidayController_update"];
+        post?: never;
+        /** Remove a holiday; held requests covering it take the day again */
+        delete: operations["HolidayController_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/dashboard/admin": {
         parameters: {
             query?: never;
@@ -891,14 +927,14 @@ export interface components {
                 } | null;
                 target: {
                     /** @enum {string} */
-                    type: "employee" | "review" | "time_off_request" | "user";
+                    type: "employee" | "review" | "time_off_request" | "holiday" | "user";
                     /** Format: uuid */
                     id: string;
                     label: string;
                 };
                 changes: {
                     /** @enum {string} */
-                    field: "title" | "date" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startDate" | "firstName" | "lastName" | "email" | "mobile" | "personalEmail" | "linkedinUrl" | "telegram" | "address" | "dateOfBirth" | "terminationDate" | "terminationReason" | "terminationComment" | "timeOffType" | "periodStart" | "periodEnd" | "days" | "note" | "decisionComment";
+                    field: "title" | "date" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startDate" | "firstName" | "lastName" | "email" | "mobile" | "personalEmail" | "linkedinUrl" | "telegram" | "address" | "dateOfBirth" | "terminationDate" | "terminationReason" | "terminationComment" | "timeOffType" | "periodStart" | "periodEnd" | "days" | "note" | "decisionComment" | "name" | "recurring";
                     from: ({
                         /** @enum {string} */
                         kind: "text";
@@ -947,6 +983,10 @@ export interface components {
                         /** @enum {string} */
                         kind: "number";
                         number: number;
+                    } | {
+                        /** @enum {string} */
+                        kind: "flag";
+                        flag: boolean;
                     }) | null;
                     to: ({
                         /** @enum {string} */
@@ -996,6 +1036,10 @@ export interface components {
                         /** @enum {string} */
                         kind: "number";
                         number: number;
+                    } | {
+                        /** @enum {string} */
+                        kind: "flag";
+                        flag: boolean;
                     }) | null;
                 }[];
             }[];
@@ -1597,6 +1641,11 @@ export interface components {
             from: string;
             /** Format: date */
             to: string;
+            holidays: {
+                /** Format: date */
+                date: string;
+                name: string;
+            }[];
         };
         ManagedTimeOffRequest_Output: {
             /** Format: uuid */
@@ -1733,6 +1782,42 @@ export interface components {
         };
         UpdateRequestResponsiblesRequest: {
             responsibleUserIds: string[];
+        };
+        Holiday_Output: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            date: string;
+            name: string;
+            recurring: boolean;
+            carriedOver: boolean;
+            version: number;
+        };
+        HolidayListResponse_Output: {
+            content: components["schemas"]["Holiday_Output"][];
+        };
+        CreateHolidayRequest: {
+            /** Format: date */
+            date: string;
+            name: string;
+            recurring: boolean;
+        };
+        HolidayResponse_Output: {
+            /** Format: uuid */
+            id: string;
+            /** Format: date */
+            date: string;
+            name: string;
+            recurring: boolean;
+            carriedOver: boolean;
+            version: number;
+        };
+        UpdateHolidayRequest: {
+            /** Format: date */
+            date: string;
+            name: string;
+            recurring: boolean;
+            version: number;
         };
         AdminDashboardResponse_Output: {
             /** Format: date */
@@ -4347,6 +4432,222 @@ export interface operations {
         };
     };
     ManagedTimeOffController_deleteComment: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    HolidayController_list: {
+        parameters: {
+            query: {
+                year: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HolidayListResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    HolidayController_create: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per logical operation, reused on retry */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateHolidayRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HolidayResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    HolidayController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateHolidayRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HolidayResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT | CONCURRENT_MODIFICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    HolidayController_remove: {
         parameters: {
             query?: never;
             header?: never;

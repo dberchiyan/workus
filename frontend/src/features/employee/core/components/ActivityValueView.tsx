@@ -107,6 +107,12 @@ export function ActivityValueView({ value }: { value: ActivityValue }) {
           {new Intl.NumberFormat(i18n.language).format(value.number)}
         </Typography>
       );
+    case 'flag':
+      return (
+        <Typography variant="body2" component="span">
+          {value.flag ? t('profile.activity.flag.yes') : t('profile.activity.flag.no')}
+        </Typography>
+      );
     case 'feedback':
     case 'redacted':
       // Rendered by the change row (added / edited / removed); the value is never logged.

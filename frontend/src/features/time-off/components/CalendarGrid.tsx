@@ -14,6 +14,8 @@ export interface CalendarGridProps {
   month: string;
   today: string;
   rows: CalendarRow[] | undefined;
+  /** Company holidays of the month: `YYYY-MM-DD` → name. */
+  holidays: ReadonlyMap<string, string>;
   search: string;
   /** Requests open on the Requests page; names open the profile. */
   canOpenRequest: boolean;
@@ -29,6 +31,7 @@ export function CalendarGrid({
   month,
   today,
   rows,
+  holidays,
   search,
   canOpenRequest,
   canOpenProfile,
@@ -80,6 +83,7 @@ export function CalendarGrid({
                 key={date}
                 date={date}
                 today={date === today}
+                holiday={holidays.get(date)}
                 weekday={weekday.format(new Date(`${date}T00:00:00Z`))}
                 {...(date === today ? { ref: todayRef } : {})}
               />
@@ -113,6 +117,7 @@ export function CalendarGrid({
               row={row}
               days={days}
               today={today}
+              holidays={holidays}
               canOpenRequest={canOpenRequest}
               canOpenProfile={canOpenProfile}
             />

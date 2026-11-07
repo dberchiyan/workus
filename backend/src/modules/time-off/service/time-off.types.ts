@@ -83,6 +83,8 @@ export interface TimeOffCalendar {
   /** First and last day of the month. */
   from: Date;
   to: Date;
+  /** Company holidays in the month, by date. */
+  holidays: { date: Date; name: string }[];
   content: CalendarRow[];
   totalElements: number;
 }

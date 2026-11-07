@@ -30,6 +30,9 @@
     "terminationBeforeStart": "The termination date can’t be before the start date",
     "terminationReasonInvalid": "Choose a reason from the list"
   },
+  "holiday": {
+    "dateTaken": "There is already a holiday on this date"
+  },
   "review": {
     "responsibleNotFound": "One of the chosen responsible people is no longer active — choose again",
     "startingNotDeletable": "The starting salary can’t be deleted — it starts the salary history. Edit it instead",
@@ -40,7 +43,7 @@
   "timeOff": {
     "beforeStart": "Time off can’t start before your start date",
     "afterTermination": "Time off can’t reach past your last day",
-    "noWorkingDays": "These dates have no working days — choose Monday to Friday",
+    "noWorkingDays": "These dates have no working days — they fall on weekends or company holidays",
     "overlaps": "You already have a request for some of these days",
     "notEnoughDays": "Only {available} days are left in this cycle; this request takes {requested}",
     "noResponsible": "Nobody is responsible for you yet, so no one can approve the request — ask an admin",

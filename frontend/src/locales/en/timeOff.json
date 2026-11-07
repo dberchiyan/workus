@@ -97,7 +97,8 @@
     "daysAvailable": "Days available",
     "unlimited": "No limit",
     "notePlaceholder": "Add a comment",
-    "overBalance": "more than available"
+    "overBalance": "more than available",
+    "holiday": "{{name}} (holiday)"
   },
   "cancel": {
     "title": "Cancel this request?",
@@ -129,7 +130,9 @@
       "error": "The calendar could not be loaded.",
       "retry": "Try again",
       "rowsPerPage": "Rows per page",
-      "displayed": "{{from}}–{{to}} of {{count}}"
+      "displayed": "{{from}}–{{to}} of {{count}}",
+      "holidayKey": "Company holiday",
+      "holiday": "Holiday: {{name}}"
     },
     "notEmployed": {
       "starts": "Not employed yet — starts on {{date}}",
@@ -263,5 +266,43 @@
     "deleteText": "Everyone who sees this request will no longer see it. This can’t be undone.",
     "keep": "Keep it",
     "deleteConfirm": "Delete comment"
+  },
+  "holidays": {
+    "title": "Company holidays",
+    "subtitle": "Days off for everyone. Time off never counts them as working days, and they show in red on the calendar.",
+    "add": "Add holiday",
+    "previousYear": "Previous year",
+    "nextYear": "Next year",
+    "count_one": "{{count}} holiday",
+    "count_other": "{{count}} holidays",
+    "loading": "Loading holidays…",
+    "error": "Couldn’t load the holidays.",
+    "retry": "Try again",
+    "empty": "No holidays in {{year}}",
+    "emptyHint": "Add the days the company is closed.",
+    "everyYear": "Every year",
+    "thisYearOnly": "This year only",
+    "onWeekend": "Falls on a weekend",
+    "edit": "Edit {{name}}",
+    "remove": "Remove {{name}}",
+    "dialog": {
+      "addTitle": "Add a holiday",
+      "editTitle": "Edit the holiday",
+      "date": "Date",
+      "name": "Name",
+      "recurring": "Repeats every year",
+      "recurringHint": "Copied to the same day next year; each year’s copy can then be changed on its own.",
+      "copyMade": "The {{year}} copy is already made — changes here don’t reach it.",
+      "cancel": "Cancel",
+      "add": "Add holiday",
+      "save": "Save"
+    },
+    "delete": {
+      "title": "Remove this holiday?",
+      "body": "{{name}} on {{date}} becomes a working day: time-off requests covering it take that day again.",
+      "copyStays": "Its copy for next year stays.",
+      "keep": "Keep it",
+      "confirm": "Remove {{name}}"
+    }
   }
 }

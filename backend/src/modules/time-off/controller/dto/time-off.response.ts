@@ -148,5 +148,7 @@ export class TimeOffCalendarResponse extends createZodDto(
     /** First and last day of the month. */
     from: z.iso.date(),
     to: z.iso.date(),
+    /** Company holidays in the month, by date. */
+    holidays: z.array(z.object({ date: z.iso.date(), name: z.string() })).max(31),
   }),
 ) {}

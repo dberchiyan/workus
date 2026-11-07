@@ -24,6 +24,8 @@ export const ACCESS = {
   /** Calendar: a request opens on the Requests page, a name opens the profile. */
   'calendar.openRequest': ADMINS,
   'calendar.openProfile': ADMINS,
+  /** Settings: the company holidays are kept by admins. */
+  'settings.holidays': ADMINS,
 } as const satisfies Record<string, readonly UserRole[]>;
 
 export type AccessPart = keyof typeof ACCESS;

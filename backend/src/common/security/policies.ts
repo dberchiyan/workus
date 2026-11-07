@@ -11,6 +11,12 @@ export const can = {
   ),
   /** Company figures (headcount, tenure, turnover, absence, salaries) are an admin screen. */
   viewInsights: policy([], (principal) => principal.hasAuthority('ADMIN')),
+  /** Company holidays: every signed-in user sees them (calendar, requesting time off). */
+  viewHolidays: policy([], () => true),
+  /** Keeping the holidays is an admin task (Settings → Holidays). */
+  manageHolidays: policy([], (principal) => principal.hasAuthority('ADMIN')),
+  /** One holiday: admin; no tenant, so the authority is the whole chain (404 for unknown ids). */
+  manageHoliday: policy(['holidayId'], (principal) => principal.hasAuthority('ADMIN')),
   /** The employee directory is an admin screen. */
   viewEmployees: policy([], (principal) => principal.hasAuthority('ADMIN')),
   /**

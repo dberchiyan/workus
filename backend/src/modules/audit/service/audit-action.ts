@@ -12,6 +12,10 @@ export const AuditAction = {
   TIME_OFF_REQUEST_REJECTED: 'time_off_request.rejected',
   TIME_OFF_REQUEST_CANCELED: 'time_off_request.canceled',
   TIME_OFF_REQUEST_UPDATED: 'time_off_request.updated',
+  /** Company holidays — target type `holiday`, no employee. */
+  HOLIDAY_CREATED: 'holiday.created',
+  HOLIDAY_UPDATED: 'holiday.updated',
+  HOLIDAY_DELETED: 'holiday.deleted',
   /** Security log — target type `user`, no employee (never in the Activity tab). */
   AUTH_SIGNED_IN: 'auth.signed_in',
   AUTH_SIGN_IN_FAILED: 'auth.sign_in_failed',
@@ -35,6 +39,7 @@ export const AuditTargetType = {
   EMPLOYEE: 'employee',
   REVIEW: 'review',
   TIME_OFF_REQUEST: 'time_off_request',
+  HOLIDAY: 'holiday',
   USER: 'user',
 } as const;
 export type AuditTargetType = (typeof AuditTargetType)[keyof typeof AuditTargetType];
@@ -43,9 +48,14 @@ export const AUDIT_TARGET_TYPES = Object.values(AuditTargetType) as [
   ...AuditTargetType[],
 ];
 
-/** Actions of the records' history (Activity) — everything but the security log (auth.*). */
+/** Not in any employee's history: the security log (auth.*) and company holidays (holiday.*). */
+type CompanyAction = Extract<AuditAction, `auth.${string}` | `holiday.${string}`>;
+const isCompanyAction = (action: AuditAction): action is CompanyAction =>
+  action.startsWith('auth.') || action.startsWith('holiday.');
+
+/** Actions of the records' history (Activity). */
 export const RECORD_ACTIONS = AUDIT_ACTIONS.filter(
-  (action): action is Exclude<AuditAction, `auth.${string}`> => !action.startsWith('auth.'),
-) as [Exclude<AuditAction, `auth.${string}`>, ...Exclude<AuditAction, `auth.${string}`>[]];
+  (action): action is Exclude<AuditAction, CompanyAction> => !isCompanyAction(action),
+) as [Exclude<AuditAction, CompanyAction>, ...Exclude<AuditAction, CompanyAction>[]];
 export const isRecordAction = (action: AuditAction): action is (typeof RECORD_ACTIONS)[number] =>
-  !action.startsWith('auth.');
+  !isCompanyAction(action);

@@ -154,6 +154,10 @@ export const toTimeOffRequestPageResponse = (
 export const toTimeOffCalendarResponse = (calendar: TimeOffCalendar): TimeOffCalendarResponse => ({
   from: isoDate(calendar.from),
   to: isoDate(calendar.to),
+  holidays: calendar.holidays.map((holiday) => ({
+    date: isoDate(holiday.date),
+    name: holiday.name,
+  })),
   content: calendar.content.map(({ employee, requests }) => ({
     employee: {
       id: employee.id,

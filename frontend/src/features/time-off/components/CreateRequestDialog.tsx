@@ -13,12 +13,14 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useEffect, useId } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+import { todayUtcIso } from '@/shared/lib/utcDay';
 import { formatCount, formatDay, formatPeriod, workingDaysBetween } from '../format';
 import { useCreateRequestForm } from '../hooks/useCreateRequestForm';
 import { RESERVED_LINE, useFieldMessage } from '../hooks/useFieldMessage';
 import { TIME_OFF_LIMITS } from '../schemas';
 import type { LeaveBalance } from '../types';
 import { RangeCalendar } from './RangeCalendar';
+import { useHolidayNames } from '../hooks/useHolidays';
 import { TypeOptions } from './TypeOptions';
 
 export interface CreateRequestDialogProps {
@@ -52,7 +54,15 @@ export function CreateRequestDialog({
   const { register, control, formState, watch, setValue } = form;
   const { errors } = formState;
   const [type, startDate, endDate] = watch(['type', 'startDate', 'endDate']);
-  const days = workingDaysBetween(startDate, endDate);
+  // The years the range and the calendar can show: this one and the next.
+  const thisYear = Number(todayUtcIso().slice(0, 4));
+  const holidays = useHolidayNames([
+    thisYear,
+    thisYear + 1,
+    Number(startDate.slice(0, 4)) || thisYear,
+    Number(endDate.slice(0, 4)) || thisYear,
+  ]);
+  const days = workingDaysBetween(startDate, endDate, holidays);
   const balance = balances.find((item) => item.type === type);
   const isOverBalance = balance?.available != null && days > balance.available;
   const rangeError = errors.startDate ?? errors.endDate;
@@ -136,6 +146,7 @@ export function CreateRequestDialog({
                     setValue('startDate', range.start);
                     setValue('endDate', range.end);
                   }}
+                  holidays={holidays}
                 />
               </div>
               {/* What the request takes, before sending; a date error takes its place. */}

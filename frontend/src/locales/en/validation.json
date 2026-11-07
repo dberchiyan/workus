@@ -116,5 +116,10 @@
   "confirmPassword": {
     "required": "Repeat the new password",
     "mismatch": "The passwords don’t match"
+  },
+  "holiday": {
+    "date": "Enter the date",
+    "nameRequired": "Enter a name",
+    "nameTooLong": "Name must be at most {{max}} characters"
   }
 }

@@ -35,8 +35,12 @@ export const formatCount = (value: number, locale: string): string =>
 export const fullName = (person: { firstName: string; lastName: string }): string =>
   `${person.firstName} ${person.lastName}`;
 
-/** Mon–Fri days in [start, end] — the same rule as the server (no public holidays yet). */
-export const workingDaysBetween = (start: string, end: string): number => {
+/** Mon–Fri days in [start, end] that are not company holidays — the server's rule. */
+export const workingDaysBetween = (
+  start: string,
+  end: string,
+  holidays: ReadonlySet<string> | ReadonlyMap<string, unknown> = new Set(),
+): number => {
   const DAY_MS = 86_400_000;
   const from = Date.parse(`${start}T00:00:00Z`);
   const to = Date.parse(`${end}T00:00:00Z`);
@@ -46,7 +50,8 @@ export const workingDaysBetween = (start: string, end: string): number => {
   let days = 0;
   for (let day = from; day <= to; day += DAY_MS) {
     const weekday = new Date(day).getUTCDay();
-    if (weekday !== 0 && weekday !== 6) {
+    const iso = new Date(day).toISOString().slice(0, 10);
+    if (weekday !== 0 && weekday !== 6 && !holidays.has(iso)) {
       days += 1;
     }
   }

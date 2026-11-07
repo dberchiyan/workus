@@ -40,6 +40,7 @@ export default function CalendarPage() {
     calendar.isPlaceholderData && data?.from.slice(0, 7) !== params.month
       ? undefined
       : data?.content;
+  const holidays = new Map((rows ? (data?.holidays ?? []) : []).map((day) => [day.date, day.name]));
 
   return (
     <div className="flex flex-col gap-6">
@@ -85,6 +86,7 @@ export default function CalendarPage() {
             month={params.month}
             today={today}
             rows={rows}
+            holidays={holidays}
             search={params.search}
             canOpenRequest={can('calendar.openRequest')}
             canOpenProfile={can('calendar.openProfile')}

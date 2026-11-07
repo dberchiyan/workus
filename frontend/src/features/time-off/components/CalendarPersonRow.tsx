@@ -15,6 +15,7 @@ export interface CalendarPersonRowProps {
   row: CalendarRow;
   days: string[];
   today: string;
+  holidays: ReadonlyMap<string, string>;
   canOpenRequest: boolean;
   canOpenProfile: boolean;
 }
@@ -24,6 +25,7 @@ export function CalendarPersonRow({
   row,
   days,
   today,
+  holidays,
   canOpenRequest,
   canOpenProfile,
 }: CalendarPersonRowProps) {
@@ -89,6 +91,7 @@ export function CalendarPersonRow({
             className={cn(
               'h-14 border-b border-l border-divider p-0',
               isWeekendIso(cell.date) && 'bg-badge-neutral-background/60',
+              holidays.has(cell.date) && 'bg-error/10',
               cell.date === today && 'bg-primary/10',
             )}
           />

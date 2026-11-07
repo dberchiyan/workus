@@ -192,6 +192,28 @@ export class TimeOffRequestRepository {
     return count > 0;
   }
 
+  /**
+   * Keeps held (pending, approved) requests in step with holidays: each of `days` (YYYY-MM-DD)
+   * that is a weekday inside a request's range gives (`delta` +1, holiday removed) or takes
+   * (`delta` −1, holiday added) one working day. One statement; never below zero.
+   */
+  async shiftDaysForHolidays(days: string[], delta: 1 | -1): Promise<number> {
+    if (days.length === 0) {
+      return 0;
+    }
+    return this.txHost.tx.$executeRaw`
+      UPDATE "time_off_requests" AS r
+      SET "days" = GREATEST(0, r."days" + ${delta}::int * (
+        SELECT count(*)::int FROM unnest(${days}::date[]) AS h(day)
+        WHERE h.day BETWEEN r."start_date" AND r."end_date" AND EXTRACT(ISODOW FROM h.day) < 6
+      ))
+      WHERE r."status" IN (${TimeOffStatus.PENDING}, ${TimeOffStatus.APPROVED})
+        AND EXISTS (
+          SELECT 1 FROM unnest(${days}::date[]) AS h(day)
+          WHERE h.day BETWEEN r."start_date" AND r."end_date" AND EXTRACT(ISODOW FROM h.day) < 6
+        )`;
+  }
+
   /** Comments mark the request as changed, so "changed today" lists pick them up. */
   async touch(id: string, updatedBy: string): Promise<void> {
     await this.txHost.tx.timeOffRequest.update({

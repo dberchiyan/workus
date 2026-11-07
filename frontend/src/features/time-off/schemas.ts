@@ -2,7 +2,13 @@ import { z } from 'zod';
 import { TIME_OFF_TYPES } from './types';
 
 /** Mirrors backend CreateTimeOffRequestRequest (time-off/controller/dto). */
-export const TIME_OFF_LIMITS = { note: 500, periodDays: 60, comment: 1000 } as const;
+export const TIME_OFF_LIMITS = {
+  note: 500,
+  periodDays: 60,
+  comment: 1000,
+  /** Mirrors backend holiday.request.ts. */
+  holidayName: 100,
+} as const;
 
 const MESSAGES = {
   typeRequired: 'validation:timeOffType.required',
@@ -13,6 +19,9 @@ const MESSAGES = {
   noteTooLong: 'validation:note.tooLong',
   commentRequired: 'validation:timeOffComment.required',
   commentTooLong: 'validation:timeOffComment.tooLong',
+  holidayDate: 'validation:holiday.date',
+  holidayNameRequired: 'validation:holiday.nameRequired',
+  holidayNameTooLong: 'validation:holiday.nameTooLong',
 } as const;
 
 export type TimeOffValidationMessage = (typeof MESSAGES)[keyof typeof MESSAGES];
@@ -54,3 +63,16 @@ export const commentSchema = z.object({
 });
 export type CommentFormValues = z.input<typeof commentSchema>;
 export type CommentFormOutput = z.output<typeof commentSchema>;
+
+/** Mirrors backend CreateHolidayRequest / UpdateHolidayRequest. */
+export const holidaySchema = z.object({
+  date: z.iso.date(MESSAGES.holidayDate),
+  name: z
+    .string()
+    .trim()
+    .min(1, MESSAGES.holidayNameRequired)
+    .max(TIME_OFF_LIMITS.holidayName, MESSAGES.holidayNameTooLong),
+  recurring: z.boolean(),
+});
+export type HolidayFormValues = z.input<typeof holidaySchema>;
+export type HolidayFormOutput = z.output<typeof holidaySchema>;

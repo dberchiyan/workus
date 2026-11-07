@@ -8,7 +8,8 @@ model TimeOffRequest {
   type            String                      @db.VarChar(16) // VACATION | SICK_DAY | DAY_OFF — CHECK in migration
   startDate       DateTime                    @map("start_date") @db.Date
   endDate         DateTime                    @map("end_date") @db.Date // inclusive; >= start_date — CHECK
-  /// Working days (Mon–Fri) in the range, counted when the request was made; > 0 — CHECK.
+  /// Working days (Mon–Fri, not company holidays) in the range: > 0 when made — CHECK >= 0, a
+  /// holiday added later may take the last one; kept in step with holidays.
   days            Int
   status          String                      @db.VarChar(16) // PENDING | APPROVED | REJECTED | CANCELED — CHECK
   /// The employee's note.
@@ -63,4 +64,26 @@ model TimeOffRequestComment {
   @@index([requestId, createdAt], map: "idx_time_off_request_comments_request_id_created_at")
   @@index([authorId], map: "idx_time_off_request_comments_author_id")
   @@map("time_off_request_comments")
+}
+
+/// A company holiday: a non-working day for everyone, so time off on it takes no working day.
+/// One row per date and year. A recurring holiday is copied to the next year once (then
+/// `carried_over`); each year's copy is edited on its own.
+model CompanyHoliday {
+  id          String   @id(map: "pk_company_holidays") @default(dbgenerated("uuidv7()")) @db.Uuid
+  date        DateTime @db.Date
+  name        String   @db.VarChar(100)
+  /// Repeats every year: copied to the same day of the next year.
+  recurring   Boolean  @default(false)
+  /// Set when its copy for the next year was made (never copied twice, even if that copy is deleted).
+  carriedOver Boolean  @default(false) @map("carried_over")
+  createdAt   DateTime @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt   DateTime @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy   String?  @map("created_by") @db.Uuid
+  updatedBy   String?  @map("updated_by") @db.Uuid
+  version     Int      @default(0)
+
+  @@unique([date], map: "uq_company_holidays_date")
+  @@index([recurring, carriedOver], map: "idx_company_holidays_recurring_carried_over")
+  @@map("company_holidays")
 }

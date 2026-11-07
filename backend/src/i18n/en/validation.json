@@ -112,5 +112,10 @@
     "needsLowercase": "Add a lower-case letter",
     "needsDigit": "Add a digit",
     "needsSymbol": "Add a symbol, such as ! or #"
+  },
+  "holiday": {
+    "date": "Enter the date",
+    "nameRequired": "Enter a name",
+    "nameTooLong": "Name must be at most {max} characters"
   }
 }

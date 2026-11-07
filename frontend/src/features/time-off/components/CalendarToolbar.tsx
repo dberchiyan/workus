@@ -111,6 +111,15 @@ export function CalendarToolbar({
           component="span"
           className="flex items-center gap-2 sm:px-2"
         >
+          <span aria-hidden className="size-8 rounded-md border border-error/40 bg-error/10" />
+          {t('calendar.page.holidayKey')}
+        </Typography>
+        <Typography
+          variant="body2"
+          color="textSecondary"
+          component="span"
+          className="flex items-center gap-2 sm:px-2"
+        >
           <span
             aria-hidden
             className={cn('size-8 rounded-md border border-divider', NOT_EMPLOYED_PATTERN)}

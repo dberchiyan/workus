@@ -37,6 +37,9 @@ export type I18nTranslations = {
             "terminationBeforeStart": string;
             "terminationReasonInvalid": string;
         };
+        "holiday": {
+            "dateTaken": string;
+        };
         "review": {
             "responsibleNotFound": string;
             "startingNotDeletable": string;
@@ -169,6 +172,11 @@ export type I18nTranslations = {
             "needsLowercase": string;
             "needsDigit": string;
             "needsSymbol": string;
+        };
+        "holiday": {
+            "date": string;
+            "nameRequired": string;
+            "nameTooLong": string;
         };
     };
 };

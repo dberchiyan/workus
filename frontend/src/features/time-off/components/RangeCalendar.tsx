@@ -16,6 +16,8 @@ export interface DateRange {
 export interface RangeCalendarProps {
   value: DateRange;
   onChange: (range: DateRange) => void;
+  /** Company holidays (`YYYY-MM-DD` → name): shown in red, still pickable. */
+  holidays?: ReadonlyMap<string, string>;
 }
 
 /**
@@ -23,7 +25,9 @@ export interface RangeCalendarProps {
  * the next one on or after it picks the last; a single day is a valid range. Arrow keys move by
  * day / week, Home / End to the week's ends, PageUp / PageDown by month; Enter or Space picks.
  */
-export function RangeCalendar({ value, onChange }: RangeCalendarProps) {
+const NO_HOLIDAYS: ReadonlyMap<string, string> = new Map();
+
+export function RangeCalendar({ value, onChange, holidays = NO_HOLIDAYS }: RangeCalendarProps) {
   const { t, i18n } = useTranslation('timeOff');
   const locale = i18n.language;
   const titleId = useId();
@@ -160,7 +164,12 @@ export function RangeCalendar({ value, onChange }: RangeCalendarProps) {
                       type="button"
                       data-date={date}
                       tabIndex={date === focused ? 0 : -1}
-                      aria-label={fullDate.format(new Date(`${date}T00:00:00Z`))}
+                      aria-label={
+                        holidays.has(date)
+                          ? `${fullDate.format(new Date(`${date}T00:00:00Z`))}, ${t('create.holiday', { name: holidays.get(date) ?? '' })}`
+                          : fullDate.format(new Date(`${date}T00:00:00Z`))
+                      }
+                      title={holidays.get(date)}
                       aria-current={date === today ? 'date' : undefined}
                       onClick={() => {
                         pick(date);
@@ -171,6 +180,7 @@ export function RangeCalendar({ value, onChange }: RangeCalendarProps) {
                       className={cn(
                         'app-body2 app-tabular mx-auto flex size-9 cursor-pointer items-center justify-center rounded-md border border-transparent bg-transparent text-text-primary outline-none hover:bg-badge-active-background focus-visible:border-primary sm:size-10',
                         isWeekendIso(date) && !isEdge && 'text-text-secondary',
+                        holidays.has(date) && !isEdge && 'bg-error/10 text-error',
                         date === today && !isEdge && 'border-primary',
                         isEdge && 'bg-primary text-primary-contrast-text hover:bg-primary-dark',
                       )}

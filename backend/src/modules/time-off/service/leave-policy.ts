@@ -47,12 +47,23 @@ export const cycleOf = (origin: Date, months: number, date: Date): { start: Date
   return { start, end: plusDays(plusMonths(origin, (index + 1) * months), -1) };
 };
 
-/** Mon–Fri days in [start, end] (no public holidays yet). */
-export const workingDaysBetween = (start: Date, end: Date): number => {
+/** `YYYY-MM-DD` of a `@db.Date` value. */
+export const isoDay = (date: Date): string => date.toISOString().slice(0, 10);
+
+export const isWeekday = (date: Date): boolean => {
+  const weekday = date.getUTCDay();
+  return weekday !== 0 && weekday !== 6;
+};
+
+/** Mon–Fri days in [start, end] that are not company holidays (`YYYY-MM-DD`). */
+export const workingDaysBetween = (
+  start: Date,
+  end: Date,
+  holidays: ReadonlySet<string> = new Set(),
+): number => {
   let days = 0;
   for (let day = start; day <= end; day = plusDays(day, 1)) {
-    const weekday = day.getUTCDay();
-    if (weekday !== 0 && weekday !== 6) {
+    if (isWeekday(day) && !holidays.has(isoDay(day))) {
       days += 1;
     }
   }

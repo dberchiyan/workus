@@ -24,6 +24,7 @@ export const AuditValueSchema = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('timeOffType'), type: z.string().max(16) }),
   z.object({ kind: z.literal('timeOffStatus'), status: z.string().max(16) }),
   z.object({ kind: z.literal('number'), number: z.number().int() }),
+  z.object({ kind: z.literal('flag'), flag: z.boolean() }),
 ]);
 export type AuditValue = z.infer<typeof AuditValueSchema>;
 
@@ -57,6 +58,8 @@ export const AuditField = {
   DAYS: 'days',
   NOTE: 'note',
   DECISION_COMMENT: 'decisionComment',
+  NAME: 'name',
+  RECURRING: 'recurring',
 } as const;
 export type AuditField = (typeof AuditField)[keyof typeof AuditField];
 export const AUDIT_FIELDS = Object.values(AuditField) as [AuditField, ...AuditField[]];
@@ -84,6 +87,7 @@ export const auditValue = {
   timeOffType: (type: string): AuditValue => ({ kind: 'timeOffType', type }),
   timeOffStatus: (status: string): AuditValue => ({ kind: 'timeOffStatus', status }),
   number: (number: number): AuditValue => ({ kind: 'number', number }),
+  flag: (flag: boolean): AuditValue => ({ kind: 'flag', flag }),
 };
 
 /** Deep equality for JSON values; jsonb reorders object keys, so key order is ignored. */

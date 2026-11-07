@@ -1,3 +1,4 @@
+import CelebrationOutlined from '@mui/icons-material/CelebrationOutlined';
 import DevicesOutlined from '@mui/icons-material/DevicesOutlined';
 import PersonOutlineOutlined from '@mui/icons-material/PersonOutlineOutlined';
 import ShieldOutlined from '@mui/icons-material/ShieldOutlined';
@@ -9,6 +10,8 @@ export const SETTINGS_SECTIONS = [
   { key: 'sessions', icon: DevicesOutlined },
   { key: 'security', icon: ShieldOutlined },
   { key: 'preferences', icon: TuneOutlined },
+  /** Admins only (ACCESS 'settings.holidays'). */
+  { key: 'holidays', icon: CelebrationOutlined },
 ] as const;
 
 export type SettingsSection = (typeof SETTINGS_SECTIONS)[number]['key'];
