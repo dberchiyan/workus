@@ -32,6 +32,20 @@ export const TOKENS = {
         c8: '#126F8F',
         text: '#FFFFFF',
       },
+      /**
+       * Chart series in fixed order — validated categorical palette (CVD ΔE ≥ 8 between neighbours);
+       * slots 3–5 sit under 3:1 on white, so charts carry labels, a legend and a table view.
+       */
+      chart: {
+        c1: '#2A78D6',
+        c2: '#EB6834',
+        c3: '#1BAF7A',
+        c4: '#EDA100',
+        c5: '#E87BA4',
+        c6: '#008300',
+        c7: '#4A3AA7',
+        c8: '#E34948',
+      },
       sidebar: {
         background: '#1F3A4D',
         text: '#C9D6DF',
@@ -65,6 +79,16 @@ export const TOKENS = {
         c7: '#4650B0',
         c8: '#126F8F',
         text: '#FFFFFF',
+      },
+      chart: {
+        c1: '#3987E5',
+        c2: '#D95926',
+        c3: '#199E70',
+        c4: '#C98500',
+        c5: '#D55181',
+        c6: '#008300',
+        c7: '#9085E9',
+        c8: '#E66767',
       },
       sidebar: {
         background: '#09141B',

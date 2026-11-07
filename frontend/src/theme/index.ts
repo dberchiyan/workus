@@ -5,6 +5,7 @@ import { muiTypography } from './typography';
 
 type SidebarPalette = Record<keyof (typeof TOKENS.colors.light)['sidebar'], string>;
 type AvatarPalette = Record<keyof (typeof TOKENS.colors.light)['avatar'], string>;
+type ChartPalette = Record<keyof (typeof TOKENS.colors.light)['chart'], string>;
 type BadgePalette = Record<keyof (typeof TOKENS.colors.light)['badge'], string>;
 
 declare module '@mui/material/styles' {
@@ -20,11 +21,13 @@ declare module '@mui/material/styles' {
     sidebar: SidebarPalette;
     avatar: AvatarPalette;
     badge: BadgePalette;
+    chart: ChartPalette;
   }
   interface PaletteOptions {
     sidebar?: SidebarPalette;
     avatar?: AvatarPalette;
     badge?: BadgePalette;
+    chart?: ChartPalette;
   }
 }
 
