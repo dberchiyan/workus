@@ -17,7 +17,12 @@
   "account": {
     "open": "Account menu for {{name}}",
     "signOut": "Sign out",
-    "signingOut": "Signing out…"
+    "signingOut": "Signing out…",
+    "title": "Account",
+    "theme": "Theme",
+    "profile": "Account",
+    "securityDevices": "Security & devices",
+    "settings": "Settings"
   },
   "role": {
     "ADMIN": "Administrator",

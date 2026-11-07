@@ -8,7 +8,10 @@
   },
   "theme": {
     "switchToDark": "Switch to dark theme",
-    "switchToLight": "Switch to light theme"
+    "switchToLight": "Switch to light theme",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark"
   },
   "status": {
     "loading": "Loading…"

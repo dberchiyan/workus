@@ -55,8 +55,15 @@ export const theme = createTheme({
       styleOverrides: { root: { minWidth: 44, minHeight: 44 } },
     },
     // Touch targets ≥ 44 px (ux.md), like Button and IconButton above.
+    // 44 px always; the small size (compact panels) is 32 px under a mouse, 44 px under a finger.
     MuiToggleButton: {
       styleOverrides: { root: { minHeight: 44 } },
+      variants: [
+        {
+          props: { size: 'small' },
+          style: { minHeight: 32, '@media (pointer: coarse)': { minHeight: 44 } },
+        },
+      ],
     },
     // Page numbers stay compact under a mouse and grow to 44 px under a finger.
     MuiPaginationItem: {

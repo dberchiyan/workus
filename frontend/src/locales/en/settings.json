@@ -70,10 +70,7 @@
   "preferences": {
     "theme": {
       "title": "Appearance",
-      "description": "Saved in this browser.",
-      "system": "System",
-      "light": "Light",
-      "dark": "Dark"
+      "description": "Saved in this browser."
     },
     "language": {
       "title": "Language",
