@@ -6,10 +6,8 @@ import PeopleAltOutlined from '@mui/icons-material/PeopleAltOutlined';
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
 import type { SvgIconProps } from '@mui/material/SvgIcon';
 import type { ComponentType } from 'react';
-import type { CurrentUser } from '@/features/auth';
+import type { AccessPart } from '@/features/auth';
 import { PATHS } from '@/shared/lib/paths';
-
-export type UserRole = CurrentUser['role'];
 
 export const NavSection = {
   DASHBOARD: 'dashboard',
@@ -25,55 +23,52 @@ export interface NavItem {
   section: NavSection;
   path: string;
   icon: ComponentType<SvgIconProps>;
-  /** Roles that see the item. Hiding is cosmetic — the backend enforces access. */
-  roles: readonly UserRole[];
+  /** The part of `ACCESS` that decides who sees it (cosmetic — the backend enforces access). */
+  access: AccessPart;
   placement: 'main' | 'bottom';
 }
-
-const EVERYONE: readonly UserRole[] = ['ADMIN', 'MANAGER', 'EMPLOYEE'];
-export const ADMIN_ONLY: readonly UserRole[] = ['ADMIN'];
 
 export const NAV_ITEMS: readonly NavItem[] = [
   {
     section: NavSection.DASHBOARD,
     path: PATHS.dashboard,
     icon: DashboardOutlined,
-    roles: EVERYONE,
+    access: 'section.dashboard',
     placement: 'main',
   },
   {
     section: NavSection.EMPLOYEES,
     path: PATHS.employees,
     icon: PeopleAltOutlined,
-    roles: ADMIN_ONLY,
+    access: 'section.employees',
     placement: 'main',
   },
   {
     section: NavSection.REQUESTS,
     path: PATHS.requests,
     icon: InboxOutlined,
-    roles: ADMIN_ONLY,
+    access: 'section.requests',
     placement: 'main',
   },
   {
     section: NavSection.CALENDAR,
     path: PATHS.calendar,
     icon: CalendarMonthOutlined,
-    roles: EVERYONE,
+    access: 'section.calendar',
     placement: 'main',
   },
   {
     section: NavSection.INSIGHTS,
     path: PATHS.insights,
     icon: InsightsOutlined,
-    roles: ADMIN_ONLY,
+    access: 'section.insights',
     placement: 'main',
   },
   {
     section: NavSection.SETTINGS,
     path: PATHS.settings,
     icon: SettingsOutlined,
-    roles: EVERYONE,
+    access: 'section.settings',
     placement: 'bottom',
   },
 ];

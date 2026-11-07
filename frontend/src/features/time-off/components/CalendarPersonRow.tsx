@@ -15,12 +15,18 @@ export interface CalendarPersonRowProps {
   row: CalendarRow;
   days: string[];
   today: string;
-  /** Admins open profiles and requests from the calendar. */
-  isAdmin: boolean;
+  canOpenRequest: boolean;
+  canOpenProfile: boolean;
 }
 
 /** The person (sticky on the left) and their month: free days, requests, days outside employment. */
-export function CalendarPersonRow({ row, days, today, isAdmin }: CalendarPersonRowProps) {
+export function CalendarPersonRow({
+  row,
+  days,
+  today,
+  canOpenRequest,
+  canOpenProfile,
+}: CalendarPersonRowProps) {
   const { employee } = row;
   const name = fullName(employee);
   const cells = calendarCells(days, row.requests, employee);
@@ -38,7 +44,7 @@ export function CalendarPersonRow({ row, days, today, isAdmin }: CalendarPersonR
             className="hidden sm:flex"
           />
           <span className="flex min-w-0 flex-col">
-            {isAdmin ? (
+            {canOpenProfile ? (
               <Link
                 component={RouterLink}
                 to={employeeProfilePath(employee.id)}
@@ -67,7 +73,7 @@ export function CalendarPersonRow({ row, days, today, isAdmin }: CalendarPersonR
             colSpan={cell.span}
             className="border-b border-l border-divider p-0"
           >
-            <CalendarBar request={cell.request} span={cell.span} linkToRequest={isAdmin} />
+            <CalendarBar request={cell.request} span={cell.span} linkToRequest={canOpenRequest} />
           </td>
         ) : cell.kind === 'outside' ? (
           <td

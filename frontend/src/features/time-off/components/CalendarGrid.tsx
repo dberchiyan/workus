@@ -15,7 +15,9 @@ export interface CalendarGridProps {
   today: string;
   rows: CalendarRow[] | undefined;
   search: string;
-  isAdmin: boolean;
+  /** Requests open on the Requests page; names open the profile. */
+  canOpenRequest: boolean;
+  canOpenProfile: boolean;
   onSearch: (search: string) => void;
 }
 
@@ -23,7 +25,15 @@ export interface CalendarGridProps {
  * People down the side, the month's days across. Below ~1250 px the days scroll inside the card
  * (the name column stays put); the current month opens scrolled to today.
  */
-export function CalendarGrid({ month, today, rows, search, isAdmin, onSearch }: CalendarGridProps) {
+export function CalendarGrid({
+  month,
+  today,
+  rows,
+  search,
+  canOpenRequest,
+  canOpenProfile,
+  onSearch,
+}: CalendarGridProps) {
   const { t, i18n } = useTranslation('timeOff');
   const days = monthDays(month);
   const weekday = new Intl.DateTimeFormat(i18n.language, { weekday: 'short', timeZone: 'UTC' });
@@ -100,7 +110,8 @@ export function CalendarGrid({ month, today, rows, search, isAdmin, onSearch }: 
               row={row}
               days={days}
               today={today}
-              isAdmin={isAdmin}
+              canOpenRequest={canOpenRequest}
+              canOpenProfile={canOpenProfile}
             />
           ))}
         </tbody>

@@ -6,7 +6,7 @@ import Typography from '@mui/material/Typography';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { todayUtcIso } from '@/shared/lib/utcDay';
-import { useCurrentUser } from '@/features/auth';
+import { useAccess } from '@/features/auth';
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
 import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
 import { CalendarGrid } from '../components/CalendarGrid';
@@ -23,7 +23,7 @@ export default function CalendarPage() {
   const currentMonth = today.slice(0, 7);
   const { params, update } = useCalendarParams(currentMonth);
   const calendar = useCalendar(params);
-  const isAdmin = useCurrentUser().data?.role === 'ADMIN';
+  const can = useAccess();
   useDocumentTitle(t('calendar.page.title'));
   const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
 
@@ -86,7 +86,8 @@ export default function CalendarPage() {
             today={today}
             rows={rows}
             search={params.search}
-            isAdmin={isAdmin}
+            canOpenRequest={can('calendar.openRequest')}
+            canOpenProfile={can('calendar.openProfile')}
             onSearch={onSearch}
           />
           {data && (data.totalElements > params.size || params.page > 0) && (

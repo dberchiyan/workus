@@ -1,6 +1,6 @@
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
-import { useCurrentUser } from '@/features/auth';
+import { useAccess, useCurrentUser } from '@/features/auth';
 import { MyTimeOff } from '@/features/time-off';
 import { AdminEvents } from '../components/AdminEvents';
 import { AdminOverview } from '../components/AdminOverview';
@@ -18,6 +18,7 @@ export default function DashboardPage() {
   const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
   // RequireAuth renders this route only with a loaded user.
   const { data: user } = useCurrentUser();
+  const can = useAccess();
 
   if (!user) {
     return null;
@@ -35,14 +36,13 @@ export default function DashboardPage() {
       >
         {t('title')}
       </Typography>
-      {user.role === 'ADMIN' ? (
+      {can('dashboard.companyOverview') && (
         <>
           <AdminOverview />
           <AdminEvents />
         </>
-      ) : (
-        <MyTimeOff />
       )}
+      {can('dashboard.ownTimeOff') && <MyTimeOff />}
     </div>
   );
 }
