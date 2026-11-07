@@ -24,7 +24,8 @@ const COLUMNS = [
 ] as const;
 
 /** Header cells stick below the top bar while the page scrolls. */
-const HEAD_CELL = 'top-top-bar-height';
+// z-20: above the row's interactive bits (`relative z-10` — responsible tooltip, stretched link).
+const HEAD_CELL = 'top-top-bar-height z-20';
 
 export interface EmployeeTableProps {
   employees: readonly EmployeeListItem[];
@@ -61,7 +62,8 @@ export function EmployeeTable({ employees, params, onSort }: EmployeeTableProps)
   };
 
   return (
-    <Table stickyHeader size="small" className="table-fixed">
+    // `isolate`: the row and header z-indexes stay inside the table, under the app top bar.
+    <Table stickyHeader size="small" className="isolate table-fixed">
       <caption className="sr-only">{t('table.caption')}</caption>
       {/* Percentages are one-off geometry for this table's columns. */}
       <colgroup>
