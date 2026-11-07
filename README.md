@@ -1,9 +1,16 @@
 # Workus
 
 Workus is a web app for a company's day-to-day HR work: the employee directory, reviews and
-salaries, time off, a company calendar and yearly insights.
+salaries, time off, a company calendar and yearly insights. One installation hosts many
+companies; each company's people and data are its own.
 
 ## Features
+
+### For owners
+
+Everything admins do, plus **Settings → Company** (rename the company) and **Settings →
+Administrators** (make an admin an owner or an owner an admin; a company always keeps one owner).
+Anyone can create a new company at `/signup` and becomes its first owner.
 
 ### For admins
 
@@ -71,7 +78,7 @@ which applies pending migrations on start. Seed development data once the backen
 docker compose exec backend npm run db:seed
 ```
 
-Every seeded account signs in with the password `Workus-Dev-2026!` (e.g. `olivia.bennett@workus.dev`, admin).
+Then sign in with one of the [demo accounts](#demo-accounts).
 
 Data lives in the `db-data` volume; `docker compose down -v` removes it.
 
@@ -103,3 +110,17 @@ npm run dev
 ```
 
 The dev server proxies `/api` to the backend on port 3000.
+
+## Demo accounts
+
+`npm run db:seed` creates two separate companies — neither sees the other's people or data.
+Every seeded account uses the password **`Workus-Dev-2026!`** (fictional demo data, local only).
+
+| Role | 🏢 OSDB — 46 people | 🌀 Vortex — 9 people |
+|---|---|---|
+| **Owner** — everything, plus the company and its administrators | `sophia.carter@osdb.io` | `liam.foster@vortex.io` |
+| **Admin** — employees, reviews, requests, calendar, insights | `marcus.reid@osdb.io` | `hannah.brooks@vortex.io` |
+| **Employee** — own time off and the calendar | `ava.thompson@osdb.io` | `ethan.cole@vortex.io` |
+
+Every other seeded person signs in the same way: `first.last@osdb.io` or `first.last@vortex.io`.
+To try a fresh, empty company, use **Create a company** on the sign-in page.
