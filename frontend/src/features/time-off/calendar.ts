@@ -66,10 +66,6 @@ export const monthDays = (month: string): string[] => {
   return Array.from({ length: count }, (_, index) => addDaysIso(`${month}-01`, index));
 };
 
-/** `YYYY-MM` that many months later. */
-export const addMonths = (month: string, months: number): string =>
-  addMonthsIso(`${month}-01`, months).slice(0, 7);
-
 export type CalendarCell<R> =
   | { kind: 'day'; date: string }
   | { kind: 'request'; request: R; date: string; span: number }

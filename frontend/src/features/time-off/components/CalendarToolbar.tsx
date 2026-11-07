@@ -1,14 +1,10 @@
-import ChevronLeftOutlined from '@mui/icons-material/ChevronLeftOutlined';
-import ChevronRightOutlined from '@mui/icons-material/ChevronRightOutlined';
 import HourglassEmptyOutlined from '@mui/icons-material/HourglassEmptyOutlined';
 import Button from '@mui/material/Button';
-import Card from '@mui/material/Card';
-import IconButton from '@mui/material/IconButton';
 import ToggleButton from '@mui/material/ToggleButton';
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
+import { MonthSwitcher } from '@/shared/components/MonthSwitcher';
 import { cn } from '@/shared/lib/cn';
-import { addMonths } from '../calendar';
 import { TIME_OFF_TYPES, type TimeOffType } from '../types';
 import { NOT_EMPLOYED_PATTERN, TYPE_VISUALS } from './timeOffVisuals';
 
@@ -29,12 +25,6 @@ export function CalendarToolbar({
   onTypes,
 }: CalendarToolbarProps) {
   const { t, i18n } = useTranslation('timeOff');
-  const label = new Intl.DateTimeFormat(i18n.language, {
-    month: 'long',
-    year: 'numeric',
-    timeZone: 'UTC',
-  }).format(new Date(`${month}-01T00:00:00Z`));
-
   const toggle = (type: TimeOffType) => {
     const next = types.includes(type) ? types.filter((item) => item !== type) : [...types, type];
     // At least one type stays on — an empty calendar would look like nobody is away.
@@ -46,32 +36,14 @@ export function CalendarToolbar({
   return (
     <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
       <div className="flex items-center gap-2">
-        <Card className="flex items-center gap-1 px-1 py-1">
-          <IconButton
-            aria-label={t('calendar.page.previous')}
-            onClick={() => {
-              onMonth(addMonths(month, -1));
-            }}
-          >
-            <ChevronLeftOutlined />
-          </IconButton>
-          <Typography
-            variant="subtitle1"
-            component="h2"
-            aria-live="polite"
-            className="app-tabular min-w-36 text-center"
-          >
-            {label}
-          </Typography>
-          <IconButton
-            aria-label={t('calendar.page.next')}
-            onClick={() => {
-              onMonth(addMonths(month, 1));
-            }}
-          >
-            <ChevronRightOutlined />
-          </IconButton>
-        </Card>
+        <MonthSwitcher
+          month={month}
+          onChange={onMonth}
+          locale={i18n.language}
+          previousLabel={t('calendar.page.previous')}
+          nextLabel={t('calendar.page.next')}
+          headingComponent="h2"
+        />
         {month !== currentMonth && (
           <Button
             variant="outlined"
