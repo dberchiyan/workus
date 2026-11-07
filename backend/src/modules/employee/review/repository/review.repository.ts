@@ -7,7 +7,13 @@ import { Prisma } from '../../../../generated/prisma/client';
 import { ReviewKind } from '../service/review-kind';
 import { ReviewStatus } from '../service/review-status';
 import type { RichTextDoc } from '../service/rich-text';
-import { MAX_REVIEWS, type ReviewRecord, reviewSelect } from './record/review.record';
+import {
+  type DashboardReviewRecord,
+  dashboardReviewSelect,
+  MAX_REVIEWS,
+  type ReviewRecord,
+  reviewSelect,
+} from './record/review.record';
 
 export type ReviewChanges = Omit<NewReview, 'employeeId' | 'kind' | 'createdBy'> & {
   updatedBy: string;
@@ -175,5 +181,33 @@ export class ReviewRepository {
     return this.txHost.tx.employeeReview.count({
       where: { status: ReviewStatus.SCHEDULED, reviewDate: { lt: date } },
     });
+  }
+
+  /** Scheduled and completed regular reviews dated in [from, to], by date then name, a page at a time. */
+  async findScheduledOrCompletedBetween(
+    from: Date,
+    to: Date,
+    page: { offset: number; limit: number },
+  ): Promise<{ content: DashboardReviewRecord[]; totalElements: number }> {
+    const where: Prisma.EmployeeReviewWhereInput = {
+      kind: ReviewKind.REGULAR,
+      status: { in: [ReviewStatus.SCHEDULED, ReviewStatus.COMPLETED] },
+      reviewDate: { gte: from, lte: to },
+    };
+    const [totalElements, content] = await Promise.all([
+      this.txHost.tx.employeeReview.count({ where }),
+      this.txHost.tx.employeeReview.findMany({
+        where,
+        select: dashboardReviewSelect,
+        orderBy: [
+          { reviewDate: 'asc' },
+          { employee: { user: { firstName: 'asc' } } },
+          { id: 'asc' },
+        ],
+        skip: page.offset,
+        take: page.limit,
+      }),
+    ]);
+    return { content, totalElements };
   }
 }

@@ -48,6 +48,8 @@ model Employee {
   linkedinUrl        String?               @map("linkedin_url") @db.VarChar(255)
   telegram           String?               @db.VarChar(33) // "@handle"
   address            String?               @db.VarChar(500)
+  /// Optional; on or after 1900-01-01 — CHECK in migration. Personal data: the audit log records only that it changed.
+  dateOfBirth        DateTime?             @map("date_of_birth") @db.Date
   createdAt          DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt          DateTime              @updatedAt @map("updated_at") @db.Timestamptz(3)
   createdBy          String?               @map("created_by") @db.Uuid

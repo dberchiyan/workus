@@ -147,6 +147,10 @@ export type I18nTranslations = {
             "required": string;
             "tooLong": string;
         };
+        "dateOfBirth": {
+            "invalid": string;
+            "inFuture": string;
+        };
     };
 };
 /* prettier-ignore */

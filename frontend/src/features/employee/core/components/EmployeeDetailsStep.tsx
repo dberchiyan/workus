@@ -142,6 +142,15 @@ export function EmployeeDetailsStep({ form }: EmployeeDetailsStepProps) {
         <Typography variant="subtitle2" component="legend" className="mb-3 p-0">
           {t('add.sections.contact')}
         </Typography>
+        <TextField
+          {...register('dateOfBirth')}
+          type="date"
+          label={t('add.fields.dateOfBirth')}
+          autoComplete="bday"
+          error={Boolean(errors.dateOfBirth)}
+          helperText={message(errors.dateOfBirth)}
+          slotProps={{ inputLabel: { shrink: true } }}
+        />
         {text('mobile', {
           max: EMPLOYEE_LIMITS.mobile,
           type: 'tel',
@@ -151,7 +160,7 @@ export function EmployeeDetailsStep({ form }: EmployeeDetailsStepProps) {
         {text('personalEmail', { max: EMPLOYEE_LIMITS.email, type: 'email', inputMode: 'email' })}
         {text('linkedinUrl', { max: EMPLOYEE_LIMITS.linkedin, type: 'url', inputMode: 'url' })}
         {text('telegram', { max: EMPLOYEE_LIMITS.telegram })}
-        {text('address', { max: EMPLOYEE_LIMITS.address, wide: true })}
+        {text('address', { max: EMPLOYEE_LIMITS.address })}
       </fieldset>
     </div>
   );

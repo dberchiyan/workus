@@ -5,6 +5,8 @@ import { AmountInputSchema } from '../../../../../common/dto/money';
 export const NAME_MAX_LENGTH = 100;
 export const EMAIL_MAX_LENGTH = 254;
 export const MAX_RESPONSIBLES = 10;
+/** Mirrored by ck_employees_date_of_birth. */
+const MIN_DATE_OF_BIRTH = '1900-01-01';
 
 const requiredName = (field: 'firstName' | 'lastName') =>
   z
@@ -65,6 +67,16 @@ export const CreateEmployeeRequestSchema = z.object({
     ),
   ),
   address: optional(text(500, 'validation.address.tooLong')),
+  /** Optional; from 1900-01-01 up to today (the server's UTC date). */
+  dateOfBirth: optional(
+    z.iso
+      .date('validation.dateOfBirth.invalid')
+      .refine((value) => value >= MIN_DATE_OF_BIRTH, 'validation.dateOfBirth.invalid')
+      .refine(
+        (value) => value <= new Date().toISOString().slice(0, 10),
+        'validation.dateOfBirth.inFuture',
+      ),
+  ),
   responsibleUserIds: z
     .array(z.uuid('validation.invalid'))
     .max(MAX_RESPONSIBLES, 'validation.responsibles.tooMany')

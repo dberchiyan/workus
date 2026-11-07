@@ -22,6 +22,7 @@ const valuesFor = (employee: EmployeeProfile): UpdateEmployeeFormValues => ({
   linkedinUrl: employee.contacts.linkedinUrl ?? '',
   telegram: employee.contacts.telegram ?? '',
   address: employee.contacts.address ?? '',
+  dateOfBirth: employee.dateOfBirth ?? '',
 });
 
 const FORM_FIELDS: ReadonlySet<string> = new Set([
@@ -35,6 +36,7 @@ const FORM_FIELDS: ReadonlySet<string> = new Set([
   'linkedinUrl',
   'telegram',
   'address',
+  'dateOfBirth',
 ] satisfies (keyof UpdateEmployeeFormValues)[]);
 const isFormField = (field: string): field is keyof UpdateEmployeeFormValues =>
   FORM_FIELDS.has(field);
@@ -53,6 +55,7 @@ const toRequest = (values: UpdateEmployeeFormOutput, version: number): UpdateEmp
     ...(optional(values.linkedinUrl) ? { linkedinUrl: values.linkedinUrl } : {}),
     ...(optional(values.telegram) ? { telegram: values.telegram } : {}),
     ...(optional(values.address) ? { address: values.address } : {}),
+    ...(optional(values.dateOfBirth) ? { dateOfBirth: values.dateOfBirth } : {}),
     version,
   };
 };

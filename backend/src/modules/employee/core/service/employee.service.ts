@@ -7,7 +7,12 @@ import {
   ResourceNotFoundException,
 } from '../../../../common/exception/api.exception';
 import { AuditAction, AuditTargetType } from '../../../audit/service/audit-action';
-import { AuditField, auditValue, changeOf } from '../../../audit/service/audit-change';
+import {
+  type AuditChange,
+  AuditField,
+  auditValue,
+  changeOf,
+} from '../../../audit/service/audit-change';
 import { AuditService } from '../../../audit/service/audit.service';
 import type { AuditEventPage } from '../../../audit/service/audit.types';
 import type { AuditEventSortField } from '../../../audit/service/audit-sort';
@@ -26,6 +31,7 @@ import type { EmployeeSortField } from './employee-sort';
 import type { EmployeeStatus } from './employee-status';
 import type {
   CreateEmployeeCommand,
+  EmployeeBirthdays,
   EmployeeCalendarPage,
   EmployeeForTimeOff,
   EmployeeMovement,
@@ -146,6 +152,7 @@ export class EmployeeService {
       linkedinUrl: command.linkedinUrl,
       telegram: command.telegram ? `@${command.telegram.replace(/^@/, '')}` : undefined,
       address: command.address,
+      dateOfBirth: command.dateOfBirth ? new Date(`${command.dateOfBirth}T00:00:00Z`) : undefined,
       responsibleUserIds,
       createdBy: actorId,
     });
@@ -278,8 +285,9 @@ export class EmployeeService {
       linkedinUrl: command.linkedinUrl ?? null,
       telegram: command.telegram ? `@${command.telegram.replace(/^@/, '')}` : null,
       address: command.address ?? null,
+      dateOfBirth: command.dateOfBirth ? new Date(`${command.dateOfBirth}T00:00:00Z`) : null,
     };
-    const contactChanges = CONTACT_FIELDS.flatMap(([column, field]) =>
+    const contactChanges: AuditChange[] = CONTACT_FIELDS.flatMap(([column, field]) =>
       before[column] === details[column]
         ? []
         : [
@@ -290,6 +298,16 @@ export class EmployeeService {
             },
           ],
     );
+    // Personal data like the contacts: the log says that it changed, never the date.
+    const dateOfBirthChanged =
+      (before.dateOfBirth?.getTime() ?? null) !== (details.dateOfBirth?.getTime() ?? null);
+    if (dateOfBirthChanged) {
+      contactChanges.push({
+        field: AuditField.DATE_OF_BIRTH,
+        from: before.dateOfBirth === null ? null : auditValue.redacted(),
+        to: details.dateOfBirth === null ? null : auditValue.redacted(),
+      });
+    }
     const identityChanged =
       before.user.firstName !== command.firstName ||
       before.user.lastName !== command.lastName ||
@@ -517,6 +535,36 @@ export class EmployeeService {
         terminatedOn: employee.terminatedOn,
       })),
       totalElements: page.totalElements,
+    };
+  }
+
+  /**
+   * For other modules (dashboard): birthdays between `from` and `to` (one month) of people employed
+   * on at least one day of it, a page at a time. 29 February birthdays count on the 28th in a year
+   * without one.
+   */
+  async birthdays(
+    range: { from: Date; to: Date },
+    page: { page: number; size: number },
+  ): Promise<EmployeeBirthdays> {
+    const { from, to } = range;
+    const year = from.getUTCFullYear();
+    const month = from.getUTCMonth() + 1;
+    const isLeap = new Date(Date.UTC(year, 1, 29)).getUTCMonth() === 1;
+    const days = Array.from(
+      { length: to.getUTCDate() - from.getUTCDate() + 1 },
+      (_, index) => from.getUTCDate() + index,
+    );
+    if (month === 2 && !isLeap && days.includes(28)) {
+      days.push(29);
+    }
+    const result = await this.employeeRepository.findBirthdays(
+      { from, to, month, days },
+      { offset: page.page * page.size, limit: page.size },
+    );
+    return {
+      content: result.content.map(({ id, ...row }) => ({ employeeId: id, ...row })),
+      totalElements: result.totalElements,
     };
   }
 

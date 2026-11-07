@@ -487,6 +487,57 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/dashboard/admin/requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Time-off requests made in the viewer's day (any status, newest first, first 100) */
+        get: operations["DashboardController_requests"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard/admin/reviews": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Scheduled and completed reviews dated in a day or month, by date then name (paged) */
+        get: operations["DashboardController_reviews"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/dashboard/admin/birthdays": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Birthdays (day and month) in a day or month of people employed then, by day then name (paged) */
+        get: operations["DashboardController_birthdays"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -594,6 +645,8 @@ export interface components {
             /** Format: date */
             startDate: string;
             /** Format: date */
+            dateOfBirth: string | null;
+            /** Format: date */
             terminatedOn: string | null;
             termination: {
                 reason: components["schemas"]["TerminationReason_Output"];
@@ -652,7 +705,7 @@ export interface components {
                 };
                 changes: {
                     /** @enum {string} */
-                    field: "title" | "date" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startDate" | "firstName" | "lastName" | "email" | "mobile" | "personalEmail" | "linkedinUrl" | "telegram" | "address" | "terminationDate" | "terminationReason" | "terminationComment" | "timeOffType" | "periodStart" | "periodEnd" | "days" | "note" | "decisionComment";
+                    field: "title" | "date" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startDate" | "firstName" | "lastName" | "email" | "mobile" | "personalEmail" | "linkedinUrl" | "telegram" | "address" | "dateOfBirth" | "terminationDate" | "terminationReason" | "terminationComment" | "timeOffType" | "periodStart" | "periodEnd" | "days" | "note" | "decisionComment";
                     from: ({
                         /** @enum {string} */
                         kind: "text";
@@ -1110,6 +1163,8 @@ export interface components {
             linkedinUrl?: string;
             telegram?: string;
             address?: string;
+            /** Format: date */
+            dateOfBirth?: string;
             /** @default [] */
             responsibleUserIds: string[];
         };
@@ -1132,6 +1187,8 @@ export interface components {
             linkedinUrl?: string;
             telegram?: string;
             address?: string;
+            /** Format: date */
+            dateOfBirth?: string;
             version: number;
         };
         /** @enum {string} */
@@ -1510,6 +1567,73 @@ export interface components {
                     };
                 } | null;
             };
+        };
+        DashboardRequest_Output: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            type: "VACATION" | "SICK_DAY" | "DAY_OFF";
+            /** @enum {string} */
+            status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELED";
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            days: number;
+            /** Format: date-time */
+            createdAt: string;
+            employee: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                userId: string;
+                firstName: string;
+                lastName: string;
+                positionTitle: string;
+            };
+        };
+        DashboardRequestsResponse_Output: {
+            content: components["schemas"]["DashboardRequest_Output"][];
+            totalElements: number;
+        };
+        DashboardReview_Output: {
+            /** Format: uuid */
+            id: string;
+            title: string;
+            /** Format: date */
+            reviewDate: string;
+            /** @enum {string} */
+            status: "SCHEDULED" | "COMPLETED";
+            employee: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                userId: string;
+                firstName: string;
+                lastName: string;
+                positionTitle: string;
+            };
+        };
+        DashboardReviewsResponse_Output: {
+            content: components["schemas"]["DashboardReview_Output"][];
+            totalElements: number;
+        };
+        DashboardBirthday_Output: {
+            month: number;
+            day: number;
+            employee: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                userId: string;
+                firstName: string;
+                lastName: string;
+                positionTitle: string;
+            };
+        };
+        DashboardBirthdaysResponse_Output: {
+            content: components["schemas"]["DashboardBirthday_Output"][];
+            totalElements: number;
         };
         /** @enum {string} */
         EmployeeStatus: "ACTIVE" | "TERMINATED";
@@ -3450,6 +3574,161 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AdminDashboardResponse_Output"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    DashboardController_requests: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardRequestsResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    DashboardController_reviews: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+                page?: number;
+                size?: number;
+                /** @description One of: date,asc|desc */
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardReviewsResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    DashboardController_birthdays: {
+        parameters: {
+            query: {
+                from: string;
+                to: string;
+                page?: number;
+                size?: number;
+                /** @description One of: date,asc|desc */
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DashboardBirthdaysResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
             /** @description UNAUTHORIZED | SESSION_EXPIRED */

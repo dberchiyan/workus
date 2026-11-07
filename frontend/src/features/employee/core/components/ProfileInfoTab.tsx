@@ -26,7 +26,6 @@ export function ProfileInfoTab({ employee, mock }: ProfileInfoTabProps) {
   );
   const tenureUntil = employee.terminatedOn ?? todayIso();
   const tenure = yearsAndMonthsBetween(employee.startDate, tenureUntil);
-  const age = yearsAndMonthsBetween(mock.dateOfBirth, todayIso()).years;
   const { contacts } = employee;
 
   return (
@@ -50,7 +49,12 @@ export function ProfileInfoTab({ employee, mock }: ProfileInfoTabProps) {
           {
             key: 'dob',
             label: t('profile.fields.dateOfBirth'),
-            value: t('profile.values.age', { date: date(mock.dateOfBirth), count: age }),
+            value:
+              employee.dateOfBirth &&
+              t('profile.values.age', {
+                date: date(employee.dateOfBirth),
+                count: yearsAndMonthsBetween(employee.dateOfBirth, todayIso()).years,
+              }),
           },
           {
             key: 'start',

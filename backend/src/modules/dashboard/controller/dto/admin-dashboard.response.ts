@@ -46,3 +46,57 @@ export class AdminDashboardResponse extends createZodDto(
     }),
   }),
 ) {}
+
+const EmployeeSchema = z.object({
+  id: z.uuid(),
+  /** For the avatar colour. */
+  userId: z.uuid(),
+  firstName: z.string(),
+  lastName: z.string(),
+  positionTitle: z.string(),
+});
+
+const DashboardRequestSchema = z
+  .object({
+    id: z.uuid(),
+    type: z.enum(['VACATION', 'SICK_DAY', 'DAY_OFF']),
+    status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'CANCELED']),
+    startDate: z.iso.date(),
+    endDate: z.iso.date(),
+    days: z.number().int(),
+    createdAt: z.iso.datetime(),
+    employee: EmployeeSchema,
+  })
+  .meta({ id: 'DashboardRequest' });
+
+const DashboardReviewSchema = z
+  .object({
+    id: z.uuid(),
+    title: z.string(),
+    reviewDate: z.iso.date(),
+    status: z.enum(['SCHEDULED', 'COMPLETED']),
+    employee: EmployeeSchema,
+  })
+  .meta({ id: 'DashboardReview' });
+
+/** Day and month only — the year (age) is personal data. */
+const DashboardBirthdaySchema = z
+  .object({
+    month: z.number().int().min(1).max(12),
+    day: z.number().int().min(1).max(31),
+    employee: EmployeeSchema,
+  })
+  .meta({ id: 'DashboardBirthday' });
+
+/** A page (reviews, birthdays) or the first 100 (requests); `totalElements` counts them all. */
+const listOf = <T extends z.ZodType>(item: T) =>
+  z.object({
+    content: z.array(item),
+    totalElements: z.number().int(),
+  });
+
+export class DashboardRequestsResponse extends createZodDto(listOf(DashboardRequestSchema)) {}
+
+export class DashboardReviewsResponse extends createZodDto(listOf(DashboardReviewSchema)) {}
+
+export class DashboardBirthdaysResponse extends createZodDto(listOf(DashboardBirthdaySchema)) {}

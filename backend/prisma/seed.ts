@@ -169,6 +169,26 @@ const seed = async (): Promise<void> => {
       contacts += count;
     }
 
+    // Dates of birth where none is set (edits made in the app survive a re-seed): every ninth
+    // person has a birthday on the seed day, every ninth from the fifth later this month.
+    const today = daysAgo(0);
+    let birthDates = 0;
+    for (const [index, employee] of EMPLOYEES.entries()) {
+      const year = 1975 + ((index * 7) % 26);
+      const lastDay = new Date(Date.UTC(year, today.getUTCMonth() + 1, 0)).getUTCDate();
+      const [month, day] =
+        index % 9 === 0
+          ? [today.getUTCMonth(), Math.min(today.getUTCDate(), lastDay)]
+          : index % 9 === 4
+            ? [today.getUTCMonth(), 1 + ((index * 5) % lastDay)]
+            : [(index * 5) % 12, 1 + ((index * 11) % 28)];
+      const { count } = await prisma.employee.updateMany({
+        where: { userId: idOf(userIdByEmail, employee.email), dateOfBirth: null },
+        data: { dateOfBirth: new Date(Date.UTC(year, month, day)) },
+      });
+      birthDates += count;
+    }
+
     const seededEmployees = await prisma.employee.findMany({
       where: { userId: { in: EMPLOYEES.map((employee) => idOf(userIdByEmail, employee.email)) } },
       select: {
@@ -199,7 +219,7 @@ const seed = async (): Promise<void> => {
     const comments = await seedTimeOffComments(prisma, admins);
 
     process.stdout.write(
-      `Seeded ${timeOff} time-off requests (pending: ${pending.created} added, ${pending.decided} decided; ${realigned} pending realigned to admins, ${comments} comments), ${activity} activity events, ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}\n`,
+      `Seeded ${timeOff} time-off requests (pending: ${pending.created} added, ${pending.decided} decided; ${realigned} pending realigned to admins, ${comments} comments), ${activity} activity events, ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}, dates of birth for ${birthDates}\n`,
     );
   } finally {
     await prisma.$disconnect();

@@ -18,6 +18,8 @@ export class EmployeeProfileResponse extends createZodDto(
       category: z.object({ id: z.uuid(), name: z.string() }),
     }),
     startDate: z.iso.date(),
+    /** Null when not recorded. */
+    dateOfBirth: z.iso.date().nullable(),
     terminatedOn: z.iso.date().nullable(),
     /** Set together with terminatedOn. */
     termination: z

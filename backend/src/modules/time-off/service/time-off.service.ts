@@ -16,10 +16,17 @@ import { TimeOffRequestRepository } from '../repository/time-off-request.reposit
 import { cycleOf, LEAVE_POLICY, plusDays, todayUtc, workingDaysBetween } from './leave-policy';
 import type { CalendarSortField, TimeOffRequestSortField } from './time-off-sort';
 import { timeOffLabel } from './time-off-label';
-import { TIME_OFF_TYPES, type TimeOffType, TimeOffStatus } from './time-off-type';
+import {
+  isTimeOffStatus,
+  isTimeOffType,
+  TIME_OFF_TYPES,
+  TimeOffStatus,
+  TimeOffType,
+} from './time-off-type';
 import type {
   AbsentPerson,
   CreateTimeOffCommand,
+  DashboardRequests,
   LeaveBalance,
   TimeOffCalendar,
   TimeOffOverview,
@@ -75,6 +82,31 @@ export class TimeOffService {
         requests: requests.filter((request) => request.employeeId === employee.id),
       })),
       totalElements: people.totalElements,
+    };
+  }
+
+  /** For other modules (dashboard): requests made in [from, to), newest first. */
+  async requestsCreatedBetween(from: Date, to: Date, limit: number): Promise<DashboardRequests> {
+    const page = await this.requestRepository.findCreatedBetween(from, to, limit);
+    return {
+      content: page.content.map((request) => ({
+        id: request.id,
+        // Guarded by ck_time_off_requests_type / _status.
+        type: isTimeOffType(request.type) ? request.type : TimeOffType.DAY_OFF,
+        status: isTimeOffStatus(request.status) ? request.status : TimeOffStatus.PENDING,
+        startDate: request.startDate,
+        endDate: request.endDate,
+        days: request.days,
+        createdAt: request.createdAt,
+        employee: {
+          id: request.employee.id,
+          userId: request.employee.user.id,
+          firstName: request.employee.user.firstName,
+          lastName: request.employee.user.lastName,
+          positionTitle: request.employee.position.title,
+        },
+      })),
+      totalElements: page.totalElements,
     };
   }
 

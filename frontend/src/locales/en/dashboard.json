@@ -31,5 +31,55 @@
       "leaves": "leaves {{date}}",
       "none": "No one starts or leaves"
     }
+  },
+  "events": {
+    "heading": "Events",
+    "error": "Couldn’t load these events",
+    "tabs": {
+      "today": "Today's events",
+      "month": "Events by month"
+    },
+    "today": {
+      "nothing": "Nothing scheduled for today — try Events by month to see what is coming."
+    },
+    "month": {
+      "previous": "Previous month",
+      "next": "Next month"
+    },
+    "requests": {
+      "title": "Requests",
+      "subtitle": "Time-off requests made today",
+      "all": "All requests",
+      "emptyTitle": "No requests today",
+      "emptyText": "Nobody has asked for time off today.",
+      "days_one": "{{count}} working day",
+      "days_other": "{{count}} working days",
+      "madeAt": "at {{time}}",
+      "open": "Open {{name}}’s request"
+    },
+    "reviews": {
+      "title": "Reviews",
+      "todaySubtitle": "Performance reviews dated today",
+      "emptyTitle": "No reviews scheduled",
+      "emptyToday": "No performance reviews are dated today.",
+      "emptyMonth": "No reviews are dated in this month.",
+      "pages": "Review pages"
+    },
+    "birthdays": {
+      "title": "Birthdays",
+      "todaySubtitle": "Team birthdays today",
+      "emptyTitle": "No birthdays",
+      "emptyToday": "Nobody on the team has a birthday today.",
+      "emptyMonth": "Nobody on the team has a birthday in this month.",
+      "pages": "Birthday pages"
+    },
+    "pagination": {
+      "range": "{{from}}–{{to}} of {{count}}",
+      "single": "{{index}} of {{count}}",
+      "page": "Go to page {{page}}",
+      "current": "Page {{page}}, current",
+      "previous": "Previous page",
+      "next": "Next page"
+    }
   }
 }

@@ -5,7 +5,7 @@ import { z } from 'zod';
 import type { Pageable, SortDirection } from '../../../../common/dto/pageable';
 import { toPrismaPage } from '../../../../common/persistence/pageable';
 import type { PrismaService } from '../../../../common/persistence/prisma.service';
-import type { Prisma } from '../../../../generated/prisma/client';
+import { Prisma } from '../../../../generated/prisma/client';
 import type { EmployeeSortField } from '../service/employee-sort';
 import type { EmployeeCriteria } from '../service/filter/employee.criteria';
 import { activeOn, employedBetween, employeeWhere, searchWhere } from './employee-where';
@@ -47,6 +47,7 @@ export interface NewEmployee {
   linkedinUrl: string | undefined;
   telegram: string | undefined;
   address: string | undefined;
+  dateOfBirth: Date | undefined;
   responsibleUserIds: string[];
   createdBy: string;
 }
@@ -55,6 +56,20 @@ export interface NewEmployee {
 const responsibleCandidateWhere: Prisma.UserWhereInput = { role: 'ADMIN' };
 
 const averageRowsSchema = z.array(z.object({ days: z.number() }));
+
+const birthdayRowsSchema = z.array(
+  z.object({
+    id: z.string(),
+    userId: z.string(),
+    firstName: z.string(),
+    lastName: z.string(),
+    positionTitle: z.string(),
+    month: z.number().int(),
+    day: z.number().int(),
+  }),
+);
+export type BirthdayRow = z.infer<typeof birthdayRowsSchema>[number];
+const countRowsSchema = z.array(z.object({ total: z.number().int() }));
 
 @Injectable()
 export class EmployeeRepository {
@@ -91,6 +106,40 @@ export class EmployeeRepository {
       this.txHost.tx.employee.findMany({ where, select: employeeCalendarSelect, ...page }),
     ]);
     return { content, totalElements };
+  }
+
+  /**
+   * People employed on at least one day of [from, to] whose birthday falls in `month` on one of
+   * `days`, by day then name, a page at a time. Prisma cannot filter by a date's month — raw SQL.
+   */
+  async findBirthdays(
+    criteria: { from: Date; to: Date; month: number; days: number[] },
+    page: { offset: number; limit: number },
+  ): Promise<{ content: BirthdayRow[]; totalElements: number }> {
+    const where = Prisma.sql`
+      WHERE e.date_of_birth IS NOT NULL
+        AND e.start_date <= ${criteria.to}::date
+        AND (e.terminated_on IS NULL OR e.terminated_on > ${criteria.from}::date)
+        AND EXTRACT(MONTH FROM e.date_of_birth) = ${criteria.month}
+        AND EXTRACT(DAY FROM e.date_of_birth) = ANY(${criteria.days}::int[])`;
+    // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
+    const [countRows, rows] = await Promise.all([
+      this.txHost.tx.$queryRaw<unknown[]>`
+        SELECT COUNT(*)::int AS total FROM employees e ${where}`,
+      this.txHost.tx.$queryRaw<unknown[]>`
+        SELECT e.id, u.id AS "userId", u.first_name AS "firstName", u.last_name AS "lastName",
+               p.title AS "positionTitle",
+               EXTRACT(MONTH FROM e.date_of_birth)::int AS month,
+               EXTRACT(DAY FROM e.date_of_birth)::int AS day
+        FROM employees e
+        JOIN users u ON u.id = e.user_id
+        JOIN positions p ON p.id = e.position_id
+        ${where}
+        ORDER BY day, u.first_name, u.last_name, e.id
+        LIMIT ${page.limit} OFFSET ${page.offset}`,
+    ]);
+    const [count] = countRowsSchema.parse(countRows);
+    return { content: birthdayRowsSchema.parse(rows), totalElements: count?.total ?? 0 };
   }
 
   countActive(today: Date): Promise<number> {
@@ -147,6 +196,7 @@ export class EmployeeRepository {
         linkedinUrl: employee.linkedinUrl ?? null,
         telegram: employee.telegram ?? null,
         address: employee.address ?? null,
+        dateOfBirth: employee.dateOfBirth ?? null,
         createdBy: employee.createdBy,
         updatedBy: employee.createdBy,
         responsibles: {
@@ -201,6 +251,7 @@ export class EmployeeRepository {
       linkedinUrl: string | null;
       telegram: string | null;
       address: string | null;
+      dateOfBirth: Date | null;
     },
     updatedBy: string,
   ): Promise<boolean> {

@@ -2,12 +2,14 @@ import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 import { useCurrentUser } from '@/features/auth';
 import { MyTimeOff } from '@/features/time-off';
+import { AdminEvents } from '../components/AdminEvents';
 import { AdminOverview } from '../components/AdminOverview';
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
 import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
 
 /**
- * Admins: what needs attention (requests, absences, reviews, people starting / leaving).
+ * Admins: what needs attention (requests, absences, reviews, people starting / leaving), then
+ * today's events and events by month (requests made, reviews, birthdays).
  * Employees and managers: their time off (balances and requests).
  */
 export default function DashboardPage() {
@@ -33,7 +35,14 @@ export default function DashboardPage() {
       >
         {t('title')}
       </Typography>
-      {user.role === 'ADMIN' ? <AdminOverview /> : <MyTimeOff />}
+      {user.role === 'ADMIN' ? (
+        <>
+          <AdminOverview />
+          <AdminEvents />
+        </>
+      ) : (
+        <MyTimeOff />
+      )}
     </div>
   );
 }

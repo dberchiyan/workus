@@ -25,3 +25,21 @@ export const reviewSelect = {
   },
 } satisfies Prisma.EmployeeReviewSelect;
 export type ReviewRecord = Prisma.EmployeeReviewGetPayload<{ select: typeof reviewSelect }>;
+
+/** A review on the admin dashboard: whose, what and when. */
+export const dashboardReviewSelect = {
+  id: true,
+  title: true,
+  reviewDate: true,
+  status: true,
+  employee: {
+    select: {
+      id: true,
+      user: { select: { id: true, firstName: true, lastName: true } },
+      position: { select: { title: true } },
+    },
+  },
+} satisfies Prisma.EmployeeReviewSelect;
+export type DashboardReviewRecord = Prisma.EmployeeReviewGetPayload<{
+  select: typeof dashboardReviewSelect;
+}>;

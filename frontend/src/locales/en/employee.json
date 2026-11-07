@@ -71,7 +71,7 @@
     },
     "sections": {
       "overall": "Overall info",
-      "contact": "Contact info"
+      "contact": "Personal and contact info"
     },
     "fields": {
       "firstName": "First name",
@@ -84,7 +84,8 @@
       "personalEmail": "Personal email",
       "linkedinUrl": "LinkedIn",
       "telegram": "Telegram",
-      "address": "Address"
+      "address": "Address",
+      "dateOfBirth": "Date of birth"
     },
     "hints": {
       "email": "Also used to sign in",
@@ -231,7 +232,8 @@
         "periodEnd": "Last day",
         "days": "Working days",
         "note": "Note",
-        "decisionComment": "Reason"
+        "decisionComment": "Reason",
+        "dateOfBirth": "Date of birth"
       },
       "previous": "Before:",
       "current": "After:",

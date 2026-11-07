@@ -24,6 +24,7 @@ export const toEmployeeProfileResponse = (
     category: { id: employee.position.category.id, name: employee.position.category.name },
   },
   startDate: toIsoDate(employee.startDate),
+  dateOfBirth: employee.dateOfBirth ? toIsoDate(employee.dateOfBirth) : null,
   terminatedOn: employee.terminatedOn ? toIsoDate(employee.terminatedOn) : null,
   // Guarded by ck_employees_termination_reason and ck_employees_termination_reason_with_date.
   termination:

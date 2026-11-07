@@ -13,6 +13,8 @@ import {
   absenceSelect,
   type CalendarRequestRecord,
   calendarRequestSelect,
+  type DashboardRequestRecord,
+  dashboardRequestSelect,
   type HeldDaysRecord,
   heldDaysSelect,
   type ManagedTimeOffRequestRecord,
@@ -270,6 +272,25 @@ export class TimeOffRequestRepository {
       orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
       take: employeeIds.length * MAX_DAYS_IN_MONTH,
     });
+  }
+
+  /** Requests made in [from, to) of any status, newest first. */
+  async findCreatedBetween(
+    from: Date,
+    to: Date,
+    limit: number,
+  ): Promise<{ content: DashboardRequestRecord[]; totalElements: number }> {
+    const where: Prisma.TimeOffRequestWhereInput = { createdAt: { gte: from, lt: to } };
+    const [totalElements, content] = await Promise.all([
+      this.txHost.tx.timeOffRequest.count({ where }),
+      this.txHost.tx.timeOffRequest.findMany({
+        where,
+        select: dashboardRequestSelect,
+        orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+        take: limit,
+      }),
+    ]);
+    return { content, totalElements };
   }
 }
 

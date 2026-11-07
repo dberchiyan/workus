@@ -30,6 +30,8 @@ const MESSAGES = {
   linkedinInvalid: 'validation:linkedin.invalid',
   telegramInvalid: 'validation:telegram.invalid',
   addressTooLong: 'validation:address.tooLong',
+  dateOfBirthInvalid: 'validation:dateOfBirth.invalid',
+  dateOfBirthInFuture: 'validation:dateOfBirth.inFuture',
   responsiblesTooMany: 'validation:responsibles.tooMany',
   terminationDateInvalid: 'validation:terminationDate.invalid',
   terminationReasonRequired: 'validation:terminationReason.required',
@@ -101,6 +103,17 @@ export const createEmployeeSchema = z.object({
     MESSAGES.telegramInvalid,
   ),
   address: z.string().trim().max(EMPLOYEE_LIMITS.address, MESSAGES.addressTooLong),
+  /** Optional `YYYY-MM-DD`; blank is fine. The server checks "not in the future" by its own date. */
+  dateOfBirth: z
+    .string()
+    .refine(
+      (value) => value === '' || (/^\d{4}-\d{2}-\d{2}$/.test(value) && value >= '1900-01-01'),
+      MESSAGES.dateOfBirthInvalid,
+    )
+    .refine(
+      (value) => value === '' || value <= new Date().toISOString().slice(0, 10),
+      MESSAGES.dateOfBirthInFuture,
+    ),
   responsibleUserIds: z
     .array(z.uuid())
     .max(EMPLOYEE_LIMITS.responsibles, MESSAGES.responsiblesTooMany),
@@ -153,6 +166,7 @@ export const DETAILS_FIELDS = [
   'linkedinUrl',
   'telegram',
   'address',
+  'dateOfBirth',
 ] as const satisfies readonly (keyof CreateEmployeeFormValues)[];
 
 export const TERMINATION_REASONS = [

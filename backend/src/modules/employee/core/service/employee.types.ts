@@ -39,6 +39,8 @@ export interface CreateEmployeeCommand {
   linkedinUrl: string | undefined;
   telegram: string | undefined;
   address: string | undefined;
+  /** `YYYY-MM-DD`. */
+  dateOfBirth: string | undefined;
   responsibleUserIds: string[];
 }
 
@@ -101,4 +103,21 @@ export interface EmployeeMovements {
   leaving: number;
   /** The soonest start or leave, if any. */
   next: EmployeeMovement | null;
+}
+
+/** A birthday (no year — age is personal data) of someone employed then. */
+export interface EmployeeBirthday {
+  employeeId: string;
+  /** For the avatar colour. */
+  userId: string;
+  firstName: string;
+  lastName: string;
+  positionTitle: string;
+  month: number;
+  day: number;
+}
+
+export interface EmployeeBirthdays {
+  content: EmployeeBirthday[];
+  totalElements: number;
 }

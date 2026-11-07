@@ -48,3 +48,23 @@ export interface StartingReviewCommand {
   salary: string;
   responsibleUserIds: string[];
 }
+
+/** A review on the admin dashboard (status as stored — guarded by its CHECK). */
+export interface DashboardReview {
+  id: string;
+  title: string;
+  reviewDate: Date;
+  status: string;
+  employee: {
+    id: string;
+    userId: string;
+    firstName: string;
+    lastName: string;
+    positionTitle: string;
+  };
+}
+
+export interface DashboardReviews {
+  content: DashboardReview[];
+  totalElements: number;
+}

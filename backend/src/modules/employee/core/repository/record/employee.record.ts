@@ -55,6 +55,7 @@ export const employeeProfileSelect = {
   linkedinUrl: true,
   telegram: true,
   address: true,
+  dateOfBirth: true,
   createdAt: true,
   version: true,
   user: { select: { id: true, firstName: true, lastName: true, email: true, role: true } },

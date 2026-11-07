@@ -94,5 +94,9 @@
   "timeOffComment": {
     "required": "Write a comment",
     "tooLong": "Comment must be at most {{max}} characters"
+  },
+  "dateOfBirth": {
+    "invalid": "Enter a valid date of birth",
+    "inFuture": "Date of birth cannot be in the future"
   }
 }

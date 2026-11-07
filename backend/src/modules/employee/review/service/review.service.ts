@@ -11,6 +11,7 @@ import { AuditField, auditValue, changeOf } from '../../../audit/service/audit-c
 import { AuditService } from '../../../audit/service/audit.service';
 import { EmployeeService } from '../../core/service/employee.service';
 import type { ReviewRecord } from '../repository/record/review.record';
+import type { DashboardReviews } from './review.types';
 import { ReviewRepository } from '../repository/review.repository';
 import { reviewCreatedChanges, reviewDeletedChanges, reviewUpdatedChanges } from './review-audit';
 import { ReviewKind, STARTING_REVIEW_TITLE } from './review-kind';
@@ -102,6 +103,34 @@ export class ReviewService {
       this.reviewRepository.countScheduledBefore(today),
     ]);
     return { upcoming, overdue };
+  }
+
+  /** For other modules (dashboard): scheduled and completed regular reviews in [from, to]. */
+  async reviewsBetween(
+    from: Date,
+    to: Date,
+    pageRequest: { page: number; size: number },
+  ): Promise<DashboardReviews> {
+    const page = await this.reviewRepository.findScheduledOrCompletedBetween(from, to, {
+      offset: pageRequest.page * pageRequest.size,
+      limit: pageRequest.size,
+    });
+    return {
+      content: page.content.map((review) => ({
+        id: review.id,
+        title: review.title,
+        reviewDate: review.reviewDate,
+        status: review.status,
+        employee: {
+          id: review.employee.id,
+          userId: review.employee.user.id,
+          firstName: review.employee.user.firstName,
+          lastName: review.employee.user.lastName,
+          positionTitle: review.employee.position.title,
+        },
+      })),
+      totalElements: page.totalElements,
+    };
   }
 
   /** The policy has already checked that the review belongs to the employee in the path. */

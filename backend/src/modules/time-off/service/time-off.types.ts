@@ -5,7 +5,7 @@ import type {
   ManagedTimeOffRequestRecord,
   TimeOffRequestRecord,
 } from '../repository/record/time-off-request.record';
-import type { TimeOffType } from './time-off-type';
+import type { TimeOffStatus, TimeOffType } from './time-off-type';
 
 export interface LeaveBalance {
   type: TimeOffType;
@@ -84,5 +84,28 @@ export interface TimeOffCalendar {
   from: Date;
   to: Date;
   content: CalendarRow[];
+  totalElements: number;
+}
+
+/** A request on the admin dashboard. */
+export interface DashboardRequest {
+  id: string;
+  type: TimeOffType;
+  status: TimeOffStatus;
+  startDate: Date;
+  endDate: Date;
+  days: number;
+  createdAt: Date;
+  employee: {
+    id: string;
+    userId: string;
+    firstName: string;
+    lastName: string;
+    positionTitle: string;
+  };
+}
+
+export interface DashboardRequests {
+  content: DashboardRequest[];
   totalElements: number;
 }

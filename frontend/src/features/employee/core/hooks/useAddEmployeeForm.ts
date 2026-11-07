@@ -29,6 +29,7 @@ const emptyValues = (): CreateEmployeeFormValues => ({
   linkedinUrl: '',
   telegram: '',
   address: '',
+  dateOfBirth: '',
   responsibleUserIds: [],
 });
 
@@ -52,6 +53,7 @@ const toRequest = (values: CreateEmployeeFormOutput): CreateEmployeeRequest => {
     ...(optional(values.linkedinUrl) ? { linkedinUrl: values.linkedinUrl } : {}),
     ...(optional(values.telegram) ? { telegram: values.telegram } : {}),
     ...(optional(values.address) ? { address: values.address } : {}),
+    ...(optional(values.dateOfBirth) ? { dateOfBirth: values.dateOfBirth } : {}),
     responsibleUserIds: values.responsibleUserIds,
   };
 };

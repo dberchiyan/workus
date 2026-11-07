@@ -103,3 +103,24 @@ export const calendarRequestSelect = {
 export type CalendarRequestRecord = Prisma.TimeOffRequestGetPayload<{
   select: typeof calendarRequestSelect;
 }>;
+
+/** A request on the admin dashboard: whose, what and its state. */
+export const dashboardRequestSelect = {
+  id: true,
+  type: true,
+  status: true,
+  startDate: true,
+  endDate: true,
+  days: true,
+  createdAt: true,
+  employee: {
+    select: {
+      id: true,
+      user: { select: { id: true, firstName: true, lastName: true } },
+      position: { select: { title: true } },
+    },
+  },
+} satisfies Prisma.TimeOffRequestSelect;
+export type DashboardRequestRecord = Prisma.TimeOffRequestGetPayload<{
+  select: typeof dashboardRequestSelect;
+}>;

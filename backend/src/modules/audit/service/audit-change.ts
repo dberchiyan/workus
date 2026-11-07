@@ -47,6 +47,7 @@ export const AuditField = {
   LINKEDIN_URL: 'linkedinUrl',
   TELEGRAM: 'telegram',
   ADDRESS: 'address',
+  DATE_OF_BIRTH: 'dateOfBirth',
   TERMINATION_DATE: 'terminationDate',
   TERMINATION_REASON: 'terminationReason',
   TERMINATION_COMMENT: 'terminationComment',
