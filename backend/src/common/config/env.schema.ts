@@ -54,6 +54,16 @@ export const validateEnv = (raw: Record<string, unknown>): Env => {
       'Invalid environment configuration: SESSION_IDLE_TIMEOUT_MINUTES must not exceed SESSION_ABSOLUTE_TIMEOUT_MINUTES',
     );
   }
+  // The __Host- prefix makes the browser enforce Secure, Path=/ and no Domain (no subdomain can
+  // set or shadow the cookie); it only works when the config matches.
+  if (
+    result.data.SESSION_COOKIE_NAME.startsWith('__Host-') &&
+    (!result.data.COOKIE_SECURE || result.data.COOKIE_DOMAIN)
+  ) {
+    throw new Error(
+      'Invalid environment configuration: a __Host- SESSION_COOKIE_NAME requires COOKIE_SECURE=true and an empty COOKIE_DOMAIN',
+    );
+  }
   if (result.data.COOKIE_SAME_SITE === 'none' && !result.data.COOKIE_SECURE) {
     throw new Error(
       'Invalid environment configuration: COOKIE_SAME_SITE=none requires COOKIE_SECURE=true',

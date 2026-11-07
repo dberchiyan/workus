@@ -141,7 +141,11 @@ export class GlobalExceptionFilter implements ExceptionFilter {
       const key: I18nPath = issue.message.startsWith(VALIDATION_KEY_PREFIX)
         ? (issue.message as I18nPath)
         : 'validation.invalid';
-      const args = 'maximum' in issue ? { max: Number(issue.maximum) } : {};
+      // Limits a message may name: {max} for too long / too many, {min} for too short.
+      const args = {
+        ...('maximum' in issue ? { max: Number(issue.maximum) } : {}),
+        ...('minimum' in issue ? { min: Number(issue.minimum) } : {}),
+      };
       return { field: issue.path.join('.'), message: this.i18n.t(key, { lang, args }) };
     });
   }

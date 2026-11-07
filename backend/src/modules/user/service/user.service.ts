@@ -20,6 +20,11 @@ export class UserService {
     return user ? { ...user, role: toRole(user.role) } : null;
   }
 
+  async findCredentialsById(id: string): Promise<UserCredentials | null> {
+    const user = await this.userRepository.findCredentialsById(id);
+    return user ? { ...user, role: toRole(user.role) } : null;
+  }
+
   async findProfileById(id: string): Promise<UserProfile | null> {
     const user = await this.userRepository.findProfileById(id);
     return user ? { ...user, role: toRole(user.role) } : null;

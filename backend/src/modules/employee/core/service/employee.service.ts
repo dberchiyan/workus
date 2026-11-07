@@ -14,7 +14,7 @@ import {
   changeOf,
 } from '../../../audit/service/audit-change';
 import { AuditService } from '../../../audit/service/audit.service';
-import type { AuditEventPage } from '../../../audit/service/audit.types';
+import type { AuditEventPage, SecurityEventPage } from '../../../audit/service/audit.types';
 import type { AuditEventSortField } from '../../../audit/service/audit-sort';
 import { UserService } from '../../../user/service/user.service';
 import { UserRole } from '../../../user/service/user-role';
@@ -494,6 +494,18 @@ export class EmployeeService {
       throw new ResourceNotFoundException();
     }
     return this.auditService.findPageByEmployee(employeeId, pageable);
+  }
+
+  /** The employee's security log (their account's sign-ins, password changes…), for admins. */
+  async findSecurityLog(
+    employeeId: string,
+    pageable: Pageable<AuditEventSortField>,
+  ): Promise<SecurityEventPage> {
+    const userId = await this.employeeRepository.findUserIdById(employeeId);
+    if (!userId) {
+      throw new ResourceNotFoundException();
+    }
+    return this.auditService.findSecurityPage(userId, pageable);
   }
 
   async findProfile(id: string): Promise<EmployeeProfile> {

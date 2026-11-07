@@ -6,7 +6,13 @@ import { toPrismaPage } from '../../../common/persistence/pageable';
 import type { PrismaService } from '../../../common/persistence/prisma.service';
 import type { Prisma } from '../../../generated/prisma/client';
 import type { AuditEventSortField } from '../service/audit-sort';
-import { auditEventSelect, type AuditEventRecord } from './record/audit-event.record';
+import { AuditTargetType } from '../service/audit-action';
+import {
+  auditEventSelect,
+  type AuditEventRecord,
+  type SecurityEventRecord,
+  securityEventSelect,
+} from './record/audit-event.record';
 
 export interface NewAuditEventRow {
   action: string;
@@ -54,6 +60,24 @@ export class AuditEventRepository {
     const [totalElements, content] = await Promise.all([
       this.txHost.tx.auditEvent.count({ where }),
       this.txHost.tx.auditEvent.findMany({ where, select: auditEventSelect, ...page }),
+    ]);
+    return { content, totalElements };
+  }
+
+  /** A user's security log, newest first. */
+  async findSecurityPage(
+    userId: string,
+    pageable: Pageable<AuditEventSortField>,
+  ): Promise<{ content: SecurityEventRecord[]; totalElements: number }> {
+    const where = {
+      targetType: AuditTargetType.USER,
+      targetId: userId,
+    } satisfies Prisma.AuditEventWhereInput;
+    const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
+    // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
+    const [totalElements, content] = await Promise.all([
+      this.txHost.tx.auditEvent.count({ where }),
+      this.txHost.tx.auditEvent.findMany({ where, select: securityEventSelect, ...page }),
     ]);
     return { content, totalElements };
   }

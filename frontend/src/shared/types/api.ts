@@ -89,6 +89,75 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/password": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Change own password; every session ends and this browser gets a new one */
+        put: operations["AuthController_changePassword"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The caller's current session and a page of their other live sessions */
+        get: operations["AuthController_sessions"];
+        put?: never;
+        post?: never;
+        /** Sign out everywhere except this session */
+        delete: operations["AuthController_endOtherSessions"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/sessions/{sessionId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /** End one of own sessions (this one signs out here) */
+        delete: operations["AuthController_endSession"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/auth/security-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The caller's security log: sign-ins, failed sign-ins, password changes, ended sessions */
+        get: operations["AuthController_securityLog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/employees": {
         parameters: {
             query?: never;
@@ -168,6 +237,23 @@ export interface paths {
         };
         /** List changes made to an employee's records, newest first, with who made them */
         get: operations["EmployeeActivityController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/{employeeId}/security-log": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** An employee's security log (sign-ins, password changes, ended sessions), newest first */
+        get: operations["EmployeeSecurityLogController_list"];
         put?: never;
         post?: never;
         delete?: never;
@@ -644,6 +730,44 @@ export interface components {
             firstName: string;
             lastName: string;
             role: components["schemas"]["UserRole_Output"];
+            idleTimeoutMinutes: number;
+        };
+        ChangePasswordRequest: {
+            currentPassword: string;
+            newPassword: unknown & unknown & unknown & unknown;
+        };
+        Session_Output: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            clientType: "WEB" | "MOBILE";
+            ip: string | null;
+            userAgent: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            lastSeenAt: string;
+        };
+        SessionsResponse_Output: {
+            current: components["schemas"]["Session_Output"] | null;
+            others: {
+                content: components["schemas"]["Session_Output"][];
+                totalElements: number;
+            };
+        };
+        SecurityEvent_Output: {
+            /** Format: uuid */
+            id: string;
+            /** @enum {string} */
+            action: "auth.signed_in" | "auth.sign_in_failed" | "auth.sign_in_refused" | "auth.signed_out" | "auth.password_changed" | "auth.session_ended" | "auth.other_sessions_ended";
+            /** Format: date-time */
+            occurredAt: string;
+            ip: string | null;
+            userAgent: string | null;
+        };
+        SecurityLogResponse_Output: {
+            content: components["schemas"]["SecurityEvent_Output"][];
+            totalElements: number;
         };
         EmployeeListItem_Output: {
             /** Format: uuid */
@@ -767,7 +891,7 @@ export interface components {
                 } | null;
                 target: {
                     /** @enum {string} */
-                    type: "employee" | "review" | "time_off_request";
+                    type: "employee" | "review" | "time_off_request" | "user";
                     /** Format: uuid */
                     id: string;
                     label: string;
@@ -875,6 +999,10 @@ export interface components {
                     }) | null;
                 }[];
             }[];
+            totalElements: number;
+        };
+        EmployeeSecurityLogResponse_Output: {
+            content: components["schemas"]["SecurityEvent_Output"][];
             totalElements: number;
         };
         PositionCategoryCountsResponse_Output: {
@@ -1993,6 +2121,217 @@ export interface operations {
             };
         };
     };
+    AuthController_changePassword: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangePasswordRequest"];
+            };
+        };
+        responses: {
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RATE_LIMIT_EXCEEDED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AuthController_sessions: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+                /** @description One of: lastSeenAt,asc|desc */
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SessionsResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AuthController_endOtherSessions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AuthController_endSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AuthController_securityLog: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+                /** @description One of: occurredAt,asc|desc */
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SecurityLogResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     EmployeeController_list: {
         parameters: {
             query?: {
@@ -2376,6 +2715,66 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["EmployeeActivityPageResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmployeeSecurityLogController_list: {
+        parameters: {
+            query?: {
+                page?: number;
+                size?: number;
+                /** @description One of: occurredAt,asc|desc */
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EmployeeSecurityLogResponse_Output"];
                 };
             };
             /** @description INVALID_PARAMETER */

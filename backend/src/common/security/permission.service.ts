@@ -17,6 +17,12 @@ export class PermissionService {
     return count > 0;
   }
 
+  /** The session is the user's own. */
+  async isOwnSession(userId: string, sessionId: string): Promise<boolean> {
+    const count = await this.prisma.session.count({ where: { id: sessionId, userId } });
+    return count > 0;
+  }
+
   /** The user wrote this comment, and it is on this request (the whole chain). */
   async isTimeOffCommentAuthor(
     userId: string,

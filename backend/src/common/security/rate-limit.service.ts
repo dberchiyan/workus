@@ -14,6 +14,8 @@ type LimiterName = RateLimitName | typeof SESSION_LIMIT;
 const LIMITS: Readonly<Record<LimiterName, { points: number; durationSeconds: number }>> = {
   // security.md: login 5 / 15 min keyed by IP and email.
   [RateLimitName.LOGIN]: { points: 5, durationSeconds: 15 * 60 },
+  // Same budget for guesses at the current password, keyed by user.
+  [RateLimitName.PASSWORD_CHANGE]: { points: 5, durationSeconds: 15 * 60 },
   // Per-session ceiling on everything else.
   [SESSION_LIMIT]: { points: 300, durationSeconds: 60 },
 };

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { AuditModule } from '../../audit/audit.module';
 import { UserModule } from '../../user/user.module';
 import { EmployeeActivityController } from './controller/employee-activity.controller';
+import { EmployeeSecurityLogController } from './controller/employee-security-log.controller';
 import { EmployeeOptionController } from './controller/employee-option.controller';
 import { EmployeeController } from './controller/employee.controller';
 import { PositionCategoryController } from './controller/position-category.controller';
@@ -15,6 +16,7 @@ import { PositionCategoryService } from './service/position-category.service';
   controllers: [
     EmployeeController,
     EmployeeActivityController,
+    EmployeeSecurityLogController,
     PositionCategoryController,
     EmployeeOptionController,
   ],

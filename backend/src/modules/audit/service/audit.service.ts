@@ -12,7 +12,7 @@ import {
   type AuditTargetType,
 } from './audit-action';
 import { AuditChangesSchema } from './audit-change';
-import type { AuditEvent, AuditEventPage, NewAuditEvent } from './audit.types';
+import type { AuditEvent, AuditEventPage, NewAuditEvent, SecurityEventPage } from './audit.types';
 import type { AuditEventSortField } from './audit-sort';
 
 const isAction = (value: string): value is AuditAction =>
@@ -44,7 +44,10 @@ export class AuditService {
   private toRow(event: NewAuditEvent) {
     return {
       action: event.action,
-      actorUserId: this.cls.get('principal')?.userId ?? null,
+      actorUserId:
+        event.actorUserId !== undefined
+          ? event.actorUserId
+          : (this.cls.get('principal')?.userId ?? null),
       employeeId: event.employeeId,
       targetType: event.target.type,
       targetId: event.target.id,
@@ -64,6 +67,30 @@ export class AuditService {
     const page = await this.auditEventRepository.findPageByEmployee(employeeId, pageable);
     return {
       content: page.content.flatMap((record) => this.toEvent(record)),
+      totalElements: page.totalElements,
+    };
+  }
+
+  /** A user's security log (sign-ins, password changes, ended sessions), newest first. */
+  async findSecurityPage(
+    userId: string,
+    pageable: Pageable<AuditEventSortField>,
+  ): Promise<SecurityEventPage> {
+    const page = await this.auditEventRepository.findSecurityPage(userId, pageable);
+    return {
+      content: page.content.flatMap((record) =>
+        isAction(record.action)
+          ? [
+              {
+                id: record.id,
+                occurredAt: record.occurredAt,
+                action: record.action,
+                ipAddress: record.ipAddress,
+                userAgent: record.userAgent,
+              },
+            ]
+          : [],
+      ),
       totalElements: page.totalElements,
     };
   }

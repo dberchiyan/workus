@@ -23,9 +23,5 @@
     "ADMIN": "Administrator",
     "MANAGER": "Manager",
     "EMPLOYEE": "Employee"
-  },
-  "placeholder": {
-    "pageTitle": "{{section}} · Workus",
-    "description": "This section is coming soon."
   }
 }

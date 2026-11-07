@@ -3,7 +3,8 @@ import { createBrowserRouter, Navigate } from 'react-router';
 import { LoginPage, RequireAccess, RequireAuth } from '@/features/auth';
 import { DashboardPage } from '@/features/dashboard';
 import { EmployeeProfilePage, EmployeesPage } from '@/features/employee/core';
-import { AppLayout, SectionPlaceholderPage } from '@/features/shell';
+import { AppLayout } from '@/features/shell';
+import { SettingsPage } from '@/features/settings';
 import { InsightsPage } from '@/features/insights';
 import { CalendarPage, RequestsPage } from '@/features/time-off';
 import { PageLoader } from '@/shared/components/PageLoader';
@@ -34,10 +35,8 @@ export const router = createBrowserRouter([
           {
             element: <RequireAccess part="section.settings" />,
             children: [
-              {
-                path: PATHS.settings,
-                element: route(<SectionPlaceholderPage section="settings" />),
-              },
+              { path: PATHS.settings, element: route(<SettingsPage />) },
+              { path: PATHS.settingsSection, element: route(<SettingsPage />) },
             ],
           },
           {

@@ -10,6 +10,8 @@ export const CurrentUserResponseSchema = z.object({
   firstName: z.string(),
   lastName: z.string(),
   role: UserRoleSchema,
+  /** Minutes without activity after which the session ends (the client warns before). */
+  idleTimeoutMinutes: z.number().int().min(1),
 });
 
 export class CurrentUserResponse extends createZodDto(CurrentUserResponseSchema) {}

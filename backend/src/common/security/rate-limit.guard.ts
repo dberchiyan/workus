@@ -35,6 +35,10 @@ export class RateLimitGuard implements CanActivate {
       return true;
     }
     const principal = this.cls.get('principal');
+    if (name === RateLimitName.PASSWORD_CHANGE && principal) {
+      await this.rateLimitService.consume(name, [principal.userId]);
+      return true;
+    }
     if (principal) {
       await this.rateLimitService.consumeSession(principal.sessionId);
     }

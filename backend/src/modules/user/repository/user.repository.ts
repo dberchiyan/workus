@@ -19,6 +19,10 @@ export class UserRepository {
     return this.txHost.tx.user.findUnique({ where: { email }, select: userCredentialsSelect });
   }
 
+  findCredentialsById(id: string): Promise<UserCredentialsRecord | null> {
+    return this.txHost.tx.user.findUnique({ where: { id }, select: userCredentialsSelect });
+  }
+
   findProfileById(id: string): Promise<UserProfileRecord | null> {
     return this.txHost.tx.user.findUnique({ where: { id }, select: userProfileSelect });
   }

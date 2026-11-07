@@ -24,6 +24,10 @@ export type I18nTranslations = {
         "RATE_LIMIT_EXCEEDED": string;
         "UPSTREAM_UNAVAILABLE": string;
         "INTERNAL_ERROR": string;
+        "auth": {
+            "currentPasswordWrong": string;
+            "samePassword": string;
+        };
         "employee": {
             "emailTaken": string;
             "positionNotFound": string;
@@ -154,6 +158,17 @@ export type I18nTranslations = {
         };
         "decisionComment": {
             "tooLong": string;
+        };
+        "currentPassword": {
+            "required": string;
+        };
+        "newPassword": {
+            "required": string;
+            "tooShort": string;
+            "needsUppercase": string;
+            "needsLowercase": string;
+            "needsDigit": string;
+            "needsSymbol": string;
         };
     };
 };

@@ -10,13 +10,14 @@ import { ReviewTab } from '@/features/employee/review';
 import { ProfileActivityTab } from './ProfileActivityTab';
 import { ProfileFilesTab } from './ProfileFilesTab';
 import { ProfileInfoTab } from './ProfileInfoTab';
+import { ProfileSecurityTab } from './ProfileSecurityTab';
 
 export interface ProfileTabsProps {
   employee: EmployeeProfile;
   mock: EmployeeProfileMock;
 }
 
-/** Info, Files, Review, Activity — the open tab is kept in the URL. */
+/** Info, Files, Review, Activity, Security — the open tab is kept in the URL. */
 export function ProfileTabs({ employee, mock }: ProfileTabsProps) {
   const { t } = useTranslation('employee');
   const { tab, setTab } = useProfileTab();
@@ -26,6 +27,7 @@ export function ProfileTabs({ employee, mock }: ProfileTabsProps) {
     files: t('profile.tabs.files', { count: mock.fileCount }),
     review: t('profile.tabs.review'),
     activity: t('profile.tabs.activity'),
+    security: t('profile.tabs.security'),
   };
 
   return (
@@ -63,6 +65,7 @@ export function ProfileTabs({ employee, mock }: ProfileTabsProps) {
         {tab === 'files' && <ProfileFilesTab mock={mock} />}
         {tab === 'review' && <ReviewTab employeeId={employee.id} />}
         {tab === 'activity' && <ProfileActivityTab employeeId={employee.id} />}
+        {tab === 'security' && <ProfileSecurityTab employeeId={employee.id} />}
       </div>
     </Card>
   );

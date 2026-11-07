@@ -2,7 +2,7 @@ import { useCallback } from 'react';
 import { useLocation, useSearchParams } from 'react-router';
 import { z } from 'zod';
 
-export const PROFILE_TABS = ['info', 'files', 'review', 'activity'] as const;
+export const PROFILE_TABS = ['info', 'files', 'review', 'activity', 'security'] as const;
 export type ProfileTab = (typeof PROFILE_TABS)[number];
 
 const tabSchema = z.enum(PROFILE_TABS).catch('info');

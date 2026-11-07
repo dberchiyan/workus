@@ -308,6 +308,15 @@ export class EmployeeRepository {
     return rows.map((row) => row.userId);
   }
 
+  /** The user account of an employee; null when unknown. */
+  async findUserIdById(id: string): Promise<string | null> {
+    const employee = await this.txHost.tx.employee.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+    return employee?.userId ?? null;
+  }
+
   findTimeOffById(id: string): Promise<EmployeeTimeOffRecord | null> {
     return this.txHost.tx.employee.findUnique({ where: { id }, select: employeeTimeOffSelect });
   }

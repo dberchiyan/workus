@@ -1,13 +1,13 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
-import { AUDIT_ACTIONS, AUDIT_TARGET_TYPES } from '../../../../audit/service/audit-action';
+import { AUDIT_TARGET_TYPES, RECORD_ACTIONS } from '../../../../audit/service/audit-action';
 import { AuditChangeSchema } from '../../../../audit/service/audit-change';
 import { pageResponseSchema } from '../../../../../common/dto/page.response';
 
 const ActivityEventSchema = z.object({
   id: z.uuid(),
   occurredAt: z.iso.datetime(),
-  action: z.enum(AUDIT_ACTIONS),
+  action: z.enum(RECORD_ACTIONS),
   /** null = a change made by the system. */
   actor: z.object({ id: z.uuid(), firstName: z.string(), lastName: z.string() }).nullable(),
   target: z.object({

@@ -3,6 +3,7 @@ import i18n from 'i18next';
 import { env } from '@/shared/config/env';
 import type { ErrorCode, ErrorResponse } from '@/shared/types';
 import { ApiError } from './apiError';
+import { markApiActivity } from './activity';
 import { checkResponseContract } from './responseContract';
 
 const TIMEOUT_MS = 15_000;
@@ -54,19 +55,25 @@ apiClient.interceptors.request.use((config) => {
 });
 
 // Every JSON answer is checked against the contract the types come from (runtime safety net).
-apiClient.interceptors.response.use(checkResponseContract, (error: unknown) => {
-  if (!(error instanceof AxiosError)) {
-    return Promise.reject(error instanceof Error ? error : new Error('Unknown error'));
-  }
-  const data: unknown = error.response?.data;
-  if (!error.response || !isErrorResponse(data)) {
-    const status = error.response?.status ?? 0;
-    const code: ErrorCode = status === 0 ? 'UPSTREAM_UNAVAILABLE' : 'INTERNAL_ERROR';
-    return Promise.reject(new ApiError(status, code, i18n.t(`errors:${code}`), [], undefined));
-  }
-  const apiError = ApiError.fromResponse(data);
-  if (apiError.status === 401 && SESSION_ERRORS.has(apiError.code)) {
-    onSessionLost?.(apiError.code, error.config);
-  }
-  return Promise.reject(apiError);
-});
+apiClient.interceptors.response.use(
+  (response) => {
+    markApiActivity();
+    return checkResponseContract(response);
+  },
+  (error: unknown) => {
+    if (!(error instanceof AxiosError)) {
+      return Promise.reject(error instanceof Error ? error : new Error('Unknown error'));
+    }
+    const data: unknown = error.response?.data;
+    if (!error.response || !isErrorResponse(data)) {
+      const status = error.response?.status ?? 0;
+      const code: ErrorCode = status === 0 ? 'UPSTREAM_UNAVAILABLE' : 'INTERNAL_ERROR';
+      return Promise.reject(new ApiError(status, code, i18n.t(`errors:${code}`), [], undefined));
+    }
+    const apiError = ApiError.fromResponse(data);
+    if (apiError.status === 401 && SESSION_ERRORS.has(apiError.code)) {
+      onSessionLost?.(apiError.code, error.config);
+    }
+    return Promise.reject(apiError);
+  },
+);

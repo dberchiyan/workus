@@ -8,6 +8,8 @@ export const employeeKeys = {
   summary: () => [...employeeKeys.all, 'summary'] as const,
   detail: (employeeId: string) => [...employeeKeys.all, 'detail', employeeId] as const,
   activity: (employeeId: string) => [...employeeKeys.detail(employeeId), 'activity'] as const,
+  securityLog: (employeeId: string, page: number) =>
+    [...employeeKeys.detail(employeeId), 'security-log', page] as const,
   categories: (filters: EmployeeFilters) => [...employeeKeys.all, 'categories', filters] as const,
   positions: () => [...employeeKeys.all, 'positions'] as const,
   responsibleCandidates: (search: string) =>

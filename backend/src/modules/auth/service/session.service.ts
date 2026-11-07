@@ -11,6 +11,7 @@ import {
 } from '../../../common/security/session-authenticator';
 import { generateToken, hashToken } from '../../../common/security/token-hash';
 import { EmployeeService } from '../../employee/core/service/employee.service';
+import type { SessionListRecord } from '../repository/record/session.record';
 import { SessionRepository } from '../repository/session.repository';
 
 const MINUTE_MS = 60_000;
@@ -31,6 +32,9 @@ export interface StartedSession {
   csrfToken: string;
   absoluteExpiresAt: Date;
 }
+
+/** Devices a person can be signed in on at once (product decision). */
+const MAX_SESSIONS_PER_USER = 10;
 
 /** Days back the hourly job looks for terminations that took effect. */
 const LEAVER_WINDOW_DAYS = 7;
@@ -68,6 +72,14 @@ export class SessionService extends SessionAuthenticator {
       idleExpiresAt: this.idleExpiry(now, absoluteExpiresAt),
       absoluteExpiresAt,
     });
+    // At most MAX_SESSIONS_PER_USER devices: a new sign-in ends the least recently used one.
+    const trimmed = await this.sessionRepository.deleteBeyondMostRecent(
+      command.userId,
+      MAX_SESSIONS_PER_USER,
+    );
+    if (trimmed > 0) {
+      this.logger.info({ userId: command.userId, trimmed }, 'Oldest sessions ended (limit)');
+    }
     return { token, csrfToken, absoluteExpiresAt };
   }
 
@@ -102,6 +114,30 @@ export class SessionService extends SessionAuthenticator {
 
   end(sessionId: string): Promise<void> {
     return this.sessionRepository.deleteById(sessionId);
+  }
+
+  /** Settings: this session, and a page of the user's other live ones (most recent first). */
+  async listForUser(
+    userId: string,
+    currentSessionId: string,
+    page: { page: number; size: number },
+  ): Promise<{
+    current: SessionListRecord | null;
+    others: { content: SessionListRecord[]; totalElements: number };
+  }> {
+    const [current, others] = await Promise.all([
+      this.sessionRepository.findListedById(currentSessionId),
+      this.sessionRepository.findOtherLivePage(userId, currentSessionId, new Date(), {
+        skip: page.page * page.size,
+        take: page.size,
+      }),
+    ]);
+    return { current, others };
+  }
+
+  /** Signs the user out everywhere but this session. */
+  endOthers(userId: string, keepSessionId: string): Promise<number> {
+    return this.sessionRepository.deleteByUserIdExcept(userId, keepSessionId);
   }
 
   /** Signs these users out everywhere (e.g. their employment has ended). */

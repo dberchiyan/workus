@@ -1,0 +1,89 @@
+{
+  "pageTitle": "Settings · Workus",
+  "title": "Settings",
+  "subtitle": "Your account, where you are signed in, and how Workus looks.",
+  "menu": "Settings sections",
+  "sections": {
+    "account": "Account",
+    "sessions": "Sessions",
+    "preferences": "Preferences",
+    "security": "Security log"
+  },
+  "account": {
+    "profile": {
+      "title": "Profile",
+      "description": "Your administrator changes your name and email.",
+      "name": "Name",
+      "email": "Email",
+      "role": "Role"
+    },
+    "password": {
+      "title": "Password",
+      "description": "Changing it signs you out on every other device.",
+      "current": "Current password",
+      "new": "New password",
+      "confirm": "Repeat the new password",
+      "submit": "Change password",
+      "show": "Show password",
+      "hide": "Hide password",
+      "done": "Password changed. You were signed out on your other devices.",
+      "rules": {
+        "title": "Your new password needs",
+        "length": "{{min}} to {{max}} characters",
+        "uppercase": "An upper-case letter (A–Z)",
+        "lowercase": "A lower-case letter (a–z)",
+        "digit": "A digit (0–9)",
+        "symbol": "A symbol, such as ! # % or -",
+        "different": "To differ from the current password",
+        "match": "The same in both new-password fields",
+        "met": "— done",
+        "notMet": "— not yet"
+      }
+    }
+  },
+  "sessions": {
+    "title": "Sessions",
+    "description": "Where you are signed in. End a session you don’t recognise.",
+    "device": "{{browser}} on {{os}}",
+    "unknownDevice": "Unknown device",
+    "current": "This device",
+    "signedIn": "signed in {{date}}",
+    "lastActive": "last active {{date}}",
+    "endOne": "Sign out",
+    "endOneLabel": "Sign out {{device}}",
+    "endOthers": "Sign out of other sessions",
+    "onlyThis": "Only this device is signed in.",
+    "error": "Couldn’t load your sessions",
+    "retry": "Try again",
+    "confirmTitle": "Sign out of other sessions?",
+    "confirmText_one": "The other device is signed out at once and needs your password to come back.",
+    "confirmText_other": "The {{count}} other devices are signed out at once and need your password to come back.",
+    "keep": "Keep them",
+    "confirm_one": "Sign out 1 session",
+    "confirm_other": "Sign out {{count}} sessions",
+    "others_one": "Other session · {{count}}",
+    "others_other": "Other sessions · {{count}}",
+    "range": "{{from}}–{{to}} of {{count}}",
+    "pages": "Session pages"
+  },
+  "preferences": {
+    "theme": {
+      "title": "Appearance",
+      "description": "Saved in this browser.",
+      "system": "System",
+      "light": "Light",
+      "dark": "Dark"
+    },
+    "language": {
+      "title": "Language",
+      "description": "More languages will come later.",
+      "english": "English"
+    }
+  },
+  "security": {
+    "title": "Security log",
+    "description": "Sign-ins, failed attempts, password changes and signed-out sessions on your account. If you don’t recognise something, change your password.",
+    "error": "Couldn’t load your security log",
+    "retry": "Try again"
+  }
+}

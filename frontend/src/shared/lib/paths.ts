@@ -8,6 +8,7 @@ export const PATHS = {
   calendar: '/calendar',
   insights: '/insights',
   settings: '/settings',
+  settingsSection: '/settings/:section',
 } as const;
 
 /** `/requests?request=<id>` — the Requests page with one request open. */
@@ -17,3 +18,7 @@ export const requestPath = (requestId: string): string =>
 /** `/employees/:employeeId` for one employee. */
 export const employeeProfilePath = (employeeId: string): string =>
   PATHS.employeeProfile.replace(':employeeId', encodeURIComponent(employeeId));
+
+/** `/settings/<section>` — one section of Settings. */
+export const settingsPath = (section: string): string =>
+  PATHS.settingsSection.replace(':section', encodeURIComponent(section));

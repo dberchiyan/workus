@@ -5,6 +5,10 @@ export const can = {
   /** Caller's own account only: /auth/me, /auth/logout. */
   authenticated: policy([], () => true),
   admin: policy([], (principal) => principal.hasAuthority('ADMIN')),
+  /** One's own sessions only (Settings → Sessions). */
+  endOwnSession: policy(['sessionId'], (principal, args, permissions) =>
+    permissions.isOwnSession(principal.userId, args.sessionId ?? ''),
+  ),
   /** Company figures (headcount, tenure, turnover, absence, salaries) are an admin screen. */
   viewInsights: policy([], (principal) => principal.hasAuthority('ADMIN')),
   /** The employee directory is an admin screen. */

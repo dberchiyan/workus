@@ -2,6 +2,8 @@ import { SetMetadata } from '@nestjs/common';
 
 export const RateLimitName = {
   LOGIN: 'LOGIN',
+  /** Changing one's password: guesses at the current one, per user. */
+  PASSWORD_CHANGE: 'PASSWORD_CHANGE',
 } as const;
 export type RateLimitName = (typeof RateLimitName)[keyof typeof RateLimitName];
 

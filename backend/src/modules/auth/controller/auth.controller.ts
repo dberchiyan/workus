@@ -1,4 +1,15 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Put,
+  Req,
+  Res,
+} from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { ZodResponse } from 'nestjs-zod';
@@ -11,10 +22,23 @@ import type { Principal } from '../../../common/security/principal';
 import { RateLimit, RateLimitName } from '../../../common/security/rate-limit';
 import { clientIp, clientUserAgent, readCookie } from '../../../common/security/request-client';
 import { Authorize, Public } from '../../../common/security/security.decorators';
+import { ApiPageable, type Pageable, PageableQuery } from '../../../common/dto/pageable';
+import { UuidParam } from '../../../common/dto/uuid-param';
+import { toSecurityEventPage } from '../../../common/dto/security-event.response';
+import { AUDIT_EVENT_PAGEABLE, type AuditEventSortField } from '../../audit/service/audit-sort';
 import { AuthService } from '../service/auth.service';
+import { SessionService } from '../service/session.service';
 import { CurrentUserResponse } from './dto/current-user.response';
+import { ChangePasswordRequest } from './dto/change-password.request';
 import { LoginRequest } from './dto/login.request';
+import {
+  SESSIONS_PAGEABLE,
+  type SessionSortField,
+  SessionsResponse,
+} from './dto/sessions.response';
+import { SecurityLogResponse } from './dto/security-log.response';
 import { toCurrentUserResponse } from './mapper/current-user.mapper';
+import { toSessionsResponse } from './mapper/session.mapper';
 import { SessionCookies } from './session-cookies';
 
 @ApiTags('Auth')
@@ -22,6 +46,7 @@ import { SessionCookies } from './session-cookies';
 export class AuthController {
   constructor(
     private readonly authService: AuthService,
+    private readonly sessionService: SessionService,
     private readonly sessionCookies: SessionCookies,
     private readonly config: AppConfigService,
   ) {}
@@ -54,7 +79,7 @@ export class AuthController {
       presentedToken: readCookie(httpRequest, this.config.get('SESSION_COOKIE_NAME')),
     });
     this.sessionCookies.write(response, session);
-    return toCurrentUserResponse(user);
+    return toCurrentUserResponse(user, this.config.get('SESSION_IDLE_TIMEOUT_MINUTES'));
   }
 
   @Post('logout')
@@ -78,6 +103,98 @@ export class AuthController {
   @ZodResponse({ status: HttpStatus.OK, type: CurrentUserResponse })
   @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED')
   async me(@CurrentPrincipal() principal: Principal): Promise<CurrentUserResponse> {
-    return toCurrentUserResponse(await this.authService.currentUser(principal.userId));
+    return toCurrentUserResponse(
+      await this.authService.currentUser(principal.userId),
+      this.config.get('SESSION_IDLE_TIMEOUT_MINUTES'),
+    );
+  }
+
+  @Put('password')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorize(can.authenticated)
+  @RateLimit(RateLimitName.PASSWORD_CHANGE)
+  @ApiOperation({
+    summary: 'Change own password; every session ends and this browser gets a new one',
+  })
+  @ApiErrors(
+    'VALIDATION_FAILED',
+    'UNAUTHORIZED',
+    'SESSION_EXPIRED',
+    'FORBIDDEN',
+    'BUSINESS_RULE_VIOLATION',
+    'RATE_LIMIT_EXCEEDED',
+  )
+  async changePassword(
+    @Body() request: ChangePasswordRequest,
+    @CurrentPrincipal() principal: Principal,
+    @Req() httpRequest: Request,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<void> {
+    const session = await this.authService.changePassword({
+      userId: principal.userId,
+      currentPassword: request.currentPassword,
+      newPassword: request.newPassword,
+      ip: clientIp(httpRequest),
+      userAgent: clientUserAgent(httpRequest),
+    });
+    this.sessionCookies.write(response, session);
+  }
+
+  @Get('sessions')
+  @Authorize(can.authenticated)
+  @ApiOperation({
+    summary: "The caller's current session and a page of their other live sessions",
+  })
+  @ApiPageable(SESSIONS_PAGEABLE)
+  @ZodResponse({ status: HttpStatus.OK, type: SessionsResponse })
+  @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED')
+  async sessions(
+    @CurrentPrincipal() principal: Principal,
+    @PageableQuery(SESSIONS_PAGEABLE) pageable: Pageable<SessionSortField>,
+  ): Promise<SessionsResponse> {
+    return toSessionsResponse(
+      await this.sessionService.listForUser(principal.userId, principal.sessionId, pageable),
+    );
+  }
+
+  @Delete('sessions')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorize(can.authenticated)
+  @ApiOperation({ summary: 'Sign out everywhere except this session' })
+  @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+  async endOtherSessions(@CurrentPrincipal() principal: Principal): Promise<void> {
+    await this.authService.endOtherSessions(principal);
+  }
+
+  @Delete('sessions/:sessionId')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorize(can.endOwnSession)
+  @ApiOperation({ summary: 'End one of own sessions (this one signs out here)' })
+  @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+  async endSession(
+    @UuidParam('sessionId') sessionId: string,
+    @CurrentPrincipal() principal: Principal,
+    @Res({ passthrough: true }) response: Response,
+  ): Promise<void> {
+    await this.authService.endSession(principal, sessionId);
+    if (sessionId === principal.sessionId) {
+      this.sessionCookies.clear(response);
+    }
+  }
+
+  @Get('security-log')
+  @Authorize(can.authenticated)
+  @ApiOperation({
+    summary:
+      "The caller's security log: sign-ins, failed sign-ins, password changes, ended sessions",
+  })
+  @ApiPageable(AUDIT_EVENT_PAGEABLE)
+  @ZodResponse({ status: HttpStatus.OK, type: SecurityLogResponse })
+  @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED')
+  async securityLog(
+    @CurrentPrincipal() principal: Principal,
+    @PageableQuery(AUDIT_EVENT_PAGEABLE) pageable: Pageable<AuditEventSortField>,
+  ): Promise<SecurityLogResponse> {
+    return toSecurityEventPage(await this.authService.securityLog(principal.userId, pageable));
   }
 }

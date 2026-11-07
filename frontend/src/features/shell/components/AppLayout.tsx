@@ -1,3 +1,4 @@
+import { IdleSessionWarning } from '@/features/auth';
 import Drawer from '@mui/material/Drawer';
 import Link from '@mui/material/Link';
 import { useTheme } from '@mui/material/styles';
@@ -78,6 +79,7 @@ export function AppLayout() {
             <Outlet />
           </div>
         </main>
+        <IdleSessionWarning />
       </div>
     </div>
   );
