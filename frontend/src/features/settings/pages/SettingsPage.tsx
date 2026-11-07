@@ -9,12 +9,11 @@ import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
 import { cn } from '@/shared/lib/cn';
 import { settingsPath } from '@/shared/lib/paths';
 import { AccountSection } from '../components/AccountSection';
-import { PreferencesSection } from '../components/PreferencesSection';
 import { SecuritySection } from '../components/SecuritySection';
 import { SessionsSection } from '../components/SessionsSection';
 import { isSettingsSection, SETTINGS_SECTIONS } from '../sections';
 
-/** Your account, sessions and preferences — one section at a time, each with its own URL. */
+/** Your account, sessions and security log — one section at a time, each with its own URL. */
 export default function SettingsPage() {
   const { t } = useTranslation('settings');
   const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
@@ -82,7 +81,6 @@ export default function SettingsPage() {
           {section === 'account' && <AccountSection />}
           {section === 'sessions' && <SessionsSection />}
           {section === 'security' && <SecuritySection />}
-          {section === 'preferences' && <PreferencesSection />}
           {section === 'holidays' && <HolidaysSection />}
         </div>
       </div>

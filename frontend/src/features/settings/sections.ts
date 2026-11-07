@@ -2,14 +2,12 @@ import CelebrationOutlined from '@mui/icons-material/CelebrationOutlined';
 import DevicesOutlined from '@mui/icons-material/DevicesOutlined';
 import PersonOutlineOutlined from '@mui/icons-material/PersonOutlineOutlined';
 import ShieldOutlined from '@mui/icons-material/ShieldOutlined';
-import TuneOutlined from '@mui/icons-material/TuneOutlined';
 
 /** Settings sections, in menu order; each has its own URL (/settings/<section>). */
 export const SETTINGS_SECTIONS = [
   { key: 'account', icon: PersonOutlineOutlined },
   { key: 'sessions', icon: DevicesOutlined },
   { key: 'security', icon: ShieldOutlined },
-  { key: 'preferences', icon: TuneOutlined },
   /** Admins only (ACCESS 'settings.holidays'). */
   { key: 'holidays', icon: CelebrationOutlined },
 ] as const;

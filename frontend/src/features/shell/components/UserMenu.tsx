@@ -14,8 +14,8 @@ import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { useCurrentUser, useLogout } from '@/features/auth';
 import { InitialsAvatar } from '@/shared/components/InitialsAvatar';
-import { ThemeModeSwitch } from '@/shared/components/ThemeModeSwitch';
 import { PATHS, settingsPath } from '@/shared/lib/paths';
+import { ThemeModeSwitch } from './ThemeModeSwitch';
 
 const LINKS = [
   { key: 'profile', to: settingsPath('account'), icon: PersonOutlineOutlined },
@@ -108,7 +108,7 @@ export function UserMenu() {
           <Typography variant="caption" color="textSecondary" aria-hidden>
             {t('account.theme')}
           </Typography>
-          <ThemeModeSwitch label={t('account.theme')} fullWidth />
+          <ThemeModeSwitch label={t('account.theme')} />
         </div>
         <Divider />
         <MenuList ref={menuRef} aria-label={t('account.title')} className="py-1">

@@ -1,12 +1,11 @@
 {
   "pageTitle": "Settings · Workus",
   "title": "Settings",
-  "subtitle": "Your account, where you are signed in, and how Workus looks.",
+  "subtitle": "Your account and where you are signed in.",
   "menu": "Settings sections",
   "sections": {
     "account": "Account",
     "sessions": "Sessions",
-    "preferences": "Preferences",
     "security": "Security log",
     "holidays": "Holidays"
   },
@@ -66,17 +65,6 @@
     "others_other": "Other sessions · {{count}}",
     "range": "{{from}}–{{to}} of {{count}}",
     "pages": "Session pages"
-  },
-  "preferences": {
-    "theme": {
-      "title": "Appearance",
-      "description": "Saved in this browser."
-    },
-    "language": {
-      "title": "Language",
-      "description": "More languages will come later.",
-      "english": "English"
-    }
   },
   "security": {
     "title": "Security log",
