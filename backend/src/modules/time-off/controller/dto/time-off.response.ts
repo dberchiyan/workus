@@ -55,8 +55,8 @@ const requestShape = {
   /** Working days. */
   days: z.number().int(),
   status: TimeOffStatusSchema,
-  note: z.string().nullable(),
-  decisionComment: z.string().nullable(),
+  note: z.string().max(500).nullable(),
+  decisionComment: z.string().max(500).nullable(),
   createdAt: z.iso.datetime(),
   decidedAt: z.iso.datetime().nullable(),
   decidedBy: PersonSchema.nullable(),

@@ -1550,8 +1550,8 @@ export interface components {
             endDate: string;
             days: number;
             status: components["schemas"]["TimeOffStatus_Output"];
-            note: string[];
-            decisionComment: string[];
+            note: string | null;
+            decisionComment: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */
@@ -1724,8 +1724,8 @@ export interface components {
             endDate: string;
             days: number;
             status: components["schemas"]["TimeOffStatus_Output"];
-            note: string[];
-            decisionComment: string[];
+            note: string | null;
+            decisionComment: string | null;
             /** Format: date-time */
             createdAt: string;
             /** Format: date-time */

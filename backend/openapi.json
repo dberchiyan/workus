@@ -7621,16 +7621,14 @@
             "$ref": "#/components/schemas/TimeOffStatus_Output"
           },
           "note": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
           },
           "decisionComment": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
           },
           "createdAt": {
             "type": "string",
@@ -7961,16 +7959,14 @@
             "$ref": "#/components/schemas/TimeOffStatus_Output"
           },
           "note": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
           },
           "decisionComment": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
           },
           "createdAt": {
             "type": "string",
@@ -8403,16 +8399,14 @@
             "$ref": "#/components/schemas/TimeOffStatus_Output"
           },
           "note": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
           },
           "decisionComment": {
-            "type": [
-              "string",
-              "null"
-            ]
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
           },
           "createdAt": {
             "type": "string",
@@ -8692,16 +8686,14 @@
             "$ref": "#/components/schemas/TimeOffStatus_Output"
           },
           "note": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
           },
           "decisionComment": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "type": "string",
+            "maxLength": 500,
+            "nullable": true
           },
           "createdAt": {
             "type": "string",
