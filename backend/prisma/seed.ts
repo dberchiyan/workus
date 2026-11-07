@@ -8,7 +8,12 @@ import { databaseUrl } from '../src/common/config/database-url';
 import { ADMINS, contactsFor, EMPLOYEES, POSITION_CATEGORIES, SEED_PASSWORD } from './seed-data';
 import { seedActivity } from './seed-activity';
 import { seedReviews } from './seed-reviews';
-import { seedTimeOff } from './seed-time-off';
+import {
+  alignPendingResponsibles,
+  seedPendingRequests,
+  seedTimeOff,
+  seedTimeOffComments,
+} from './seed-time-off';
 
 /**
  * Development seed (APP_ENV=dev only): admins and employees sharing SEED_PASSWORD, position
@@ -189,9 +194,12 @@ const seed = async (): Promise<void> => {
 
     const activity = await seedActivity(prisma, admins);
     const timeOff = await seedTimeOff(prisma, admins[0] ?? '');
+    const pending = await seedPendingRequests(prisma, admins[0] ?? '');
+    const realigned = await alignPendingResponsibles(prisma);
+    const comments = await seedTimeOffComments(prisma, admins);
 
     process.stdout.write(
-      `Seeded ${timeOff} time-off requests, ${activity} activity events, ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}\n`,
+      `Seeded ${timeOff} time-off requests (pending: ${pending.created} added, ${pending.decided} decided; ${realigned} pending realigned to admins, ${comments} comments), ${activity} activity events, ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}\n`,
     );
   } finally {
     await prisma.$disconnect();

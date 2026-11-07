@@ -90,5 +90,9 @@
   },
   "note": {
     "tooLong": "Note must be at most {max} characters"
+  },
+  "timeOffComment": {
+    "required": "Write a comment",
+    "tooLong": "Comment must be at most {max} characters"
   }
 }

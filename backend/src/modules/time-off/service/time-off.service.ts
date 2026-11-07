@@ -14,13 +14,14 @@ import { EmployeeService } from '../../employee/core/service/employee.service';
 import type { TimeOffRequestRecord } from '../repository/record/time-off-request.record';
 import { TimeOffRequestRepository } from '../repository/time-off-request.repository';
 import { cycleOf, LEAVE_POLICY, plusDays, todayUtc, workingDaysBetween } from './leave-policy';
-import type { TimeOffRequestSortField } from './time-off-sort';
+import type { CalendarSortField, TimeOffRequestSortField } from './time-off-sort';
 import { timeOffLabel } from './time-off-label';
-import { TIME_OFF_TYPES, TimeOffStatus } from './time-off-type';
+import { TIME_OFF_TYPES, type TimeOffType, TimeOffStatus } from './time-off-type';
 import type {
   AbsentPerson,
   CreateTimeOffCommand,
   LeaveBalance,
+  TimeOffCalendar,
   TimeOffOverview,
   TimeOffRequestPage,
   TimeOffRequestView,
@@ -43,6 +44,39 @@ export class TimeOffService {
     private readonly employeeService: EmployeeService,
     private readonly auditService: AuditService,
   ) {}
+
+  /**
+   * The month calendar: people employed in it (by name, paged) with their approved and pending
+   * requests of the given types. Every signed-in user sees everyone's (product decision).
+   */
+  async calendar(
+    query: {
+      year: number;
+      month: number;
+      types: readonly TimeOffType[];
+      search: string | undefined;
+    },
+    pageable: Pageable<CalendarSortField>,
+  ): Promise<TimeOffCalendar> {
+    const from = new Date(Date.UTC(query.year, query.month - 1, 1));
+    const to = new Date(Date.UTC(query.year, query.month, 0));
+    const people = await this.employeeService.findCalendarPage(query.search, from, to, pageable);
+    const requests = await this.requestRepository.findCalendarRequests(
+      people.content.map((employee) => employee.id),
+      from,
+      to,
+      query.types,
+    );
+    return {
+      from,
+      to,
+      content: people.content.map((employee) => ({
+        employee,
+        requests: requests.filter((request) => request.employeeId === employee.id),
+      })),
+      totalElements: people.totalElements,
+    };
+  }
 
   /** The caller's balances; 404 when the caller has no employee record (admins). */
   async findOwnBalances(userId: string): Promise<LeaveBalance[]> {

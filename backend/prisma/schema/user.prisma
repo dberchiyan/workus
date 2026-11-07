@@ -14,6 +14,7 @@ model User {
   auditEvents           AuditEvent[]                @relation("AuditEventActor")
   timeOffDecisions      TimeOffRequest[]            @relation("TimeOffRequestDecider")
   timeOffResponsibleFor TimeOffRequestResponsible[] @relation("TimeOffRequestResponsibleUser")
+  timeOffComments       TimeOffRequestComment[]     @relation("TimeOffRequestCommentAuthor")
   idempotencyKeys       IdempotencyKey[]
   reviewResponsibleFor  EmployeeReviewResponsible[] @relation("ReviewResponsibleUser")
   employee              Employee?                   @relation("EmployeeUser")

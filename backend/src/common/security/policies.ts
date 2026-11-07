@@ -32,4 +32,19 @@ export const can = {
   cancelOwnTimeOffRequest: policy(['requestId'], (principal, args, permissions) =>
     permissions.isOwnTimeOffRequest(principal.userId, args.requestId ?? ''),
   ),
+  /** Every employee's requests: an admin screen. */
+  /** Everyone's approved and pending time off, with types — any signed-in user (product decision). */
+  viewTimeOffCalendar: policy([], () => true),
+  viewTimeOffRequests: policy([], (principal) => principal.hasAuthority('ADMIN')),
+  /** One request (no tenant): admin; the service answers 404 for an unknown id. */
+  viewTimeOffRequest: policy(['requestId'], (principal) => principal.hasAuthority('ADMIN')),
+  /** Any admin may comment on a request. */
+  commentTimeOffRequest: policy(['requestId'], (principal) => principal.hasAuthority('ADMIN')),
+  /** Approve, reject, cancel: an admin who is one of the request's responsible people. */
+  decideTimeOffRequest: policy(
+    ['requestId'],
+    async (principal, args, permissions) =>
+      principal.hasAuthority('ADMIN') &&
+      (await permissions.isTimeOffRequestResponsible(principal.userId, args.requestId ?? '')),
+  ),
 } as const;

@@ -47,6 +47,7 @@ export type I18nTranslations = {
             "notEnoughDays": string;
             "noResponsible": string;
             "notCancelable": string;
+            "notPending": string;
         };
     };
     "validation": {
@@ -140,6 +141,10 @@ export type I18nTranslations = {
             "tooLong": string;
         };
         "note": {
+            "tooLong": string;
+        };
+        "timeOffComment": {
+            "required": string;
             "tooLong": string;
         };
     };

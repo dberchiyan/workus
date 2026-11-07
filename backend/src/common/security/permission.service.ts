@@ -17,6 +17,14 @@ export class PermissionService {
     return count > 0;
   }
 
+  /** The user is one of the request's responsible people (as they were when it was made). */
+  async isTimeOffRequestResponsible(userId: string, requestId: string): Promise<boolean> {
+    const count = await this.prisma.timeOffRequestResponsible.count({
+      where: { requestId, responsibleUserId: userId },
+    });
+    return count > 0;
+  }
+
   /** The whole chain: the review belongs to the employee in the path. */
   async hasAccessToReview(employeeId: string, reviewId: string): Promise<boolean> {
     const count = await this.prisma.employeeReview.count({ where: { id: reviewId, employeeId } });

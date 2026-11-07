@@ -26,6 +26,7 @@ import type { EmployeeSortField } from './employee-sort';
 import type { EmployeeStatus } from './employee-status';
 import type {
   CreateEmployeeCommand,
+  EmployeeCalendarPage,
   EmployeeForTimeOff,
   EmployeeMovement,
   EmployeeMovements,
@@ -492,6 +493,31 @@ export class EmployeeService {
   async findForTimeOff(employeeId: string): Promise<EmployeeForTimeOff | null> {
     const employee = await this.employeeRepository.findTimeOffById(employeeId);
     return employee ? toTimeOff(employee) : null;
+  }
+
+  /** For other modules (time-off calendar): people employed on at least one day of [from, to]. */
+  async findCalendarPage(
+    search: string | undefined,
+    from: Date,
+    to: Date,
+    pageable: Pageable<EmployeeSortField>,
+  ): Promise<EmployeeCalendarPage> {
+    const page = await this.employeeRepository.findCalendarPage(
+      { searchTerms: toSearchTerms(search), from, to },
+      pageable,
+    );
+    return {
+      content: page.content.map((employee) => ({
+        id: employee.id,
+        userId: employee.user.id,
+        firstName: employee.user.firstName,
+        lastName: employee.user.lastName,
+        positionTitle: employee.position.title,
+        startDate: employee.startDate,
+        terminatedOn: employee.terminatedOn,
+      })),
+      totalElements: page.totalElements,
+    };
   }
 
   /** For other modules (dashboard): who starts and who leaves in the next `days` days. */

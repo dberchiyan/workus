@@ -67,6 +67,24 @@ export interface EmployeeForTimeOff {
   responsibleUserIds: string[];
 }
 
+/** One row of the time-off calendar (for other modules). */
+export interface EmployeeCalendarRow {
+  id: string;
+  /** For the avatar colour. */
+  userId: string;
+  firstName: string;
+  lastName: string;
+  positionTitle: string;
+  startDate: Date;
+  /** First day without work; null while employed. */
+  terminatedOn: Date | null;
+}
+
+export interface EmployeeCalendarPage {
+  content: EmployeeCalendarRow[];
+  totalElements: number;
+}
+
 export interface EmployeeMovement {
   kind: 'JOINING' | 'LEAVING';
   date: Date;

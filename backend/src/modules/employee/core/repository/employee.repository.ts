@@ -8,8 +8,10 @@ import type { PrismaService } from '../../../../common/persistence/prisma.servic
 import type { Prisma } from '../../../../generated/prisma/client';
 import type { EmployeeSortField } from '../service/employee-sort';
 import type { EmployeeCriteria } from '../service/filter/employee.criteria';
-import { activeOn, employeeWhere } from './employee-where';
+import { activeOn, employedBetween, employeeWhere, searchWhere } from './employee-where';
 import {
+  type EmployeeCalendarRecord,
+  employeeCalendarSelect,
   type EmployeeListItemRecord,
   employeeListItemSelect,
   type EmployeeProfileRecord,
@@ -70,6 +72,23 @@ export class EmployeeRepository {
     const [totalElements, content] = await Promise.all([
       this.txHost.tx.employee.count({ where }),
       this.txHost.tx.employee.findMany({ where, select: employeeListItemSelect, ...page }),
+    ]);
+    return { content, totalElements };
+  }
+
+  /** People employed on at least one day of [from, to], matching every search term. */
+  async findCalendarPage(
+    criteria: { searchTerms: string[]; from: Date; to: Date },
+    pageable: Pageable<EmployeeSortField>,
+  ): Promise<{ content: EmployeeCalendarRecord[]; totalElements: number }> {
+    const where: Prisma.EmployeeWhereInput = {
+      AND: [employedBetween(criteria.from, criteria.to), ...searchWhere(criteria.searchTerms)],
+    };
+    const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
+    // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
+    const [totalElements, content] = await Promise.all([
+      this.txHost.tx.employee.count({ where }),
+      this.txHost.tx.employee.findMany({ where, select: employeeCalendarSelect, ...page }),
     ]);
     return { content, totalElements };
   }

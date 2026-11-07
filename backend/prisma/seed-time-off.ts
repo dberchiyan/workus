@@ -12,10 +12,25 @@ import {
   todayUtc,
   workingDaysBetween,
 } from '../src/modules/time-off/service/leave-policy';
-import { type TimeOffStatus, TimeOffType } from '../src/modules/time-off/service/time-off-type';
+import {
+  isTimeOffType,
+  TIME_OFF_TYPES,
+  type TimeOffStatus,
+  TimeOffType,
+} from '../src/modules/time-off/service/time-off-type';
 import { timeOffLabel } from '../src/modules/time-off/service/time-off-label';
 
 const HOUR_MS = 3_600_000;
+
+/**
+ * Pending requests in the seed, by type (11 in all) — enough to fill the Requests page without
+ * burying it.
+ */
+const PENDING_MIX: Readonly<Record<TimeOffType, number>> = {
+  [TimeOffType.VACATION]: 5,
+  [TimeOffType.DAY_OFF]: 3,
+  [TimeOffType.SICK_DAY]: 3,
+};
 
 /** The Monday on or after `date`. */
 const weekday = (date: Date): Date => {
@@ -45,8 +60,8 @@ interface Plan {
 
 /**
  * Per employee: the previous vacation cycle has an approved vacation; the current one an approved
- * vacation (when it has already started), a rejected and a canceled one and a pending request
- * ahead; an approved sick day and day off this year. Vacation days stay within the allowance.
+ * vacation (when it has already started), a rejected and a canceled one; an approved sick day and
+ * day off this year. Pending requests come from `seedPendingRequests`. Vacation days stay within the allowance.
  */
 const plansFor = (index: number): Plan[] => [
   // Every fifth person is off around today (the admin dashboard's "Out today").
@@ -86,14 +101,6 @@ const plansFor = (index: number): Plan[] => [
     status: 'APPROVED',
     fromToday: true,
     note: 'Moving house',
-  },
-  {
-    type: TimeOffType.VACATION,
-    offset: 14 + (index % 21),
-    length: 4,
-    status: 'PENDING',
-    fromToday: true,
-    note: 'Summer break',
   },
 ];
 
@@ -138,7 +145,7 @@ export const seedTimeOff = async (
       const outsideEmployment = start < employee.startDate || (lastDay !== null && end > lastDay);
       const overlaps = taken.some((t) => start <= t.end && end >= t.start);
       // Terminated people have nothing pending.
-      if (outsideEmployment || overlaps || (plan.status === 'PENDING' && lastDay !== null)) {
+      if (outsideEmployment || overlaps) {
         continue;
       }
       taken.push({ start, end });
@@ -246,4 +253,301 @@ export const seedTimeOff = async (
     await prisma.auditEvent.createMany({ data: events });
   }
   return created;
+};
+
+/** The weekday on or before `date`. */
+const weekdayBefore = (date: Date): Date => {
+  const day = date.getUTCDay();
+  return day === 6 ? plusDays(date, -1) : day === 0 ? plusDays(date, -2) : date;
+};
+
+/** Slot `k` of a type: dates, note and when it was made (some wait over two days). */
+const pendingSlot = (
+  type: TimeOffType,
+  k: number,
+  today: Date,
+  now: number,
+): { start: Date; end: Date; note: string | null; createdAt: Date } => {
+  if (type === TimeOffType.SICK_DAY) {
+    const start = weekdayBefore(plusDays(today, -2 * k));
+    return {
+      start,
+      end: plusWorkingDays(start, 1 + (k % 2)),
+      note: ['Flu', 'Migraine', 'Doctor said to stay home'][k % 3] ?? null,
+      createdAt: new Date(Math.min(start.getTime() + 8 * HOUR_MS, now - HOUR_MS)),
+    };
+  }
+  if (type === TimeOffType.DAY_OFF) {
+    const start = weekday(plusDays(today, 5 + 3 * k));
+    return {
+      start,
+      end: start,
+      note: ['Moving house', "Child's school event", null][k % 3] ?? null,
+      createdAt: new Date(now - (3 + 20 * k) * HOUR_MS),
+    };
+  }
+  const start = weekday(plusDays(today, 14 + 6 * k));
+  return {
+    start,
+    end: plusWorkingDays(start, 3 + (k % 3)),
+    note: ['Summer break', 'Visiting family', null, 'Wedding abroad', 'Hiking trip'][k % 5] ?? null,
+    createdAt: new Date(now - (6 + 30 * k) * HOUR_MS),
+  };
+};
+
+const decisionEvent = (
+  request: { id: string; employeeId: string; type: string; startDate: Date; endDate: Date },
+  status: 'APPROVED' | 'REJECTED',
+  actorUserId: string | null,
+  occurredAt: Date,
+): Prisma.AuditEventCreateManyInput => ({
+  targetType: AuditTargetType.TIME_OFF_REQUEST,
+  targetId: request.id,
+  targetLabel: timeOffLabel(request),
+  employeeId: request.employeeId,
+  ipAddress: '127.0.0.1',
+  userAgent: 'seed',
+  occurredAt,
+  action:
+    status === 'APPROVED'
+      ? AuditAction.TIME_OFF_REQUEST_APPROVED
+      : AuditAction.TIME_OFF_REQUEST_REJECTED,
+  actorUserId,
+  changes: [
+    {
+      field: AuditField.STATUS,
+      from: auditValue.timeOffStatus('PENDING'),
+      to: auditValue.timeOffStatus(status),
+    },
+  ] satisfies AuditChange[],
+});
+
+/**
+ * Brings pending requests to PENDING_MIX (dev only). Per type, those with comments and then the
+ * oldest stay; the rest are decided by their first responsible person, alternately approved and
+ * rejected, with the matching history event. Missing ones are made for active employees with
+ * nothing pending, within their allowance and clear of their other requests.
+ */
+export const seedPendingRequests = async (
+  prisma: PrismaClient,
+  fallbackResponsibleId: string,
+): Promise<{ decided: number; created: number }> => {
+  const today = todayUtc();
+  const now = Date.now();
+  const pending = await prisma.timeOffRequest.findMany({
+    where: { status: 'PENDING' },
+    select: {
+      id: true,
+      employeeId: true,
+      type: true,
+      startDate: true,
+      endDate: true,
+      createdAt: true,
+      responsibles: { select: { responsibleUserId: true }, take: 1 },
+    },
+    orderBy: [{ comments: { _count: 'desc' } }, { createdAt: 'asc' }, { id: 'asc' }],
+  });
+  const kept = new Map<string, number>();
+  const surplus = pending.filter((request) => {
+    const count = kept.get(request.type) ?? 0;
+    const limit = isTimeOffType(request.type) ? PENDING_MIX[request.type] : 0;
+    kept.set(request.type, count + 1);
+    return count >= limit;
+  });
+  const events: Prisma.AuditEventCreateManyInput[] = [];
+  for (const [index, request] of surplus.entries()) {
+    const status = index % 2 === 0 ? 'APPROVED' : 'REJECTED';
+    const decider = request.responsibles[0]?.responsibleUserId ?? null;
+    const decidedAt = new Date(
+      Math.max(
+        request.createdAt.getTime(),
+        Math.min(request.createdAt.getTime() + 26 * HOUR_MS, now - 3 * HOUR_MS),
+      ),
+    );
+    await prisma.timeOffRequest.update({
+      where: { id: request.id },
+      data: {
+        status,
+        decidedBy: decider,
+        decidedAt,
+        updatedBy: decider,
+        updatedAt: decidedAt,
+        version: { increment: 1 },
+      },
+      select: { id: true },
+    });
+    events.push(decisionEvent(request, status, decider, decidedAt));
+  }
+
+  const busy = new Set(
+    pending.filter((request) => !surplus.includes(request)).map((r) => r.employeeId),
+  );
+  const candidates = (
+    await prisma.employee.findMany({
+      where: {
+        startDate: { lte: plusDays(today, -30) },
+        OR: [{ terminatedOn: null }, { terminatedOn: { gt: plusDays(today, 60) } }],
+      },
+      select: {
+        id: true,
+        userId: true,
+        startDate: true,
+        responsibles: { select: { responsibleUserId: true }, take: 10 },
+        timeOffRequests: {
+          where: {
+            status: { in: ['PENDING', 'APPROVED'] },
+            endDate: { gte: plusDays(today, -400) },
+          },
+          select: { type: true, startDate: true, endDate: true, days: true },
+          take: 50,
+        },
+      },
+      orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+    })
+  ).filter((employee) => !busy.has(employee.id));
+
+  let created = 0;
+  let next = 0;
+  for (const type of TIME_OFF_TYPES) {
+    const missing = PENDING_MIX[type] - Math.min(kept.get(type) ?? 0, PENDING_MIX[type]);
+    for (let k = 0; k < missing; k += 1) {
+      const slot = pendingSlot(type, k, today, now);
+      const days = workingDaysBetween(slot.start, slot.end);
+      const policy = LEAVE_POLICY[type];
+      const at = candidates.findIndex((employee, offset) => {
+        const candidate = candidates[(next + offset) % candidates.length] ?? employee;
+        if (candidate.startDate > slot.start) {
+          return false;
+        }
+        const overlaps = candidate.timeOffRequests.some(
+          (r) => slot.start <= r.endDate && slot.end >= r.startDate,
+        );
+        const cycle = cycleOf(candidate.startDate, policy.cycleMonths, slot.start);
+        const used = candidate.timeOffRequests
+          .filter((r) => r.type === type && r.startDate >= cycle.start && r.startDate <= cycle.end)
+          .reduce((sum, r) => sum + r.days, 0);
+        return !overlaps && (policy.allowance === null || used + days <= policy.allowance);
+      });
+      if (at < 0) {
+        continue;
+      }
+      const index = (next + at) % candidates.length;
+      const [employee] = candidates.splice(index, 1);
+      next = candidates.length > 0 ? index % candidates.length : 0;
+      if (!employee) {
+        continue;
+      }
+      const responsibleUserIds =
+        employee.responsibles.length > 0
+          ? employee.responsibles.map((r) => r.responsibleUserId)
+          : [fallbackResponsibleId];
+      const request = await prisma.timeOffRequest.create({
+        data: {
+          employeeId: employee.id,
+          type,
+          startDate: slot.start,
+          endDate: slot.end,
+          days,
+          status: 'PENDING',
+          note: slot.note,
+          createdAt: slot.createdAt,
+          createdBy: employee.userId,
+          updatedBy: employee.userId,
+          updatedAt: slot.createdAt,
+          responsibles: {
+            create: responsibleUserIds.map((responsibleUserId) => ({ responsibleUserId })),
+          },
+        },
+        select: { id: true },
+      });
+      created += 1;
+      events.push({
+        targetType: AuditTargetType.TIME_OFF_REQUEST,
+        targetId: request.id,
+        targetLabel: timeOffLabel({ type, startDate: slot.start, endDate: slot.end }),
+        employeeId: employee.id,
+        ipAddress: '127.0.0.1',
+        userAgent: 'seed',
+        occurredAt: slot.createdAt,
+        action: AuditAction.TIME_OFF_REQUEST_CREATED,
+        actorUserId: employee.userId,
+        changes: [
+          { field: AuditField.TIME_OFF_TYPE, from: null, to: auditValue.timeOffType(type) },
+          { field: AuditField.PERIOD_START, from: null, to: auditValue.date(slot.start) },
+          { field: AuditField.PERIOD_END, from: null, to: auditValue.date(slot.end) },
+          { field: AuditField.DAYS, from: null, to: auditValue.number(days) },
+          ...(slot.note
+            ? [{ field: AuditField.NOTE, from: null, to: auditValue.text(slot.note) }]
+            : []),
+        ] satisfies AuditChange[],
+      });
+    }
+  }
+  await prisma.auditEvent.createMany({ data: events });
+  return { decided: surplus.length, created };
+};
+
+/**
+ * Only admins are responsible: pending requests made when others could be get the employee's
+ * current responsible people instead (dev data only; decided requests keep theirs).
+ */
+export const alignPendingResponsibles = async (prisma: PrismaClient): Promise<number> => {
+  const requests = await prisma.timeOffRequest.findMany({
+    where: {
+      status: 'PENDING',
+      responsibles: { some: { responsible: { role: { not: 'ADMIN' } } } },
+    },
+    select: {
+      id: true,
+      employee: { select: { responsibles: { select: { responsibleUserId: true }, take: 10 } } },
+    },
+  });
+  const ids = requests.map((request) => request.id);
+  await prisma.timeOffRequestResponsible.deleteMany({ where: { requestId: { in: ids } } });
+  await prisma.timeOffRequestResponsible.createMany({
+    data: requests.flatMap((request) =>
+      request.employee.responsibles.map(({ responsibleUserId }) => ({
+        requestId: request.id,
+        responsibleUserId,
+      })),
+    ),
+  });
+  return ids.length;
+};
+
+const COMMENTS = [
+  'Checked the team calendar — no overlap with the release week.',
+  'Please hand over the open tickets before you go.',
+  'Discussed with the project manager, fine from the delivery side.',
+  'Can you confirm the dates with the client first?',
+];
+
+/** A few admin comments on the oldest pending requests, once (dev only). */
+export const seedTimeOffComments = async (
+  prisma: PrismaClient,
+  admins: string[],
+): Promise<number> => {
+  if ((await prisma.timeOffRequestComment.count()) > 0 || admins.length === 0) {
+    return 0;
+  }
+  const requests = await prisma.timeOffRequest.findMany({
+    where: { status: 'PENDING' },
+    select: { id: true, createdAt: true },
+    orderBy: [{ createdAt: 'asc' }, { id: 'asc' }],
+    take: 8,
+  });
+  const now = Date.now();
+  const { count } = await prisma.timeOffRequestComment.createMany({
+    data: requests.flatMap((request, index) =>
+      COMMENTS.slice(0, 1 + (index % 2)).map((body, offset) => ({
+        requestId: request.id,
+        authorId: admins[(index + offset) % admins.length] ?? '',
+        body: COMMENTS[(index + offset) % COMMENTS.length] ?? body,
+        createdAt: new Date(
+          Math.min(request.createdAt.getTime() + (offset + 1) * 2 * HOUR_MS, now - HOUR_MS),
+        ),
+      })),
+    ),
+  });
+  return count;
 };

@@ -1,3 +1,6 @@
+import type { CalendarQuery } from '../api/calendarApi';
+import type { ManagedRequestsQuery } from '../api/managedRequestsApi';
+
 /** No tenant: one company per installation. "own" = the signed-in employee. */
 export const timeOffKeys = {
   all: ['time-off'] as const,
@@ -6,4 +9,11 @@ export const timeOffKeys = {
   ownRequestsSince: (changedSince: string) => [...timeOffKeys.ownRequests(), changedSince] as const,
   employeeBalances: (employeeId: string) =>
     [...timeOffKeys.all, 'employee', employeeId, 'balances'] as const,
+  /** Every employee's requests (admin). */
+  managed: () => [...timeOffKeys.all, 'managed'] as const,
+  managedLists: () => [...timeOffKeys.managed(), 'list'] as const,
+  managedList: (query: ManagedRequestsQuery) => [...timeOffKeys.managedLists(), query] as const,
+  managedRequest: (requestId: string) => [...timeOffKeys.managed(), 'request', requestId] as const,
+  /** The company calendar (everyone's). */
+  calendar: (query: CalendarQuery) => [...timeOffKeys.all, 'calendar', query] as const,
 };

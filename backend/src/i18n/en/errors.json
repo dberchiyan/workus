@@ -39,6 +39,7 @@
     "overlaps": "You already have a request for some of these days",
     "notEnoughDays": "Only {available} days are left in this cycle; this request takes {requested}",
     "noResponsible": "Nobody is responsible for you yet, so no one can approve the request — ask an admin",
-    "notCancelable": "This request can no longer be canceled"
+    "notCancelable": "This request can no longer be canceled",
+    "notPending": "This request has already been decided or canceled — reload to see its status"
   }
 }

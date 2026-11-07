@@ -1,6 +1,6 @@
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined';
 import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
-import EventBusyOutlined from '@mui/icons-material/EventBusyOutlined';
+import InboxOutlined from '@mui/icons-material/InboxOutlined';
 import InsightsOutlined from '@mui/icons-material/InsightsOutlined';
 import PeopleAltOutlined from '@mui/icons-material/PeopleAltOutlined';
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
@@ -14,7 +14,7 @@ export type UserRole = CurrentUser['role'];
 export const NavSection = {
   DASHBOARD: 'dashboard',
   EMPLOYEES: 'employees',
-  TIME_OFF: 'timeOff',
+  REQUESTS: 'requests',
   CALENDAR: 'calendar',
   INSIGHTS: 'insights',
   SETTINGS: 'settings',
@@ -49,9 +49,9 @@ export const NAV_ITEMS: readonly NavItem[] = [
     placement: 'main',
   },
   {
-    section: NavSection.TIME_OFF,
-    path: PATHS.timeOff,
-    icon: EventBusyOutlined,
+    section: NavSection.REQUESTS,
+    path: PATHS.requests,
+    icon: InboxOutlined,
     roles: ADMIN_ONLY,
     placement: 'main',
   },

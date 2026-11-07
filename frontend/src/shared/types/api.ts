@@ -334,6 +334,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/time-off/calendar": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One month: people employed in it, by name, with their approved and pending requests of the chosen types */
+        get: operations["TimeOffCalendarController_calendar"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/employees/{employeeId}/time-off/balances": {
         parameters: {
             query?: never;
@@ -345,6 +362,108 @@ export interface paths {
         get: operations["EmployeeTimeOffController_balances"];
         put?: never;
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/time-off-requests": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Pending or closed time-off requests of every employee, with their history */
+        get: operations["ManagedTimeOffController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/time-off-requests/{requestId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** One time-off request with its history and comments */
+        get: operations["ManagedTimeOffController_findOne"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/time-off-requests/{requestId}/approval": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Approve a pending request (its responsible people only) */
+        post: operations["ManagedTimeOffController_approve"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/time-off-requests/{requestId}/rejection": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Reject a pending request (its responsible people only) */
+        post: operations["ManagedTimeOffController_reject"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/time-off-requests/{requestId}/cancellation": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Cancel a pending or approved request, even a started one (its responsible people only) */
+        post: operations["ManagedTimeOffController_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/time-off-requests/{requestId}/comments": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Comment on a request; every admin and the employee see it */
+        post: operations["ManagedTimeOffController_comment"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1087,10 +1206,26 @@ export interface components {
                     positionTitle: string | null;
                 } | null;
             }[];
+            comments: components["schemas"]["TimeOffComment_Output"][];
+            commentCount: number;
             canCancel: boolean;
         };
         /** @enum {string} */
         TimeOffStatus_Output: "PENDING" | "APPROVED" | "REJECTED" | "CANCELED";
+        TimeOffComment_Output: {
+            /** Format: uuid */
+            id: string;
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+            author: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+                positionTitle: string | null;
+            };
+        };
         TimeOffRequestPageResponse_Output: {
             content: components["schemas"]["TimeOffRequest_Output"][];
             totalElements: number;
@@ -1150,7 +1285,190 @@ export interface components {
                     positionTitle: string | null;
                 } | null;
             }[];
+            comments: components["schemas"]["TimeOffComment_Output"][];
+            commentCount: number;
             canCancel: boolean;
+        };
+        TimeOffCalendarRow_Output: {
+            employee: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                userId: string;
+                firstName: string;
+                lastName: string;
+                positionTitle: string;
+                /** Format: date */
+                startDate: string;
+                /** Format: date */
+                terminatedOn: string | null;
+            };
+            requests: {
+                /** Format: uuid */
+                id: string;
+                type: components["schemas"]["TimeOffType_Output"];
+                status: components["schemas"]["TimeOffStatus_Output"];
+                /** Format: date */
+                startDate: string;
+                /** Format: date */
+                endDate: string;
+                days: number;
+            }[];
+        };
+        TimeOffCalendarResponse_Output: {
+            content: components["schemas"]["TimeOffCalendarRow_Output"][];
+            totalElements: number;
+            /** Format: date */
+            from: string;
+            /** Format: date */
+            to: string;
+        };
+        ManagedTimeOffRequest_Output: {
+            /** Format: uuid */
+            id: string;
+            type: components["schemas"]["TimeOffType_Output"];
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            days: number;
+            status: components["schemas"]["TimeOffStatus_Output"];
+            note: string | null;
+            decisionComment: string | null;
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            decidedAt: string | null;
+            decidedBy: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+                positionTitle: string | null;
+            } | null;
+            responsibles: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+                positionTitle: string | null;
+            }[];
+            history: {
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                action: "CREATED" | "APPROVED" | "REJECTED" | "CANCELED";
+                /** Format: date-time */
+                occurredAt: string;
+                actor: {
+                    /** Format: uuid */
+                    id: string;
+                    firstName: string;
+                    lastName: string;
+                    positionTitle: string | null;
+                } | null;
+            }[];
+            comments: components["schemas"]["TimeOffComment_Output"][];
+            commentCount: number;
+            employee: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                userId: string;
+                firstName: string;
+                lastName: string;
+                email: string;
+                positionTitle: string;
+            };
+            can: {
+                approve: boolean;
+                reject: boolean;
+                cancel: boolean;
+            };
+        };
+        ManagedTimeOffRequestPageResponse_Output: {
+            content: components["schemas"]["ManagedTimeOffRequest_Output"][];
+            totalElements: number;
+        };
+        ManagedTimeOffRequestResponse_Output: {
+            /** Format: uuid */
+            id: string;
+            type: components["schemas"]["TimeOffType_Output"];
+            /** Format: date */
+            startDate: string;
+            /** Format: date */
+            endDate: string;
+            days: number;
+            status: components["schemas"]["TimeOffStatus_Output"];
+            note: string[];
+            decisionComment: string[];
+            /** Format: date-time */
+            createdAt: string;
+            /** Format: date-time */
+            decidedAt: string | null;
+            decidedBy: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+                positionTitle: string | null;
+            } | null;
+            responsibles: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+                positionTitle: string | null;
+            }[];
+            history: {
+                /** Format: uuid */
+                id: string;
+                /** @enum {string} */
+                action: "CREATED" | "APPROVED" | "REJECTED" | "CANCELED";
+                /** Format: date-time */
+                occurredAt: string;
+                actor: {
+                    /** Format: uuid */
+                    id: string;
+                    firstName: string;
+                    lastName: string;
+                    positionTitle: string | null;
+                } | null;
+            }[];
+            comments: components["schemas"]["TimeOffComment_Output"][];
+            commentCount: number;
+            employee: {
+                /** Format: uuid */
+                id: string;
+                /** Format: uuid */
+                userId: string;
+                firstName: string;
+                lastName: string;
+                email: string;
+                positionTitle: string;
+            };
+            can: {
+                approve: boolean;
+                reject: boolean;
+                cancel: boolean;
+            };
+        };
+        AddTimeOffCommentRequest: {
+            body: string;
+        };
+        TimeOffCommentResponse_Output: {
+            /** Format: uuid */
+            id: string;
+            body: string;
+            /** Format: date-time */
+            createdAt: string;
+            author: {
+                /** Format: uuid */
+                id: string;
+                firstName: string;
+                lastName: string;
+                positionTitle: string | null;
+            };
         };
         AdminDashboardResponse_Output: {
             /** Format: date */
@@ -2616,6 +2934,51 @@ export interface operations {
             };
         };
     };
+    TimeOffCalendarController_calendar: {
+        parameters: {
+            query: {
+                month: string;
+                types?: string;
+                search?: string;
+                page?: number;
+                size?: number;
+                /** @description One of: name,asc|desc */
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeOffCalendarResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     EmployeeTimeOffController_balances: {
         parameters: {
             query?: never;
@@ -2662,6 +3025,407 @@ export interface operations {
             };
             /** @description RESOURCE_NOT_FOUND */
             404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ManagedTimeOffController_list: {
+        parameters: {
+            query?: {
+                state?: "PENDING" | "CLOSED";
+                status?: "APPROVED" | "REJECTED" | "CANCELED";
+                type?: components["schemas"]["TimeOffType"];
+                mine?: "true" | "false";
+                search?: string;
+                page?: number;
+                size?: number;
+                /** @description One of: createdAt,asc|desc, updatedAt,asc|desc */
+                sort?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManagedTimeOffRequestPageResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ManagedTimeOffController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManagedTimeOffRequestResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ManagedTimeOffController_approve: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManagedTimeOffRequestResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONCURRENT_MODIFICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ManagedTimeOffController_reject: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManagedTimeOffRequestResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONCURRENT_MODIFICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ManagedTimeOffController_cancel: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ManagedTimeOffRequestResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONCURRENT_MODIFICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    ManagedTimeOffController_comment: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per logical operation, reused on retry */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddTimeOffCommentRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TimeOffCommentResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description IDEMPOTENCY_KEY_REUSED */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

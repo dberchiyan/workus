@@ -24,8 +24,10 @@ model TimeOffRequest {
   updatedBy       String?                     @map("updated_by") @db.Uuid
   version         Int                         @default(0)
   responsibles    TimeOffRequestResponsible[]
+  comments        TimeOffRequestComment[]
 
   @@index([employeeId, startDate], map: "idx_time_off_requests_employee_id_start_date")
+  @@index([status, createdAt], map: "idx_time_off_requests_status_created_at")
   @@index([decidedBy], map: "idx_time_off_requests_decided_by")
   @@map("time_off_requests")
 }
@@ -43,4 +45,19 @@ model TimeOffRequestResponsible {
   @@id([requestId, responsibleUserId], map: "pk_time_off_request_responsibles")
   @@index([responsibleUserId], map: "idx_time_off_request_responsibles_responsible_user_id")
   @@map("time_off_request_responsibles")
+}
+
+/// Admins' comments on a request, oldest first; written once, never edited.
+model TimeOffRequestComment {
+  id        String         @id(map: "pk_time_off_request_comments") @default(dbgenerated("uuidv7()")) @db.Uuid
+  requestId String         @map("request_id") @db.Uuid
+  request   TimeOffRequest @relation(fields: [requestId], references: [id], onDelete: Restrict, map: "fk_time_off_request_comments_request_id")
+  authorId  String         @map("author_id") @db.Uuid
+  author    User           @relation("TimeOffRequestCommentAuthor", fields: [authorId], references: [id], onDelete: Restrict, map: "fk_time_off_request_comments_author_id")
+  body      String         @db.VarChar(1000)
+  createdAt DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@index([requestId, createdAt], map: "idx_time_off_request_comments_request_id_created_at")
+  @@index([authorId], map: "idx_time_off_request_comments_author_id")
+  @@map("time_off_request_comments")
 }

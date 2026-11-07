@@ -50,3 +50,9 @@ export const workingDaysBetween = (start: string, end: string): number => {
   }
   return days;
 };
+
+const DAY_MS = 86_400_000;
+
+/** Whole days from an instant to `now` (never negative). */
+export const daysSince = (iso: string, now: number): number =>
+  Math.max(0, Math.floor((now - Date.parse(iso)) / DAY_MS));

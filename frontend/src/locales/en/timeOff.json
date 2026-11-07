@@ -75,7 +75,8 @@
       "APPROVED": "Approved",
       "REJECTED": "Rejected",
       "CANCELED": "Canceled"
-    }
+    },
+    "commentBy": "{{name}} · {{date}}"
   },
   "create": {
     "title": "Create new request",
@@ -110,6 +111,128 @@
   },
   "calendar": {
     "previous": "Previous month",
-    "next": "Next month"
+    "next": "Next month",
+    "bar": "{{type}}, {{status}}: {{period}} · {{days}}",
+    "page": {
+      "title": "Calendar",
+      "subtitle": "Who is away and when: approved time off, and requests still waiting for a decision in grey.",
+      "caption": "Time off by person and day",
+      "previous": "Previous month",
+      "next": "Next month",
+      "today": "Today",
+      "types": "Request types",
+      "pendingKey": "Waiting for a decision",
+      "notEmployedKey": "Not employed",
+      "empty": "Nobody was employed in this month.",
+      "noMatches": "No one matches the search.",
+      "error": "The calendar could not be loaded.",
+      "retry": "Try again",
+      "rowsPerPage": "Rows per page",
+      "displayed": "{{from}}–{{to}} of {{count}}"
+    },
+    "notEmployed": {
+      "starts": "Not employed yet — starts on {{date}}",
+      "left": "No longer employed — from {{date}}"
+    }
+  },
+  "manage": {
+    "pageTitle": "Requests",
+    "title": "Requests",
+    "subtitle": "Time-off requests from every employee. Responsible people decide; any admin can comment.",
+    "loading": "Loading requests…",
+    "error": "Couldn’t load the requests",
+    "filters": {
+      "search": "Search by employee",
+      "type": "Request type",
+      "allTypes": "All types",
+      "mine": "Only requests I decide"
+    },
+    "pending": {
+      "title": "Pending",
+      "subtitle": "Waiting for a decision — the longest waiting first",
+      "empty": "All caught up",
+      "emptyHint": "No requests are waiting for a decision.",
+      "more": "Show more ({{shown}} of {{total}})"
+    },
+    "closed": {
+      "title": "All other requests",
+      "subtitle": "Approved, rejected and canceled — the latest change first",
+      "caption": "Approved, rejected and canceled requests, the latest change first",
+      "statusFilter": "Status",
+      "allStatuses": "All",
+      "empty": "No requests match these filters",
+      "rowsPerPage": "Rows per page",
+      "displayed": "{{from}}–{{to}} of {{count}}",
+      "columns": {
+        "employee": "Employee",
+        "type": "Request type",
+        "period": "Period",
+        "status": "Status",
+        "changed": "Last change",
+        "comments": "Comments"
+      }
+    },
+    "open": "Open the {{type}} request of {{name}}, {{period}}",
+    "waited_one": "Waiting {{count}} day",
+    "waited_other": "Waiting {{count}} days",
+    "waitedToday": "Sent today",
+    "commentCount_one": "{{count}} comment",
+    "commentCount_other": "{{count}} comments",
+    "notYours": "Waiting for its responsible people",
+    "approve": "Approve",
+    "reject": "Reject",
+    "cancel": "Cancel request",
+    "approveFor": "Approve the {{type}} request of {{name}}, {{period}}",
+    "rejectFor": "Reject the {{type}} request of {{name}}, {{period}}",
+    "dialog": {
+      "title": "{{name}}’s request",
+      "loadingTitle": "Request",
+      "profile": "{{position}} · Open profile",
+      "error": "Couldn’t load this request — it may have been removed",
+      "days": "Working days",
+      "created": "Sent",
+      "available": "Available in the cycle",
+      "availableValue": "{{available}} of {{allowance}} days",
+      "used": "Used in the cycle",
+      "note": "Employee’s note",
+      "you": "You",
+      "activity": "History and comments",
+      "notYours": "Only the request’s responsible people can decide it",
+      "closed": "This request is closed",
+      "usedValue_one": "{{formatted}} day",
+      "usedValue_other": "{{formatted}} days"
+    },
+    "timeline": {
+      "CREATED": "{{name}} sent the request",
+      "APPROVED": "{{name}} approved it",
+      "REJECTED": "{{name}} rejected it",
+      "CANCELED": "{{name}} canceled it"
+    },
+    "comment": {
+      "label": "Comment",
+      "placeholder": "Write a comment",
+      "hint": "Every admin and the employee will see it · Ctrl + Enter to send",
+      "send": "Send",
+      "sending": "Sending…"
+    },
+    "confirm": {
+      "keep": "Keep it",
+      "working": "Saving…",
+      "reject": {
+        "title": "Reject this request?",
+        "description": "{{name}}’s {{type}} request for {{period}} will be rejected and the days return to the balance. This can’t be undone — they can send a new request.",
+        "confirm": "Reject request"
+      },
+      "cancel": {
+        "title": "Cancel this request?",
+        "description": "{{name}}’s {{type}} request for {{period}} will be canceled and the days return to the balance. This can’t be undone — they can send a new request.",
+        "confirm": "Cancel request"
+      }
+    },
+    "notice": {
+      "approve": "Approved: {{name}}, {{type}} {{period}}",
+      "reject": "Rejected: {{name}}, {{type}} {{period}}",
+      "cancel": "Canceled: {{name}}, {{type}} {{period}}"
+    }
   }
 }

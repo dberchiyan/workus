@@ -1,5 +1,10 @@
 import type { AuditEvent } from '../../audit/service/audit.types';
-import type { TimeOffRequestRecord } from '../repository/record/time-off-request.record';
+import type { EmployeeCalendarRow } from '../../employee/core/service/employee.types';
+import type {
+  CalendarRequestRecord,
+  ManagedTimeOffRequestRecord,
+  TimeOffRequestRecord,
+} from '../repository/record/time-off-request.record';
 import type { TimeOffType } from './time-off-type';
 
 export interface LeaveBalance {
@@ -29,6 +34,20 @@ export interface TimeOffRequestPage {
   totalElements: number;
 }
 
+/** A request as an admin sees it, with what the viewer may do with it. */
+export interface ManagedTimeOffRequestView {
+  request: ManagedTimeOffRequestRecord;
+  /** The request's events, oldest first. */
+  history: AuditEvent[];
+  /** Only the request's responsible people decide; each action only from its statuses. */
+  can: { approve: boolean; reject: boolean; cancel: boolean };
+}
+
+export interface ManagedTimeOffRequestPage {
+  content: ManagedTimeOffRequestView[];
+  totalElements: number;
+}
+
 export interface CreateTimeOffCommand {
   type: TimeOffType;
   startDate: string;
@@ -52,4 +71,18 @@ export interface TimeOffOverview {
   outTodayCount: number;
   /** Others off on a later day of this week (Monday–Sunday). */
   outLaterThisWeekCount: number;
+}
+
+/** One person on the calendar with their approved and pending requests in the month. */
+export interface CalendarRow {
+  employee: EmployeeCalendarRow;
+  requests: CalendarRequestRecord[];
+}
+
+export interface TimeOffCalendar {
+  /** First and last day of the month. */
+  from: Date;
+  to: Date;
+  content: CalendarRow[];
+  totalElements: number;
 }

@@ -7,12 +7,23 @@ import {
   TimeOffType,
 } from '../../service/time-off-type';
 import type {
+  TimeOffCommentRecord,
+  TimeOffRequestRecord,
+} from '../../repository/record/time-off-request.record';
+import type {
   LeaveBalance,
+  ManagedTimeOffRequestPage,
+  TimeOffCalendar,
+  ManagedTimeOffRequestView,
   TimeOffRequestPage,
   TimeOffRequestView,
 } from '../../service/time-off.types';
 import type {
   LeaveBalancesResponse,
+  ManagedTimeOffRequestPageResponse,
+  ManagedTimeOffRequestResponse,
+  TimeOffCalendarResponse,
+  TimeOffCommentResponse,
   TimeOffRequestPageResponse,
   TimeOffRequestResponse,
 } from '../dto/time-off.response';
@@ -68,11 +79,17 @@ export const toLeaveBalancesResponse = (balances: LeaveBalance[]): LeaveBalances
   })),
 });
 
-export const toTimeOffRequestResponse = ({
-  request,
-  history,
-  canCancel,
-}: TimeOffRequestView): TimeOffRequestResponse => ({
+export const toTimeOffCommentResponse = (
+  comment: TimeOffCommentRecord,
+): TimeOffCommentResponse => ({
+  id: comment.id,
+  body: comment.body,
+  createdAt: comment.createdAt.toISOString(),
+  author: person(comment.author),
+});
+
+/** Fields every view of a request shares. */
+const requestFields = (request: TimeOffRequestRecord, history: AuditEvent[]) => ({
   id: request.id,
   // Guarded by ck_time_off_requests_type / _status.
   type: isTimeOffType(request.type) ? request.type : TimeOffType.DAY_OFF,
@@ -87,7 +104,42 @@ export const toTimeOffRequestResponse = ({
   decidedBy: request.decider ? person(request.decider) : null,
   responsibles: request.responsibles.map(({ responsible }) => person(responsible)),
   history: historyOf(history),
+  // Read newest first (bounded), shown oldest first.
+  comments: request.comments.map(toTimeOffCommentResponse).reverse(),
+  commentCount: request._count.comments,
+});
+
+export const toTimeOffRequestResponse = ({
+  request,
+  history,
   canCancel,
+}: TimeOffRequestView): TimeOffRequestResponse => ({
+  ...requestFields(request, history),
+  canCancel,
+});
+
+export const toManagedTimeOffRequestResponse = ({
+  request,
+  history,
+  can,
+}: ManagedTimeOffRequestView): ManagedTimeOffRequestResponse => ({
+  ...requestFields(request, history),
+  employee: {
+    id: request.employeeId,
+    userId: request.employee.user.id,
+    firstName: request.employee.user.firstName,
+    lastName: request.employee.user.lastName,
+    email: request.employee.user.email,
+    positionTitle: request.employee.position.title,
+  },
+  can,
+});
+
+export const toManagedTimeOffRequestPageResponse = (
+  page: ManagedTimeOffRequestPage,
+): ManagedTimeOffRequestPageResponse => ({
+  content: page.content.map(toManagedTimeOffRequestResponse),
+  totalElements: page.totalElements,
 });
 
 export const toTimeOffRequestPageResponse = (
@@ -95,4 +147,30 @@ export const toTimeOffRequestPageResponse = (
 ): TimeOffRequestPageResponse => ({
   content: page.content.map(toTimeOffRequestResponse),
   totalElements: page.totalElements,
+});
+
+export const toTimeOffCalendarResponse = (calendar: TimeOffCalendar): TimeOffCalendarResponse => ({
+  from: isoDate(calendar.from),
+  to: isoDate(calendar.to),
+  content: calendar.content.map(({ employee, requests }) => ({
+    employee: {
+      id: employee.id,
+      userId: employee.userId,
+      firstName: employee.firstName,
+      lastName: employee.lastName,
+      positionTitle: employee.positionTitle,
+      startDate: isoDate(employee.startDate),
+      terminatedOn: employee.terminatedOn ? isoDate(employee.terminatedOn) : null,
+    },
+    requests: requests.map((request) => ({
+      id: request.id,
+      // Guarded by ck_time_off_requests_type / _status.
+      type: isTimeOffType(request.type) ? request.type : TimeOffType.DAY_OFF,
+      status: isTimeOffStatus(request.status) ? request.status : TimeOffStatus.PENDING,
+      startDate: isoDate(request.startDate),
+      endDate: isoDate(request.endDate),
+      days: request.days,
+    })),
+  })),
+  totalElements: calendar.totalElements,
 });

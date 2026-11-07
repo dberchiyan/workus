@@ -31,6 +31,7 @@ export interface RequestDetailsProps {
 /** Responsible people, status, history and comments of one request. */
 export function RequestDetails({ request, onCancel }: RequestDetailsProps) {
   const { t, i18n } = useTranslation('timeOff');
+  // The employee's note first, then the admins' comments, oldest first.
   const comments = [
     ...(request.note ? [{ key: 'note', author: t('details.note'), text: request.note }] : []),
     ...(request.decisionComment && request.decidedBy
@@ -42,6 +43,14 @@ export function RequestDetails({ request, onCancel }: RequestDetailsProps) {
           },
         ]
       : []),
+    ...request.comments.map((comment) => ({
+      key: comment.id,
+      author: t('details.commentBy', {
+        name: fullName(comment.author),
+        date: formatDateTime(comment.createdAt, i18n.language),
+      }),
+      text: comment.body,
+    })),
   ];
   return (
     // One grid, row by row: Responsible | Status, then History | Comments — each row as tall
@@ -133,7 +142,10 @@ export function RequestDetails({ request, onCancel }: RequestDetailsProps) {
                 <Typography variant="caption" color="textSecondary">
                   {comment.author}
                 </Typography>
-                <Typography variant="body2" className="[overflow-wrap:anywhere]">
+                <Typography
+                  variant="body2"
+                  className="[overflow-wrap:anywhere] whitespace-pre-line"
+                >
                   {comment.text}
                 </Typography>
               </li>
