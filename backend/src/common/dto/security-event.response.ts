@@ -10,6 +10,9 @@ export const SECURITY_ACTIONS = [
   'auth.password_changed',
   'auth.session_ended',
   'auth.other_sessions_ended',
+  'auth.session_evicted',
+  'auth.sessions_ended_on_termination',
+  'auth.sign_in_locked',
 ] as const;
 export type SecurityAction = (typeof SECURITY_ACTIONS)[number];
 export const isSecurityAction = (action: string): action is SecurityAction =>

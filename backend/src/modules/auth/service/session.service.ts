@@ -10,6 +10,8 @@ import {
   SessionLookup,
 } from '../../../common/security/session-authenticator';
 import { generateToken, hashToken } from '../../../common/security/token-hash';
+import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
+import { AuditService } from '../../audit/service/audit.service';
 import { EmployeeService } from '../../employee/core/service/employee.service';
 import type { SessionListRecord } from '../repository/record/session.record';
 import { SessionRepository } from '../repository/session.repository';
@@ -31,6 +33,8 @@ export interface StartedSession {
   token: string;
   csrfToken: string;
   absoluteExpiresAt: Date;
+  /** Sessions this sign-in ended (the per-user limit) — for the security log. */
+  evicted: number;
 }
 
 /** Devices a person can be signed in on at once (product decision). */
@@ -44,6 +48,7 @@ export class SessionService extends SessionAuthenticator {
   constructor(
     private readonly sessionRepository: SessionRepository,
     private readonly employeeService: EmployeeService,
+    private readonly auditService: AuditService,
     private readonly config: AppConfigService,
     @InjectPinoLogger(SessionService.name) private readonly logger: PinoLogger,
   ) {
@@ -80,7 +85,7 @@ export class SessionService extends SessionAuthenticator {
     if (trimmed > 0) {
       this.logger.info({ userId: command.userId, trimmed }, 'Oldest sessions ended (limit)');
     }
-    return { token, csrfToken, absoluteExpiresAt };
+    return { token, csrfToken, absoluteExpiresAt, evicted: trimmed };
   }
 
   async authenticate(token: string): Promise<SessionAuthentication> {
@@ -140,9 +145,32 @@ export class SessionService extends SessionAuthenticator {
     return this.sessionRepository.deleteByUserIdExcept(userId, keepSessionId);
   }
 
-  /** Signs these users out everywhere (e.g. their employment has ended). */
+  /** Signs these users out everywhere (e.g. a password change). */
   endAllForUsers(userIds: string[]): Promise<number> {
     return this.sessionRepository.deleteByUserIds(userIds);
+  }
+
+  /**
+   * Their employment has ended: every session of these users ends, and each one who had any
+   * gets a security-log entry (actor: the admin terminating, or nobody for the daily job).
+   */
+  @Transactional()
+  async endForTermination(userIds: string[], actorUserId?: string | null): Promise<number> {
+    const signedIn = await this.sessionRepository.findUserIdsWithSessions(userIds);
+    if (signedIn.length === 0) {
+      return 0;
+    }
+    const count = await this.sessionRepository.deleteByUserIds(signedIn);
+    await this.auditService.recordMany(
+      signedIn.map((userId) => ({
+        action: AuditAction.AUTH_SESSIONS_ENDED_ON_TERMINATION,
+        ...(actorUserId === undefined ? {} : { actorUserId }),
+        employeeId: null,
+        target: { type: AuditTargetType.USER, id: userId, label: 'account' },
+        changes: [],
+      })),
+    );
+    return count;
   }
 
   /**
@@ -151,8 +179,9 @@ export class SessionService extends SessionAuthenticator {
    */
   @Cron(CronExpression.EVERY_HOUR)
   async endForLeavers(): Promise<void> {
-    const count = await this.endAllForUsers(
+    const count = await this.endForTermination(
       await this.employeeService.usersWhoLeftWithin(LEAVER_WINDOW_DAYS),
+      null,
     );
     if (count > 0) {
       this.logger.info({ count }, 'Sessions of people who left ended');

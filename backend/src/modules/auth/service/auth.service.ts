@@ -67,6 +67,15 @@ export class AuthService {
     if (!(await this.passwordHasher.verify(credentials.passwordHash, command.password))) {
       // A wrong password for a real account goes to its owner's security log.
       await this.security(AuditAction.AUTH_SIGN_IN_FAILED, credentials.id, null);
+      // That was the last allowed try from this IP: sign-in is now blocked there for a while.
+      if (
+        await this.rateLimitService.isExhausted(
+          RateLimitName.LOGIN,
+          loginRateLimitKey(command.ip, command.email),
+        )
+      ) {
+        await this.security(AuditAction.AUTH_SIGN_IN_LOCKED, credentials.id, null);
+      }
       throw this.loginFailed(command);
     }
     // Checked only after the password, so it tells nothing to someone who does not know it.
@@ -139,6 +148,9 @@ export class AuthService {
       presentedToken: command.presentedToken,
     });
     await this.security(AuditAction.AUTH_SIGNED_IN, userId, userId);
+    if (session.evicted > 0) {
+      await this.security(AuditAction.AUTH_SESSION_EVICTED, userId, userId);
+    }
     return session;
   }
 

@@ -68,7 +68,7 @@ export class EmploymentService {
     await this.reviewService.cancelScheduledAfter(employeeId, command.date, actorId);
     // Effective today or earlier: signed out now (a later date is handled on its day).
     if (after.terminatedOn && after.terminatedOn <= todayUtc()) {
-      await this.sessionService.endAllForUsers([after.user.id]);
+      await this.sessionService.endForTermination([after.user.id]);
     }
   }
 

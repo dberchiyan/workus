@@ -759,7 +759,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
-            action: "auth.signed_in" | "auth.sign_in_failed" | "auth.sign_in_refused" | "auth.signed_out" | "auth.password_changed" | "auth.session_ended" | "auth.other_sessions_ended";
+            action: "auth.signed_in" | "auth.sign_in_failed" | "auth.sign_in_refused" | "auth.signed_out" | "auth.password_changed" | "auth.session_ended" | "auth.other_sessions_ended" | "auth.session_evicted" | "auth.sessions_ended_on_termination" | "auth.sign_in_locked";
             /** Format: date-time */
             occurredAt: string;
             ip: string | null;

@@ -2,6 +2,7 @@ import BlockOutlined from '@mui/icons-material/BlockOutlined';
 import DevicesOtherOutlined from '@mui/icons-material/DevicesOtherOutlined';
 import ErrorOutlineOutlined from '@mui/icons-material/ErrorOutlineOutlined';
 import KeyOutlined from '@mui/icons-material/KeyOutlined';
+import LockClockOutlined from '@mui/icons-material/LockClockOutlined';
 import LoginOutlined from '@mui/icons-material/LoginOutlined';
 import LogoutOutlined from '@mui/icons-material/LogoutOutlined';
 import Pagination from '@mui/material/Pagination';
@@ -24,6 +25,9 @@ const VISUALS: Record<Action, { icon: ComponentType<SvgIconProps>; warning: bool
   'auth.password_changed': { icon: KeyOutlined, warning: false },
   'auth.session_ended': { icon: DevicesOtherOutlined, warning: false },
   'auth.other_sessions_ended': { icon: DevicesOtherOutlined, warning: false },
+  'auth.session_evicted': { icon: DevicesOtherOutlined, warning: false },
+  'auth.sessions_ended_on_termination': { icon: BlockOutlined, warning: true },
+  'auth.sign_in_locked': { icon: LockClockOutlined, warning: true },
 };
 
 export interface SecurityEventListProps {

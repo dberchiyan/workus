@@ -127,6 +127,20 @@ export class SessionRepository {
     await this.txHost.tx.session.deleteMany({ where: { tokenHash } });
   }
 
+  /** Which of these users have any session (bounded by the list). */
+  async findUserIdsWithSessions(userIds: string[]): Promise<string[]> {
+    if (userIds.length === 0) {
+      return [];
+    }
+    const rows = await this.txHost.tx.session.findMany({
+      where: { userId: { in: userIds } },
+      select: { userId: true },
+      distinct: ['userId'],
+      take: userIds.length,
+    });
+    return rows.map((row) => row.userId);
+  }
+
   async deleteByUserIds(userIds: string[]): Promise<number> {
     if (userIds.length === 0) {
       return 0;

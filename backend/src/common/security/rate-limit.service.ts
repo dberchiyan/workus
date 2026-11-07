@@ -58,6 +58,12 @@ export class RateLimitService {
     return this.consumeLimiter(SESSION_LIMIT, sessionId);
   }
 
+  /** Has this key used up its budget (the next attempt will be refused)? */
+  async isExhausted(name: RateLimitName, keyParts: readonly string[]): Promise<boolean> {
+    const state = await this.limiter(name).get(toKey(keyParts));
+    return state !== null && state.consumedPoints >= LIMITS[name].points;
+  }
+
   async reset(name: RateLimitName, keyParts: readonly string[]): Promise<void> {
     await this.limiter(name).delete(toKey(keyParts));
   }

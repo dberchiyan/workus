@@ -20,6 +20,12 @@ export const AuditAction = {
   AUTH_PASSWORD_CHANGED: 'auth.password_changed',
   AUTH_SESSION_ENDED: 'auth.session_ended',
   AUTH_OTHER_SESSIONS_ENDED: 'auth.other_sessions_ended',
+  /** A sign-in elsewhere ended the least recently used session (per-user limit). */
+  AUTH_SESSION_EVICTED: 'auth.session_evicted',
+  /** The employment ended: every session of the person ended (by an admin or the daily job). */
+  AUTH_SESSIONS_ENDED_ON_TERMINATION: 'auth.sessions_ended_on_termination',
+  /** Too many wrong passwords from one IP: sign-in blocked there for a while. */
+  AUTH_SIGN_IN_LOCKED: 'auth.sign_in_locked',
 } as const;
 export type AuditAction = (typeof AuditAction)[keyof typeof AuditAction];
 export const AUDIT_ACTIONS = Object.values(AuditAction) as [AuditAction, ...AuditAction[]];
