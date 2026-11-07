@@ -114,3 +114,21 @@ export const employeeMovementSelect = {
 export type EmployeeMovementRecord = Prisma.EmployeeGetPayload<{
   select: typeof employeeMovementSelect;
 }>;
+
+/** Everyone with their dates and position — the base of the company figures (insights). */
+export const employeeRosterSelect = {
+  id: true,
+  startDate: true,
+  terminatedOn: true,
+  user: { select: { id: true, firstName: true, lastName: true } },
+  position: {
+    select: {
+      id: true,
+      title: true,
+      category: { select: { id: true, name: true, sortOrder: true } },
+    },
+  },
+} satisfies Prisma.EmployeeSelect;
+export type EmployeeRosterRecord = Prisma.EmployeeGetPayload<{
+  select: typeof employeeRosterSelect;
+}>;

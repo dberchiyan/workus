@@ -33,6 +33,7 @@ import type {
   CreateEmployeeCommand,
   EmployeeBirthdays,
   EmployeeCalendarPage,
+  RosterEmployee,
   EmployeeForTimeOff,
   EmployeeMovement,
   EmployeeMovements,
@@ -52,6 +53,8 @@ export interface EmployeeListQuery {
 }
 
 const NEW_HIRE_WINDOW_DAYS = 30;
+/** Insights read the whole roster in memory; a company of this size never comes close. */
+const MAX_ROSTER = 5000;
 const TERMINATION_WINDOW_DAYS = 90;
 
 @Injectable()
@@ -566,6 +569,24 @@ export class EmployeeService {
       content: result.content.map(({ id, ...row }) => ({ employeeId: id, ...row })),
       totalElements: result.totalElements,
     };
+  }
+
+  /**
+   * For other modules (insights): everyone who ever worked here, with dates and position. One
+   * company is small; bounded defensively.
+   */
+  async roster(): Promise<RosterEmployee[]> {
+    const rows = await this.employeeRepository.findRoster(MAX_ROSTER);
+    return rows.map((row) => ({
+      id: row.id,
+      userId: row.user.id,
+      firstName: row.user.firstName,
+      lastName: row.user.lastName,
+      startDate: row.startDate,
+      terminatedOn: row.terminatedOn,
+      position: { id: row.position.id, title: row.position.title },
+      category: row.position.category,
+    }));
   }
 
   /** For other modules (dashboard): who starts and who leaves in the next `days` days. */

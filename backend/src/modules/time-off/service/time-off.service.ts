@@ -85,6 +85,26 @@ export class TimeOffService {
     };
   }
 
+  /**
+   * For other modules (insights): approved working days per employee and type in [from, to]
+   * (each request clipped to the range).
+   */
+  async approvedDaysBetween(
+    from: Date,
+    to: Date,
+  ): Promise<{ employeeId: string; type: TimeOffType; days: number }[]> {
+    const requests = await this.requestRepository.findApprovedWithTypeOverlapping(from, to);
+    return requests.map((request) => ({
+      employeeId: request.employeeId,
+      // Guarded by ck_time_off_requests_type.
+      type: isTimeOffType(request.type) ? request.type : TimeOffType.DAY_OFF,
+      days: workingDaysBetween(
+        request.startDate > from ? request.startDate : from,
+        request.endDate < to ? request.endDate : to,
+      ),
+    }));
+  }
+
   /** For other modules (dashboard): requests made in [from, to), newest first. */
   async requestsCreatedBetween(from: Date, to: Date, limit: number): Promise<DashboardRequests> {
     const page = await this.requestRepository.findCreatedBetween(from, to, limit);

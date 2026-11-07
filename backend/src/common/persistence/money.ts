@@ -28,3 +28,7 @@ export const percentChange = (current: Decimal, previous: Decimal): string =>
     .times(100)
     .toDecimalPlaces(1, Prisma.Decimal.ROUND_HALF_UP)
     .toFixed(1);
+
+/** Rounded to the cent, ROUND_HALF_UP (averages of salaries). */
+export const roundToCents = (amount: Decimal): Decimal =>
+  amount.toDecimalPlaces(2, Prisma.Decimal.ROUND_HALF_UP);

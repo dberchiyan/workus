@@ -5,7 +5,12 @@ import {
   ConcurrentModificationException,
   ResourceNotFoundException,
 } from '../../../../common/exception/api.exception';
-import { Currency, percentChange, toDecimal } from '../../../../common/persistence/money';
+import {
+  Currency,
+  type Decimal,
+  percentChange,
+  toDecimal,
+} from '../../../../common/persistence/money';
 import { AuditAction, AuditTargetType } from '../../../audit/service/audit-action';
 import { AuditField, auditValue, changeOf } from '../../../audit/service/audit-change';
 import { AuditService } from '../../../audit/service/audit.service';
@@ -81,6 +86,9 @@ const lockStarting = (review: ReviewRecord, command: UpdateReviewCommand): void 
   }
 };
 
+/** One salary per employee; a company of this size never comes close. */
+const MAX_SALARIES = 5000;
+
 @Injectable()
 export class ReviewService {
   constructor(
@@ -103,6 +111,18 @@ export class ReviewService {
       this.reviewRepository.countScheduledBefore(today),
     ]);
     return { upcoming, overdue };
+  }
+
+  /** For other modules (insights): each employee's salary as of `asOf` (latest completed review). */
+  async salariesAsOf(
+    asOf: Date,
+  ): Promise<{ employeeId: string; amount: Decimal; currency: string }[]> {
+    const rows = await this.reviewRepository.findLatestSalaries(asOf, MAX_SALARIES);
+    return rows.flatMap((row) =>
+      row.salaryAmount && row.salaryCurrency
+        ? [{ employeeId: row.employeeId, amount: row.salaryAmount, currency: row.salaryCurrency }]
+        : [],
+    );
   }
 
   /** For other modules (dashboard): scheduled and completed regular reviews in [from, to]. */

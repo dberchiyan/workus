@@ -9,6 +9,8 @@ import { HOLDING_STATUSES, TimeOffStatus } from '../service/time-off-type';
 import { RequestState, type TimeOffRequestCriteria } from '../service/time-off-request.criteria';
 import type { ManagedRequestSortField, TimeOffRequestSortField } from '../service/time-off-sort';
 import {
+  type AbsenceDaysRecord,
+  absenceDaysSelect,
   type AbsenceRecord,
   absenceSelect,
   type CalendarRequestRecord,
@@ -237,6 +239,16 @@ export class TimeOffRequestRepository {
     return { count: result._count._all, oldestCreatedAt: result._min.createdAt };
   }
 
+  /** Approved requests covering any day of [from, to], with their type (bounded). */
+  findApprovedWithTypeOverlapping(from: Date, to: Date): Promise<AbsenceDaysRecord[]> {
+    return this.txHost.tx.timeOffRequest.findMany({
+      where: { status: TimeOffStatus.APPROVED, startDate: { lte: to }, endDate: { gte: from } },
+      select: absenceDaysSelect,
+      orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+      take: MAX_YEAR_ABSENCES,
+    });
+  }
+
   /** Approved requests covering any day of [from, to]; who (bounded) and their dates. */
   findApprovedOverlapping(from: Date, to: Date): Promise<AbsenceRecord[]> {
     return this.txHost.tx.timeOffRequest.findMany({
@@ -293,6 +305,9 @@ export class TimeOffRequestRepository {
     return { content, totalElements };
   }
 }
+
+/** A year of approved requests for the whole company. */
+const MAX_YEAR_ABSENCES = 20_000;
 
 /** One request per person per day at most. */
 const MAX_DAYS_IN_MONTH = 31;

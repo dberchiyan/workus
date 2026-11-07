@@ -25,6 +25,7 @@ import { EmploymentModule } from './modules/employee/employment/employment.modul
 import { ReviewModule } from './modules/employee/review/review.module';
 import { TimeOffModule } from './modules/time-off/time-off.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { InsightsModule } from './modules/insights/insights.module';
 import { UserModule } from './modules/user/user.module';
 
 @Module({
@@ -47,6 +48,7 @@ import { UserModule } from './modules/user/user.module';
     EmploymentModule,
     TimeOffModule,
     DashboardModule,
+    InsightsModule,
   ],
   providers: [
     // Guards run in registration order (security.md → Guards).

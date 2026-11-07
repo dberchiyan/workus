@@ -4,6 +4,7 @@ import enAuth from '@/locales/en/auth.json';
 import enCommon from '@/locales/en/common.json';
 import enEmployee from '@/locales/en/employee.json';
 import enErrors from '@/locales/en/errors.json';
+import enInsights from '@/locales/en/insights.json';
 import enDashboard from '@/locales/en/dashboard.json';
 import enReview from '@/locales/en/review.json';
 import enShell from '@/locales/en/shell.json';
@@ -21,6 +22,7 @@ export const resources = {
     auth: enAuth,
     dashboard: enDashboard,
     employee: enEmployee,
+    insights: enInsights,
     review: enReview,
     shell: enShell,
     timeOff: enTimeOff,

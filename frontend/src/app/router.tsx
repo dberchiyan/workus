@@ -4,6 +4,7 @@ import { LoginPage, RequireAuth } from '@/features/auth';
 import { DashboardPage } from '@/features/dashboard';
 import { EmployeeProfilePage, EmployeesPage } from '@/features/employee/core';
 import { ADMIN_ONLY, AppLayout, RequireRole, SectionPlaceholderPage } from '@/features/shell';
+import { InsightsPage } from '@/features/insights';
 import { CalendarPage, RequestsPage } from '@/features/time-off';
 import { PageLoader } from '@/shared/components/PageLoader';
 import { RouteErrorBoundary } from '@/shared/components/RouteErrorBoundary';
@@ -32,10 +33,7 @@ export const router = createBrowserRouter([
               { path: PATHS.employees, element: route(<EmployeesPage />) },
               { path: PATHS.employeeProfile, element: route(<EmployeeProfilePage />) },
               { path: PATHS.requests, element: route(<RequestsPage />) },
-              {
-                path: PATHS.insights,
-                element: route(<SectionPlaceholderPage section="insights" />),
-              },
+              { path: PATHS.insights, element: route(<InsightsPage />) },
             ],
           },
         ],

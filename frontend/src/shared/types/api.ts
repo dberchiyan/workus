@@ -538,6 +538,91 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/insights/headcount": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** People employed at the end of each month, by category or position */
+        get: operations["InsightsController_headcount"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/insights/tenure": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Average months worked by the people employed at the end of the year */
+        get: operations["InsightsController_tenure"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/insights/turnover": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Starts and leaves per month, with the people, and the turnover rate */
+        get: operations["InsightsController_turnover"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/insights/absence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The ten people with the most approved days off, and the average */
+        get: operations["InsightsController_absence"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/insights/salary": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Average monthly salary by category or position, and overall */
+        get: operations["InsightsController_salary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -1634,6 +1719,102 @@ export interface components {
         DashboardBirthdaysResponse_Output: {
             content: components["schemas"]["DashboardBirthday_Output"][];
             totalElements: number;
+        };
+        InsightGroup_Output: {
+            /** Format: uuid */
+            id: string;
+            name: string;
+        };
+        HeadcountResponse_Output: {
+            groups: components["schemas"]["InsightGroup_Output"][];
+            months: {
+                month: number;
+                counts: number[] | null;
+            }[];
+            current: number;
+            previous: number;
+        };
+        TenureResponse_Output: {
+            averageMonths: number | null;
+            previousAverageMonths: number | null;
+            groups: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                averageMonths: number;
+                employees: number;
+                items: {
+                    /** Format: uuid */
+                    id: string;
+                    name: string;
+                    averageMonths: number;
+                    employees: number;
+                }[];
+            }[];
+        };
+        TurnoverResponse_Output: {
+            months: {
+                month: number;
+                hired: {
+                    /** Format: uuid */
+                    employeeId: string;
+                    /** Format: uuid */
+                    userId: string;
+                    firstName: string;
+                    lastName: string;
+                    positionTitle: string;
+                    /** Format: date */
+                    date: string;
+                }[];
+                left: {
+                    /** Format: uuid */
+                    employeeId: string;
+                    /** Format: uuid */
+                    userId: string;
+                    firstName: string;
+                    lastName: string;
+                    positionTitle: string;
+                    /** Format: date */
+                    date: string;
+                }[];
+            }[];
+            hiredTotal: number;
+            leftTotal: number;
+            rate: number | null;
+            previousRate: number | null;
+        };
+        InsightPerson_Output: {
+            /** Format: uuid */
+            employeeId: string;
+            /** Format: uuid */
+            userId: string;
+            firstName: string;
+            lastName: string;
+            positionTitle: string;
+        };
+        AbsenceResponse_Output: {
+            top: {
+                person: components["schemas"]["InsightPerson_Output"];
+                days: number;
+                byType: {
+                    VACATION: number;
+                    SICK_DAY: number;
+                    DAY_OFF: number;
+                };
+            }[];
+            averageDays: number | null;
+            previousAverageDays: number | null;
+        };
+        SalaryResponse_Output: {
+            average: components["schemas"]["Money_Output"] | null;
+            previousAverage: components["schemas"]["Money_Output"] | null;
+            groups: {
+                /** Format: uuid */
+                id: string;
+                name: string;
+                average: components["schemas"]["Money_Output"];
+                employees: number;
+            }[];
         };
         /** @enum {string} */
         EmployeeStatus: "ACTIVE" | "TERMINATED";
@@ -3723,6 +3904,251 @@ export interface operations {
                 };
             };
             /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    InsightsController_headcount: {
+        parameters: {
+            query: {
+                year: number;
+                categoryId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HeadcountResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    InsightsController_tenure: {
+        parameters: {
+            query: {
+                year: number;
+                categoryId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TenureResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    InsightsController_turnover: {
+        parameters: {
+            query: {
+                year: number;
+                categoryId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TurnoverResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    InsightsController_absence: {
+        parameters: {
+            query: {
+                year: number;
+                categoryId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AbsenceResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    InsightsController_salary: {
+        parameters: {
+            query: {
+                year: number;
+                categoryId?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SalaryResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED */
             400: {
                 headers: {
                     [name: string]: unknown;

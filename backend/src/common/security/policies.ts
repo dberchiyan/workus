@@ -5,6 +5,8 @@ export const can = {
   /** Caller's own account only: /auth/me, /auth/logout. */
   authenticated: policy([], () => true),
   admin: policy([], (principal) => principal.hasAuthority('ADMIN')),
+  /** Company figures (headcount, tenure, turnover, absence, salaries) are an admin screen. */
+  viewInsights: policy([], (principal) => principal.hasAuthority('ADMIN')),
   /** The employee directory is an admin screen. */
   viewEmployees: policy([], (principal) => principal.hasAuthority('ADMIN')),
   /**

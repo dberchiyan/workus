@@ -121,3 +121,16 @@ export interface EmployeeBirthdays {
   content: EmployeeBirthday[];
   totalElements: number;
 }
+
+/** One person in the company figures (insights). */
+export interface RosterEmployee {
+  id: string;
+  userId: string;
+  firstName: string;
+  lastName: string;
+  startDate: Date;
+  /** First day without work; null while employed. */
+  terminatedOn: Date | null;
+  position: { id: string; title: string };
+  category: { id: string; name: string; sortOrder: number };
+}

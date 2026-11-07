@@ -124,3 +124,14 @@ export const dashboardRequestSelect = {
 export type DashboardRequestRecord = Prisma.TimeOffRequestGetPayload<{
   select: typeof dashboardRequestSelect;
 }>;
+
+/** An approved request as the insights count it. */
+export const absenceDaysSelect = {
+  employeeId: true,
+  type: true,
+  startDate: true,
+  endDate: true,
+} satisfies Prisma.TimeOffRequestSelect;
+export type AbsenceDaysRecord = Prisma.TimeOffRequestGetPayload<{
+  select: typeof absenceDaysSelect;
+}>;

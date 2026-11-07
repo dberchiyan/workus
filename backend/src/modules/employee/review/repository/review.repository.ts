@@ -210,4 +210,24 @@ export class ReviewRepository {
     ]);
     return { content, totalElements };
   }
+
+  /** Each employee's latest completed salary on or before `asOf` (bounded). */
+  findLatestSalaries(
+    asOf: Date,
+    limit: number,
+  ): Promise<
+    { employeeId: string; salaryAmount: Decimal | null; salaryCurrency: string | null }[]
+  > {
+    return this.txHost.tx.employeeReview.findMany({
+      where: {
+        status: ReviewStatus.COMPLETED,
+        reviewDate: { lte: asOf },
+        salaryAmount: { not: null },
+      },
+      select: { employeeId: true, salaryAmount: true, salaryCurrency: true },
+      distinct: ['employeeId'],
+      orderBy: [{ employeeId: 'asc' }, { reviewDate: 'desc' }, { createdAt: 'desc' }],
+      take: limit,
+    });
+  }
 }

@@ -1,0 +1,90 @@
+{
+  "pageTitle": "Insights · Workus",
+  "title": "Insights",
+  "subtitle": "How the company changes over the year: people, tenure, turnover, time off and pay.",
+  "filters": {
+    "category": "Category",
+    "allCategories": "Whole company",
+    "year": "Year",
+    "previousYear": "Previous year",
+    "nextYear": "Next year"
+  },
+  "common": {
+    "error": "Couldn’t load this figure",
+    "retry": "Try again",
+    "empty": "No data for this year.",
+    "table": "Table",
+    "tableLabel": "Show as a table",
+    "vsYear": "vs {{year}}",
+    "noChange": "Same as {{year}}",
+    "about": "About this figure",
+    "months_one": "{{count}} month",
+    "months_other": "{{count}} months",
+    "yearsMonths": "{{years}} y {{months}} m",
+    "people_one": "{{count}} person",
+    "people_other": "{{count}} people",
+    "month": "Month",
+    "total": "Total",
+    "monthsUnit_one": "month",
+    "monthsUnit_other": "months"
+  },
+  "headcount": {
+    "title": "Number of employees",
+    "subtitle": "People employed at the end of each month",
+    "label": "Employed at the end of {{month}}",
+    "legend": "Groups (select to hide or show)",
+    "column": "{{month}}: {{count}} employed",
+    "future": "{{month}}: not yet",
+    "aboutTitle": "Number of employees",
+    "about": "The base every other figure is built on — turnover, tenure and averages are all relative to it. Select a month to see who makes it up."
+  },
+  "tenure": {
+    "title": "Average tenure",
+    "subtitle": "Whole months worked by the people employed at the end of the year",
+    "label": "Average tenure",
+    "employees_one": "{{count}} employee",
+    "employees_other": "{{count}} employees",
+    "aboutTitle": "Average tenure",
+    "about": "How long people stay. Short tenure in one area points to a retention problem worth a closer look."
+  },
+  "turnover": {
+    "title": "Staff turnover",
+    "subtitle": "Hires and leavers by month",
+    "hired": "Hired",
+    "left": "Left",
+    "rate": "Turnover rate",
+    "rateValue": "{{value}} %",
+    "column": "{{month}}: {{hired}} hired, {{left}} left",
+    "future": "{{month}}: not yet",
+    "selected": "{{month}}",
+    "nobody": "Nobody joined or left in {{month}}.",
+    "totals": "{{hired}} hired · {{left}} left this year",
+    "aboutTitle": "Turnover rate",
+    "about": "People who left in the year as a share of the average month-end headcount. Select a month to see who joined and who left."
+  },
+  "absence": {
+    "title": "Absence",
+    "subtitle": "Top 10 by approved working days off this year",
+    "rank": "Rank",
+    "person": "Employee",
+    "days": "Days",
+    "daysValue_one": "{{count}} day",
+    "daysValue_other": "{{count}} days",
+    "label": "Average days off per person",
+    "empty": "No approved time off this year.",
+    "aboutTitle": "Absence",
+    "about": "Who takes the most time off, by type. A rise in sick days can signal burnout or dissatisfaction early.",
+    "legend": "Time-off types"
+  },
+  "salary": {
+    "title": "Average salary",
+    "subtitle": "Monthly, from each person’s latest completed review",
+    "label": "Average monthly salary",
+    "employees_one": "{{count}} employee",
+    "employees_other": "{{count}} employees",
+    "group": "Group",
+    "average": "Average",
+    "aboutTitle": "Average salary",
+    "about": "Pay across groups, to benchmark levels and spot gaps. Each person counts with their salary at the end of the year."
+  }
+}

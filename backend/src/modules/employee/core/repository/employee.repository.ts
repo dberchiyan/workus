@@ -12,6 +12,8 @@ import { activeOn, employedBetween, employeeWhere, searchWhere } from './employe
 import {
   type EmployeeCalendarRecord,
   employeeCalendarSelect,
+  type EmployeeRosterRecord,
+  employeeRosterSelect,
   type EmployeeListItemRecord,
   employeeListItemSelect,
   type EmployeeProfileRecord,
@@ -140,6 +142,15 @@ export class EmployeeRepository {
     ]);
     const [count] = countRowsSchema.parse(countRows);
     return { content: birthdayRowsSchema.parse(rows), totalElements: count?.total ?? 0 };
+  }
+
+  /** Everyone who ever worked here (bounded), by start date. */
+  findRoster(limit: number): Promise<EmployeeRosterRecord[]> {
+    return this.txHost.tx.employee.findMany({
+      select: employeeRosterSelect,
+      orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+      take: limit,
+    });
   }
 
   countActive(today: Date): Promise<number> {
