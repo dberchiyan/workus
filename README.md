@@ -67,37 +67,84 @@ light and dark themes, and a responsive layout from phone to desktop.
 
 ## Architecture
 
+**Request path** — every call passes the guards, then flows down the layers, scoped to the
+caller's organisation.
+
 ```mermaid
-flowchart LR
-  B[Browser<br/>React SPA] -- "/api · JSON · session cookie" --> N[NestJS API<br/>modular monolith]
-  N -- Prisma --> P[(PostgreSQL)]
-  N -. OpenAPI .-> T[Generated TS types<br/>+ runtime checks]
-  T -.-> B
+flowchart TB
+  SPA["<b>React SPA</b><br/>browser"]
+
+  subgraph API["NestJS · modular monolith"]
+    direction LR
+    G["<b>Guards</b><br/>auth · policies"]
+    C["<b>Controller</b><br/>routes · DTOs"]
+    S["<b>Service</b><br/>business logic"]
+    R["<b>Repository</b><br/>tenant-scoped"]
+    G --> C --> S --> R
+  end
+
+  DB[("<b>PostgreSQL</b><br/>tenant data")]
+
+  SPA -- "JSON · cookie" --> API
+  API -- Prisma --> DB
+
+  classDef client fill:#E3F1F5,stroke:#21697C,stroke-width:2px,color:#1F3A4D
+  classDef api fill:#21697C,stroke:#174C5A,stroke-width:2px,color:#FFFFFF
+  classDef data fill:#1F3A4D,stroke:#7CC4D6,stroke-width:2px,color:#FFFFFF
+  class SPA client
+  class G,C,S,R api
+  class DB data
+  style API fill:transparent,stroke:#7CC4D6,stroke-width:2px,stroke-dasharray:6 4,color:#7CC4D6
 ```
 
-- **Multi-tenancy.** Every user belongs to one organisation. Each tenant row carries
-  `organisation_id`, and composite foreign keys make cross-tenant links impossible in the
-  database itself. Every query is scoped, and an id from another company answers like one that
-  doesn't exist.
-- **Security.**
-  - Server-side sessions (HttpOnly cookie, CSRF double-submit, idle and absolute timeouts).
-  - Argon2id passwords and rate limits on sign-in and sign-up.
-  - Deny-by-default policies that check the whole ownership chain; the app refuses to start if a
-    route has no policy.
-- **Data integrity.**
-  - Optimistic locking and `Idempotency-Key` on side-effecting POSTs.
-  - Money as `NUMERIC(19,4)`, never a float.
-  - The audit log is written in the same transaction as the change.
-- **One contract.** Zod schemas validate input and generate `openapi.json`. The frontend
-  generates its types and response validators from it.
+**One contract** — the API is described once, in Zod; the frontend never hand-writes an API type.
+
+```mermaid
+flowchart TB
+  Z["<b>Zod schemas</b><br/>backend DTOs"]
+  O["<b>openapi.json</b><br/>the contract"]
+  T["<b>TS types</b><br/>compile time"]
+  V["<b>Zod validators</b><br/>runtime"]
+  Z -- generate --> O
+  O -- generate --> T & V
+
+  classDef src fill:#21697C,stroke:#174C5A,stroke-width:2px,color:#FFFFFF
+  classDef spec fill:#1F3A4D,stroke:#7CC4D6,stroke-width:2px,color:#FFFFFF
+  classDef out fill:#E3F1F5,stroke:#21697C,stroke-width:2px,color:#1F3A4D
+  class Z src
+  class O spec
+  class T,V out
+```
+
+### Engineering guarantees
+
+| Concern | Guarantee | Enforced by |
+|---|---|---|
+| **Tenancy** | No cross-company access | `organisation_id` · composite FKs |
+| **Authorisation** | Deny by default | Policy on every route, checked at boot |
+| **Sessions** | Instant revocation | Server-side sessions · CSRF |
+| **Passwords** | Never in plain text | Argon2id · shown once |
+| **Retries** | No double POSTs | `Idempotency-Key` |
+| **Concurrency** | No lost updates | Optimistic locking · row locks |
+| **Money** | Exact | `NUMERIC(19,4)` · `Decimal` |
+| **Audit** | Full, permanent history | Same transaction · append-only |
+| **API contract** | No client–server drift | OpenAPI → generated types |
+
+**Trade-offs, on purpose**
+
+- **Tenant from the session, not the URL** — a user belongs to one company, so URLs stay clean;
+  every id in a path is still checked against the caller's company.
+- **Polling, not WebSockets**, for notifications (60 s) — no extra infrastructure for an HR cadence.
+- **No automated tests yet** — invariants live in types, database constraints and startup checks;
+  tenant isolation is verified with scripted API runs. Policies are the first thing to cover.
 
 ### Tech stack
 
 | Layer | Stack |
 |---|---|
-| Backend | Node.js 26 · TypeScript 6 · NestJS 11 · Prisma 7 · PostgreSQL 18 · Zod 4 · pino |
-| Frontend | React 19 · TypeScript 5.9 · Vite 8 · MUI 9 · Tailwind CSS 4 · TanStack Query 5 · React Router · React Hook Form · react-i18next |
-| Tooling | ESLint · Prettier · OpenAPI codegen · Docker Compose |
+| Backend | NestJS · Prisma · PostgreSQL · Zod |
+| Frontend | React · MUI · Tailwind CSS · TanStack Query |
+| Tooling | TypeScript · OpenAPI · Docker |
 
 ### Repository layout
 
@@ -127,17 +174,17 @@ npm run dev
 
 ### Scripts
 
-| Where | Command | Does |
-|---|---|---|
-| backend | `npm run start:dev` | API with watch mode |
-| backend | `npm run db:migrate:create -- --name <module>_<change>` | New migration (review the SQL) |
-| backend | `npm run db:migrate:deploy` · `db:seed` · `db:check` | Apply · seed · schema drift check |
-| backend | `npm run openapi:generate` | Write `openapi.json` |
-| frontend | `npm run dev` · `build` | Dev server · production build |
-| frontend | `npm run generate:api` | Types and validators from `openapi.json` |
-| both | `npm run typecheck` · `lint` · `format` | Quality gates |
+Run with `npm run <script>` inside the package.
 
-An API change ships with the regenerated `openapi.json` and frontend types in the same commit.
+| Task | `backend/` | `frontend/` |
+|---|---|---|
+| **Develop** | `start:dev` | `dev` |
+| **Build** | `build` | `build` |
+| **Check** | `typecheck` · `lint` · `format:check` | `typecheck` · `lint` · `format:check` |
+| **Database** | `db:migrate:create` · `db:migrate:deploy` · `db:seed` | — |
+| **Contract** | `openapi:generate` · `openapi:check` | `generate:api` |
+
+**Changing the API:** `openapi:generate` → `generate:api` → commit both with the change.
 
 ### Environment
 
