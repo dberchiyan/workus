@@ -60,8 +60,7 @@ cannot lock the others out:
 - signing out other sessions (they belong to other visitors);
 - editing or terminating the showcase accounts listed in `DEMO_PROTECTED_EMAILS`.
 
-Everything else — hiring, reviews, requests, comments, holidays — works as usual, under a
-*Public demo* banner.
+Everything else — hiring, reviews, requests, comments, holidays — works as usual.
 
 ## Demo accounts
 
