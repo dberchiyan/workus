@@ -8,6 +8,7 @@ import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router';
 import { cn } from '@/shared/lib/cn';
 import { useSidebarCollapsed } from '../hooks/useSidebarCollapsed';
+import { DemoBanner } from './DemoBanner';
 import { SidebarContent } from './SidebarContent';
 import { TopBar } from './TopBar';
 
@@ -58,6 +59,7 @@ export function AppLayout() {
         </Drawer>
       )}
       <div className="flex min-w-0 flex-1 flex-col">
+        <DemoBanner />
         <TopBar
           {...(isTabletUp
             ? {}

@@ -61,5 +61,8 @@
   "security": {
     "title": "Security log",
     "description": "Sign-ins, failed attempts, password changes and signed-out sessions on your account. If you don’t recognise something, change your password."
+  },
+  "demo": {
+    "passwordOff": "Password changes are turned off in the public demo — the accounts are shared."
   }
 }

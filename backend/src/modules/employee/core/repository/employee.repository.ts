@@ -343,6 +343,14 @@ export class EmployeeRepository {
     return employee?.userId ?? null;
   }
 
+  async findEmailById(organisationId: string, id: string): Promise<string | null> {
+    const employee = await this.txHost.tx.employee.findUnique({
+      where: { id, organisationId },
+      select: { user: { select: { email: true } } },
+    });
+    return employee?.user.email ?? null;
+  }
+
   findTimeOffById(organisationId: string, id: string): Promise<EmployeeTimeOffRecord | null> {
     return this.txHost.tx.employee.findUnique({
       where: { id, organisationId },

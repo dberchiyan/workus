@@ -12,6 +12,7 @@ import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   SESSIONS_PAGE_SIZE,
+  useAccess,
   useEndOtherSessions,
   useEndSession,
   useSessions,
@@ -27,6 +28,7 @@ export function SessionsSection() {
   const sessions = useSessions(page);
   const endOne = useEndSession();
   const endOthers = useEndOtherSessions();
+  const canEnd = useAccess()('account.endSessions');
   const [confirming, setConfirming] = useState(false);
   const titleId = useId();
   const keepRef = useRef<HTMLButtonElement>(null);
@@ -57,7 +59,8 @@ export function SessionsSection() {
       title={t('sessions.title')}
       description={t('sessions.description')}
       action={
-        total > 0 && (
+        total > 0 &&
+        canEnd && (
           <Button
             variant="outlined"
             color="error"
@@ -115,9 +118,13 @@ export function SessionsSection() {
                     session={session}
                     current={false}
                     ending={endOne.isPending && endOne.variables === session.id}
-                    onEnd={() => {
-                      endOne.mutate(session.id);
-                    }}
+                    {...(canEnd
+                      ? {
+                          onEnd: () => {
+                            endOne.mutate(session.id);
+                          },
+                        }
+                      : {})}
                   />
                 ))}
               </ul>

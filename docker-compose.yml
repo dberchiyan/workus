@@ -48,6 +48,9 @@ services:
       SESSION_ABSOLUTE_TIMEOUT_MINUTES: '1440'
       CORS_ALLOWED_ORIGINS: http://localhost:${APP_PORT:-8080}
       SUPPORTED_LOCALES: en
+      # DEMO_MODE=true docker compose up → the public demo's restrictions (README → Environments).
+      DEMO_MODE: ${DEMO_MODE:-false}
+      DEMO_PROTECTED_EMAILS: ${DEMO_PROTECTED_EMAILS:-}
     healthcheck:
       test: ['CMD-SHELL', 'wget -qO- http://localhost:3000/health/live >/dev/null || exit 1']
       interval: 10s

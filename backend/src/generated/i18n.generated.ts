@@ -14,6 +14,7 @@ export type I18nTranslations = {
         "SESSION_EXPIRED": string;
         "ACCESS_ENDED": string;
         "ORGANISATION_NOT_ACTIVE": string;
+        "DEMO_RESTRICTED": string;
         "FORBIDDEN": string;
         "RESOURCE_NOT_FOUND": string;
         "CONFLICT": string;

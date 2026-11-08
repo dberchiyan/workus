@@ -995,7 +995,7 @@ export interface components {
             status: "ok";
         };
         /** @enum {string} */
-        ErrorCode: "VALIDATION_FAILED" | "MALFORMED_REQUEST" | "INVALID_PARAMETER" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "SESSION_EXPIRED" | "FORBIDDEN" | "ACCESS_ENDED" | "ORGANISATION_NOT_ACTIVE" | "RESOURCE_NOT_FOUND" | "CONFLICT" | "CONCURRENT_MODIFICATION" | "IDEMPOTENCY_KEY_REUSED" | "BUSINESS_RULE_VIOLATION" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "RATE_LIMIT_EXCEEDED" | "UPSTREAM_UNAVAILABLE" | "INTERNAL_ERROR";
+        ErrorCode: "VALIDATION_FAILED" | "MALFORMED_REQUEST" | "INVALID_PARAMETER" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "SESSION_EXPIRED" | "FORBIDDEN" | "ACCESS_ENDED" | "ORGANISATION_NOT_ACTIVE" | "DEMO_RESTRICTED" | "RESOURCE_NOT_FOUND" | "CONFLICT" | "CONCURRENT_MODIFICATION" | "IDEMPOTENCY_KEY_REUSED" | "BUSINESS_RULE_VIOLATION" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "RATE_LIMIT_EXCEEDED" | "UPSTREAM_UNAVAILABLE" | "INTERNAL_ERROR";
         ErrorResponse: {
             /** Format: date-time */
             timestamp: string;
@@ -1112,6 +1112,7 @@ export interface components {
                 rejectionReason: string | null;
             };
             idleTimeoutMinutes: number;
+            demoMode: boolean;
         };
         ChangePasswordRequest: {
             currentPassword: string;
@@ -2882,7 +2883,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description FORBIDDEN | DEMO_RESTRICTED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -2971,7 +2972,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description FORBIDDEN | DEMO_RESTRICTED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3009,7 +3010,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description FORBIDDEN | DEMO_RESTRICTED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3311,7 +3312,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description FORBIDDEN | DEMO_RESTRICTED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3971,7 +3972,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description FORBIDDEN | DEMO_RESTRICTED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4711,7 +4712,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description FORBIDDEN | DEMO_RESTRICTED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4847,7 +4848,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description FORBIDDEN | DEMO_RESTRICTED */
             403: {
                 headers: {
                     [name: string]: unknown;

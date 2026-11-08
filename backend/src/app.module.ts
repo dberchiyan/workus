@@ -14,6 +14,7 @@ import { ObservabilityModule } from './common/observability/observability.module
 import { TimingInterceptor } from './common/observability/timing.interceptor';
 import { PersistenceModule } from './common/persistence/persistence.module';
 import { AuthorizationGuard } from './common/security/authorization.guard';
+import { DemoGuard } from './common/security/demo.guard';
 import { CsrfGuard } from './common/security/csrf.guard';
 import { JsonOnlyMiddleware } from './common/security/json-only.middleware';
 import { RateLimitGuard } from './common/security/rate-limit.guard';
@@ -62,6 +63,7 @@ import { PlatformModule } from './modules/platform/platform.module';
     { provide: APP_GUARD, useClass: CsrfGuard },
     { provide: APP_GUARD, useClass: RateLimitGuard },
     { provide: APP_GUARD, useClass: AuthorizationGuard },
+    { provide: APP_GUARD, useClass: DemoGuard },
     { provide: APP_PIPE, useClass: ZodValidationPipe },
     // Outermost first: timing measures everything; idempotency stores the serialized response.
     { provide: APP_INTERCEPTOR, useClass: TimingInterceptor },

@@ -5,7 +5,7 @@ export const LoginPage = lazy(() => import('./pages/LoginPage'));
 export { RequireAuth } from './components/RequireAuth';
 export { RequireAccess } from './components/RequireAccess';
 export { IdleSessionWarning } from './components/IdleSessionWarning';
-export { useAccess } from './hooks/useAccess';
+export { useAccess, useDemoMode } from './hooks/useAccess';
 export { ACCESS, type AccessPart, type UserRole } from './access';
 export { useLogout } from './hooks/useLogout';
 export { useCurrentUser } from './hooks/useCurrentUser';

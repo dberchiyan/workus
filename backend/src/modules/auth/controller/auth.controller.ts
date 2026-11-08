@@ -22,6 +22,7 @@ import { can } from '../../../common/security/policies';
 import type { Principal } from '../../../common/security/principal';
 import { RateLimit, RateLimitName } from '../../../common/security/rate-limit';
 import { clientIp, clientUserAgent, readCookie } from '../../../common/security/request-client';
+import { DemoRestricted } from '../../../common/security/demo.guard';
 import { Authorize, Public } from '../../../common/security/security.decorators';
 import { ApiPageable, type Pageable, PageableQuery } from '../../../common/dto/pageable';
 import { UuidParam } from '../../../common/dto/uuid-param';
@@ -80,7 +81,11 @@ export class AuthController {
       presentedToken: readCookie(httpRequest, this.config.get('SESSION_COOKIE_NAME')),
     });
     this.sessionCookies.write(response, session);
-    return toCurrentUserResponse(user, this.config.get('SESSION_IDLE_TIMEOUT_MINUTES'));
+    return toCurrentUserResponse(
+      user,
+      this.config.get('SESSION_IDLE_TIMEOUT_MINUTES'),
+      this.config.isDemo,
+    );
   }
 
   @Post('logout')
@@ -107,12 +112,14 @@ export class AuthController {
     return toCurrentUserResponse(
       await this.authService.currentUser(principal.userId),
       this.config.get('SESSION_IDLE_TIMEOUT_MINUTES'),
+      this.config.isDemo,
     );
   }
 
   @Put('password')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Authorize(can.ownAccount)
+  @DemoRestricted()
   @RateLimit(RateLimitName.PASSWORD_CHANGE)
   @ApiOperation({
     summary: 'Change own password; every session ends and this browser gets a new one',
@@ -124,6 +131,7 @@ export class AuthController {
     'FORBIDDEN',
     'BUSINESS_RULE_VIOLATION',
     'RATE_LIMIT_EXCEEDED',
+    'DEMO_RESTRICTED',
   )
   async changePassword(
     @Body() request: ChangePasswordRequest,
@@ -161,8 +169,9 @@ export class AuthController {
   @Delete('sessions')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Authorize(can.ownAccount)
+  @DemoRestricted()
   @ApiOperation({ summary: 'Sign out everywhere except this session' })
-  @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+  @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN', 'DEMO_RESTRICTED')
   async endOtherSessions(@CurrentPrincipal() principal: Principal): Promise<void> {
     await this.authService.endOtherSessions(principal);
   }
@@ -170,8 +179,9 @@ export class AuthController {
   @Delete('sessions/:sessionId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Authorize(can.endOwnSession)
+  @DemoRestricted()
   @ApiOperation({ summary: 'End one of own sessions (this one signs out here)' })
-  @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+  @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN', 'DEMO_RESTRICTED')
   async endSession(
     @UuidParam('sessionId') sessionId: string,
     @CurrentPrincipal() principal: Principal,

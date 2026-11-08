@@ -21,8 +21,8 @@ Sign in with any [demo account](#demo-accounts) · password `Workus-Dev-2026!`
 
 <br/>
 
-[Quick start](#quick-start) · [Demo accounts](#demo-accounts) · [Features](#features) ·
-[Architecture](#architecture) · [Development](#development)
+[Quick start](#quick-start) · [Environments](#environments) · [Demo accounts](#demo-accounts) ·
+[Features](#features) · [Architecture](#architecture) · [Development](#development)
 
 </div>
 
@@ -34,12 +34,34 @@ Requires Docker with Compose v2.
 
 ```bash
 cp .env.example .env                              # set DATABASE_PASSWORD
-docker compose up --build                         # db + backend + frontend
+docker compose up --build                         # local — no limits
+DEMO_MODE=true docker compose up --build          # …or run it as the public demo
 docker compose exec backend npm run db:seed       # demo data (once)
 ```
 
 Open **http://localhost:8080** and sign in with a [demo account](#demo-accounts). Migrations run
 on backend start; data lives in the `db-data` volume (`docker compose down -v` removes it).
+
+## Environments
+
+One build, two modes — switched by `DEMO_MODE` on the backend.
+
+| | 💻 Local | 🌐 Demo |
+|---|---|---|
+| **Run** | `docker compose up` | `DEMO_MODE=true docker compose up` |
+| **`DEMO_MODE`** | `false` (default) | `true` |
+| **Limits** | None — every action works | Shared accounts stay usable (below) |
+| **Seen at** | http://localhost:8080 | [demo-workus.osdb.io](https://demo-workus.osdb.io) |
+
+In demo mode the API answers `403 DEMO_RESTRICTED` and the UI hides the action — so one visitor
+cannot lock the others out:
+
+- changing your password, resetting an employee's, changing admin ↔ owner roles;
+- signing out other sessions (they belong to other visitors);
+- editing or terminating the showcase accounts listed in `DEMO_PROTECTED_EMAILS`.
+
+Everything else — hiring, reviews, requests, comments, holidays — works as usual, under a
+*Public demo* banner.
 
 ## Demo accounts
 
@@ -145,6 +167,7 @@ flowchart TB
 | **Concurrency** | No lost updates | Optimistic locking · row locks |
 | **Money** | Exact | `NUMERIC(19,4)` · `Decimal` |
 | **Audit** | Full, permanent history | Same transaction · append-only |
+| **Public demo** | No visitor locks others out | `DEMO_MODE` guard · hidden in UI |
 | **API contract** | No client–server drift | OpenAPI → generated types |
 
 **Trade-offs, on purpose**
@@ -181,7 +204,7 @@ Requires Node.js 26 (`.nvmrc` in each package) and PostgreSQL 18 with an empty d
 # backend — http://localhost:3000 (API docs at /docs)
 cd backend && cp .env.example .env    # set DATABASE_* values
 npm ci && npm run db:migrate:deploy && npm run db:seed
-npm run start:dev
+npm run start:dev                     # local · DEMO_MODE=true npm run start:dev → demo
 
 # frontend — http://localhost:5173 (proxies /api to :3000)
 cd frontend && cp .env.example .env
@@ -203,12 +226,12 @@ Run with `npm run <script>` inside the package.
 
 **Changing the API:** `openapi:generate` → `generate:api` → commit both with the change.
 
-### Environment
+### Configuration
 
 Copy each `.env.example` to `.env` beside it and fill in the blanks.
 
-| File | For | Required |
-|---|---|---|
-| `.env.example` | Docker Compose | `DATABASE_PASSWORD` |
-| `backend/.env.example` | Backend outside Docker | `DATABASE_PASSWORD` |
-| `frontend/.env.example` | Frontend build | — |
+| File | For | Required | Demo mode |
+|---|---|---|---|
+| `.env.example` | Docker Compose | `DATABASE_PASSWORD` | `DEMO_MODE` · `DEMO_PROTECTED_EMAILS` |
+| `backend/.env.example` | Backend outside Docker | `DATABASE_PASSWORD` | `DEMO_MODE` · `DEMO_PROTECTED_EMAILS` |
+| `frontend/.env.example` | Frontend build | — | — (read from the API) |

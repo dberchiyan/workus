@@ -560,6 +560,15 @@ export class EmployeeService {
     return userId;
   }
 
+  /** For other modules (employment): the employee's sign-in email; 404 for an unknown employee. */
+  async findEmail(organisationId: string, employeeId: string): Promise<string> {
+    const email = await this.employeeRepository.findEmailById(organisationId, employeeId);
+    if (!email) {
+      throw new ResourceNotFoundException();
+    }
+    return email;
+  }
+
   async findProfile(organisationId: string, id: string): Promise<EmployeeProfile> {
     const employee = await this.employeeRepository.findProfileById(organisationId, id);
     if (!employee) {

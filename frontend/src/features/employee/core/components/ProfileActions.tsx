@@ -12,6 +12,7 @@ import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
 import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useAccess } from '@/features/auth';
 import type { EmployeeProfile } from '../types';
 import { CancelTerminationDialog } from './CancelTerminationDialog';
 import { EditProfileDialog } from './EditProfileDialog';
@@ -34,6 +35,7 @@ export function ProfileActions({ employee }: { employee: EmployeeProfile }) {
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const returnFocusTo = useRef<HTMLElement | null>(null);
   const isTerminated = employee.termination !== null;
+  const can = useAccess();
   const name = `${employee.firstName} ${employee.lastName}`;
 
   const open = (kind: DialogKind, trigger: HTMLElement | null): void => {
@@ -87,16 +89,18 @@ export function ProfileActions({ employee }: { employee: EmployeeProfile }) {
           </ListItemIcon>
           <ListItemText>{t('profile.actions.edit')}</ListItemText>
         </MenuItem>
-        <MenuItem
-          onClick={() => {
-            open('resetPassword', menuButtonRef.current);
-          }}
-        >
-          <ListItemIcon>
-            <KeyOutlined aria-hidden fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>{t('profile.actions.resetPassword')}</ListItemText>
-        </MenuItem>
+        {can('employee.resetPassword') && (
+          <MenuItem
+            onClick={() => {
+              open('resetPassword', menuButtonRef.current);
+            }}
+          >
+            <ListItemIcon>
+              <KeyOutlined aria-hidden fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>{t('profile.actions.resetPassword')}</ListItemText>
+          </MenuItem>
+        )}
         {isTerminated
           ? [
               <MenuItem

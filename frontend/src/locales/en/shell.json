@@ -32,5 +32,8 @@
     "MANAGER": "Manager",
     "EMPLOYEE": "Employee",
     "PLATFORM_ADMIN": "Platform admin"
+  },
+  "demo": {
+    "banner": "Public demo — shared accounts, so password, role and session changes are turned off."
   }
 }

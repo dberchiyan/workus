@@ -42,6 +42,13 @@ export class OrganisationNotActiveException extends ApiException {
   }
 }
 
+/** The public demo refuses actions that would lock other visitors out. */
+export class DemoRestrictedException extends ApiException {
+  constructor() {
+    super('DEMO_RESTRICTED', 'errors.DEMO_RESTRICTED');
+  }
+}
+
 export class SessionExpiredException extends ApiException {
   constructor() {
     super('SESSION_EXPIRED', 'errors.SESSION_EXPIRED');

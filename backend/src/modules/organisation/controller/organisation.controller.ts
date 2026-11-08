@@ -8,6 +8,7 @@ import { Idempotent } from '../../../common/idempotency/idempotent.decorator';
 import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
 import { can } from '../../../common/security/policies';
 import type { Principal } from '../../../common/security/principal';
+import { DemoRestricted } from '../../../common/security/demo.guard';
 import { Authorize } from '../../../common/security/security.decorators';
 import type { AdministratorSortField } from '../../user/service/administrator-sort';
 import { OrganisationService } from '../service/organisation.service';
@@ -127,6 +128,7 @@ export class OrganisationController {
 
   @Put('administrators/:userId/role')
   @Authorize(can.manageUserRole)
+  @DemoRestricted()
   @ApiOperation({
     summary: 'Make an admin an owner or an owner an admin (owners only); the last owner stays',
   })
@@ -140,6 +142,7 @@ export class OrganisationController {
     'RESOURCE_NOT_FOUND',
     'CONCURRENT_MODIFICATION',
     'BUSINESS_RULE_VIOLATION',
+    'DEMO_RESTRICTED',
   )
   async changeRole(
     @CurrentPrincipal() principal: Principal,

@@ -10,6 +10,8 @@ export const ErrorCode = {
   ACCESS_ENDED: 403,
   /** The caller's organisation is not approved (waiting, or rejected): its data is closed. */
   ORGANISATION_NOT_ACTIVE: 403,
+  /** Turned off in the public demo (DEMO_MODE): it would lock other visitors out. */
+  DEMO_RESTRICTED: 403,
   RESOURCE_NOT_FOUND: 404,
   CONFLICT: 409,
   CONCURRENT_MODIFICATION: 409,

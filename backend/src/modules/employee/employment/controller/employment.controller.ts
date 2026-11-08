@@ -7,6 +7,7 @@ import { Idempotent } from '../../../../common/idempotency/idempotent.decorator'
 import { CurrentPrincipal } from '../../../../common/security/current-principal.decorator';
 import { can } from '../../../../common/security/policies';
 import type { Principal } from '../../../../common/security/principal';
+import { DemoRestricted } from '../../../../common/security/demo.guard';
 import { Authorize } from '../../../../common/security/security.decorators';
 import { EmploymentService } from '../service/employment.service';
 import { CreateEmployeeRequest, UpdateEmployeeRequest } from './dto/hire-employee.request';
@@ -80,6 +81,7 @@ export class EmploymentController {
     'CONFLICT',
     'CONCURRENT_MODIFICATION',
     'BUSINESS_RULE_VIOLATION',
+    'DEMO_RESTRICTED',
   )
   async update(
     @UuidParam('employeeId') employeeId: string,
@@ -123,6 +125,7 @@ export class EmploymentController {
     'RESOURCE_NOT_FOUND',
     'CONCURRENT_MODIFICATION',
     'BUSINESS_RULE_VIOLATION',
+    'DEMO_RESTRICTED',
   )
   async terminate(
     @UuidParam('employeeId') employeeId: string,
@@ -172,6 +175,7 @@ export class EmploymentController {
   @Post(':employeeId/password-reset')
   @HttpCode(HttpStatus.OK)
   @Authorize(can.manageEmployee)
+  @DemoRestricted()
   @Idempotent({ redact: ['temporaryPassword'] })
   @ApiOperation({
     summary:
@@ -185,6 +189,7 @@ export class EmploymentController {
     'FORBIDDEN',
     'RESOURCE_NOT_FOUND',
     'IDEMPOTENCY_KEY_REUSED',
+    'DEMO_RESTRICTED',
   )
   resetPassword(
     @UuidParam('employeeId') employeeId: string,

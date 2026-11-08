@@ -38,6 +38,19 @@ export const envSchema = z.object({
   SESSION_ABSOLUTE_TIMEOUT_MINUTES: z.coerce.number().int().min(1),
   CORS_ALLOWED_ORIGINS: commaSeparated.pipe(z.array(z.url()).min(1)),
   SUPPORTED_LOCALES: commaSeparated.pipe(z.array(z.string().regex(/^[a-z]{2}$/)).min(1)),
+  // Public demo: actions that would lock other visitors out are refused (off by default).
+  DEMO_MODE: booleanString.default(false),
+  // The showcase accounts (README) that cannot be edited or terminated in the demo.
+  DEMO_PROTECTED_EMAILS: z
+    .string()
+    .optional()
+    .transform((value) =>
+      (value ?? '')
+        .split(',')
+        .map((item) => item.trim().toLowerCase())
+        .filter((item) => item.length > 0),
+    )
+    .pipe(z.array(z.email())),
 });
 
 export type Env = z.infer<typeof envSchema>;

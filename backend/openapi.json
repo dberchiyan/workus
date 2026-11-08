@@ -460,7 +460,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "FORBIDDEN | DEMO_RESTRICTED",
             "content": {
               "application/json": {
                 "schema": {
@@ -594,7 +594,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "FORBIDDEN | DEMO_RESTRICTED",
             "content": {
               "application/json": {
                 "schema": {
@@ -641,7 +641,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "FORBIDDEN | DEMO_RESTRICTED",
             "content": {
               "application/json": {
                 "schema": {
@@ -1116,7 +1116,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "FORBIDDEN | DEMO_RESTRICTED",
             "content": {
               "application/json": {
                 "schema": {
@@ -2070,7 +2070,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "FORBIDDEN | DEMO_RESTRICTED",
             "content": {
               "application/json": {
                 "schema": {
@@ -3073,7 +3073,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "FORBIDDEN | DEMO_RESTRICTED",
             "content": {
               "application/json": {
                 "schema": {
@@ -3246,7 +3246,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "FORBIDDEN | DEMO_RESTRICTED",
             "content": {
               "application/json": {
                 "schema": {
@@ -5478,6 +5478,7 @@
           "FORBIDDEN",
           "ACCESS_ENDED",
           "ORGANISATION_NOT_ACTIVE",
+          "DEMO_RESTRICTED",
           "RESOURCE_NOT_FOUND",
           "CONFLICT",
           "CONCURRENT_MODIFICATION",
@@ -5963,6 +5964,9 @@
             "type": "integer",
             "minimum": 1,
             "maximum": 9007199254740991
+          },
+          "demoMode": {
+            "type": "boolean"
           }
         },
         "required": [
@@ -5972,7 +5976,8 @@
           "lastName",
           "role",
           "organisation",
-          "idleTimeoutMinutes"
+          "idleTimeoutMinutes",
+          "demoMode"
         ],
         "additionalProperties": false
       },

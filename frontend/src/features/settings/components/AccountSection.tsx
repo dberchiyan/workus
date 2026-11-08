@@ -1,6 +1,7 @@
+import Alert from '@mui/material/Alert';
 import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
-import { useCurrentUser } from '@/features/auth';
+import { useAccess, useCurrentUser } from '@/features/auth';
 import { InitialsAvatar } from '@/shared/components/InitialsAvatar';
 import { ChangePasswordForm } from './ChangePasswordForm';
 import { SettingsCard } from './SettingsCard';
@@ -9,6 +10,7 @@ import { SettingsCard } from './SettingsCard';
 export function AccountSection() {
   const { t } = useTranslation(['settings', 'shell']);
   const user = useCurrentUser().data;
+  const can = useAccess();
   return (
     <div className="flex flex-col gap-4">
       <SettingsCard
@@ -53,9 +55,13 @@ export function AccountSection() {
         description={t('account.password.description')}
       >
         {/* A container: the rules box sits beside the fields when the card is wide enough. */}
-        <div className="@container">
-          <ChangePasswordForm />
-        </div>
+        {can('account.changePassword') ? (
+          <div className="@container">
+            <ChangePasswordForm />
+          </div>
+        ) : (
+          <Alert severity="info">{t('demo.passwordOff')}</Alert>
+        )}
       </SettingsCard>
     </div>
   );

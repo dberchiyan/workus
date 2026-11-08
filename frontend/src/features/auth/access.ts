@@ -40,10 +40,32 @@ export const ACCESS = {
   'settings.administrators': ADMINS,
   'administrators.changeRole': OWNERS,
   'administrators.add': OWNERS,
+  /** Settings → Account / Sessions: one's own password and other sessions. */
+  'account.changePassword': [...EVERYONE, ...PLATFORM],
+  'account.endSessions': [...EVERYONE, ...PLATFORM],
+  /** Employee profile: a new generated password. */
+  'employee.resetPassword': ADMINS,
 } as const satisfies Record<string, readonly UserRole[]>;
 
 export type AccessPart = keyof typeof ACCESS;
 
-/** Does this role use that part? No user → no. */
-export const canAccess = (role: UserRole | undefined, part: AccessPart): boolean =>
-  role !== undefined && (ACCESS[part] as readonly UserRole[]).includes(role);
+/**
+ * Turned off in the public demo (`demoMode` from the server, which refuses them too): each
+ * would lock other visitors out of the shared accounts.
+ */
+const DEMO_RESTRICTED: ReadonlySet<AccessPart> = new Set<AccessPart>([
+  'account.changePassword',
+  'account.endSessions',
+  'employee.resetPassword',
+  'administrators.changeRole',
+]);
+
+/** Does this role use that part (and is it open in the demo)? No user → no. */
+export const canAccess = (
+  role: UserRole | undefined,
+  part: AccessPart,
+  demoMode = false,
+): boolean =>
+  role !== undefined &&
+  (ACCESS[part] as readonly UserRole[]).includes(role) &&
+  !(demoMode && DEMO_RESTRICTED.has(part));

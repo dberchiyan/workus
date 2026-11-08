@@ -1,5 +1,7 @@
 import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { AppConfigService } from '../../../../common/config/app-config.service';
+import { DemoRestrictedException } from '../../../../common/exception/api.exception';
 import { AuthService } from '../../../auth/service/auth.service';
 import { PasswordHasher } from '../../../auth/service/password-hasher.service';
 import { SessionService } from '../../../auth/service/session.service';
@@ -27,6 +29,7 @@ export class EmploymentService {
     private readonly sessionService: SessionService,
     private readonly passwordHasher: PasswordHasher,
     private readonly authService: AuthService,
+    private readonly config: AppConfigService,
   ) {}
 
   /**
@@ -86,6 +89,7 @@ export class EmploymentService {
     command: UpdateEmployeeCommand,
     actorId: string,
   ): Promise<void> {
+    await this.refuseDemoAccount(organisationId, employeeId);
     const { before, after } = await this.employeeService.update(
       organisationId,
       employeeId,
@@ -105,6 +109,7 @@ export class EmploymentService {
     command: TerminateEmployeeCommand,
     actorId: string,
   ): Promise<void> {
+    await this.refuseDemoAccount(organisationId, employeeId);
     const { after } = await this.employeeService.terminate(
       organisationId,
       employeeId,
@@ -148,5 +153,16 @@ export class EmploymentService {
     actorId: string,
   ): Promise<void> {
     await this.employeeService.cancelTermination(organisationId, employeeId, version, actorId);
+  }
+
+  /** The demo's showcase accounts stay signable-in: no edits, no termination (DEMO_MODE only). */
+  private async refuseDemoAccount(organisationId: string, employeeId: string): Promise<void> {
+    if (!this.config.isDemo) {
+      return;
+    }
+    const email = await this.employeeService.findEmail(organisationId, employeeId);
+    if (this.config.isDemoProtected(email)) {
+      throw new DemoRestrictedException();
+    }
   }
 }

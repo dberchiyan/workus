@@ -14,4 +14,13 @@ export class AppConfigService {
   get isDev(): boolean {
     return this.get('APP_ENV') === 'dev';
   }
+
+  get isDemo(): boolean {
+    return this.get('DEMO_MODE');
+  }
+
+  /** In the demo, a showcase account (DEMO_PROTECTED_EMAILS) that nobody may edit. */
+  isDemoProtected(email: string): boolean {
+    return this.isDemo && this.get('DEMO_PROTECTED_EMAILS').includes(email.toLowerCase());
+  }
 }
