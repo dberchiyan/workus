@@ -60,8 +60,8 @@ export class UserService {
     return this.userRepository.createWithPassword({ ...user, email: user.email.toLowerCase() });
   }
 
-  updatePasswordHash(id: string, passwordHash: string): Promise<void> {
-    return this.userRepository.updatePasswordHash(id, passwordHash);
+  updatePasswordHash(id: string, passwordHash: string, updatedBy: string = id): Promise<void> {
+    return this.userRepository.updatePasswordHash(id, passwordHash, updatedBy);
   }
 
   /** Returns the new owner's id. Email is stored lower-case. */

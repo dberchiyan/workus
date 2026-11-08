@@ -1,5 +1,6 @@
 import EditOutlined from '@mui/icons-material/EditOutlined';
 import EventBusyOutlined from '@mui/icons-material/EventBusyOutlined';
+import KeyOutlined from '@mui/icons-material/KeyOutlined';
 import MoreVertOutlined from '@mui/icons-material/MoreVertOutlined';
 import PersonRemoveOutlined from '@mui/icons-material/PersonRemoveOutlined';
 import UndoOutlined from '@mui/icons-material/UndoOutlined';
@@ -14,12 +15,13 @@ import { useTranslation } from 'react-i18next';
 import type { EmployeeProfile } from '../types';
 import { CancelTerminationDialog } from './CancelTerminationDialog';
 import { EditProfileDialog } from './EditProfileDialog';
+import { ResetPasswordDialog } from './ResetPasswordDialog';
 import { TerminateDialog } from './TerminateDialog';
 
-type DialogKind = 'edit' | 'terminate' | 'cancelTermination';
+type DialogKind = 'edit' | 'resetPassword' | 'terminate' | 'cancelTermination';
 
 /**
- * One ⋮ menu: Edit profile, then Terminate (or Change / Cancel termination). Dialogs remount on
+ * One ⋮ menu: Edit profile, Reset password, then Terminate (or Change / Cancel termination). Dialogs remount on
  * each opening; on close, focus returns to the menu button.
  */
 export function ProfileActions({ employee }: { employee: EmployeeProfile }) {
@@ -85,6 +87,16 @@ export function ProfileActions({ employee }: { employee: EmployeeProfile }) {
           </ListItemIcon>
           <ListItemText>{t('profile.actions.edit')}</ListItemText>
         </MenuItem>
+        <MenuItem
+          onClick={() => {
+            open('resetPassword', menuButtonRef.current);
+          }}
+        >
+          <ListItemIcon>
+            <KeyOutlined aria-hidden fontSize="small" />
+          </ListItemIcon>
+          <ListItemText>{t('profile.actions.resetPassword')}</ListItemText>
+        </MenuItem>
         {isTerminated
           ? [
               <MenuItem
@@ -129,6 +141,13 @@ export function ProfileActions({ employee }: { employee: EmployeeProfile }) {
         key={`edit-${opening}`}
         employee={employee}
         open={dialog === 'edit'}
+        onClose={close}
+        onExited={exited}
+      />
+      <ResetPasswordDialog
+        key={`reset-${opening}`}
+        employee={employee}
+        open={dialog === 'resetPassword'}
         onClose={close}
         onExited={exited}
       />

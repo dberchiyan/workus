@@ -505,6 +505,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/employees/{employeeId}/password-reset": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Give the employee a new generated password (returned once); the old one stops working and they are signed out everywhere */
+        post: operations["EmploymentController_resetPassword"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/time-off/balances": {
         parameters: {
             query?: never;
@@ -1016,7 +1033,7 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** @enum {string} */
-            action: "auth.signed_in" | "auth.sign_in_failed" | "auth.sign_in_refused" | "auth.signed_out" | "auth.password_changed" | "auth.session_ended" | "auth.other_sessions_ended" | "auth.session_evicted" | "auth.sessions_ended_on_termination" | "auth.sign_in_locked";
+            action: "auth.signed_in" | "auth.sign_in_failed" | "auth.sign_in_refused" | "auth.signed_out" | "auth.password_changed" | "auth.password_reset" | "auth.session_ended" | "auth.other_sessions_ended" | "auth.session_evicted" | "auth.sessions_ended_on_termination" | "auth.sign_in_locked";
             /** Format: date-time */
             occurredAt: string;
             ip: string | null;
@@ -1712,6 +1729,9 @@ export interface components {
         };
         CancelTerminationRequest: {
             version: number;
+        };
+        PasswordResetResponse_Output: {
+            temporaryPassword: string | null;
         };
         /** @enum {string} */
         TimeOffType_Output: "VACATION" | "SICK_DAY" | "DAY_OFF";
@@ -4166,6 +4186,73 @@ export interface operations {
                 };
             };
             /** @description CONCURRENT_MODIFICATION */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmploymentController_resetPassword: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per logical operation, reused on retry */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PasswordResetResponse_Output"];
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description IDEMPOTENCY_KEY_REUSED */
             409: {
                 headers: {
                     [name: string]: unknown;

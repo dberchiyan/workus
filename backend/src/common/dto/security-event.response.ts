@@ -10,6 +10,7 @@ export const SECURITY_ACTIONS = [
   'auth.sign_in_refused',
   'auth.signed_out',
   'auth.password_changed',
+  'auth.password_reset',
   'auth.session_ended',
   'auth.other_sessions_ended',
   'auth.session_evicted',

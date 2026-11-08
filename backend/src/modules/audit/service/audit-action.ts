@@ -26,6 +26,8 @@ export const AuditAction = {
   AUTH_SIGN_IN_REFUSED: 'auth.sign_in_refused',
   AUTH_SIGNED_OUT: 'auth.signed_out',
   AUTH_PASSWORD_CHANGED: 'auth.password_changed',
+  /** An admin gave the person a new generated password; every session of theirs ended. */
+  AUTH_PASSWORD_RESET: 'auth.password_reset',
   AUTH_SESSION_ENDED: 'auth.session_ended',
   AUTH_OTHER_SESSIONS_ENDED: 'auth.other_sessions_ended',
   /** A sign-in elsewhere ended the least recently used session (per-user limit). */

@@ -25,10 +25,14 @@ export interface EmployeeCredentialsProps {
   password: string | null;
   saved: boolean;
   onSavedChange: (saved: boolean) => void;
+  /** Heading and line under it; default: the new-employee wording. */
+  title?: string;
+  description?: string;
 }
 
 /**
- * The new employee's sign-in details, shown this once: the password is never stored in plain text,
+ * An employee's sign-in details with a just-generated password (a new employee, a password
+ * reset), shown this once: the password is never stored in plain text,
  * so the admin copies it here (each value or both) and confirms it is saved before closing.
  */
 export function EmployeeCredentials({
@@ -37,6 +41,8 @@ export function EmployeeCredentials({
   password,
   saved,
   onSavedChange,
+  title,
+  description,
 }: EmployeeCredentialsProps) {
   const { t } = useTranslation('employee');
   const [copied, setCopied] = useState<Copied>(null);
@@ -74,10 +80,10 @@ export function EmployeeCredentials({
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-1">
         <Typography variant="h6" component="h3">
-          {t('add.access.title', { name })}
+          {title ?? t('add.access.title', { name })}
         </Typography>
         <Typography variant="body2" color="textSecondary">
-          {t('add.access.description')}
+          {description ?? t('add.access.description')}
         </Typography>
       </div>
 

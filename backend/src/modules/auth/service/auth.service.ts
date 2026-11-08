@@ -194,6 +194,22 @@ export class AuthService {
     return session;
   }
 
+  /**
+   * For other modules (employment): an admin gives the person a new password (hashed by the
+   * caller before the transaction). The old one stops working and every session of theirs ends
+   * (security.md → Passwords); their security log records it with the admin as the actor.
+   */
+  @Transactional()
+  async resetPassword(
+    user: { id: string; organisationId: string },
+    passwordHash: string,
+    actorUserId: string,
+  ): Promise<void> {
+    await this.userService.updatePasswordHash(user.id, passwordHash, actorUserId);
+    await this.sessionService.endAllForUsers([user.id]);
+    await this.security(AuditAction.AUTH_PASSWORD_RESET, user.id, actorUserId, user.organisationId);
+  }
+
   @Transactional()
   async logout(principal: Principal): Promise<void> {
     await this.sessionService.end(principal.sessionId);

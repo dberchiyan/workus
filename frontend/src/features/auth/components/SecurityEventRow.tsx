@@ -5,6 +5,7 @@ import ExpandLessOutlined from '@mui/icons-material/ExpandLessOutlined';
 import ExpandMoreOutlined from '@mui/icons-material/ExpandMoreOutlined';
 import KeyOutlined from '@mui/icons-material/KeyOutlined';
 import LockClockOutlined from '@mui/icons-material/LockClockOutlined';
+import LockResetOutlined from '@mui/icons-material/LockResetOutlined';
 import LoginOutlined from '@mui/icons-material/LoginOutlined';
 import LogoutOutlined from '@mui/icons-material/LogoutOutlined';
 import WarningAmberOutlined from '@mui/icons-material/WarningAmberOutlined';
@@ -27,6 +28,7 @@ const ICONS: Record<Action, ComponentType<SvgIconProps>> = {
   'auth.sign_in_refused': BlockOutlined,
   'auth.signed_out': LogoutOutlined,
   'auth.password_changed': KeyOutlined,
+  'auth.password_reset': LockResetOutlined,
   'auth.session_ended': DevicesOtherOutlined,
   'auth.other_sessions_ended': DevicesOtherOutlined,
   'auth.session_evicted': DevicesOtherOutlined,

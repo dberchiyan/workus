@@ -103,10 +103,11 @@ export class UserRepository {
     return id;
   }
 
-  async updatePasswordHash(id: string, passwordHash: string): Promise<void> {
+  /** `updatedBy`: the user themselves, or the admin who reset it. */
+  async updatePasswordHash(id: string, passwordHash: string, updatedBy: string): Promise<void> {
     await this.txHost.tx.user.update({
       where: { id },
-      data: { passwordHash, updatedBy: id, version: { increment: 1 } },
+      data: { passwordHash, updatedBy, version: { increment: 1 } },
       select: { id: true },
     });
   }

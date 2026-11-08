@@ -2,11 +2,12 @@ import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tansta
 import type { ApiError } from '@/shared/api/apiError';
 import { employeeApi } from '../api/employeeApi';
 import type {
-  CreatedEmployee,
   CreateEmployeeRequest,
+  CreatedEmployee,
   EmployeeFilters,
   EmployeeListParams,
   EmployeeProfile,
+  PasswordReset,
   TerminateEmployeeRequest,
   UpdateEmployeeRequest,
   UpdateResponsiblesRequest,
@@ -136,3 +137,20 @@ export const useEmployeeProfile = (employeeId: string) =>
     queryKey: employeeKeys.detail(employeeId),
     queryFn: () => employeeApi.profile(employeeId),
   });
+
+/**
+ * Gives the employee a new generated password (they are signed out everywhere). The answer holds
+ * the password: never kept in the mutation cache. Their security log changes.
+ */
+export const useResetPassword = (employeeId: string) => {
+  const queryClient = useQueryClient();
+  return useMutation<PasswordReset, ApiError, string>({
+    mutationFn: (idempotencyKey) => employeeApi.resetPassword(employeeId, idempotencyKey),
+    gcTime: 0,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [...employeeKeys.detail(employeeId), 'security-log'],
+      });
+    },
+  });
+};

@@ -12,6 +12,7 @@ import { EmploymentService } from '../service/employment.service';
 import { CreateEmployeeRequest, UpdateEmployeeRequest } from './dto/hire-employee.request';
 import { CancelTerminationRequest, TerminateEmployeeRequest } from './dto/termination.request';
 import { HiredEmployeeResponse } from './dto/hired-employee.response';
+import { PasswordResetResponse } from './dto/password-reset.response';
 
 @ApiTags('Employees')
 @Controller('api/v1/employees')
@@ -164,6 +165,34 @@ export class EmploymentController {
       principal.organisationId,
       employeeId,
       request.version,
+      principal.userId,
+    );
+  }
+
+  @Post(':employeeId/password-reset')
+  @HttpCode(HttpStatus.OK)
+  @Authorize(can.manageEmployee)
+  @Idempotent({ redact: ['temporaryPassword'] })
+  @ApiOperation({
+    summary:
+      'Give the employee a new generated password (returned once); the old one stops working and they are signed out everywhere',
+  })
+  @ZodResponse({ status: HttpStatus.OK, type: PasswordResetResponse })
+  @ApiErrors(
+    'INVALID_PARAMETER',
+    'UNAUTHORIZED',
+    'SESSION_EXPIRED',
+    'FORBIDDEN',
+    'RESOURCE_NOT_FOUND',
+    'IDEMPOTENCY_KEY_REUSED',
+  )
+  resetPassword(
+    @UuidParam('employeeId') employeeId: string,
+    @CurrentPrincipal() principal: Principal,
+  ): Promise<PasswordResetResponse> {
+    return this.employmentService.resetPassword(
+      principal.organisationId,
+      employeeId,
       principal.userId,
     );
   }

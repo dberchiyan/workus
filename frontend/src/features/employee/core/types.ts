@@ -24,6 +24,7 @@ export type EmployeeFilters = Pick<EmployeeListParams, 'status' | 'search'>;
 
 export type CreateEmployeeRequest = Schemas['CreateEmployeeRequest'];
 export type CreatedEmployee = Schemas['HiredEmployeeResponse_Output'];
+export type PasswordReset = Schemas['PasswordResetResponse_Output'];
 export type PositionOption = Schemas['PositionOptionsResponse_Output']['content'][number];
 export type ResponsibleCandidate =
   Schemas['ResponsibleCandidatesResponse_Output']['content'][number];

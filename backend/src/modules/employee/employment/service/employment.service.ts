@@ -1,5 +1,6 @@
 import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { AuthService } from '../../../auth/service/auth.service';
 import { PasswordHasher } from '../../../auth/service/password-hasher.service';
 import { SessionService } from '../../../auth/service/session.service';
 import { todayUtc } from '../../core/service/calendar-date';
@@ -25,6 +26,7 @@ export class EmploymentService {
     private readonly reviewService: ReviewService,
     private readonly sessionService: SessionService,
     private readonly passwordHasher: PasswordHasher,
+    private readonly authService: AuthService,
   ) {}
 
   /**
@@ -119,6 +121,22 @@ export class EmploymentService {
     if (after.terminatedOn && after.terminatedOn <= todayUtc()) {
       await this.sessionService.endForTermination([{ userId: after.user.id, organisationId }]);
     }
+  }
+
+  /**
+   * A new generated password for the employee, returned once for the admin to hand over (only
+   * its hash is stored); the old one stops working and the employee is signed out everywhere.
+   */
+  async resetPassword(
+    organisationId: string,
+    employeeId: string,
+    actorId: string,
+  ): Promise<{ temporaryPassword: string }> {
+    const userId = await this.employeeService.findUserId(organisationId, employeeId);
+    const temporaryPassword = this.passwordHasher.generateTemporary();
+    const passwordHash = await this.passwordHasher.hash(temporaryPassword);
+    await this.authService.resetPassword({ id: userId, organisationId }, passwordHash, actorId);
+    return { temporaryPassword };
   }
 
   /** The employee is active again; reviews canceled by the termination stay canceled. */

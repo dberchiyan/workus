@@ -551,6 +551,15 @@ export class EmployeeService {
     return this.auditService.findSecurityPage(organisationId, userId, category, pageable);
   }
 
+  /** For other modules (employment): the employee's account; 404 for an unknown employee. */
+  async findUserId(organisationId: string, employeeId: string): Promise<string> {
+    const userId = await this.employeeRepository.findUserIdById(organisationId, employeeId);
+    if (!userId) {
+      throw new ResourceNotFoundException();
+    }
+    return userId;
+  }
+
   async findProfile(organisationId: string, id: string): Promise<EmployeeProfile> {
     const employee = await this.employeeRepository.findProfileById(organisationId, id);
     if (!employee) {

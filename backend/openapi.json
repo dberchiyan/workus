@@ -2597,6 +2597,94 @@
         ]
       }
     },
+    "/api/v1/employees/{employeeId}/password-reset": {
+      "post": {
+        "operationId": "EmploymentController_resetPassword",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "UUID per logical operation, reused on retry",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PasswordResetResponse_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "INVALID_PARAMETER",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "RESOURCE_NOT_FOUND",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "IDEMPOTENCY_KEY_REUSED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "Give the employee a new generated password (returned once); the old one stops working and they are signed out everywhere",
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
     "/api/v1/time-off/balances": {
       "get": {
         "operationId": "TimeOffController_balances",
@@ -5370,6 +5458,7 @@
               "auth.sign_in_refused",
               "auth.signed_out",
               "auth.password_changed",
+              "auth.password_reset",
               "auth.session_ended",
               "auth.other_sessions_ended",
               "auth.session_evicted",
@@ -8718,6 +8807,21 @@
         "required": [
           "version"
         ]
+      },
+      "PasswordResetResponse_Output": {
+        "type": "object",
+        "properties": {
+          "temporaryPassword": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "nullable": true
+          }
+        },
+        "required": [
+          "temporaryPassword"
+        ],
+        "additionalProperties": false
       },
       "TimeOffType_Output": {
         "type": "string",

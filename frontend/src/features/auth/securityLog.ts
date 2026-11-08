@@ -25,6 +25,7 @@ export const SECURITY_TONES: Record<Action, SecurityTone> = {
   'auth.sign_in_refused': 'danger',
   'auth.signed_out': 'normal',
   'auth.password_changed': 'critical',
+  'auth.password_reset': 'critical',
   'auth.session_ended': 'normal',
   'auth.other_sessions_ended': 'critical',
   'auth.session_evicted': 'normal',

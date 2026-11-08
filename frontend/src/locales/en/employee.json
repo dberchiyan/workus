@@ -293,7 +293,8 @@
       "moreFor": "More actions for {{name}}",
       "terminate": "Terminate…",
       "changeTermination": "Change termination…",
-      "cancelTermination": "Cancel termination…"
+      "cancelTermination": "Cancel termination…",
+      "resetPassword": "Reset password"
     },
     "termination": {
       "since": "Terminated on {{date}} · {{reason}}",
@@ -346,5 +347,13 @@
     "confirm": "Cancel termination",
     "keep": "Keep it",
     "saving": "Saving…"
+  },
+  "resetPassword": {
+    "title": "Reset password",
+    "description": "{{name}} gets a new password. The current one stops working and they are signed out on every device.",
+    "cancel": "Cancel",
+    "confirm": "Reset password",
+    "doneTitle": "New password for {{name}}",
+    "doneDescription": "They were signed out everywhere and sign in again with this password."
   }
 }

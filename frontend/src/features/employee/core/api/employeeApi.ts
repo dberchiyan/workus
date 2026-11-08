@@ -3,18 +3,19 @@ import { apiClient } from '@/shared/api/client';
 import type {
   ActivityPage,
   CategoryCounts,
-  CreatedEmployee,
   CreateEmployeeRequest,
+  CreatedEmployee,
   EmployeeFilters,
   EmployeeListParams,
   EmployeePage,
   EmployeeProfile,
   EmployeeSummary,
+  PasswordReset,
   PositionOption,
+  ResponsibleCandidate,
   TerminateEmployeeRequest,
   UpdateEmployeeRequest,
   UpdateResponsiblesRequest,
-  ResponsibleCandidate,
 } from '../types';
 
 const filterParams = ({ status, search }: EmployeeFilters) => ({
@@ -92,6 +93,15 @@ export const employeeApi = {
   terminate: async (employeeId: string, request: TerminateEmployeeRequest): Promise<void> => {
     await apiClient.put(`/api/v1/employees/${employeeId}/termination`, request);
   },
+  /** A new generated password, in this answer only (null on a replayed retry). */
+  resetPassword: async (employeeId: string, idempotencyKey: string): Promise<PasswordReset> =>
+    (
+      await apiClient.post<PasswordReset>(
+        `/api/v1/employees/${encodeURIComponent(employeeId)}/password-reset`,
+        undefined,
+        { headers: { 'Idempotency-Key': idempotencyKey } },
+      )
+    ).data,
   cancelTermination: async (employeeId: string, version: number): Promise<void> => {
     await apiClient.delete(`/api/v1/employees/${employeeId}/termination`, { data: { version } });
   },
