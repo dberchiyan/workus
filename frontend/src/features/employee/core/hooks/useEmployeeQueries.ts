@@ -58,6 +58,8 @@ export const useCreateEmployee = () => {
     { request: CreateEmployeeRequest; idempotencyKey: string }
   >({
     mutationFn: ({ request, idempotencyKey }) => employeeApi.create(request, idempotencyKey),
+    // The answer holds the generated password: never kept in the mutation cache.
+    gcTime: 0,
     onSuccess: async () => {
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: employeeKeys.lists() }),

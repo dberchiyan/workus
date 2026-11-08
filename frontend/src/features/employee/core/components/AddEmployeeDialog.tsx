@@ -14,6 +14,7 @@ import { useTranslation } from 'react-i18next';
 import { AddEmployeeStep, useAddEmployeeForm } from '../hooks/useAddEmployeeForm';
 import { RESERVED_LINE } from '../hooks/useFieldMessage';
 import type { CreatedEmployee } from '../types';
+import { EmployeeCredentials } from './EmployeeCredentials';
 import { EmployeeDetailsStep } from './EmployeeDetailsStep';
 import { ResponsibleStep } from './ResponsibleStep';
 
@@ -39,6 +40,10 @@ export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmp
     goBack,
     submit,
     reset,
+    finish,
+    added,
+    isSaved,
+    setIsSaved,
     errorCode,
     errorRef,
     responsibles,
@@ -46,6 +51,7 @@ export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmp
     isSubmitting,
   } = useAddEmployeeForm(onCreated);
   const isDetails = step === AddEmployeeStep.DETAILS;
+  const doneHintId = useId();
 
   const close = (): void => {
     if (isSubmitting) {
@@ -58,7 +64,8 @@ export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmp
   return (
     <Dialog
       open={open}
-      onClose={close}
+      // On the Access step only Done closes it, so the password is not lost by a stray click or Esc.
+      onClose={added ? undefined : close}
       fullScreen={isPhone}
       fullWidth
       maxWidth="md"
@@ -70,7 +77,12 @@ export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmp
         noValidate
         className="flex min-h-0 flex-1 flex-col"
         onSubmit={(event) => {
-          if (isDetails) {
+          if (added) {
+            event.preventDefault();
+            if (isSaved) {
+              finish();
+            }
+          } else if (isDetails) {
             event.preventDefault();
             void goNext();
           } else {
@@ -87,8 +99,19 @@ export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmp
             <Step>
               <StepLabel optional={t('add.steps.optional')}>{t('add.steps.responsible')}</StepLabel>
             </Step>
+            <Step completed={added !== null}>
+              <StepLabel>{t('add.steps.access')}</StepLabel>
+            </Step>
           </Stepper>
-          {isDetails ? (
+          {added ? (
+            <EmployeeCredentials
+              name={`${added.employee.firstName} ${added.employee.lastName}`}
+              email={added.email}
+              password={added.employee.temporaryPassword}
+              saved={isSaved || added.employee.temporaryPassword === null}
+              onSavedChange={setIsSaved}
+            />
+          ) : isDetails ? (
             <EmployeeDetailsStep form={form} />
           ) : (
             <ResponsibleStep
@@ -98,38 +121,56 @@ export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmp
             />
           )}
         </DialogContent>
-        <DialogActions className="flex-wrap gap-2 px-4 py-3 sm:px-6 sm:py-4">
-          <FormHelperText
-            component="div"
-            role="alert"
-            ref={errorRef}
-            tabIndex={-1}
-            error
-            className="m-0 basis-full outline-none sm:mr-auto sm:basis-auto"
-          >
-            {errorCode ? t(`errors:${errorCode}`) : RESERVED_LINE}
-          </FormHelperText>
-          <Button onClick={close} disabled={isSubmitting}>
-            {t('add.actions.cancel')}
-          </Button>
-          {!isDetails && (
-            <Button onClick={goBack} disabled={isSubmitting}>
-              {t('add.actions.back')}
+        {added ? (
+          <DialogActions className="flex-wrap gap-2 px-4 py-3 sm:px-6 sm:py-4">
+            <FormHelperText id={doneHintId} className="m-0 basis-full sm:mr-auto sm:basis-auto">
+              {isSaved || added.employee.temporaryPassword === null
+                ? RESERVED_LINE
+                : t('add.access.doneHint')}
+            </FormHelperText>
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={!isSaved && added.employee.temporaryPassword !== null}
+              aria-describedby={doneHintId}
+            >
+              {t('add.actions.done')}
             </Button>
-          )}
-          <Button
-            type="submit"
-            variant="contained"
-            disabled={isSubmitting}
-            aria-busy={isSubmitting}
-          >
-            {isDetails
-              ? t('add.actions.next')
-              : isSubmitting
-                ? t('add.actions.submitting')
-                : t('add.actions.submit')}
-          </Button>
-        </DialogActions>
+          </DialogActions>
+        ) : (
+          <DialogActions className="flex-wrap gap-2 px-4 py-3 sm:px-6 sm:py-4">
+            <FormHelperText
+              component="div"
+              role="alert"
+              ref={errorRef}
+              tabIndex={-1}
+              error
+              className="m-0 basis-full outline-none sm:mr-auto sm:basis-auto"
+            >
+              {errorCode ? t(`errors:${errorCode}`) : RESERVED_LINE}
+            </FormHelperText>
+            <Button onClick={close} disabled={isSubmitting}>
+              {t('add.actions.cancel')}
+            </Button>
+            {!isDetails && (
+              <Button onClick={goBack} disabled={isSubmitting}>
+                {t('add.actions.back')}
+              </Button>
+            )}
+            <Button
+              type="submit"
+              variant="contained"
+              disabled={isSubmitting}
+              aria-busy={isSubmitting}
+            >
+              {isDetails
+                ? t('add.actions.next')
+                : isSubmitting
+                  ? t('add.actions.submitting')
+                  : t('add.actions.submit')}
+            </Button>
+          </DialogActions>
+        )}
       </form>
     </Dialog>
   );

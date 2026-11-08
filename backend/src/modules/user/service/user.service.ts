@@ -56,8 +56,8 @@ export class UserService {
   }
 
   /** Returns the new user's id. Email is stored lower-case. */
-  createWithoutPassword(user: NewUser): Promise<string> {
-    return this.userRepository.createWithoutPassword({ ...user, email: user.email.toLowerCase() });
+  createWithPassword(user: NewUser): Promise<string> {
+    return this.userRepository.createWithPassword({ ...user, email: user.email.toLowerCase() });
   }
 
   updatePasswordHash(id: string, passwordHash: string): Promise<void> {

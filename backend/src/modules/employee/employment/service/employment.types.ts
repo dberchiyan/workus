@@ -15,4 +15,6 @@ export interface HiredEmployee {
   id: string;
   firstName: string;
   lastName: string;
+  /** Sign-in password, in plain text only in this answer (never stored, logged or replayed). */
+  temporaryPassword: string;
 }

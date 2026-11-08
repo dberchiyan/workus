@@ -236,7 +236,7 @@ export interface paths {
         /** List employees with search, status and category filters */
         get: operations["EmployeeController_list"];
         put?: never;
-        /** Create an employee with their account, responsibles and starting salary */
+        /** Create an employee with their account (a generated password, returned once), responsibles and starting salary */
         post: operations["EmploymentController_hire"];
         delete?: never;
         options?: never;
@@ -1682,6 +1682,7 @@ export interface components {
             id: string;
             firstName: string;
             lastName: string;
+            temporaryPassword: string | null;
         };
         UpdateEmployeeRequest: {
             firstName: string;

@@ -1,5 +1,6 @@
 import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { PasswordHasher } from '../../../auth/service/password-hasher.service';
 import { SessionService } from '../../../auth/service/session.service';
 import { todayUtc } from '../../core/service/calendar-date';
 import { EmployeeService } from '../../core/service/employee.service';
@@ -23,17 +24,39 @@ export class EmploymentService {
     private readonly employeeService: EmployeeService,
     private readonly reviewService: ReviewService,
     private readonly sessionService: SessionService,
+    private readonly passwordHasher: PasswordHasher,
   ) {}
 
-  /** One transaction: the employee never exists without a starting salary. */
-  @Transactional()
+  /**
+   * Hires with a generated password, returned once for the admin to hand over (only its hash is
+   * stored). Hashing is CPU work, done before the transaction opens.
+   */
   async hire(
     organisationId: string,
     command: HireEmployeeCommand,
     actorId: string,
   ): Promise<HiredEmployee> {
+    const temporaryPassword = this.passwordHasher.generateTemporary();
+    const passwordHash = await this.passwordHasher.hash(temporaryPassword);
+    const employee = await this.hireWithPassword(organisationId, command, passwordHash, actorId);
+    return { ...employee, temporaryPassword };
+  }
+
+  /** One transaction: the employee never exists without a starting salary. */
+  @Transactional()
+  private async hireWithPassword(
+    organisationId: string,
+    command: HireEmployeeCommand,
+    passwordHash: string,
+    actorId: string,
+  ): Promise<Omit<HiredEmployee, 'temporaryPassword'>> {
     const { startingSalary, ...employeeCommand } = command;
-    const employee = await this.employeeService.create(organisationId, employeeCommand, actorId);
+    const employee = await this.employeeService.create(
+      organisationId,
+      employeeCommand,
+      passwordHash,
+      actorId,
+    );
     const responsibleUserIds = [...new Set(command.responsibleUserIds)];
     await this.reviewService.createStarting(
       organisationId,

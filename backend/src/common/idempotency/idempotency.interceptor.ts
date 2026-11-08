@@ -19,10 +19,18 @@ import {
 } from '../exception/api.exception';
 import { MetricsService } from '../observability/metrics.service';
 import { IdempotencyKeyStore } from '../persistence/idempotency-key.store';
-import { IDEMPOTENCY_HEADER, IDEMPOTENT_KEY } from './idempotent.decorator';
+import { IDEMPOTENCY_HEADER, IDEMPOTENCY_REDACT_KEY, IDEMPOTENT_KEY } from './idempotent.decorator';
 
 const KEY_TTL_MS = 24 * 60 * 60 * 1000;
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
+/** The body as stored for replay: redacted top-level fields become null. */
+const storable = (body: unknown, redact: readonly string[]): unknown =>
+  redact.length === 0 || typeof body !== 'object' || body === null || Array.isArray(body)
+    ? body
+    : Object.fromEntries(
+        Object.entries(body).map(([key, value]) => [key, redact.includes(key) ? null : value]),
+      );
 
 const endpointOf = (request: Request): string => {
   const route: unknown = request.route;
@@ -59,6 +67,11 @@ export class IdempotencyInterceptor implements NestInterceptor {
     if (!principal) {
       throw new NotAuthenticatedException();
     }
+    const redact =
+      this.reflector.get<readonly string[] | undefined>(
+        IDEMPOTENCY_REDACT_KEY,
+        context.getHandler(),
+      ) ?? [];
     const endpoint = endpointOf(request);
     const requestHash = createHash('sha256')
       .update(`${endpoint}\n${JSON.stringify(request.body ?? null)}`)
@@ -88,9 +101,12 @@ export class IdempotencyInterceptor implements NestInterceptor {
           case 'CLAIMED':
             return next.handle().pipe(
               switchMap((body: unknown) =>
-                from(this.store.complete(claim.id, { statusCode: response.statusCode, body })).pipe(
-                  switchMap(() => of(body)),
-                ),
+                from(
+                  this.store.complete(claim.id, {
+                    statusCode: response.statusCode,
+                    body: storable(body, redact),
+                  }),
+                ).pipe(switchMap(() => of(body))),
               ),
               catchError((error: unknown) =>
                 from(this.store.release(claim.id)).pipe(switchMap(() => throwError(() => error))),

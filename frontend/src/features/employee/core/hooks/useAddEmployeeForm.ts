@@ -12,7 +12,7 @@ import {
 import type { CreatedEmployee, CreateEmployeeRequest, ResponsibleOption } from '../types';
 import { useCreateEmployee } from './useEmployeeQueries';
 
-export const AddEmployeeStep = { DETAILS: 0, RESPONSIBLE: 1 } as const;
+export const AddEmployeeStep = { DETAILS: 0, RESPONSIBLE: 1, ACCESS: 2 } as const;
 export type AddEmployeeStep = (typeof AddEmployeeStep)[keyof typeof AddEmployeeStep];
 
 const todayIso = (): string => new Date().toISOString().slice(0, 10);
@@ -58,9 +58,16 @@ const toRequest = (values: CreateEmployeeFormOutput): CreateEmployeeRequest => {
   };
 };
 
+/** The created employee and their sign-in details, shown on the Access step. */
+export interface AddedEmployee {
+  employee: CreatedEmployee;
+  email: string;
+}
+
 /**
- * Two-step "Add employee": details, then responsibles. One Idempotency-Key per opening of the
- * dialog, reused on every retry of that submission (api.md → Idempotency).
+ * "Add employee": details, then responsibles, then — once created — the sign-in details with the
+ * generated password (shown this once). One Idempotency-Key per opening of the dialog, reused on
+ * every retry of that submission (api.md → Idempotency).
  */
 export const useAddEmployeeForm = (onCreated: (employee: CreatedEmployee) => void) => {
   const create = useCreateEmployee();
@@ -69,6 +76,8 @@ export const useAddEmployeeForm = (onCreated: (employee: CreatedEmployee) => voi
   const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);
   const [errorCount, setErrorCount] = useState(0);
   const [responsibles, setResponsibles] = useState<ResponsibleOption[]>([]);
+  const [added, setAdded] = useState<AddedEmployee | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
   const errorRef = useRef<HTMLDivElement>(null);
 
   const form = useForm<CreateEmployeeFormValues, unknown, CreateEmployeeFormOutput>({
@@ -91,6 +100,18 @@ export const useAddEmployeeForm = (onCreated: (employee: CreatedEmployee) => voi
     setStep(AddEmployeeStep.DETAILS);
     setErrorCode(null);
     setIdempotencyKey(crypto.randomUUID());
+    // The password leaves memory with the dialog.
+    create.reset();
+    setAdded(null);
+    setIsSaved(false);
+  };
+
+  /** Done on the Access step: the parent hears of the new employee, the form starts afresh. */
+  const finish = (): void => {
+    if (added) {
+      onCreated(added.employee);
+    }
+    reset();
   };
 
   const goNext = async (): Promise<void> => {
@@ -117,8 +138,8 @@ export const useAddEmployeeForm = (onCreated: (employee: CreatedEmployee) => voi
     setErrorCode(null);
     try {
       const created = await create.mutateAsync({ request: toRequest(values), idempotencyKey });
-      reset();
-      onCreated(created);
+      setAdded({ employee: created, email: values.email });
+      setStep(AddEmployeeStep.ACCESS);
     } catch (error) {
       if (!isApiError(error)) {
         throw error;
@@ -151,6 +172,10 @@ export const useAddEmployeeForm = (onCreated: (employee: CreatedEmployee) => voi
     goBack,
     submit,
     reset,
+    finish,
+    added,
+    isSaved,
+    setIsSaved,
     errorCode,
     errorRef,
     responsibles,

@@ -36,6 +36,7 @@ export const createLoggerOptions = (isDev: boolean): Params => ({
         'res.headers["set-cookie"]',
         '*.password',
         '*.passwordHash',
+        '*.temporaryPassword',
         '*.token',
         '*.secret',
         '*.cookie',

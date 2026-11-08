@@ -77,17 +77,19 @@ export class UserRepository {
     });
   }
 
-  /** No password: the person sets one later (invitation flow). */
-  async createWithoutPassword(user: {
+  /** An account an admin creates; its password is generated and shown to the admin once. */
+  async createWithPassword(user: {
     organisationId: string;
     email: string;
     firstName: string;
     lastName: string;
     role: string;
+    passwordHash: string;
     createdBy: string;
   }): Promise<string> {
     const { id } = await this.txHost.tx.user.create({
       data: {
+        passwordHash: user.passwordHash,
         organisationId: user.organisationId,
         email: user.email,
         firstName: user.firstName,

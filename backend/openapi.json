@@ -962,7 +962,7 @@
             "session": []
           }
         ],
-        "summary": "Create an employee with their account, responsibles and starting salary",
+        "summary": "Create an employee with their account (a generated password, returned once), responsibles and starting salary",
         "tags": [
           "Employees"
         ]
@@ -8582,12 +8582,19 @@
           },
           "lastName": {
             "type": "string"
+          },
+          "temporaryPassword": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 64,
+            "nullable": true
           }
         },
         "required": [
           "id",
           "firstName",
-          "lastName"
+          "lastName",
+          "temporaryPassword"
         ],
         "additionalProperties": false
       },

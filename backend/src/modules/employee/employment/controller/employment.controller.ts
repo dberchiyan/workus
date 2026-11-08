@@ -21,9 +21,10 @@ export class EmploymentController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @Authorize(can.manageEmployees)
-  @Idempotent()
+  @Idempotent({ redact: ['temporaryPassword'] })
   @ApiOperation({
-    summary: 'Create an employee with their account, responsibles and starting salary',
+    summary:
+      'Create an employee with their account (a generated password, returned once), responsibles and starting salary',
   })
   @ZodResponse({ status: HttpStatus.OK, type: HiredEmployeeResponse })
   @ApiErrors(
