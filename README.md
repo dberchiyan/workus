@@ -1,5 +1,7 @@
 <div align="center">
 
+[![Workus — day-to-day HR for growing teams: dashboard, employees, profile, insights, requests and calendar, in light and dark themes and on a phone](docs/banner.png)](https://demo-workus.osdb.io)
+
 # Workus
 
 **Day-to-day HR for growing teams** — people, reviews and salaries, time off, a shared calendar
