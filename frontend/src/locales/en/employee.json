@@ -39,10 +39,7 @@
     "status": "Status"
   },
   "responsibles": {
-    "label": "Responsible: {{names}}",
-    "none": "Not assigned",
-    "more": "+{{count}}",
-    "andMore": "{{count}} more"
+    "none": "Not assigned"
   },
   "empty": {
     "title": "No employees found",

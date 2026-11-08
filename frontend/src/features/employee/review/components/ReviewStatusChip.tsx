@@ -1,20 +1,14 @@
-import Chip from '@mui/material/Chip';
 import { useTranslation } from 'react-i18next';
-import { cn } from '@/shared/lib/cn';
+import { StatusBadge, type StatusTone } from '@/shared/components/StatusBadge';
 import type { ReviewStatus } from '../types';
 
-/** Text carries the status; colour only supports it. */
+const TONE: Record<ReviewStatus, StatusTone> = {
+  SCHEDULED: 'info',
+  COMPLETED: 'success',
+  CANCELED: 'neutral',
+};
+
 export function ReviewStatusChip({ status }: { status: ReviewStatus }) {
   const { t } = useTranslation('review');
-  return (
-    <Chip
-      size="small"
-      label={t(`status.${status}`)}
-      className={cn(
-        status === 'COMPLETED' && 'bg-success-light text-success-dark dark:text-success',
-        status === 'SCHEDULED' && 'bg-badge-active-background text-badge-active-text',
-        status === 'CANCELED' && 'bg-badge-neutral-background text-badge-neutral-text',
-      )}
-    />
-  );
+  return <StatusBadge tone={TONE[status]} label={t(`status.${status}`)} />;
 }

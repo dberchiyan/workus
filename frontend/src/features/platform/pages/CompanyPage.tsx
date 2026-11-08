@@ -24,6 +24,7 @@ import { DecideCompanyDialog } from '../components/DecideCompanyDialog';
 import { useCompany, useCompanyPeople } from '../hooks/usePlatform';
 import type { Company, CompanyPeople } from '../types';
 import { RowSkeleton } from '@/shared/components/RowSkeleton';
+import { StatusBadge } from '@/shared/components/StatusBadge';
 
 const PEOPLE: readonly CompanyPeople[] = ['OWNER', 'ADMIN', 'EMPLOYEE'];
 
@@ -243,18 +244,10 @@ function PeopleCard({ organisationId }: { organisationId: string }) {
                 <Typography variant="body2" color="textSecondary" className="whitespace-nowrap">
                   {t(`role.${user.role}`)}
                 </Typography>
-                <Typography
-                  variant="caption"
-                  component="span"
-                  className={cn(
-                    'rounded-full px-2',
-                    user.status === 'ACTIVE'
-                      ? 'bg-success/15 text-success'
-                      : 'bg-badge-neutral-background text-text-secondary',
-                  )}
-                >
-                  {t(`userStatus.${user.status}`)}
-                </Typography>
+                <StatusBadge
+                  tone={user.status === 'ACTIVE' ? 'success' : 'neutral'}
+                  label={t(`userStatus.${user.status}`)}
+                />
                 <Typography
                   variant="body2"
                   color="textSecondary"

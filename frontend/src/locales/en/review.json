@@ -108,9 +108,7 @@
     "date": "Date",
     "status": "Status",
     "salary": "Salary",
-    "responsible": "Responsible",
-    "more": "+{{count}}",
-    "responsibleLabel": "Responsible: {{names}}"
+    "responsible": "Responsible"
   },
   "editor": {
     "toolbar": "Formatting for {{label}}",

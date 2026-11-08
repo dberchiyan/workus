@@ -50,6 +50,28 @@ export const TOKENS = {
         neutralBackground: 'oklch(94.1% 0.007 247.9)',
         neutralText: 'oklch(48.3% 0.033 243.6)',
       },
+      /**
+       * Status badges (`StatusBadge`): a soft fill, a dot and the word — the text ≥ 6:1 on its
+       * fill. Success = done / active, warning = waiting, info = planned, danger = refused,
+       * neutral = ended.
+       */
+      status: {
+        successBackground: 'oklch(95.5% 0.035 155)',
+        successText: 'oklch(42% 0.09 155)',
+        successDot: 'oklch(62% 0.15 155)',
+        warningBackground: 'oklch(96% 0.045 85)',
+        warningText: 'oklch(46% 0.1 60)',
+        warningDot: 'oklch(72% 0.16 65)',
+        infoBackground: 'oklch(95.5% 0.025 225)',
+        infoText: 'oklch(43% 0.075 225)',
+        infoDot: 'oklch(60% 0.11 225)',
+        dangerBackground: 'oklch(95.5% 0.025 25)',
+        dangerText: 'oklch(47% 0.16 27)',
+        dangerDot: 'oklch(62% 0.19 27)',
+        neutralBackground: 'oklch(95% 0.007 248)',
+        neutralText: 'oklch(46% 0.03 243)',
+        neutralDot: 'oklch(70% 0.02 245)',
+      },
       /** Blue, teal, violet, pink, amber, green, indigo, cyan — white initials ≥ 5:1 on each. */
       avatar: {
         c1: 'oklch(50.7% 0.120 254.6)',
@@ -126,6 +148,23 @@ export const TOKENS = {
         activeText: 'oklch(85.8% 0.053 214.4)',
         neutralBackground: 'oklch(29.5% 0.034 239.4)',
         neutralText: 'oklch(79.8% 0.024 236.1)',
+      },
+      status: {
+        successBackground: 'oklch(32% 0.05 157)',
+        successText: 'oklch(86% 0.09 156)',
+        successDot: 'oklch(75% 0.13 156)',
+        warningBackground: 'oklch(33% 0.05 70)',
+        warningText: 'oklch(88% 0.1 82)',
+        warningDot: 'oklch(80% 0.14 75)',
+        infoBackground: 'oklch(33% 0.045 225)',
+        infoText: 'oklch(87% 0.06 220)',
+        infoDot: 'oklch(74% 0.1 225)',
+        dangerBackground: 'oklch(32% 0.06 25)',
+        dangerText: 'oklch(86% 0.07 22)',
+        dangerDot: 'oklch(72% 0.15 25)',
+        neutralBackground: 'oklch(32% 0.025 240)',
+        neutralText: 'oklch(82% 0.024 236)',
+        neutralDot: 'oklch(65% 0.03 235)',
       },
       avatar: {
         c1: 'oklch(50.7% 0.120 254.6)',

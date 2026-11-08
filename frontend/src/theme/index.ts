@@ -8,6 +8,7 @@ type AvatarPalette = Record<keyof (typeof TOKENS.colors.light)['avatar'], string
 type ChartPalette = Record<keyof (typeof TOKENS.colors.light)['chart'], string>;
 type BadgePalette = Record<keyof (typeof TOKENS.colors.light)['badge'], string>;
 type ShadowPalette = Record<keyof (typeof TOKENS.colors.light)['shadow'], string>;
+type StatusPalette = Record<keyof (typeof TOKENS.colors.light)['status'], string>;
 
 declare module '@mui/material/styles' {
   interface TypographyVariants {
@@ -24,6 +25,7 @@ declare module '@mui/material/styles' {
     badge: BadgePalette;
     chart: ChartPalette;
     shadow: ShadowPalette;
+    status: StatusPalette;
   }
   interface PaletteOptions {
     sidebar?: SidebarPalette;
@@ -31,6 +33,7 @@ declare module '@mui/material/styles' {
     badge?: BadgePalette;
     chart?: ChartPalette;
     shadow?: ShadowPalette;
+    status?: StatusPalette;
   }
 }
 

@@ -1,20 +1,10 @@
-import Chip from '@mui/material/Chip';
 import { useTranslation } from 'react-i18next';
-import { cn } from '@/shared/lib/cn';
+import { StatusBadge, type StatusTone } from '@/shared/components/StatusBadge';
 import type { EmployeeStatus } from '../types';
 
-/** Text, not only colour, carries the status. */
+const TONE: Record<EmployeeStatus, StatusTone> = { ACTIVE: 'success', TERMINATED: 'neutral' };
+
 export function EmployeeStatusChip({ status }: { status: EmployeeStatus }) {
   const { t } = useTranslation('employee');
-  return (
-    <Chip
-      size="small"
-      label={t(`status.${status}`)}
-      className={cn(
-        status === 'ACTIVE'
-          ? 'bg-success-light text-success-dark dark:text-success'
-          : 'bg-background text-text-secondary',
-      )}
-    />
-  );
+  return <StatusBadge tone={TONE[status]} label={t(`status.${status}`)} />;
 }

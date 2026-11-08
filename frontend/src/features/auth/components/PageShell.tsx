@@ -11,11 +11,15 @@ export interface PageShellProps {
   className?: string;
 }
 
-/** Skip link, top bar and the page's single <main> landmark. */
+/**
+ * Skip link, top bar and the page's single <main> landmark, over the brand backdrop (soft
+ * glows and a dot grid fading out from the centre — decorative).
+ */
 export function PageShell({ children, actions, className }: PageShellProps) {
   const { t } = useTranslation();
   return (
-    <div className="flex min-h-dvh flex-col bg-background">
+    <div className="relative isolate flex min-h-dvh flex-col bg-background">
+      <div aria-hidden className="app-brand-backdrop pointer-events-none absolute inset-0 -z-10" />
       <Link
         href="#main"
         className="absolute top-2 left-2 z-10 -translate-y-24 rounded-sm bg-background-paper p-3 focus-visible:translate-y-0"

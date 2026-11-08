@@ -1,6 +1,6 @@
 import Chip from '@mui/material/Chip';
 import { useTranslation } from 'react-i18next';
-import { cn } from '@/shared/lib/cn';
+import { StatusBadge, type StatusTone } from '@/shared/components/StatusBadge';
 import type { TimeOffStatus, TimeOffType } from '../types';
 import { TYPE_VISUALS } from './timeOffVisuals';
 
@@ -18,19 +18,14 @@ export function TimeOffTypeChip({ type }: { type: TimeOffType }) {
   );
 }
 
-/** Text carries the status; colour only supports it. */
+const STATUS_TONE: Record<TimeOffStatus, StatusTone> = {
+  PENDING: 'warning',
+  APPROVED: 'success',
+  REJECTED: 'danger',
+  CANCELED: 'neutral',
+};
+
 export function TimeOffStatusChip({ status }: { status: TimeOffStatus }) {
   const { t } = useTranslation('timeOff');
-  return (
-    <Chip
-      size="small"
-      label={t(`status.${status}`)}
-      className={cn(
-        status === 'PENDING' && 'bg-badge-active-background text-badge-active-text',
-        status === 'APPROVED' && 'bg-success-light text-success-dark dark:text-success',
-        status === 'REJECTED' && 'bg-badge-neutral-background text-error',
-        status === 'CANCELED' && 'bg-badge-neutral-background text-badge-neutral-text',
-      )}
-    />
-  );
+  return <StatusBadge tone={STATUS_TONE[status]} label={t(`status.${status}`)} />;
 }

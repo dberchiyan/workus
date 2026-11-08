@@ -53,9 +53,7 @@
     "days_one": "{{count}} working day",
     "days_other": "{{count}} working days",
     "showDetails": "Show details of the {{type}} request, {{period}}",
-    "hideDetails": "Hide details of the {{type}} request, {{period}}",
-    "more": "+{{count}}",
-    "responsibleLabel": "Responsible: {{names}}"
+    "hideDetails": "Hide details of the {{type}} request, {{period}}"
   },
   "details": {
     "responsible_one": "Responsible",

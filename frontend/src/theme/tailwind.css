@@ -146,3 +146,33 @@
     animation: value-in 240ms cubic-bezier(0.2, 0, 0, 1) both;
   }
 }
+
+/*
+ * Brand backdrop behind sign-in and sign-up (PageShell): two soft glows in the brand tones and a
+ * dot grid that fades out towards the edges. Decorative; the page reads the same without it.
+ */
+.app-brand-backdrop {
+  overflow: hidden;
+  background:
+    radial-gradient(
+      60rem 40rem at 85% -10%,
+      color-mix(in oklch, var(--mui-palette-primary-main) 16%, transparent),
+      transparent 70%
+    ),
+    radial-gradient(
+      50rem 36rem at -10% 110%,
+      color-mix(in oklch, var(--mui-palette-avatar-c3) 10%, transparent),
+      transparent 70%
+    );
+}
+.app-brand-backdrop::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(
+    color-mix(in oklch, var(--mui-palette-text-primary) 14%, transparent) 1px,
+    transparent 1px
+  );
+  background-size: 24px 24px;
+  mask-image: radial-gradient(ellipse at center, #000 20%, transparent 70%);
+}
