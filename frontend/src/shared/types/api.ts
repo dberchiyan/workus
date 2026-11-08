@@ -925,7 +925,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** Time-off requests made in a day (today, UTC) (any status, newest first, first 100) */
+        /** Time-off requests made in a day (today, UTC) (any status, newest first, paged) */
         get: operations["DashboardController_requests"];
         put?: never;
         post?: never;
@@ -6126,6 +6126,10 @@ export interface operations {
             query: {
                 from: string;
                 to: string;
+                page?: number;
+                size?: number;
+                /** @description One of: date,asc|desc */
+                sort?: string;
             };
             header?: never;
             path?: never;
@@ -6141,7 +6145,7 @@ export interface operations {
                     "application/json": components["schemas"]["DashboardRequestsResponse_Output"];
                 };
             };
-            /** @description VALIDATION_FAILED */
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
             400: {
                 headers: {
                     [name: string]: unknown;

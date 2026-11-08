@@ -10,9 +10,6 @@ import type { AdminDashboard } from './dashboard.types';
 /** Reviews due and people starting / leaving: the next 30 days. */
 const WINDOW_DAYS = 30;
 
-/** Requests made in one day are few; bounded defensively. */
-const MAX_REQUESTS = 100;
-
 const asDate = (iso: string): Date => new Date(`${iso}T00:00:00Z`);
 
 const todayUtc = (): Date => {
@@ -39,17 +36,17 @@ export class DashboardService {
     return { today, timeOff, reviews, movements };
   }
 
-  /** Requests made between `from` and `to` (today, UTC), newest first. */
+  /** Requests made between `from` and `to` (today, UTC), newest first, a page at a time. */
   requestsMadeBetween(
     organisationId: string,
-    from: string,
-    to: string,
+    range: { from: string; to: string },
+    page: { page: number; size: number },
   ): Promise<DashboardRequests> {
     return this.timeOffService.requestsCreatedBetween(
       organisationId,
-      new Date(from),
-      new Date(to),
-      MAX_REQUESTS,
+      new Date(range.from),
+      new Date(range.to),
+      page,
     );
   }
 

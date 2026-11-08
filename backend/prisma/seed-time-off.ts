@@ -150,12 +150,14 @@ export const seedTimeOff = async (
         continue;
       }
       taken.push({ start, end });
-      // Made two weeks ahead (sick days on the day), never in the future.
+      // Made two weeks ahead (sick days on the day), never in the future — and never all on the
+      // seed day: a request planned ahead was made 1–20 days ago, so "made today" stays short.
+      const daysAgo = 1 + ((index * 7 + taken.length * 3) % 20);
       const createdAt = new Date(
         Math.min(
           (plan.type === TimeOffType.SICK_DAY ? start : plusDays(start, -14)).getTime() +
             9 * HOUR_MS,
-          now.getTime() - 6 * HOUR_MS,
+          now.getTime() - daysAgo * 24 * HOUR_MS - 6 * HOUR_MS,
         ),
       );
       const decidedAt =

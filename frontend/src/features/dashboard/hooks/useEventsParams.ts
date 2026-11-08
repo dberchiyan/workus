@@ -10,6 +10,7 @@ export interface EventsParams {
   reviewsMonth: string;
   birthdaysMonth: string;
   /** Zero-based page of each card in the open tab. */
+  requestsPage: number;
   reviewsPage: number;
   birthdaysPage: number;
 }
@@ -31,6 +32,7 @@ export const useEventsParams = (currentMonth: string) => {
       tab: searchParams.get('events') === 'month' ? 'month' : 'today',
       reviewsMonth: month('reviewsMonth'),
       birthdaysMonth: month('birthdaysMonth'),
+      requestsPage: readPage(searchParams.get('requestsPage')),
       reviewsPage: readPage(searchParams.get('reviewsPage')),
       birthdaysPage: readPage(searchParams.get('birthdaysPage')),
     };
@@ -54,10 +56,12 @@ export const useEventsParams = (currentMonth: string) => {
           set('events', changes.tab, 'today');
           set('reviewsMonth', changes.reviewsMonth, currentMonth);
           set('birthdaysMonth', changes.birthdaysMonth, currentMonth);
+          set('requestsPage', changes.requestsPage?.toString(), '0');
           set('reviewsPage', changes.reviewsPage?.toString(), '0');
           set('birthdaysPage', changes.birthdaysPage?.toString(), '0');
           // Another tab starts both cards from their first page; another month, its card.
           if (changes.tab !== undefined) {
+            next.delete('requestsPage');
             next.delete('reviewsPage');
             next.delete('birthdaysPage');
           }

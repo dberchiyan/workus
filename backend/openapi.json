@@ -5051,6 +5051,37 @@
               "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
               "type": "string"
             }
+          },
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0
+            }
+          },
+          {
+            "name": "size",
+            "required": false,
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "minimum": 1,
+              "maximum": 100,
+              "default": 20
+            }
+          },
+          {
+            "name": "sort",
+            "required": false,
+            "in": "query",
+            "description": "One of: date,asc|desc",
+            "schema": {
+              "type": "string",
+              "default": "date,asc"
+            }
           }
         ],
         "responses": {
@@ -5065,7 +5096,7 @@
             }
           },
           "400": {
-            "description": "VALIDATION_FAILED",
+            "description": "VALIDATION_FAILED | INVALID_PARAMETER",
             "content": {
               "application/json": {
                 "schema": {
@@ -5100,7 +5131,7 @@
             "session": []
           }
         ],
-        "summary": "Time-off requests made in a day (today, UTC) (any status, newest first, first 100)",
+        "summary": "Time-off requests made in a day (today, UTC) (any status, newest first, paged)",
         "tags": [
           "Dashboard"
         ]

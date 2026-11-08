@@ -6,7 +6,8 @@ import type { DateRange, LocalDay } from '../types';
 export const dashboardKeys = {
   all: ['dashboard'] as const,
   admin: () => [...dashboardKeys.all, 'admin'] as const,
-  requests: (day: LocalDay) => [...dashboardKeys.admin(), 'requests', day] as const,
+  requests: (day: LocalDay, page: number) =>
+    [...dashboardKeys.admin(), 'requests', day, page] as const,
   reviews: (range: DateRange, page: number) =>
     [...dashboardKeys.admin(), 'reviews', range, page] as const,
   birthdays: (range: DateRange, page: number) =>
@@ -16,8 +17,13 @@ export const dashboardKeys = {
 export const useAdminDashboard = () =>
   useQuery({ queryKey: dashboardKeys.admin(), queryFn: dashboardApi.admin });
 
-export const useTodayRequests = (day: LocalDay) =>
-  useQuery({ queryKey: dashboardKeys.requests(day), queryFn: () => dashboardApi.requests(day) });
+/** Another page keeps the previous rows on screen until the new ones arrive. */
+export const useTodayRequests = (day: LocalDay, page: number) =>
+  useQuery({
+    queryKey: dashboardKeys.requests(day, page),
+    queryFn: () => dashboardApi.requests(day, page),
+    placeholderData: keepPreviousData,
+  });
 
 /** Another page or month keeps the previous rows on screen until the new ones arrive. */
 export const useEventReviews = (range: DateRange, page: number) =>

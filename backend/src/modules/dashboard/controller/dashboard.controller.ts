@@ -49,19 +49,27 @@ export class DashboardController {
   @Get('admin/requests')
   @Authorize(can.admin)
   @ApiOperation({
-    summary: 'Time-off requests made in a day (today, UTC) (any status, newest first, first 100)',
+    summary: 'Time-off requests made in a day (today, UTC) (any status, newest first, paged)',
   })
+  @ApiPageable(EVENTS_PAGEABLE)
   @ZodResponse({ status: HttpStatus.OK, type: DashboardRequestsResponse })
-  @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+  @ApiErrors(
+    'VALIDATION_FAILED',
+    'INVALID_PARAMETER',
+    'UNAUTHORIZED',
+    'SESSION_EXPIRED',
+    'FORBIDDEN',
+  )
   async requests(
     @CurrentPrincipal() principal: Principal,
     @Query() query: InstantRangeQuery,
+    @PageableQuery(EVENTS_PAGEABLE) pageable: Pageable<EventsSortField>,
   ): Promise<DashboardRequestsResponse> {
     return toDashboardRequestsResponse(
       await this.dashboardService.requestsMadeBetween(
         principal.organisationId,
-        query.from,
-        query.to,
+        { from: query.from, to: query.to },
+        pageable,
       ),
     );
   }

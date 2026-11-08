@@ -121,14 +121,17 @@ export class TimeOffService {
     }));
   }
 
-  /** For other modules (dashboard): requests made in [from, to), newest first. */
+  /** For other modules (dashboard): requests made in [from, to), newest first, a page at a time. */
   async requestsCreatedBetween(
     organisationId: string,
     from: Date,
     to: Date,
-    limit: number,
+    pageRequest: { page: number; size: number },
   ): Promise<DashboardRequests> {
-    const page = await this.requestRepository.findCreatedBetween(organisationId, from, to, limit);
+    const page = await this.requestRepository.findCreatedBetween(organisationId, from, to, {
+      offset: pageRequest.page * pageRequest.size,
+      limit: pageRequest.size,
+    });
     return {
       content: page.content.map((request) => ({
         id: request.id,

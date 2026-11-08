@@ -5,16 +5,24 @@ import type { UseQueryResult } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router';
 import { PATHS } from '@/shared/lib/paths';
-import type { DashboardBirthdays, DashboardRequests, DashboardReviews } from '../types';
+import {
+  type DashboardBirthdays,
+  type DashboardRequests,
+  type DashboardReviews,
+  EVENTS_PAGE_SIZE,
+} from '../types';
 import { BirthdaysEventCard } from './BirthdaysEventCard';
 import { EVENT_TONES } from './eventTones';
 import { EventCard } from './EventCard';
 import { EventList } from './EventList';
+import { EventPagination } from './EventPagination';
 import { RequestEventRow } from './EventRows';
 import { ReviewsEventCard } from './ReviewsEventCard';
 
 export interface TodayEventsPanelProps {
   requests: UseQueryResult<DashboardRequests>;
+  requestsPage: number;
+  onRequestsPage: (page: number) => void;
   reviews: UseQueryResult<DashboardReviews>;
   birthdays: UseQueryResult<DashboardBirthdays>;
   reviewsPage: number;
@@ -23,7 +31,7 @@ export interface TodayEventsPanelProps {
   onBirthdaysPage: (page: number) => void;
 }
 
-/** Requests made today (full width), then reviews and birthdays side by side. */
+/** Requests made today (full width, five a page), then reviews and birthdays side by side. */
 export function TodayEventsPanel(props: TodayEventsPanelProps) {
   const { t, i18n } = useTranslation('dashboard');
   const { requests, reviews, birthdays } = props;
@@ -59,8 +67,19 @@ export function TodayEventsPanel(props: TodayEventsPanelProps) {
         onRetry={() => void requests.refetch()}
         isEmpty={requestTotal === 0}
         empty={{ title: t('events.requests.emptyTitle'), text: t('events.requests.emptyText') }}
+        footer={
+          <EventPagination
+            label={t('events.requests.pages')}
+            page={props.requestsPage}
+            total={requestTotal ?? 0}
+            onPage={props.onRequestsPage}
+          />
+        }
       >
-        <EventList paged={false} stale={false}>
+        <EventList
+          paged={(requestTotal ?? 0) > EVENTS_PAGE_SIZE}
+          stale={requests.isPlaceholderData}
+        >
           {requests.data?.content.map((request) => (
             <RequestEventRow key={request.id} request={request} />
           ))}

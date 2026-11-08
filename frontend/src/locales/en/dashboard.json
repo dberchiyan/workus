@@ -55,7 +55,8 @@
       "days_one": "{{count}} working day",
       "days_other": "{{count}} working days",
       "madeAt": "at {{time}}",
-      "open": "Open {{name}}’s request"
+      "open": "Open {{name}}’s request",
+      "pages": "Request pages"
     },
     "reviews": {
       "title": "Reviews",

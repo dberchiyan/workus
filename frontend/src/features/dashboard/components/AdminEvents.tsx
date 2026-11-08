@@ -36,7 +36,7 @@ export function AdminEvents() {
   const onToday = params.tab === 'today';
   // The open tab's cards use the pages in the URL; the other tab's first pages give its count.
   const todayRange = { from: day.date, to: day.date };
-  const requests = useTodayRequests(day);
+  const requests = useTodayRequests(day, onToday ? params.requestsPage : 0);
   const todayReviews = useEventReviews(todayRange, onToday ? params.reviewsPage : 0);
   const todayBirthdays = useEventBirthdays(todayRange, onToday ? params.birthdaysPage : 0);
   const monthReviews = useEventReviews(
@@ -65,6 +65,9 @@ export function AdminEvents() {
     todayBirthdays.data?.totalElements,
   );
   const monthTotal = sum(monthReviews.data?.totalElements, monthBirthdays.data?.totalElements);
+  const onRequestsPage = (requestsPage: number) => {
+    update({ requestsPage });
+  };
   const onReviewsPage = (reviewsPage: number) => {
     update({ reviewsPage });
   };
@@ -128,6 +131,8 @@ export function AdminEvents() {
         {onToday ? (
           <TodayEventsPanel
             requests={requests}
+            requestsPage={params.requestsPage}
+            onRequestsPage={onRequestsPage}
             reviews={todayReviews}
             birthdays={todayBirthdays}
             reviewsPage={params.reviewsPage}

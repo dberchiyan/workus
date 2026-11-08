@@ -447,12 +447,12 @@ export class TimeOffRequestRepository {
     });
   }
 
-  /** Requests made in [from, to) of any status, newest first. */
+  /** Requests made in [from, to) of any status, newest first, a page at a time. */
   async findCreatedBetween(
     organisationId: string,
     from: Date,
     to: Date,
-    limit: number,
+    page: { offset: number; limit: number },
   ): Promise<{ content: DashboardRequestRecord[]; totalElements: number }> {
     const where: Prisma.TimeOffRequestWhereInput = {
       organisationId,
@@ -464,7 +464,8 @@ export class TimeOffRequestRepository {
         where,
         select: dashboardRequestSelect,
         orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
-        take: limit,
+        skip: page.offset,
+        take: page.limit,
       }),
     ]);
     return { content, totalElements };
