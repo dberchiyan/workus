@@ -13,6 +13,14 @@ once the Workus team approves it.
 ![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
 ![MUI](https://img.shields.io/badge/MUI-9-007FFF?logo=mui&logoColor=white)
 
+<br/>
+
+[![Live demo](https://img.shields.io/badge/▶_Live_demo-demo--workus.osdb.io-21697C?style=for-the-badge)](https://demo-workus.osdb.io)
+
+Sign in with any [demo account](#demo-accounts) · password `Workus-Dev-2026!`
+
+<br/>
+
 [Quick start](#quick-start) · [Demo accounts](#demo-accounts) · [Features](#features) ·
 [Architecture](#architecture) · [Development](#development)
 
@@ -35,8 +43,9 @@ on backend start; data lives in the `db-data` volume (`docker compose down -v` r
 
 ## Demo accounts
 
-The seed creates two independent companies and a Workus platform admin. Password for every
-account: **`Workus-Dev-2026!`** (fictional data, local use only).
+Try them on the **[live demo](https://demo-workus.osdb.io)** or locally — the seed creates two
+independent companies and a Workus platform admin. Password for every account:
+**`Workus-Dev-2026!`** (fictional data).
 
 | Role | 🏢 OSDB · 46 people | 🌀 Vortex · 34 people |
 |---|---|---|
