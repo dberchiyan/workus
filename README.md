@@ -36,11 +36,12 @@ Requires Docker with Compose v2.
 cp .env.example .env                              # set DATABASE_PASSWORD
 docker compose up --build                         # local — no limits
 DEMO_MODE=true docker compose up --build          # …or run it as the public demo
-docker compose exec backend npm run db:seed       # demo data (once)
+docker compose run --rm migrate npm run db:seed  # demo data (once)
 ```
 
-Open **http://localhost:8080** and sign in with a [demo account](#demo-accounts). Migrations run
-on backend start; data lives in the `db-data` volume (`docker compose down -v` removes it).
+Open **http://localhost:8080** and sign in with a [demo account](#demo-accounts). The `migrate`
+service applies migrations before the backend starts; data lives in the `db-data` volume
+(`docker compose down -v` removes it).
 
 ## Environments
 
@@ -192,7 +193,7 @@ workus/
 ├── backend/            NestJS API — src/modules/<module>/{controller,service,repository}
 │   └── prisma/         schema, SQL migrations (each with down.sql), seed
 ├── frontend/           React SPA — src/features/<feature> mirrors backend modules
-└── docker-compose.yml  local stack: db · backend · frontend (nginx)
+└── docker-compose.yml  local stack: db · migrate · backend · frontend (nginx)
 ```
 
 ## Development
