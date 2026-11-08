@@ -1,3 +1,4 @@
+import ShieldOutlined from '@mui/icons-material/ShieldOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Skeleton from '@mui/material/Skeleton';
@@ -100,9 +101,15 @@ export function SecurityLogView({ log, category, onCategory }: SecurityLogViewPr
           <Skeleton variant="rounded" height={56} />
         </div>
       ) : days.length === 0 ? (
-        <Typography variant="body2" color="textSecondary">
-          {category ? t('securityLog.emptyFiltered') : t('securityLog.empty')}
-        </Typography>
+        <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
+          <ShieldOutlined aria-hidden fontSize="large" className="text-text-disabled" />
+          <Typography variant="subtitle1" component="p">
+            {category ? t('securityLog.emptyFiltered') : t('securityLog.empty')}
+          </Typography>
+          <Typography variant="body2" color="textSecondary">
+            {category ? t('securityLog.emptyFilteredHint') : t('securityLog.emptyHint')}
+          </Typography>
+        </div>
       ) : (
         <div
           aria-busy={log.isPlaceholderData}
