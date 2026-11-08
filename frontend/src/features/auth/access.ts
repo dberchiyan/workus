@@ -33,6 +33,7 @@ export const ACCESS = {
   /** Settings: who runs the organisation — admins see it, owners change roles. */
   'settings.administrators': ADMINS,
   'administrators.changeRole': OWNERS,
+  'administrators.add': OWNERS,
 } as const satisfies Record<string, readonly UserRole[]>;
 
 export type AccessPart = keyof typeof ACCESS;

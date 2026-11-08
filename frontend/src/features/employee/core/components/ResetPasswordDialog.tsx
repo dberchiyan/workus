@@ -5,14 +5,16 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormHelperText from '@mui/material/FormHelperText';
+import { useTheme } from '@mui/material/styles';
+import useMediaQuery from '@mui/material/useMediaQuery';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { isApiError } from '@/shared/api/apiError';
 import type { ErrorCode } from '@/shared/types';
 import { useResetPassword } from '../hooks/useEmployeeQueries';
+import { CredentialsCard } from '@/shared/components/CredentialsCard';
 import { RESERVED_LINE } from '../hooks/useFieldMessage';
 import type { EmployeeProfile } from '../types';
-import { EmployeeCredentials } from './EmployeeCredentials';
 
 export interface ResetPasswordDialogProps {
   employee: EmployeeProfile;
@@ -32,10 +34,13 @@ export function ResetPasswordDialog({
   onClose,
   onExited,
 }: ResetPasswordDialogProps) {
-  const { t } = useTranslation(['employee', 'errors']);
+  const { t } = useTranslation(['employee', 'common', 'errors']);
   const titleId = useId();
   const descriptionId = useId();
   const doneHintId = useId();
+  const theme = useTheme();
+  // The password step is a full-screen sheet on phones, so the password stays on one line.
+  const isPhone = useMediaQuery(theme.breakpoints.down('sm'));
   const reset = useResetPassword(employee.id);
   // One key per opening: a retry of this reset never resets twice.
   const [idempotencyKey] = useState(() => crypto.randomUUID());
@@ -88,6 +93,7 @@ export function ResetPasswordDialog({
       onClose={isDone || reset.isPending ? undefined : onClose}
       maxWidth={isDone ? 'sm' : 'xs'}
       fullWidth
+      fullScreen={isDone && isPhone}
       aria-labelledby={titleId}
       aria-describedby={isDone ? undefined : descriptionId}
       slotProps={{ transition: { onExited } }}
@@ -96,7 +102,7 @@ export function ResetPasswordDialog({
       {isDone ? (
         <>
           <DialogContent dividers>
-            <EmployeeCredentials
+            <CredentialsCard
               name={name}
               email={employee.email}
               password={password}
@@ -108,7 +114,7 @@ export function ResetPasswordDialog({
           </DialogContent>
           <DialogActions className="flex-wrap gap-2 px-4 py-3 sm:px-6 sm:py-4">
             <FormHelperText id={doneHintId} className="m-0 basis-full sm:mr-auto sm:basis-auto">
-              {canFinish ? RESERVED_LINE : t('add.access.doneHint')}
+              {canFinish ? RESERVED_LINE : t('common:credentials.doneHint')}
             </FormHelperText>
             <Button
               variant="contained"
@@ -116,7 +122,7 @@ export function ResetPasswordDialog({
               aria-describedby={doneHintId}
               onClick={finish}
             >
-              {t('add.actions.done')}
+              {t('common:credentials.done')}
             </Button>
           </DialogActions>
         </>

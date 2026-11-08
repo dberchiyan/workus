@@ -12,6 +12,12 @@ export interface RegisterCommand {
   presentedToken: string | undefined;
 }
 
+export interface AddAdministratorCommand {
+  firstName: string;
+  lastName: string;
+  email: string;
+}
+
 export interface ChangeRoleCommand {
   role: Extract<UserRole, 'OWNER' | 'ADMIN'>;
   version: number;

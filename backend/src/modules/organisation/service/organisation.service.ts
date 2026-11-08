@@ -22,7 +22,11 @@ import { UserService } from '../../user/service/user.service';
 import type { Administrator } from '../../user/service/user.types';
 import type { OrganisationRecord } from '../repository/record/organisation.record';
 import { OrganisationRepository } from '../repository/organisation.repository';
-import type { ChangeRoleCommand, RegisterCommand } from './organisation.types';
+import type {
+  AddAdministratorCommand,
+  ChangeRoleCommand,
+  RegisterCommand,
+} from './organisation.types';
 
 const MAX_SEARCH_TERMS = 5;
 
@@ -149,6 +153,64 @@ export class OrganisationService {
     pageable: Pageable<AdministratorSortField>,
   ): Promise<{ content: Administrator[]; totalElements: number }> {
     return this.userService.findAdministratorPage(organisationId, toSearchTerms(search), pageable);
+  }
+
+  /**
+   * Adds an admin (owners only): an account in the caller's organisation with a generated
+   * password, returned once for the owner to hand over — only its hash is stored. Emails are
+   * unique across organisations (409). Hashing is CPU work, done before the transaction opens.
+   */
+  async addAdministrator(
+    principal: Principal,
+    command: AddAdministratorCommand,
+  ): Promise<Administrator & { temporaryPassword: string }> {
+    const email = command.email.toLowerCase();
+    if (await this.userService.existsByEmail(email)) {
+      throw new BusinessConflictException('errors.employee.emailTaken', { email }, 'email');
+    }
+    const temporaryPassword = this.passwordHasher.generateTemporary();
+    const passwordHash = await this.passwordHasher.hash(temporaryPassword);
+    const administrator = await this.createAdministrator(
+      principal,
+      { ...command, email },
+      passwordHash,
+    );
+    return { ...administrator, temporaryPassword };
+  }
+
+  @Transactional()
+  private async createAdministrator(
+    principal: Principal,
+    command: AddAdministratorCommand,
+    passwordHash: string,
+  ): Promise<Administrator> {
+    const userId = await this.userService.createWithPassword({
+      organisationId: principal.organisationId,
+      email: command.email,
+      firstName: command.firstName,
+      lastName: command.lastName,
+      role: UserRole.ADMIN,
+      passwordHash,
+      createdBy: principal.userId,
+    });
+    await this.auditService.record({
+      action: AuditAction.USER_CREATED,
+      employeeId: null,
+      target: {
+        type: AuditTargetType.USER,
+        id: userId,
+        label: `${command.firstName} ${command.lastName}`,
+      },
+      changes: changeOf(AuditField.ROLE, null, auditValue.text(UserRole.ADMIN)),
+    });
+    const administrator = await this.userService.findAdministrator(
+      principal.organisationId,
+      userId,
+    );
+    if (!administrator) {
+      throw new Error('Created administrator not found in the same transaction');
+    }
+    return administrator;
   }
 
   /**

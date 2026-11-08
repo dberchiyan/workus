@@ -426,7 +426,8 @@ export interface paths {
         /** List the owners and admins of the organisation */
         get: operations["OrganisationController_administrators"];
         put?: never;
-        post?: never;
+        /** Add an admin to the organisation with a generated password, returned once (owners only) */
+        post: operations["OrganisationController_addAdministrator"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1352,6 +1353,21 @@ export interface components {
         AdministratorPageResponse_Output: {
             content: components["schemas"]["Administrator_Output"][];
             totalElements: number;
+        };
+        AddAdministratorRequest: {
+            firstName: string;
+            lastName: string;
+            email: string;
+        };
+        AddedAdministratorResponse_Output: {
+            /** Format: uuid */
+            id: string;
+            firstName: string;
+            lastName: string;
+            email: string;
+            role: components["schemas"]["AdministratorRole_Output"];
+            version: number;
+            temporaryPassword: string | null;
         };
         ChangeRoleRequest: {
             /** @enum {string} */
@@ -3658,6 +3674,68 @@ export interface operations {
             };
             /** @description FORBIDDEN */
             403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    OrganisationController_addAdministrator: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per logical operation, reused on retry */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["AddAdministratorRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AddedAdministratorResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description CONFLICT | IDEMPOTENCY_KEY_REUSED */
+            409: {
                 headers: {
                     [name: string]: unknown;
                 };

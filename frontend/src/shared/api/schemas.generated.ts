@@ -2,8 +2,9 @@
 // Run `npm run generate:api` after the API changes.
 import { z } from 'zod';
 
-export const AdminDashboardResponse_Output = /* @__PURE__ */ z.object({ "today": z.string(), "pendingRequests": z.object({ "count": z.number().int(), "oldestCreatedAt": z.string().nullable() }), "outToday": z.object({ "count": z.number().int(), "people": z.array(z.object({ "id": z.string(), "firstName": z.string(), "lastName": z.string() })), "laterThisWeek": z.number().int() }), "reviewsDue": z.object({ "upcoming": z.number().int(), "overdue": z.number().int() }), "movements": z.object({ "joining": z.number().int(), "leaving": z.number().int(), "next": z.object({ "kind": z.enum(["JOINING", "LEAVING"]), "date": z.string(), "employeeId": z.string(), "person": z.object({ "id": z.string(), "firstName": z.string(), "lastName": z.string() }) }).nullable() }) });
 export const AdministratorRole_Output = /* @__PURE__ */ z.enum(["OWNER", "ADMIN"]);
+export const AddedAdministratorResponse_Output = /* @__PURE__ */ z.object({ "id": z.string(), "firstName": z.string(), "lastName": z.string(), "email": z.string(), "role": AdministratorRole_Output, "version": z.number().int(), "temporaryPassword": z.string().nullable() });
+export const AdminDashboardResponse_Output = /* @__PURE__ */ z.object({ "today": z.string(), "pendingRequests": z.object({ "count": z.number().int(), "oldestCreatedAt": z.string().nullable() }), "outToday": z.object({ "count": z.number().int(), "people": z.array(z.object({ "id": z.string(), "firstName": z.string(), "lastName": z.string() })), "laterThisWeek": z.number().int() }), "reviewsDue": z.object({ "upcoming": z.number().int(), "overdue": z.number().int() }), "movements": z.object({ "joining": z.number().int(), "leaving": z.number().int(), "next": z.object({ "kind": z.enum(["JOINING", "LEAVING"]), "date": z.string(), "employeeId": z.string(), "person": z.object({ "id": z.string(), "firstName": z.string(), "lastName": z.string() }) }).nullable() }) });
 export const Administrator_Output = /* @__PURE__ */ z.object({ "id": z.string(), "firstName": z.string(), "lastName": z.string(), "email": z.string(), "role": AdministratorRole_Output, "version": z.number().int() });
 export const AdministratorPageResponse_Output = /* @__PURE__ */ z.object({ "content": z.array(Administrator_Output), "totalElements": z.number().int() });
 export const AdministratorResponse_Output = /* @__PURE__ */ z.object({ "id": z.string(), "firstName": z.string(), "lastName": z.string(), "email": z.string(), "role": AdministratorRole_Output, "version": z.number().int() });
@@ -83,6 +84,7 @@ export const RESPONSE_SCHEMAS: readonly { method: string; pattern: RegExp; schem
   { method: 'put', pattern: /^\/api\/v1\/notifications\/read$/, schema: UnreadNotificationsResponse_Output },
   { method: 'get', pattern: /^\/api\/v1\/notifications\/unread-count$/, schema: UnreadNotificationsResponse_Output },
   { method: 'get', pattern: /^\/api\/v1\/organisation\/administrators$/, schema: AdministratorPageResponse_Output },
+  { method: 'post', pattern: /^\/api\/v1\/organisation\/administrators$/, schema: AddedAdministratorResponse_Output },
   { method: 'get', pattern: /^\/api\/v1\/time-off\/balances$/, schema: LeaveBalancesResponse_Output },
   { method: 'get', pattern: /^\/api\/v1\/time-off\/calendar$/, schema: TimeOffCalendarResponse_Output },
   { method: 'get', pattern: /^\/api\/v1\/time-off\/requests$/, schema: TimeOffRequestPageResponse_Output },

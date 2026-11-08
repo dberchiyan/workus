@@ -1,3 +1,4 @@
+import PersonAddOutlined from '@mui/icons-material/PersonAddOutlined';
 import SearchOutlined from '@mui/icons-material/SearchOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
@@ -7,7 +8,7 @@ import Pagination from '@mui/material/Pagination';
 import Skeleton from '@mui/material/Skeleton';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { useDeferredValue, useId, useState } from 'react';
+import { useDeferredValue, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useAccess, useCurrentUser } from '@/features/auth';
 import { InitialsAvatar } from '@/shared/components/InitialsAvatar';
@@ -16,6 +17,7 @@ import { ADMINISTRATORS_PAGE_SIZE } from '../api/organisationApi';
 import { useAdministrators } from '../hooks/useOrganisation';
 import type { Administrator } from '../types';
 import { NEXT_ROLE, ROLE_BADGE } from '../roles';
+import { AddAdministratorDialog } from './AddAdministratorDialog';
 import { ChangeRoleDialog } from './ChangeRoleDialog';
 
 const SKELETON_ROWS = ['s1', 's2', 's3'];
@@ -23,7 +25,7 @@ const SEARCH_MAX_LENGTH = 100;
 
 /**
  * Settings → Administrators: the owners and admins of the organisation. Admins see the list;
- * owners make an admin an owner or an owner an admin (the last owner stays one).
+ * owners add admins and make an admin an owner or an owner an admin (the last owner stays one).
  */
 export function AdministratorsSection() {
   const { t, i18n } = useTranslation('organisation');
@@ -38,6 +40,10 @@ export function AdministratorsSection() {
     null,
   );
   const [open, setOpen] = useState(false);
+  // Add admin: remounted on each opening (a fresh form and Idempotency-Key).
+  const [addOpening, setAddOpening] = useState(0);
+  const [isAddOpen, setIsAddOpen] = useState(false);
+  const addButtonRef = useRef<HTMLButtonElement>(null);
   const number = (value: number): string => new Intl.NumberFormat(i18n.language).format(value);
   const total = administrators.data?.totalElements ?? 0;
   const pages = Math.max(1, Math.ceil(total / ADMINISTRATORS_PAGE_SIZE));
@@ -55,27 +61,43 @@ export function AdministratorsSection() {
         </Typography>
       </div>
       <div className="flex flex-col gap-4 p-4 sm:p-6">
-        <TextField
-          value={search}
-          onChange={(event) => {
-            setSearch(event.target.value);
-            setPage(0);
-          }}
-          label={t('settings.administrators.search')}
-          type="search"
-          size="small"
-          className="sm:max-w-xs"
-          slotProps={{
-            htmlInput: { maxLength: SEARCH_MAX_LENGTH },
-            input: {
-              startAdornment: (
-                <InputAdornment position="start">
-                  <SearchOutlined aria-hidden fontSize="small" />
-                </InputAdornment>
-              ),
-            },
-          }}
-        />
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <TextField
+            value={search}
+            onChange={(event) => {
+              setSearch(event.target.value);
+              setPage(0);
+            }}
+            label={t('settings.administrators.search')}
+            type="search"
+            size="small"
+            className="sm:max-w-xs"
+            slotProps={{
+              htmlInput: { maxLength: SEARCH_MAX_LENGTH },
+              input: {
+                startAdornment: (
+                  <InputAdornment position="start">
+                    <SearchOutlined aria-hidden fontSize="small" />
+                  </InputAdornment>
+                ),
+              },
+            }}
+          />
+          {can('administrators.add') && (
+            <Button
+              ref={addButtonRef}
+              variant="contained"
+              startIcon={<PersonAddOutlined aria-hidden />}
+              onClick={() => {
+                setAddOpening((count) => count + 1);
+                setIsAddOpen(true);
+              }}
+              className="self-start"
+            >
+              {t('settings.administrators.add.open')}
+            </Button>
+          )}
+        </div>
         {administrators.isError ? (
           <Alert
             severity="error"
@@ -178,6 +200,18 @@ export function AdministratorsSection() {
           </div>
         )}
       </div>
+      {addOpening > 0 && (
+        <AddAdministratorDialog
+          key={addOpening}
+          open={isAddOpen}
+          onClose={() => {
+            setIsAddOpen(false);
+          }}
+          onExited={() => {
+            addButtonRef.current?.focus();
+          }}
+        />
+      )}
       {changing && (
         <ChangeRoleDialog
           key={changing.key}

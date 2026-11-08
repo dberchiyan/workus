@@ -1,6 +1,9 @@
 import type { Administrator } from '../../../user/service/user.types';
 import type { OrganisationRecord } from '../../repository/record/organisation.record';
-import type { AdministratorResponse } from '../dto/administrator.response';
+import type {
+  AddedAdministratorResponse,
+  AdministratorResponse,
+} from '../dto/administrator.response';
 import type { OrganisationResponse } from '../dto/organisation.response';
 
 export const toOrganisationResponse = (organisation: OrganisationRecord): OrganisationResponse => ({
@@ -17,4 +20,17 @@ export const toAdministratorResponse = (user: Administrator): AdministratorRespo
   email: user.email,
   role: user.role === 'OWNER' ? 'OWNER' : 'ADMIN',
   version: user.version,
+});
+
+/** A just-added admin with their generated password (in this answer only). */
+export const toAddedAdministratorResponse = (
+  user: Administrator & { temporaryPassword: string },
+): AddedAdministratorResponse => ({
+  id: user.id,
+  firstName: user.firstName,
+  lastName: user.lastName,
+  email: user.email,
+  role: user.role === 'OWNER' ? 'OWNER' : 'ADMIN',
+  version: user.version,
+  temporaryPassword: user.temporaryPassword,
 });

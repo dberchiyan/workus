@@ -12,9 +12,9 @@ import useMediaQuery from '@mui/material/useMediaQuery';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AddEmployeeStep, useAddEmployeeForm } from '../hooks/useAddEmployeeForm';
+import { CredentialsCard } from '@/shared/components/CredentialsCard';
 import { RESERVED_LINE } from '../hooks/useFieldMessage';
 import type { CreatedEmployee } from '../types';
-import { EmployeeCredentials } from './EmployeeCredentials';
 import { EmployeeDetailsStep } from './EmployeeDetailsStep';
 import { ResponsibleStep } from './ResponsibleStep';
 
@@ -28,7 +28,7 @@ export interface AddEmployeeDialogProps {
 
 /** Centred modal on tablet/desktop, full-screen sheet on phones (ux.md → Patterns). */
 export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmployeeDialogProps) {
-  const { t } = useTranslation(['employee', 'errors']);
+  const { t } = useTranslation(['employee', 'common', 'errors']);
   const theme = useTheme();
   // Behaviour CSS cannot express: the dialog variant.
   const isPhone = useMediaQuery(theme.breakpoints.down('sm'));
@@ -104,12 +104,16 @@ export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmp
             </Step>
           </Stepper>
           {added ? (
-            <EmployeeCredentials
+            <CredentialsCard
               name={`${added.employee.firstName} ${added.employee.lastName}`}
               email={added.email}
               password={added.employee.temporaryPassword}
               saved={isSaved || added.employee.temporaryPassword === null}
               onSavedChange={setIsSaved}
+              title={t('add.access.title', {
+                name: `${added.employee.firstName} ${added.employee.lastName}`,
+              })}
+              description={t('add.access.description')}
             />
           ) : isDetails ? (
             <EmployeeDetailsStep form={form} />
@@ -126,7 +130,7 @@ export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmp
             <FormHelperText id={doneHintId} className="m-0 basis-full sm:mr-auto sm:basis-auto">
               {isSaved || added.employee.temporaryPassword === null
                 ? RESERVED_LINE
-                : t('add.access.doneHint')}
+                : t('common:credentials.doneHint')}
             </FormHelperText>
             <Button
               type="submit"
@@ -134,7 +138,7 @@ export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmp
               disabled={!isSaved && added.employee.temporaryPassword !== null}
               aria-describedby={doneHintId}
             >
-              {t('add.actions.done')}
+              {t('common:credentials.done')}
             </Button>
           </DialogActions>
         ) : (

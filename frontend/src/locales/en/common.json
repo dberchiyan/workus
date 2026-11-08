@@ -34,5 +34,25 @@
       "met": "— done",
       "notMet": "— not yet"
     }
+  },
+  "credentials": {
+    "onceTitle": "The only time you see this password",
+    "onceText": "Copy it now and pass it to {{name}} in a safe way. Workus does not keep it, so it can never be shown again.",
+    "alreadyShown": "This employee was already created and their password was shown then; it cannot be shown again.",
+    "email": "Email",
+    "password": "Password",
+    "show": "Show password",
+    "hide": "Hide password",
+    "hidden": "hidden",
+    "copyEmail": "Copy email",
+    "copyPassword": "Copy password",
+    "copyBoth": "Copy sign-in details",
+    "copiedBoth": "Copied",
+    "copied": "Copied to the clipboard",
+    "clipboard": "Workus sign-in for {{name}}\nEmail: {{email}}\nPassword: {{password}}",
+    "copyFailed": "Could not copy — select the text and copy it yourself.",
+    "saved": "I have saved the password",
+    "doneHint": "Copy the password or confirm you saved it to finish.",
+    "done": "Done"
   }
 }

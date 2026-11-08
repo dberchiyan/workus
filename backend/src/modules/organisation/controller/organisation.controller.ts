@@ -1,9 +1,10 @@
-import { Body, Controller, Get, HttpStatus, Put, Query } from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { ApiPageable, type Pageable, PageableQuery } from '../../../common/dto/pageable';
 import { UuidParam } from '../../../common/dto/uuid-param';
 import { ApiErrors } from '../../../common/exception/api-errors.decorator';
+import { Idempotent } from '../../../common/idempotency/idempotent.decorator';
 import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
 import { can } from '../../../common/security/policies';
 import type { Principal } from '../../../common/security/principal';
@@ -11,6 +12,8 @@ import { Authorize } from '../../../common/security/security.decorators';
 import type { AdministratorSortField } from '../../user/service/administrator-sort';
 import { OrganisationService } from '../service/organisation.service';
 import {
+  AddAdministratorRequest,
+  AddedAdministratorResponse,
   ADMINISTRATOR_PAGEABLE,
   AdministratorFilterQuery,
   AdministratorPageResponse,
@@ -18,7 +21,11 @@ import {
   ChangeRoleRequest,
 } from './dto/administrator.response';
 import { OrganisationResponse, UpdateOrganisationRequest } from './dto/organisation.response';
-import { toAdministratorResponse, toOrganisationResponse } from './mapper/organisation.mapper';
+import {
+  toAddedAdministratorResponse,
+  toAdministratorResponse,
+  toOrganisationResponse,
+} from './mapper/organisation.mapper';
 
 /** The caller's own organisation (a user belongs to one — it comes from the session). */
 @ApiTags('Organisation')
@@ -85,6 +92,37 @@ export class OrganisationController {
       content: page.content.map(toAdministratorResponse),
       totalElements: page.totalElements,
     };
+  }
+
+  @Post('administrators')
+  @HttpCode(HttpStatus.OK)
+  @Authorize(can.owner)
+  @Idempotent({ redact: ['temporaryPassword'] })
+  @ApiOperation({
+    summary:
+      'Add an admin to the organisation with a generated password, returned once (owners only)',
+  })
+  @ZodResponse({ status: HttpStatus.OK, type: AddedAdministratorResponse })
+  @ApiErrors(
+    'VALIDATION_FAILED',
+    'INVALID_PARAMETER',
+    'UNAUTHORIZED',
+    'SESSION_EXPIRED',
+    'FORBIDDEN',
+    'CONFLICT',
+    'IDEMPOTENCY_KEY_REUSED',
+  )
+  async addAdministrator(
+    @CurrentPrincipal() principal: Principal,
+    @Body() request: AddAdministratorRequest,
+  ): Promise<AddedAdministratorResponse> {
+    return toAddedAdministratorResponse(
+      await this.organisationService.addAdministrator(principal, {
+        firstName: request.firstName,
+        lastName: request.lastName,
+        email: request.email,
+      }),
+    );
   }
 
   @Put('administrators/:userId/role')

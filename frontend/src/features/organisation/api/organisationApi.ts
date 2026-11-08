@@ -1,5 +1,7 @@
 import { apiClient } from '@/shared/api/client';
 import type {
+  AddAdministratorRequest,
+  AddedAdministrator,
   Administrator,
   AdministratorPage,
   ChangeRoleRequest,
@@ -25,6 +27,16 @@ export const organisationApi = {
     (
       await apiClient.get<AdministratorPage>(`${BASE}/administrators`, {
         params: { search: search || undefined, page, size: ADMINISTRATORS_PAGE_SIZE },
+      })
+    ).data,
+  /** A new admin with a generated password, in this answer only (null on a replayed retry). */
+  addAdministrator: async (
+    request: AddAdministratorRequest,
+    idempotencyKey: string,
+  ): Promise<AddedAdministrator> =>
+    (
+      await apiClient.post<AddedAdministrator>(`${BASE}/administrators`, request, {
+        headers: { 'Idempotency-Key': idempotencyKey },
       })
     ).data,
   changeRole: async (userId: string, request: ChangeRoleRequest): Promise<Administrator> =>

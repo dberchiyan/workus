@@ -3,6 +3,8 @@ import { authKeys } from '@/features/auth';
 import type { ApiError } from '@/shared/api/apiError';
 import { organisationApi } from '../api/organisationApi';
 import type {
+  AddAdministratorRequest,
+  AddedAdministrator,
   Administrator,
   AdministratorPage,
   ChangeRoleRequest,
@@ -62,6 +64,23 @@ export const useChangeRole = () => {
         queryClient.invalidateQueries({ queryKey: organisationKeys.administrators() }),
         queryClient.invalidateQueries({ queryKey: authKeys.me() }),
       ]);
+    },
+  });
+};
+
+/** Adds an admin (owners). The answer holds the generated password: never kept in the cache. */
+export const useAddAdministrator = () => {
+  const queryClient = useQueryClient();
+  return useMutation<
+    AddedAdministrator,
+    ApiError,
+    { request: AddAdministratorRequest; idempotencyKey: string }
+  >({
+    mutationFn: ({ request, idempotencyKey }) =>
+      organisationApi.addAdministrator(request, idempotencyKey),
+    gcTime: 0,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: organisationKeys.administrators() });
     },
   });
 };

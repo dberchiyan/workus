@@ -68,6 +68,18 @@
         "signedOutText": "{{name}} will be signed out on every device and will sign in again with the new role.",
         "selfText": "You stay signed in here with the new role.",
         "cancel": "Cancel"
+      },
+      "add": {
+        "open": "Add admin",
+        "title": "Add admin",
+        "description": "They get admin rights in your company and sign in with their work email. You can make them an owner later.",
+        "firstName": "First name",
+        "lastName": "Last name",
+        "email": "Work email",
+        "cancel": "Cancel",
+        "submit": "Add admin",
+        "doneTitle": "{{name}} can now sign in",
+        "doneDescription": "Give them these details. They sign in with their work email as an admin."
       }
     }
   }

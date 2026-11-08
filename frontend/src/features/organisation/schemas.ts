@@ -45,3 +45,17 @@ export type RegistrationOutput = z.output<typeof registrationSchema>;
 
 export const renameSchema = z.object({ name: organisationNameSchema });
 export type RenameValues = z.input<typeof renameSchema>;
+
+/** Mirrors backend AddAdministratorRequest. */
+export const addAdministratorSchema = z.object({
+  firstName: ownerStepSchema.shape.firstName,
+  lastName: ownerStepSchema.shape.lastName,
+  email: z
+    .string()
+    .trim()
+    .min(1, 'validation:workEmail.required')
+    .max(ORGANISATION_LIMITS.email, 'validation:email.tooLong')
+    .pipe(z.email('validation:email.invalid')),
+});
+export type AddAdministratorValues = z.input<typeof addAdministratorSchema>;
+export type AddAdministratorOutput = z.output<typeof addAdministratorSchema>;
