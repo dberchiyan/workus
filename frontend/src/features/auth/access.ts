@@ -2,7 +2,9 @@ import type { CurrentUser } from './types';
 
 export type UserRole = CurrentUser['role'];
 
+/** Everyone in a company (platform admins are not: they never see tenant data). */
 const EVERYONE = ['OWNER', 'ADMIN', 'MANAGER', 'EMPLOYEE'] as const satisfies readonly UserRole[];
+const PLATFORM = ['PLATFORM_ADMIN'] as const satisfies readonly UserRole[];
 /** Owners can do everything admins can. */
 const ADMINS = ['OWNER', 'ADMIN'] as const satisfies readonly UserRole[];
 const OWNERS = ['OWNER'] as const satisfies readonly UserRole[];
@@ -19,7 +21,11 @@ export const ACCESS = {
   'section.requests': ADMINS,
   'section.calendar': EVERYONE,
   'section.insights': ADMINS,
-  'section.settings': EVERYONE,
+  'section.settings': [...EVERYONE, ...PLATFORM],
+  /** Workus platform administration: companies and their approval. */
+  'section.companies': PLATFORM,
+  /** The bell: a company's notices. */
+  'shell.notifications': EVERYONE,
   /** Dashboard: company figures and events vs one's own time off. */
   'dashboard.companyOverview': ADMINS,
   'dashboard.ownTimeOff': ['MANAGER', 'EMPLOYEE'],

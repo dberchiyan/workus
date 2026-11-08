@@ -13,6 +13,7 @@ export type I18nTranslations = {
         "INVALID_CREDENTIALS": string;
         "SESSION_EXPIRED": string;
         "ACCESS_ENDED": string;
+        "ORGANISATION_NOT_ACTIVE": string;
         "FORBIDDEN": string;
         "RESOURCE_NOT_FOUND": string;
         "CONFLICT": string;
@@ -43,6 +44,9 @@ export type I18nTranslations = {
         "organisation": {
             "lastOwner": string;
             "notAdministrator": string;
+        };
+        "platform": {
+            "activeNotRejectable": string;
         };
         "registration": {
             "emailTaken": string;
@@ -191,6 +195,10 @@ export type I18nTranslations = {
         };
         "role": {
             "invalid": string;
+        };
+        "rejectionReason": {
+            "required": string;
+            "tooLong": string;
         };
     };
 };

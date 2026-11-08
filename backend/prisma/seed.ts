@@ -8,6 +8,8 @@ import { databaseUrl } from '../src/common/config/database-url';
 import {
   contactsFor,
   ORGANISATIONS,
+  PLATFORM_ADMINS,
+  PLATFORM_ID,
   POSITION_CATEGORIES,
   SEED_PASSWORD,
   type SeedOrganisation,
@@ -57,7 +59,7 @@ const seedOrganisation = async (
   const organisationId = organisation.id;
   await prisma.organisation.upsert({
     where: { id: organisationId },
-    create: { id: organisationId, name: organisation.name },
+    create: { id: organisationId, name: organisation.name, status: organisation.status },
     update: {},
     select: { id: true },
   });
@@ -261,6 +263,17 @@ const seed = async (): Promise<void> => {
         skipDuplicates: true,
       });
     }
+    // Platform admins: the internal organisation, no tenant data.
+    const platform = await prisma.user.createMany({
+      data: PLATFORM_ADMINS.map((admin) => ({
+        ...admin,
+        organisationId: PLATFORM_ID,
+        role: UserRole.PLATFORM_ADMIN,
+        passwordHash,
+      })),
+      skipDuplicates: true,
+    });
+    process.stdout.write(`Platform: ${platform.count} platform admins\n`);
     for (const organisation of ORGANISATIONS) {
       process.stdout.write(
         `${organisation.name}: ${await seedOrganisation(prisma, organisation, passwordHash)}\n`,

@@ -8,6 +8,8 @@ export const ErrorCode = {
   FORBIDDEN: 403,
   /** Correct credentials of someone no longer employed. */
   ACCESS_ENDED: 403,
+  /** The caller's organisation is not approved (waiting, or rejected): its data is closed. */
+  ORGANISATION_NOT_ACTIVE: 403,
   RESOURCE_NOT_FOUND: 404,
   CONFLICT: 409,
   CONCURRENT_MODIFICATION: 409,

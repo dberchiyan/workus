@@ -8,6 +8,7 @@ import enErrors from '@/locales/en/errors.json';
 import enInsights from '@/locales/en/insights.json';
 import enNotification from '@/locales/en/notification.json';
 import enOrganisation from '@/locales/en/organisation.json';
+import enPlatform from '@/locales/en/platform.json';
 import enDashboard from '@/locales/en/dashboard.json';
 import enReview from '@/locales/en/review.json';
 import enSettings from '@/locales/en/settings.json';
@@ -29,6 +30,7 @@ export const resources = {
     insights: enInsights,
     notification: enNotification,
     organisation: enOrganisation,
+    platform: enPlatform,
     review: enReview,
     settings: enSettings,
     shell: enShell,

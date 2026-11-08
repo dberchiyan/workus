@@ -1,6 +1,7 @@
 import MenuOutlined from '@mui/icons-material/MenuOutlined';
 import IconButton from '@mui/material/IconButton';
 import { useTranslation } from 'react-i18next';
+import { useAccess } from '@/features/auth';
 import { NotificationBell } from '@/features/notification';
 import { UserMenu } from './UserMenu';
 
@@ -13,6 +14,7 @@ export interface TopBarProps {
 
 export function TopBar({ onOpenMenu, menuButtonId, isMenuOpen }: TopBarProps) {
   const { t } = useTranslation('shell');
+  const can = useAccess();
   return (
     // Background and border span the full width; the controls sit in the page's content column
     // (same padding and max width as <main>), so they line up with the content's edges.
@@ -30,7 +32,7 @@ export function TopBar({ onOpenMenu, menuButtonId, isMenuOpen }: TopBarProps) {
           </IconButton>
         )}
         <div className="ml-auto flex items-center gap-1 sm:gap-2">
-          <NotificationBell />
+          {can('shell.notifications') && <NotificationBell />}
           <UserMenu />
         </div>
       </div>

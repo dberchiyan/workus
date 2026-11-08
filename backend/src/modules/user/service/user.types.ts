@@ -1,3 +1,4 @@
+import type { OrganisationStatus } from './organisation-status';
 import type { UserRole } from './user-role';
 
 export interface UserCredentials {
@@ -15,7 +16,12 @@ export interface UserProfile {
   firstName: string;
   lastName: string;
   role: UserRole;
-  organisation: { id: string; name: string };
+  organisation: {
+    id: string;
+    name: string;
+    status: OrganisationStatus;
+    rejectionReason: string | null;
+  };
 }
 
 export interface NewUser {

@@ -1,0 +1,74 @@
+{
+  "retry": "Try again",
+  "loading": "Loading",
+  "status": {
+    "PENDING": "Waiting",
+    "ACTIVE": "Active",
+    "REJECTED": "Rejected"
+  },
+  "tabs": {
+    "PENDING": "Waiting for approval",
+    "ACTIVE": "Active",
+    "REJECTED": "Rejected"
+  },
+  "companies": {
+    "pageTitle": "Companies",
+    "title": "Companies",
+    "subtitle": "Companies on Workus. New sign-ups wait here for your approval.",
+    "tabs": "Company status",
+    "search": "Search by company name",
+    "error": "The companies could not be loaded.",
+    "empty": {
+      "PENDING": "No companies are waiting for approval.",
+      "ACTIVE": "No active companies yet.",
+      "REJECTED": "No rejected companies."
+    },
+    "emptySearch": "No companies match the search.",
+    "noOwner": "No owner",
+    "size": "{{admins}} admins · {{employees}} employees",
+    "registered": "Registered {{date}}",
+    "pages": "Company pages"
+  },
+  "company": {
+    "pageTitle": "Company",
+    "back": "Companies",
+    "error": "The company could not be loaded.",
+    "approvedBy": "Approved by {{name}} on {{date}}",
+    "rejectedBy": "Rejected by {{name}} on {{date}}",
+    "people": "People",
+    "search": "Search by name or email",
+    "peopleError": "The people could not be loaded.",
+    "noPeople": "Nobody here.",
+    "added": "Added {{date}}",
+    "pages": "People pages",
+    "range_one": "{{from}}–{{to}} of {{total}} person",
+    "range_other": "{{from}}–{{to}} of {{total}} people"
+  },
+  "people": {
+    "OWNER": "Owners",
+    "ADMIN": "Admins",
+    "EMPLOYEE": "Employees"
+  },
+  "role": {
+    "OWNER": "Owner",
+    "ADMIN": "Admin",
+    "MANAGER": "Manager",
+    "EMPLOYEE": "Employee"
+  },
+  "userStatus": {
+    "ACTIVE": "Active",
+    "TERMINATED": "Left"
+  },
+  "decide": {
+    "approve": "Approve",
+    "reject": "Reject",
+    "cancel": "Cancel",
+    "approveTitle": "Approve {{company}}?",
+    "approveText": "Its people can sign in and start working right away.",
+    "rejectTitle": "Reject {{company}}?",
+    "rejectText": "Its owner sees the reason. You can still approve the company later.",
+    "reason": "Reason",
+    "reasonHint": "Shown to the company's owner.",
+    "reasonRequired": "Say why the company is not approved"
+  }
+}

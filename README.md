@@ -3,7 +3,8 @@
 # Workus
 
 **Day-to-day HR for growing teams** — people, reviews and salaries, time off, a shared calendar
-and yearly insights. Multi-tenant: every company's data is its own.
+and yearly insights. Multi-tenant: every company's data is its own, and a new company goes live
+once the Workus team approves it.
 
 ![Node.js](https://img.shields.io/badge/Node.js-26-5FA04E?logo=nodedotjs&logoColor=white)
 ![TypeScript](https://img.shields.io/badge/TypeScript-strict-3178C6?logo=typescript&logoColor=white)
@@ -34,8 +35,8 @@ on backend start; data lives in the `db-data` volume (`docker compose down -v` r
 
 ## Demo accounts
 
-The seed creates two independent companies. Password for every account: **`Workus-Dev-2026!`**
-(fictional data, local use only).
+The seed creates two independent companies and a Workus platform admin. Password for every
+account: **`Workus-Dev-2026!`** (fictional data, local use only).
 
 | Role | 🏢 OSDB · 46 people | 🌀 Vortex · 34 people |
 |---|---|---|
@@ -43,24 +44,29 @@ The seed creates two independent companies. Password for every account: **`Worku
 | **Admin** | `marcus.reid@osdb.io` | `hannah.brooks@vortex.io` |
 | **Employee** | `ava.thompson@osdb.io` | `ethan.cole@vortex.io` |
 
-Any other seeded person: `first.last@osdb.io` or `first.last@vortex.io`. For an empty company,
-choose **Create a company** on the sign-in page.
+| Workus platform | Account |
+|---|---|
+| **Platform admin** — approves companies | `admin@workus.io` |
+
+Any other seeded person: `first.last@osdb.io` or `first.last@vortex.io`. **Create a company** on
+the sign-in page registers a new one — it opens after a platform admin approves it.
 
 ## Features
 
-| | Owner | Admin | Employee |
-|---|:---:|:---:|:---:|
-| **Dashboard** — pending requests, who is out, reviews due, joiners and leavers, birthdays | ✅ | ✅ | — |
-| **Dashboard** — own leave balances and requests | — | — | ✅ |
-| **Employees** — directory, profiles, hiring, termination, activity history | ✅ | ✅ | — |
-| **Reviews** — salary history and rich-text feedback | ✅ | ✅ | — |
-| **Requests** — approve, reject, cancel, comment | ✅ | ✅ | — |
-| **Time off** — request vacation, sick days and days off | — | — | ✅ |
-| **Calendar** — everyone's time off for the month | ✅ | ✅ | ✅ |
-| **Insights** — headcount, turnover, tenure, absence, salaries vs last year | ✅ | ✅ | — |
-| **Settings** — account, password, sessions, security log | ✅ | ✅ | ✅ |
-| **Settings** — company holidays, administrators list | ✅ | ✅ | — |
-| **Settings** — rename the company, make owners and admins | ✅ | — | — |
+| | Owner | Admin | Employee | Platform admin |
+|---|:---:|:---:|:---:|:---:|
+| **Dashboard** — pending requests, who is out, reviews due, joiners and leavers, birthdays | ✅ | ✅ | — | — |
+| **Dashboard** — own leave balances and requests | — | — | ✅ | — |
+| **Employees** — directory, profiles, hiring, termination, password reset, activity | ✅ | ✅ | — | — |
+| **Reviews** — salary history and rich-text feedback | ✅ | ✅ | — | — |
+| **Requests** — approve, reject, cancel, comment | ✅ | ✅ | — | — |
+| **Time off** — request vacation, sick days and days off | — | — | ✅ | — |
+| **Calendar** — everyone's time off for the month | ✅ | ✅ | ✅ | — |
+| **Insights** — headcount, turnover, tenure, absence, salaries vs last year | ✅ | ✅ | — | — |
+| **Settings** — account, password, sessions, security log | ✅ | ✅ | ✅ | ✅ |
+| **Settings** — company holidays, administrators list | ✅ | ✅ | — | — |
+| **Settings** — rename the company, add admins, make owners | ✅ | — | — | — |
+| **Companies** — approve sign-ups, see each company's people (directory only) | — | — | — | ✅ |
 
 Also: in-app notifications, an append-only change history for every employee, review and request,
 light and dark themes, and a responsive layout from phone to desktop.
@@ -121,6 +127,8 @@ flowchart TB
 | Concern | Guarantee | Enforced by |
 |---|---|---|
 | **Tenancy** | No cross-company access | `organisation_id` · composite FKs |
+| **Platform admins** | Never see company data | Policy scope checked by one guard |
+| **Approval** | Nothing opens before approval | Company status in the session |
 | **Authorisation** | Deny by default | Policy on every route, checked at boot |
 | **Sessions** | Instant revocation | Server-side sessions · CSRF |
 | **Passwords** | Never in plain text | Argon2id · shown once |

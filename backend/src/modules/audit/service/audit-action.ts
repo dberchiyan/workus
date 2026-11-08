@@ -19,6 +19,9 @@ export const AuditAction = {
   /** The organisation itself (target type `organisation`) and people's roles (target `user`). */
   ORGANISATION_CREATED: 'organisation.created',
   ORGANISATION_UPDATED: 'organisation.updated',
+  /** A Workus platform admin decided on a sign-up (in the company's own history). */
+  ORGANISATION_APPROVED: 'organisation.approved',
+  ORGANISATION_REJECTED: 'organisation.rejected',
   USER_ROLE_CHANGED: 'user.role_changed',
   /** An owner added an administrator (an account with a generated password). */
   USER_CREATED: 'user.created',

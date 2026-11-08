@@ -6,6 +6,7 @@
   "INVALID_CREDENTIALS": "Invalid email or password",
   "SESSION_EXPIRED": "Your session has expired — sign in again",
   "ACCESS_ENDED": "Your access to Workus has ended — contact your administrator",
+  "ORGANISATION_NOT_ACTIVE": "Your company is not approved yet",
   "FORBIDDEN": "You don't have access to this action",
   "RESOURCE_NOT_FOUND": "The requested item was not found",
   "CONFLICT": "This conflicts with existing data — reload and try again",
@@ -36,6 +37,9 @@
   "organisation": {
     "lastOwner": "The company needs at least one owner — make someone else an owner first",
     "notAdministrator": "Only administrators can be owners"
+  },
+  "platform": {
+    "activeNotRejectable": "An approved company cannot be rejected"
   },
   "registration": {
     "emailTaken": "An account with this email already exists — sign in instead"

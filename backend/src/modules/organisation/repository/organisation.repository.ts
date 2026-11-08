@@ -2,6 +2,7 @@ import { TransactionHost } from '@nestjs-cls/transactional';
 import type { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
 import { Injectable } from '@nestjs/common';
 import type { PrismaService } from '../../../common/persistence/prisma.service';
+import { OrganisationStatus } from '../../user/service/organisation-status';
 import { type OrganisationRecord, organisationSelect } from './record/organisation.record';
 
 @Injectable()
@@ -10,8 +11,12 @@ export class OrganisationRepository {
     private readonly txHost: TransactionHost<TransactionalAdapterPrisma<PrismaService>>,
   ) {}
 
+  /** A registered company waits for a platform admin's approval. */
   create(name: string): Promise<OrganisationRecord> {
-    return this.txHost.tx.organisation.create({ data: { name }, select: organisationSelect });
+    return this.txHost.tx.organisation.create({
+      data: { name, status: OrganisationStatus.PENDING },
+      select: organisationSelect,
+    });
   }
 
   findById(id: string): Promise<OrganisationRecord | null> {

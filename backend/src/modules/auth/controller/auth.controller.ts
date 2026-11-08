@@ -85,7 +85,7 @@ export class AuthController {
 
   @Post('logout')
   @HttpCode(HttpStatus.OK)
-  @Authorize(can.authenticated)
+  @Authorize(can.ownAccount)
   @IdempotencyExempt('Deleting the session is idempotent by nature')
   @ApiOperation({ summary: 'End the current session' })
   @ApiOkResponse({ description: 'Session ended; cookies cleared' })
@@ -99,7 +99,7 @@ export class AuthController {
   }
 
   @Get('me')
-  @Authorize(can.authenticated)
+  @Authorize(can.ownAccount)
   @ApiOperation({ summary: 'Return the signed-in user' })
   @ZodResponse({ status: HttpStatus.OK, type: CurrentUserResponse })
   @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED')
@@ -112,7 +112,7 @@ export class AuthController {
 
   @Put('password')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.authenticated)
+  @Authorize(can.ownAccount)
   @RateLimit(RateLimitName.PASSWORD_CHANGE)
   @ApiOperation({
     summary: 'Change own password; every session ends and this browser gets a new one',
@@ -142,7 +142,7 @@ export class AuthController {
   }
 
   @Get('sessions')
-  @Authorize(can.authenticated)
+  @Authorize(can.ownAccount)
   @ApiOperation({
     summary: "The caller's current session and a page of their other live sessions",
   })
@@ -160,7 +160,7 @@ export class AuthController {
 
   @Delete('sessions')
   @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.authenticated)
+  @Authorize(can.ownAccount)
   @ApiOperation({ summary: 'Sign out everywhere except this session' })
   @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
   async endOtherSessions(@CurrentPrincipal() principal: Principal): Promise<void> {
@@ -184,7 +184,7 @@ export class AuthController {
   }
 
   @Get('security-log')
-  @Authorize(can.authenticated)
+  @Authorize(can.ownAccount)
   @ApiOperation({
     summary:
       "The caller's security log: sign-ins, failed sign-ins, password changes, ended sessions",

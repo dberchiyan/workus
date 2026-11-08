@@ -82,5 +82,17 @@
         "doneDescription": "Give them these details. They sign in with their work email as an admin."
       }
     }
+  },
+  "gate": {
+    "pending": {
+      "title": "Waiting for approval",
+      "text": "{{company}} is registered. The Workus team reviews new companies — you can start as soon as it is approved.",
+      "hint": "This page updates by itself."
+    },
+    "rejected": {
+      "title": "Not approved",
+      "text": "The Workus team did not approve {{company}}."
+    },
+    "signOut": "Sign out"
   }
 }

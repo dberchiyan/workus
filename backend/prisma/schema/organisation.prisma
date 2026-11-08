@@ -4,6 +4,16 @@
 model Organisation {
   id                         String                      @id(map: "pk_organisations") @default(dbgenerated("uuidv7()")) @db.Uuid
   name                       String                      @db.VarChar(100)
+  /// PENDING (registered, waiting for a platform admin) | ACTIVE | REJECTED — CHECK in migration.
+  status                     String                      @db.VarChar(16)
+  /// The internal organisation of Workus platform admins: never listed as a company.
+  isPlatform                 Boolean                     @default(false) @map("is_platform")
+  /// When and by whom (a platform admin) it was last approved or rejected.
+  decidedAt                  DateTime?                   @map("decided_at") @db.Timestamptz(3)
+  decidedBy                  String?                     @map("decided_by") @db.Uuid
+  decider                    User?                       @relation("OrganisationDecider", fields: [decidedBy], references: [id], onDelete: Restrict, map: "fk_organisations_decided_by")
+  /// Why it was rejected (shown to its owner); cleared on approval.
+  rejectionReason            String?                     @map("rejection_reason") @db.VarChar(500)
   createdAt                  DateTime                    @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt                  DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(3)
   createdBy                  String?                     @map("created_by") @db.Uuid
@@ -21,5 +31,7 @@ model Organisation {
   notifications              Notification[]
   auditEvents                AuditEvent[]
 
+  @@index([status, createdAt], map: "idx_organisations_status_created_at")
+  @@index([decidedBy], map: "idx_organisations_decided_by")
   @@map("organisations")
 }

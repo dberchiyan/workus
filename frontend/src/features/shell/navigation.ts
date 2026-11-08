@@ -1,3 +1,4 @@
+import BusinessOutlined from '@mui/icons-material/BusinessOutlined';
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined';
 import DashboardOutlined from '@mui/icons-material/DashboardOutlined';
 import InboxOutlined from '@mui/icons-material/InboxOutlined';
@@ -15,6 +16,7 @@ export const NavSection = {
   REQUESTS: 'requests',
   CALENDAR: 'calendar',
   INSIGHTS: 'insights',
+  COMPANIES: 'companies',
   SETTINGS: 'settings',
 } as const;
 export type NavSection = (typeof NavSection)[keyof typeof NavSection];
@@ -29,6 +31,13 @@ export interface NavItem {
 }
 
 export const NAV_ITEMS: readonly NavItem[] = [
+  {
+    section: NavSection.COMPANIES,
+    path: PATHS.platform,
+    icon: BusinessOutlined,
+    access: 'section.companies',
+    placement: 'main',
+  },
   {
     section: NavSection.DASHBOARD,
     path: PATHS.dashboard,

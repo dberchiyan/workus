@@ -12,6 +12,7 @@ import {
 import { generateToken, hashToken } from '../../../common/security/token-hash';
 import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
 import { AuditService } from '../../audit/service/audit.service';
+import { OrganisationStatus } from '../../user/service/organisation-status';
 import { EmployeeService } from '../../employee/core/service/employee.service';
 import type { SessionListRecord } from '../repository/record/session.record';
 import { SessionRepository } from '../repository/session.repository';
@@ -110,6 +111,7 @@ export class SessionService extends SessionAuthenticator {
       principal: new Principal(
         session.userId,
         session.user.organisationId,
+        session.user.organisation.status === OrganisationStatus.ACTIVE,
         session.id,
         session.authorities,
         session.clientType === ClientType.MOBILE ? ClientType.MOBILE : ClientType.WEB,

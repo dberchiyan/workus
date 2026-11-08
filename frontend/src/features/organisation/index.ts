@@ -4,3 +4,4 @@ import { lazy } from 'react';
 export const SignupPage = lazy(() => import('./pages/SignupPage'));
 export { OrganisationSection } from './components/OrganisationSection';
 export { AdministratorsSection } from './components/AdministratorsSection';
+export { OrganisationGate } from './components/OrganisationGate';

@@ -6,6 +6,7 @@
   "INVALID_CREDENTIALS": "Invalid email or password",
   "SESSION_EXPIRED": "Your session has expired — sign in again",
   "ACCESS_ENDED": "Your access to Workus has ended — contact your administrator",
+  "ORGANISATION_NOT_ACTIVE": "Your company is not approved yet",
   "FORBIDDEN": "You don't have access to this action",
   "RESOURCE_NOT_FOUND": "The requested item was not found",
   "CONFLICT": "This conflicts with existing data — reload and try again",

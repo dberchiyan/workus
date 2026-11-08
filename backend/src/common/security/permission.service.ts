@@ -10,6 +10,14 @@ import { PrismaService } from '../persistence/prisma.service';
 export class PermissionService {
   constructor(private readonly prisma: PrismaService) {}
 
+  /** A company of the platform (an organisation that is not the platform's own). */
+  async isCompany(organisationId: string): Promise<boolean> {
+    const count = await this.prisma.organisation.count({
+      where: { id: organisationId, isPlatform: false },
+    });
+    return count > 0;
+  }
+
   /** The employee belongs to the organisation. */
   async isOrganisationEmployee(organisationId: string, employeeId: string): Promise<boolean> {
     const count = await this.prisma.employee.count({ where: { id: employeeId, organisationId } });

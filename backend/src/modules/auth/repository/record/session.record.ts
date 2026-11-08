@@ -3,7 +3,7 @@ import type { Prisma } from '../../../../generated/prisma/client';
 export const sessionAuthenticationSelect = {
   id: true,
   userId: true,
-  user: { select: { organisationId: true } },
+  user: { select: { organisationId: true, organisation: { select: { status: true } } } },
   authorities: true,
   clientType: true,
   csrfTokenHash: true,

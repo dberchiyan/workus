@@ -10,6 +10,11 @@ export const toCurrentUserResponse = (
   firstName: user.firstName,
   lastName: user.lastName,
   role: user.role,
-  organisation: { id: user.organisation.id, name: user.organisation.name },
+  organisation: {
+    id: user.organisation.id,
+    name: user.organisation.name,
+    status: user.organisation.status,
+    rejectionReason: user.organisation.rejectionReason,
+  },
   idleTimeoutMinutes,
 });

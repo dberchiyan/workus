@@ -101,7 +101,8 @@
         "OWNER": "Owner",
         "ADMIN": "Administrator",
         "MANAGER": "Manager",
-        "EMPLOYEE": "Employee"
+        "EMPLOYEE": "Employee",
+        "PLATFORM_ADMIN": "Platform admin"
       }
     },
     "actions": {
@@ -168,7 +169,8 @@
       "OWNER": "Owner",
       "ADMIN": "Administrator",
       "MANAGER": "Manager",
-      "EMPLOYEE": "Employee"
+      "EMPLOYEE": "Employee",
+      "PLATFORM_ADMIN": "Platform admin"
     },
     "responsible": {
       "title": "Responsible",

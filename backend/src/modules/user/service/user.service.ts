@@ -3,6 +3,7 @@ import type { Pageable } from '../../../common/dto/pageable';
 import type { AdministratorRecord } from '../repository/record/user.record';
 import { UserRepository } from '../repository/user.repository';
 import type { AdministratorSortField } from './administrator-sort';
+import { isOrganisationStatus, OrganisationStatus } from './organisation-status';
 import { isUserRole, UserRole } from './user-role';
 import type { Administrator, NewOwner, NewUser, UserCredentials, UserProfile } from './user.types';
 
@@ -30,7 +31,19 @@ export class UserService {
 
   async findProfileById(id: string): Promise<UserProfile | null> {
     const user = await this.userRepository.findProfileById(id);
-    return user ? { ...user, role: toRole(user.role) } : null;
+    return user
+      ? {
+          ...user,
+          role: toRole(user.role),
+          organisation: {
+            ...user.organisation,
+            // Guarded by ck_organisations_status.
+            status: isOrganisationStatus(user.organisation.status)
+              ? user.organisation.status
+              : OrganisationStatus.PENDING,
+          },
+        }
+      : null;
   }
 
   existsByEmail(email: string): Promise<boolean> {

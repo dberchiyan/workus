@@ -16,6 +16,8 @@ export interface SeedPerson {
 export const OSDB_ID = '01960000-0000-7000-8000-000000000001';
 /** Vortex: a second, smaller company — nothing is shared with OSDB. */
 export const VORTEX_ID = '01960000-0000-7000-8000-000000000002';
+/** Lumen Studio: registered, waiting for a platform admin's approval. */
+export const LUMEN_ID = '01960000-0000-7000-8000-000000000003';
 
 export const OSDB_OWNERS: SeedPerson[] = [
   { firstName: 'Sophia', lastName: 'Carter', email: 'sophia.carter@osdb.io' },
@@ -658,6 +660,8 @@ export const VORTEX_EMPLOYEES: SeedEmployee[] = [
 export interface SeedOrganisation {
   id: string;
   name: string;
+  /** ACTIVE, or PENDING — a sign-up waiting for a platform admin. */
+  status: 'ACTIVE' | 'PENDING';
   owners: SeedPerson[];
   /** Responsible for the employees, in turns. */
   admins: SeedPerson[];
@@ -665,12 +669,36 @@ export interface SeedOrganisation {
 }
 
 export const ORGANISATIONS: SeedOrganisation[] = [
-  { id: OSDB_ID, name: 'OSDB', owners: OSDB_OWNERS, admins: ADMINS, employees: EMPLOYEES },
+  {
+    id: OSDB_ID,
+    name: 'OSDB',
+    status: 'ACTIVE',
+    owners: OSDB_OWNERS,
+    admins: ADMINS,
+    employees: EMPLOYEES,
+  },
   {
     id: VORTEX_ID,
     name: 'Vortex',
+    status: 'ACTIVE',
     owners: VORTEX_OWNERS,
     admins: VORTEX_ADMINS,
     employees: VORTEX_EMPLOYEES,
   },
+  /** A sign-up waiting for approval: just its owner, so the platform's queue is never empty. */
+  {
+    id: LUMEN_ID,
+    name: 'Lumen Studio',
+    status: 'PENDING',
+    owners: [{ firstName: 'Mila', lastName: 'Novak', email: 'mila.novak@lumen.io' }],
+    admins: [],
+    employees: [],
+  },
+];
+
+/** The internal organisation of Workus platform admins (created by the approval migration). */
+export const PLATFORM_ID = '01960000-0000-7000-8000-000000000000';
+
+export const PLATFORM_ADMINS: SeedPerson[] = [
+  { firstName: 'Alex', lastName: 'Morgan', email: 'admin@workus.io' },
 ];

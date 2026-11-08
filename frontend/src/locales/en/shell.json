@@ -6,7 +6,8 @@
     "requests": "Requests",
     "calendar": "Calendar",
     "insights": "Insights",
-    "settings": "Settings"
+    "settings": "Settings",
+    "companies": "Companies"
   },
   "menu": {
     "open": "Open menu",
@@ -29,6 +30,7 @@
     "OWNER": "Owner",
     "ADMIN": "Administrator",
     "MANAGER": "Manager",
-    "EMPLOYEE": "Employee"
+    "EMPLOYEE": "Employee",
+    "PLATFORM_ADMIN": "Platform admin"
   }
 }

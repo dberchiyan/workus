@@ -12,6 +12,8 @@ export class Principal {
   constructor(
     readonly userId: string,
     readonly organisationId: string,
+    /** The organisation is approved (ACTIVE): its data is reachable. */
+    readonly isOrganisationActive: boolean,
     readonly sessionId: string,
     readonly authorities: readonly string[],
     readonly clientType: ClientType,

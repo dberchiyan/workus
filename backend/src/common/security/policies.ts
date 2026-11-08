@@ -36,8 +36,20 @@ const adminOfRequest = async (
 
 /** Declared constants, never built inline. Owners hold the ADMIN authority too. */
 export const can = {
-  /** Caller's own account only: /auth/me, /auth/logout. */
+  /** The caller's own account (sign-out, password, sessions) — also while the company waits. */
+  ownAccount: policy([], () => true, 'account'),
+  /** Any member of an active organisation (their own data in it). */
   authenticated: policy([], () => true),
+  /** Workus platform administration: companies and their approval. */
+  platformAdmin: policy([], (principal) => principal.hasAuthority('PLATFORM_ADMIN'), 'platform'),
+  /** One company (never the platform's own organisation): a platform admin. */
+  manageCompany: policy(
+    ['organisationId'],
+    async (principal, args, permissions) =>
+      principal.hasAuthority('PLATFORM_ADMIN') &&
+      orNotFound(await permissions.isCompany(args.organisationId ?? '')),
+    'platform',
+  ),
   admin: policy([], isAdmin),
   /** The organisation's settings and people's roles. */
   owner: policy([], (principal) => principal.hasAuthority('OWNER')),
@@ -57,8 +69,11 @@ export const can = {
     ),
   ),
   /** One's own sessions only (Settings → Sessions). */
-  endOwnSession: policy(['sessionId'], (principal, args, permissions) =>
-    permissions.isOwnSession(principal.userId, args.sessionId ?? ''),
+  endOwnSession: policy(
+    ['sessionId'],
+    (principal, args, permissions) =>
+      permissions.isOwnSession(principal.userId, args.sessionId ?? ''),
+    'account',
   ),
   /** Company figures (headcount, tenure, turnover, absence, salaries) are an admin screen. */
   viewInsights: policy([], isAdmin),

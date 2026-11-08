@@ -6,7 +6,7 @@ model User {
   passwordHash          String?                     @map("password_hash") @db.VarChar(255) // null → cannot sign in yet (no password set)
   firstName             String                      @map("first_name") @db.VarChar(100)
   lastName              String                      @map("last_name") @db.VarChar(100)
-  role                  String                      @db.VarChar(32) // OWNER | ADMIN | MANAGER | EMPLOYEE — CHECK in migration
+  role                  String                      @db.VarChar(32) // PLATFORM_ADMIN | OWNER | ADMIN | MANAGER | EMPLOYEE — CHECK in migration
   createdAt             DateTime                    @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt             DateTime                    @updatedAt @map("updated_at") @db.Timestamptz(3)
   createdBy             String?                     @map("created_by") @db.Uuid
@@ -23,6 +23,7 @@ model User {
   responsibleFor        EmployeeResponsible[]       @relation("EmployeeResponsibleUser")
   notifications         Notification[]              @relation("NotificationRecipient")
   notificationsCaused   Notification[]              @relation("NotificationActor")
+  organisationsDecided  Organisation[]              @relation("OrganisationDecider")
 
   @@unique([email], map: "uq_users_email")
   /// Target of the (organisation_id, user) foreign keys of tenant rows.

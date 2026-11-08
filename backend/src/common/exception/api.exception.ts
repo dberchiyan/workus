@@ -36,6 +36,12 @@ export class AccessEndedException extends ApiException {
   }
 }
 
+export class OrganisationNotActiveException extends ApiException {
+  constructor() {
+    super('ORGANISATION_NOT_ACTIVE', 'errors.ORGANISATION_NOT_ACTIVE');
+  }
+}
+
 export class SessionExpiredException extends ApiException {
   constructor() {
     super('SESSION_EXPIRED', 'errors.SESSION_EXPIRED');

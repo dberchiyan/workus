@@ -124,5 +124,9 @@
   },
   "role": {
     "invalid": "Choose owner or admin"
+  },
+  "rejectionReason": {
+    "required": "Say why the company is not approved",
+    "tooLong": "Reason must be at most {max} characters"
   }
 }

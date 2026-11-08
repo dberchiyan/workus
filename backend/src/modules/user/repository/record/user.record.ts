@@ -15,7 +15,7 @@ export const userProfileSelect = {
   firstName: true,
   lastName: true,
   role: true,
-  organisation: { select: { id: true, name: true } },
+  organisation: { select: { id: true, name: true, status: true, rejectionReason: true } },
 } satisfies Prisma.UserSelect;
 export type UserProfileRecord = Prisma.UserGetPayload<{ select: typeof userProfileSelect }>;
 
