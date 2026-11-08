@@ -37,7 +37,7 @@ on backend start; data lives in the `db-data` volume (`docker compose down -v` r
 The seed creates two independent companies. Password for every account: **`Workus-Dev-2026!`**
 (fictional data, local use only).
 
-| Role | 🏢 OSDB · 46 people | 🌀 Vortex · 9 people |
+| Role | 🏢 OSDB · 46 people | 🌀 Vortex · 34 people |
 |---|---|---|
 | **Owner** | `sophia.carter@osdb.io` | `liam.foster@vortex.io` |
 | **Admin** | `marcus.reid@osdb.io` | `hannah.brooks@vortex.io` |
