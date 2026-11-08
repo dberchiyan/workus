@@ -9,6 +9,8 @@ import { formatCalendarDate } from '../format';
 import type { EmployeeProfile } from '../types';
 import { EmployeeStatusChip } from './EmployeeStatusChip';
 import { ProfileActions } from './ProfileActions';
+import { ViewTransition } from 'react';
+import { personAvatarTransition } from '@/shared/lib/viewTransitionNames';
 
 export interface ProfileHeaderProps {
   employee: EmployeeProfile;
@@ -34,12 +36,14 @@ export function ProfileHeader({ employee, headingRef }: ProfileHeaderProps) {
     <Card variant="outlined" className="flex-1">
       {/* Phone: avatar and actions on top, the text full width below; side by side from sm. */}
       <CardContent className="flex flex-wrap items-start gap-4 p-5 sm:flex-nowrap sm:items-center sm:p-6">
-        <InitialsAvatar
-          id={employee.userId}
-          firstName={employee.firstName}
-          lastName={employee.lastName}
-          size="lg"
-        />
+        <ViewTransition name={personAvatarTransition(employee.id)}>
+          <InitialsAvatar
+            id={employee.userId}
+            firstName={employee.firstName}
+            lastName={employee.lastName}
+            size="lg"
+          />
+        </ViewTransition>
         <div className="order-3 flex min-w-0 basis-full flex-col gap-1 sm:order-none sm:flex-1 sm:basis-auto">
           <div className="flex flex-wrap items-center gap-2">
             <Typography

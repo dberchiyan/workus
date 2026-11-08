@@ -1,5 +1,5 @@
-import { lazy } from 'react';
+import { lazyWithPreload } from '@/shared/lib/lazyWithPreload';
 
 /** Public surface of the platform feature (Workus platform admins). */
-export const CompaniesPage = lazy(() => import('./pages/CompaniesPage'));
-export const CompanyPage = lazy(() => import('./pages/CompanyPage'));
+export const CompaniesPage = lazyWithPreload(() => import('./pages/CompaniesPage'));
+export const CompanyPage = lazyWithPreload(() => import('./pages/CompanyPage'));

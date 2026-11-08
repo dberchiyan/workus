@@ -5,7 +5,6 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import InputAdornment from '@mui/material/InputAdornment';
 import Pagination from '@mui/material/Pagination';
-import Skeleton from '@mui/material/Skeleton';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useDeferredValue, useId, useRef, useState } from 'react';
@@ -19,6 +18,7 @@ import type { Administrator } from '../types';
 import { NEXT_ROLE, ROLE_BADGE } from '../roles';
 import { AddAdministratorDialog } from './AddAdministratorDialog';
 import { ChangeRoleDialog } from './ChangeRoleDialog';
+import { RowSkeleton } from '@/shared/components/RowSkeleton';
 
 const SKELETON_ROWS = ['s1', 's2', 's3'];
 const SEARCH_MAX_LENGTH = 100;
@@ -110,10 +110,10 @@ export function AdministratorsSection() {
             {t('settings.administrators.error')}
           </Alert>
         ) : !administrators.data ? (
-          <div aria-busy="true" className="flex flex-col gap-2">
+          <div aria-busy="true" className="flex flex-col divide-y divide-divider">
             <span className="sr-only">{t('settings.loading')}</span>
             {SKELETON_ROWS.map((key) => (
-              <Skeleton key={key} variant="rounded" height={56} />
+              <RowSkeleton key={key} />
             ))}
           </div>
         ) : administrators.data.content.length === 0 ? (

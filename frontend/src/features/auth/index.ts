@@ -1,7 +1,7 @@
-import { lazy } from 'react';
+import { lazyWithPreload } from '@/shared/lib/lazyWithPreload';
 
 /** Public surface of the auth feature. Pages are lazy so the router stays in the shell chunk. */
-export const LoginPage = lazy(() => import('./pages/LoginPage'));
+export const LoginPage = lazyWithPreload(() => import('./pages/LoginPage'));
 export { RequireAuth } from './components/RequireAuth';
 export { RequireAccess } from './components/RequireAccess';
 export { IdleSessionWarning } from './components/IdleSessionWarning';

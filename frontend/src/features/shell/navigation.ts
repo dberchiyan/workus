@@ -8,6 +8,12 @@ import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
 import type { SvgIconProps } from '@mui/material/SvgIcon';
 import type { ComponentType } from 'react';
 import type { AccessPart } from '@/features/auth';
+import { DashboardPage } from '@/features/dashboard';
+import { EmployeesPage } from '@/features/employee/core';
+import { InsightsPage } from '@/features/insights';
+import { CompaniesPage } from '@/features/platform';
+import { SettingsPage } from '@/features/settings';
+import { CalendarPage, RequestsPage } from '@/features/time-off';
 import { PATHS } from '@/shared/lib/paths';
 
 export const NavSection = {
@@ -28,6 +34,8 @@ export interface NavItem {
   /** The part of `ACCESS` that decides who sees it (cosmetic — the backend enforces access). */
   access: AccessPart;
   placement: 'main' | 'bottom';
+  /** Loads the page's code on hover or focus, so the click renders at once. */
+  preload: () => Promise<unknown>;
 }
 
 export const NAV_ITEMS: readonly NavItem[] = [
@@ -37,6 +45,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     icon: BusinessOutlined,
     access: 'section.companies',
     placement: 'main',
+    preload: CompaniesPage.preload,
   },
   {
     section: NavSection.DASHBOARD,
@@ -44,6 +53,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     icon: DashboardOutlined,
     access: 'section.dashboard',
     placement: 'main',
+    preload: DashboardPage.preload,
   },
   {
     section: NavSection.EMPLOYEES,
@@ -51,6 +61,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     icon: PeopleAltOutlined,
     access: 'section.employees',
     placement: 'main',
+    preload: EmployeesPage.preload,
   },
   {
     section: NavSection.REQUESTS,
@@ -58,6 +69,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     icon: InboxOutlined,
     access: 'section.requests',
     placement: 'main',
+    preload: RequestsPage.preload,
   },
   {
     section: NavSection.CALENDAR,
@@ -65,6 +77,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     icon: CalendarMonthOutlined,
     access: 'section.calendar',
     placement: 'main',
+    preload: CalendarPage.preload,
   },
   {
     section: NavSection.INSIGHTS,
@@ -72,6 +85,7 @@ export const NAV_ITEMS: readonly NavItem[] = [
     icon: InsightsOutlined,
     access: 'section.insights',
     placement: 'main',
+    preload: InsightsPage.preload,
   },
   {
     section: NavSection.SETTINGS,
@@ -79,5 +93,6 @@ export const NAV_ITEMS: readonly NavItem[] = [
     icon: SettingsOutlined,
     access: 'section.settings',
     placement: 'bottom',
+    preload: SettingsPage.preload,
   },
 ];

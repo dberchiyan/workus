@@ -13,14 +13,33 @@ import type {
   UpdateResponsiblesRequest,
 } from '../types';
 import { employeeReviewsKey } from '@/features/employee/review';
+import { EmployeeProfilePage } from '../routePages';
 import { employeeKeys } from './queryKeys';
 
-export const useEmployees = (params: EmployeeListParams) =>
+const QUICK_SEARCH_SIZE = 6;
+
+export const useEmployees = (params: EmployeeListParams, enabled = true) =>
   useQuery({
     queryKey: employeeKeys.list(params),
     queryFn: () => employeeApi.list(params),
     placeholderData: keepPreviousData,
+    enabled,
   });
+
+/** A few active people by name or email — the command menu's people search (shell). */
+export const useEmployeeQuickSearch = (search: string, enabled: boolean) =>
+  useEmployees(
+    {
+      categoryId: undefined,
+      status: 'ACTIVE',
+      search,
+      page: 1,
+      size: QUICK_SEARCH_SIZE,
+      sortField: 'name',
+      sortDirection: 'asc',
+    },
+    enabled,
+  );
 
 export const useEmployeeSummary = () =>
   useQuery({ queryKey: employeeKeys.summary(), queryFn: employeeApi.summary });
@@ -132,11 +151,30 @@ export const useCancelTermination = (employeeId: string) =>
     employeeApi.cancelTermination(employeeId, version),
   );
 
-export const useEmployeeProfile = (employeeId: string) =>
-  useQuery({
-    queryKey: employeeKeys.detail(employeeId),
-    queryFn: () => employeeApi.profile(employeeId),
-  });
+const profileQuery = (employeeId: string) => ({
+  queryKey: employeeKeys.detail(employeeId),
+  queryFn: () => employeeApi.profile(employeeId),
+});
+
+export const useEmployeeProfile = (employeeId: string) => useQuery(profileQuery(employeeId));
+
+/** How long a hover's prefetch counts as fresh: opening the profile soon after shows it at once. */
+const PREFETCH_FRESH_MS = 30_000;
+
+/**
+ * Hover or focus on a link to a profile: fetch the page's code and the profile ahead, so the
+ * click shows it at once. Repeated calls within the freshness window do nothing.
+ */
+export const usePrefetchEmployeeProfile = (): ((employeeId: string) => void) => {
+  const queryClient = useQueryClient();
+  return (employeeId) => {
+    void EmployeeProfilePage.preload();
+    // A failed prefetch is silent: opening the profile asks again and shows the error there.
+    queryClient
+      .query({ ...profileQuery(employeeId), staleTime: PREFETCH_FRESH_MS })
+      .catch(() => undefined);
+  };
+};
 
 /**
  * Gives the employee a new generated password (they are signed out everywhere). The answer holds

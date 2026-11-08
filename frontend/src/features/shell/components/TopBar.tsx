@@ -3,6 +3,7 @@ import IconButton from '@mui/material/IconButton';
 import { useTranslation } from 'react-i18next';
 import { useAccess } from '@/features/auth';
 import { NotificationBell } from '@/features/notification';
+import { CommandPaletteButton } from './CommandPaletteButton';
 import { UserMenu } from './UserMenu';
 
 export interface TopBarProps {
@@ -31,7 +32,10 @@ export function TopBar({ onOpenMenu, menuButtonId, isMenuOpen }: TopBarProps) {
             <MenuOutlined aria-hidden />
           </IconButton>
         )}
-        <div className="ml-auto flex items-center gap-1 sm:gap-2">
+        <div className="ml-auto flex items-center gap-1 sm:ml-0 sm:flex-1">
+          <CommandPaletteButton />
+        </div>
+        <div className="flex items-center gap-1 sm:gap-2">
           {can('shell.notifications') && <NotificationBell />}
           <UserMenu />
         </div>

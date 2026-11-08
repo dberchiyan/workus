@@ -99,8 +99,9 @@ the sign-in page registers a new one — it opens after a platform admin approve
 | **Settings** — rename the company, add admins, make owners | ✅ | — | — | — |
 | **Companies** — approve sign-ups, see each company's people (directory only) | — | — | — | ✅ |
 
-Also: in-app notifications, an append-only change history for every employee, review and request,
-light and dark themes, and a responsive layout from phone to desktop.
+Also: a **⌘K command menu** (pages, settings, people, theme), in-app notifications, an
+append-only change history for every employee, review and request, light and dark themes, and a
+responsive layout from phone to desktop.
 
 ## Architecture
 

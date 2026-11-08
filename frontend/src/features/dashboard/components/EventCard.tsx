@@ -1,12 +1,12 @@
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
-import Skeleton from '@mui/material/Skeleton';
 import type { SvgIconProps } from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
 import type { ComponentType, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/cn';
+import { RowSkeleton } from '@/shared/components/RowSkeleton';
 
 const SKELETON_ROWS = ['a', 'b'];
 
@@ -85,9 +85,9 @@ export function EventCard(props: EventCardProps) {
             {t('events.error')}
           </Alert>
         ) : props.isLoading ? (
-          <div className="flex flex-col gap-3 p-4">
+          <div className="flex flex-col divide-y divide-divider px-4 py-2">
             {SKELETON_ROWS.map((key) => (
-              <Skeleton key={key} variant="rounded" height={40} />
+              <RowSkeleton key={key} />
             ))}
           </div>
         ) : props.isEmpty ? (

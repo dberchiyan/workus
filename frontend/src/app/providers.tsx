@@ -1,4 +1,5 @@
-import '@fontsource-variable/inter';
+// The opsz build: optical sizes (Inter Display cut for headings), same family name.
+import '@fontsource-variable/inter/opsz.css';
 import CssBaseline from '@mui/material/CssBaseline';
 import GlobalStyles from '@mui/material/GlobalStyles';
 import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';

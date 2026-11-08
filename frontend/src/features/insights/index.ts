@@ -1,4 +1,4 @@
 /** Public surface of the insights feature. */
-import { lazy } from 'react';
+import { lazyWithPreload } from '@/shared/lib/lazyWithPreload';
 
-export const InsightsPage = lazy(() => import('./pages/InsightsPage'));
+export const InsightsPage = lazyWithPreload(() => import('./pages/InsightsPage'));

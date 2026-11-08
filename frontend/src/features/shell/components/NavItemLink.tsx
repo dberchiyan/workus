@@ -29,6 +29,8 @@ export function NavItemLink({ item, isCollapsed, onNavigate }: NavItemLinkProps)
       to={item.path}
       end={exact}
       onClick={onNavigate}
+      onMouseEnter={() => void item.preload()}
+      onFocus={() => void item.preload()}
       aria-label={isCollapsed ? label : undefined}
       className={cn(
         'relative min-h-12 gap-3 rounded-sm px-3 text-sidebar-text hover:bg-sidebar-hover',

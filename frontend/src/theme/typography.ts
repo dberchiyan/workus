@@ -6,32 +6,38 @@ export const TYPE = {
   fontFamily: "'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif",
   fontMono: "'JetBrains Mono', ui-monospace, monospace",
   measure: '65ch',
+  /**
+   * Inter's alternates: `cv05` (l with a tail) and `cv08` (I with serifs) tell I, l and 1 apart in
+   * emails and ids; `ss03` rounds quotes and commas. Optical sizing (the opsz axis) gives large
+   * headings Inter Display's tighter cut on its own.
+   */
+  features: "'cv05', 'cv08', 'ss03'",
   variants: {
     h1: {
       size: 'clamp(2rem, 1.5rem + 2.5vw, 3rem)',
       weight: 700,
       leading: 1.15,
-      tracking: '-0.02em',
+      tracking: '-0.025em',
     },
     h2: {
       size: 'clamp(1.75rem, 1.4rem + 1.75vw, 2.5rem)',
       weight: 700,
       leading: 1.2,
-      tracking: '-0.015em',
+      tracking: '-0.02em',
     },
     h3: {
       size: 'clamp(1.5rem, 1.3rem + 1vw, 2rem)',
       weight: 650,
       leading: 1.25,
-      tracking: '-0.01em',
+      tracking: '-0.015em',
     },
     h4: {
       size: 'clamp(1.375rem, 1.25rem + 0.6vw, 1.75rem)',
       weight: 650,
       leading: 1.3,
-      tracking: '-0.005em',
+      tracking: '-0.01em',
     },
-    h5: { size: '1.25rem', weight: 600, leading: 1.35, tracking: '0' },
+    h5: { size: '1.25rem', weight: 600, leading: 1.35, tracking: '-0.005em' },
     h6: { size: '1.125rem', weight: 600, leading: 1.4, tracking: '0' },
     subtitle1: { size: '1.125rem', weight: 400, leading: 1.5, tracking: '0' },
     subtitle2: { size: '0.875rem', weight: 500, leading: 1.5, tracking: '0' },
@@ -45,7 +51,7 @@ export const TYPE = {
       size: 'clamp(1.75rem, 1.4rem + 1.5vw, 2.5rem)',
       weight: 700,
       leading: 1.1,
-      tracking: '-0.01em',
+      tracking: '-0.02em',
     },
   },
   /** Variants whose figures are always tabular. */
@@ -80,6 +86,7 @@ export const muiTypography: TypographyVariantsOptions = {
 
 /** Custom properties, `.app-*` utility classes and `.app-prose`, injected once with GlobalStyles. */
 export const typographyGlobalStyles = {
+  html: { fontFeatureSettings: TYPE.features, fontOpticalSizing: 'auto' },
   ':root': {
     '--app-font-family': TYPE.fontFamily,
     '--app-font-mono': TYPE.fontMono,

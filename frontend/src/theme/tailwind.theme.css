@@ -14,7 +14,7 @@
   --breakpoint-xl: 96rem;
   --radius-sm: 0.5rem;
   --radius-md: 0.75rem;
-  --radius-lg: 1.25rem;
+  --radius-lg: 1rem;
   --spacing-sidebar-width: 15rem;
   --spacing-rail-width: 5rem;
   --spacing-top-bar-height: 4rem;
@@ -41,6 +41,8 @@
   --color-text-secondary: var(--mui-palette-text-secondary);
   --color-text-disabled: var(--mui-palette-text-disabled);
   --color-divider: var(--mui-palette-divider);
+  --color-shadow-soft: var(--mui-palette-shadow-soft);
+  --color-shadow-strong: var(--mui-palette-shadow-strong);
   --color-badge-active-background: var(--mui-palette-badge-activeBackground);
   --color-badge-active-text: var(--mui-palette-badge-activeText);
   --color-badge-neutral-background: var(--mui-palette-badge-neutralBackground);
@@ -68,4 +70,6 @@
   --color-sidebar-active: var(--mui-palette-sidebar-active);
   --color-sidebar-active-text: var(--mui-palette-sidebar-activeText);
   --color-sidebar-indicator: var(--mui-palette-sidebar-indicator);
+  --color-sidebar-border: var(--mui-palette-sidebar-border);
+  --color-sidebar-title: var(--mui-palette-sidebar-title);
 }

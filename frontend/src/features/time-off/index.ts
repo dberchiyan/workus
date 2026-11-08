@@ -1,8 +1,8 @@
 /** Public surface of the time-off feature. */
-import { lazy } from 'react';
+import { lazyWithPreload } from '@/shared/lib/lazyWithPreload';
 
-export const RequestsPage = lazy(() => import('./pages/RequestsPage'));
-export const CalendarPage = lazy(() => import('./pages/CalendarPage'));
+export const RequestsPage = lazyWithPreload(() => import('./pages/RequestsPage'));
+export const CalendarPage = lazyWithPreload(() => import('./pages/CalendarPage'));
 export { MyTimeOff } from './components/MyTimeOff';
 export { HolidaysSection } from './components/HolidaysSection';
 export { EmployeeLeaveBalances } from './components/EmployeeLeaveBalances';

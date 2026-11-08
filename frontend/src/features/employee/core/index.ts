@@ -1,4 +1,3 @@
-import { lazy } from 'react';
-
-export const EmployeesPage = lazy(() => import('./pages/EmployeesPage'));
-export const EmployeeProfilePage = lazy(() => import('./pages/EmployeeProfilePage'));
+export { EmployeesPage, EmployeeProfilePage } from './routePages';
+export { useEmployeeQuickSearch } from './hooks/useEmployeeQueries';
+export type { EmployeeListItem } from './types';

@@ -31,20 +31,20 @@ export function SidebarContent({
   return (
     <nav
       aria-label={t('shell:nav.label')}
-      className="flex h-full flex-col gap-6 bg-sidebar-background px-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
+      className="flex h-full flex-col gap-6 border-r border-sidebar-border bg-sidebar-background px-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
     >
       {/* Arbitrary value above: safe-area inset for devices with a home indicator. */}
       {/* Brand row: as tall as the top bar, so its rule sits level with the top bar's border; same
           inset as the rule above Settings. */}
       <div
         className={cn(
-          'flex h-top-bar-height shrink-0 items-center gap-3 border-b border-sidebar-hover px-1',
+          'flex h-top-bar-height shrink-0 items-center gap-3 border-b border-sidebar-border px-1',
           isCollapsed && 'justify-center px-0',
         )}
       >
         <BrandMark className="size-9" />
         {!isCollapsed && (
-          <Typography variant="h6" component="p" className="text-sidebar-active-text">
+          <Typography variant="h6" component="p" className="text-sidebar-title">
             {t('app.name')}
           </Typography>
         )}
@@ -60,7 +60,7 @@ export function SidebarContent({
           </li>
         ))}
       </List>
-      <List disablePadding className="flex flex-col gap-1 border-t border-sidebar-hover pt-3">
+      <List disablePadding className="flex flex-col gap-1 border-t border-sidebar-border pt-3">
         {bottom.map((item) => (
           <li key={item.section}>
             <NavItemLink

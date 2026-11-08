@@ -6,7 +6,6 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Pagination from '@mui/material/Pagination';
-import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -20,6 +19,7 @@ import {
 import { useUrlPage } from '../useUrlPage';
 import { SessionRow } from './SessionRow';
 import { SettingsCard } from './SettingsCard';
+import { RowSkeleton } from '@/shared/components/RowSkeleton';
 
 /** This device first, then the others five a page; sign out one or all of them. */
 export function SessionsSection() {
@@ -85,9 +85,9 @@ export function SessionsSection() {
           {t('sessions.error')}
         </Alert>
       ) : sessions.isPending ? (
-        <div className="flex flex-col gap-3">
-          <Skeleton variant="rounded" height={56} />
-          <Skeleton variant="rounded" height={56} />
+        <div aria-busy="true" className="flex flex-col divide-y divide-divider">
+          <RowSkeleton leading="icon" trailing={false} />
+          <RowSkeleton leading="icon" trailing={false} />
         </div>
       ) : (
         <div className="flex flex-col gap-4">

@@ -32,5 +32,27 @@
     "MANAGER": "Manager",
     "EMPLOYEE": "Employee",
     "PLATFORM_ADMIN": "Platform admin"
+  },
+  "command": {
+    "title": "Command menu",
+    "open": "Search and commands ({{shortcut}})",
+    "trigger": "Search or jump to…",
+    "placeholder": "Search pages, settings, people…",
+    "empty": "Nothing found",
+    "searching": "Searching…",
+    "current": "Current",
+    "theme": "Theme: {{theme}}",
+    "groups": {
+      "people": "People",
+      "pages": "Pages",
+      "settings": "Settings",
+      "preferences": "Preferences",
+      "account": "Account"
+    },
+    "keys": {
+      "navigate": "↑ ↓ to move",
+      "open": "↵ to open",
+      "close": "esc to close"
+    }
   }
 }

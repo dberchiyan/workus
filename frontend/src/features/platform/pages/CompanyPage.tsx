@@ -23,6 +23,7 @@ import { CompanyStatusChip } from '../components/CompanyStatusChip';
 import { DecideCompanyDialog } from '../components/DecideCompanyDialog';
 import { useCompany, useCompanyPeople } from '../hooks/usePlatform';
 import type { Company, CompanyPeople } from '../types';
+import { RowSkeleton } from '@/shared/components/RowSkeleton';
 
 const PEOPLE: readonly CompanyPeople[] = ['OWNER', 'ADMIN', 'EMPLOYEE'];
 
@@ -211,7 +212,11 @@ function PeopleCard({ organisationId }: { organisationId: string }) {
         {result.isError ? (
           <Alert severity="error">{t('company.peopleError')}</Alert>
         ) : !result.data ? (
-          <Skeleton variant="rounded" height={120} />
+          <div aria-busy="true" className="flex flex-col divide-y divide-divider">
+            <RowSkeleton />
+            <RowSkeleton />
+            <RowSkeleton />
+          </div>
         ) : result.data.content.length === 0 ? (
           <Typography variant="body2" color="textSecondary" className="py-6 text-center">
             {t('company.noPeople')}
