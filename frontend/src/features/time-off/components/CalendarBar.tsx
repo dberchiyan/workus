@@ -59,8 +59,29 @@ export function CalendarBar({ request, span, linkToRequest }: CalendarBarProps) 
     </>
   );
 
+  // The same facts as the description, laid out: the type, then when and the status.
+  const details = (
+    <span className="flex flex-col gap-0.5 py-0.5">
+      <span className="flex items-center gap-1.5">
+        <Icon aria-hidden fontSize="small" />
+        <Typography variant="subtitle2" component="span" color="inherit">
+          {t(`types.${request.type}`)}
+        </Typography>
+      </span>
+      <Typography variant="body2" component="span" color="inherit">
+        {formatPeriod(request.startDate, request.endDate, i18n.language)}
+      </Typography>
+      <Typography variant="caption" component="span" color="inherit" className="opacity-80">
+        {t('calendar.barDetails', {
+          days: t('requests.days', { count: request.days }),
+          status: t(`status.${request.status}`),
+        })}
+      </Typography>
+    </span>
+  );
+
   return (
-    <Tooltip title={description} describeChild>
+    <Tooltip title={details} describeChild>
       {linkToRequest ? (
         <RouterLink to={requestPath(request.id)} className={className}>
           {content}

@@ -115,6 +115,7 @@
     "previous": "Previous month",
     "next": "Next month",
     "bar": "{{type}}, {{status}}: {{period}} · {{days}}",
+    "barDetails": "{{days}} · {{status}}",
     "page": {
       "title": "Calendar",
       "subtitle": "Who is away and when: approved time off, and requests still waiting for a decision in grey.",

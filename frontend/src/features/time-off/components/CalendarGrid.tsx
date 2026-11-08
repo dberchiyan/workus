@@ -1,7 +1,8 @@
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
-import { type CSSProperties, useEffect, useRef } from 'react';
+import { type CSSProperties, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+import { trackScrollEdges } from '@/shared/lib/scrollEdges';
 import { monthDays } from '../calendar';
 import type { CalendarRow } from '../types';
 import { CalendarDayHeader } from './CalendarDayHeader';
@@ -41,6 +42,10 @@ export function CalendarGrid({
   const days = monthDays(month);
   const weekday = new Intl.DateTimeFormat(i18n.language, { weekday: 'short', timeZone: 'UTC' });
   const scrollRef = useRef<HTMLDivElement>(null);
+  const setScrollBox = useCallback((box: HTMLDivElement | null) => {
+    scrollRef.current = box;
+    return trackScrollEdges(box);
+  }, []);
   const todayRef = useRef<HTMLTableCellElement>(null);
   const loaded = rows !== undefined;
 
@@ -59,7 +64,8 @@ export function CalendarGrid({
     // `isolate`: the sticky name column's z-index stays inside the grid, under the top bar.
     // `relative`: absolutely positioned bits (the sr-only caption) are placed and clipped in
     // here — otherwise they sit in the page, where the scrolled days are, and widen it.
-    <div ref={scrollRef} className="relative isolate overflow-x-auto">
+    // The days fade out at the end; scrolled, the name column casts a shadow over them.
+    <div ref={setScrollBox} className="app-scroll-fade-end relative isolate overflow-x-auto">
       <table
         // One-off geometry: the name column plus a width per day before the days start
         // scrolling — 2.5rem on a phone (a one-day request stays a finger-sized target), 2rem up.
@@ -75,7 +81,7 @@ export function CalendarGrid({
         </colgroup>
         <thead>
           <tr>
-            <td className="sticky left-0 z-10 border-b border-divider bg-background-paper px-3 py-3 sm:px-4">
+            <td className="app-scroll-shadow sticky left-0 z-10 border-b border-divider bg-background-paper px-3 py-3 sm:px-4">
               <RequestSearchField value={search} onSearch={onSearch} />
             </td>
             {days.map((date) => (
@@ -94,7 +100,7 @@ export function CalendarGrid({
           {!rows &&
             SKELETON_ROWS.map((key) => (
               <tr key={key}>
-                <td className="sticky left-0 border-b border-divider bg-background-paper px-4 py-2">
+                <td className="app-scroll-shadow sticky left-0 z-10 border-b border-divider bg-background-paper px-4 py-2">
                   <Skeleton variant="text" width="70%" />
                   <Skeleton variant="text" width="45%" />
                 </td>

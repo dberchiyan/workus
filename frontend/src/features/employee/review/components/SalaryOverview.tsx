@@ -7,6 +7,7 @@ import { formatMoney } from '@/shared/lib/money';
 import { formatPercentChange, formatReviewDate } from '../format';
 import type { EmployeeReviews } from '../types';
 import { SalaryHistoryChart } from './SalaryHistoryChart';
+import { RevealValue } from '@/shared/components/RevealValue';
 
 /** Current salary, change vs the previous completed review, and the history chart. */
 export function SalaryOverview({ salary }: { salary: EmployeeReviews['salary'] }) {
@@ -41,7 +42,7 @@ export function SalaryOverview({ salary }: { salary: EmployeeReviews['salary'] }
         </Typography>
         <div className="flex items-baseline gap-2">
           <Typography variant="metric" component="p">
-            {formatMoney(salary.current, locale)}
+            <RevealValue value={formatMoney(salary.current, locale)} />
           </Typography>
           <Typography variant="body2" color="textSecondary">
             {t('salary.perMonth')}

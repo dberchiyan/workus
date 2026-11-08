@@ -56,6 +56,14 @@ export const TYPE = {
   },
   /** Variants whose figures are always tabular. */
   tabularVariants: ['metric'],
+  /**
+   * How lines break: headings even out their lines (no lone word on the last one); running text
+   * avoids a single-word last line. Only the style is set — `noWrap` / `truncate` still win.
+   */
+  wrap: {
+    balance: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1'],
+    pretty: ['body1', 'body2', 'caption'],
+  },
 } as const;
 
 export type TypeVariant = keyof typeof TYPE.variants;
@@ -68,6 +76,11 @@ const cssVar = (
 ): string => `var(--app-${variant}-${property})`;
 
 const TABULAR: ReadonlySet<string> = new Set(TYPE.tabularVariants);
+const BALANCED: ReadonlySet<string> = new Set(TYPE.wrap.balance);
+const PRETTY: ReadonlySet<string> = new Set(TYPE.wrap.pretty);
+
+const wrapStyle = (variant: TypeVariant): CSSProperties['textWrapStyle'] =>
+  BALANCED.has(variant) ? 'balance' : PRETTY.has(variant) ? 'pretty' : undefined;
 
 const variantStyle = (variant: TypeVariant): CSSProperties => ({
   fontSize: cssVar(variant, 'size'),
@@ -75,6 +88,7 @@ const variantStyle = (variant: TypeVariant): CSSProperties => ({
   lineHeight: cssVar(variant, 'leading'),
   letterSpacing: cssVar(variant, 'tracking'),
   ...(TABULAR.has(variant) ? { fontVariantNumeric: 'tabular-nums' } : {}),
+  ...(wrapStyle(variant) ? { textWrapStyle: wrapStyle(variant) } : {}),
 });
 
 /** MUI typography options — every variant reads the generated custom properties. */

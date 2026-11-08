@@ -1,5 +1,6 @@
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
+import { RevealValue } from '@/shared/components/RevealValue';
 
 export interface FigureProps {
   value: string;
@@ -12,7 +13,7 @@ export function Figure({ value, label, delta }: FigureProps) {
   return (
     <div className="flex flex-col gap-1">
       <Typography variant="metric" color="primary" className="app-tabular">
-        {value}
+        <RevealValue value={value} />
       </Typography>
       <Typography variant="body2" color="textSecondary">
         {label}

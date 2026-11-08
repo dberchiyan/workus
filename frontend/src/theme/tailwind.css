@@ -81,3 +81,68 @@
     opacity: 0.6;
   }
 }
+
+/*
+ * Sideways scrollers (`trackScrollEdges`): an edge with more content past it fades out, so the row
+ * reads as "keeps going". Only while something is hidden — a box that fits has no mask, which
+ * would otherwise clip focus rings outside it. `-end` fades the end only (the calendar: its sticky
+ * name column takes the start and gets a shadow instead).
+ */
+@property --scroll-fade-start {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+@property --scroll-fade-end {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+.app-scroll-fade:is([data-more-start], [data-more-end]) {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 var(--scroll-fade-start),
+    #000 calc(100% - var(--scroll-fade-end)),
+    transparent
+  );
+}
+.app-scroll-fade-end[data-more-end] {
+  mask-image: linear-gradient(to left, transparent, #000 var(--scroll-fade-end));
+}
+.app-scroll-fade[data-more-start] {
+  --scroll-fade-start: 2rem;
+}
+:is(.app-scroll-fade, .app-scroll-fade-end)[data-more-end] {
+  --scroll-fade-end: 2rem;
+}
+[data-more-start] .app-scroll-shadow {
+  box-shadow: 6px 0 8px -6px var(--mui-palette-shadow-strong);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .app-scroll-fade,
+  .app-scroll-fade-end {
+    transition:
+      --scroll-fade-start 150ms ease-out,
+      --scroll-fade-end 150ms ease-out;
+  }
+  .app-scroll-shadow {
+    transition: box-shadow 150ms ease-out;
+  }
+}
+
+/*
+ * A figure that arrives after loading, or changes (`RevealValue`), rises in — the real value only,
+ * never counting through made-up ones (ux.md). Still when motion is reduced.
+ */
+@keyframes value-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.25em);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .app-value-in {
+    animation: value-in 240ms cubic-bezier(0.2, 0, 0, 1) both;
+  }
+}

@@ -7,6 +7,7 @@ import { MonthSwitcher } from '@/shared/components/MonthSwitcher';
 import { cn } from '@/shared/lib/cn';
 import { TIME_OFF_TYPES, type TimeOffType } from '../types';
 import { NOT_EMPLOYED_PATTERN, TYPE_VISUALS } from './timeOffVisuals';
+import { trackScrollEdges } from '@/shared/lib/scrollEdges';
 
 export interface CalendarToolbarProps {
   month: string;
@@ -60,7 +61,8 @@ export function CalendarToolbar({
         <div
           role="group"
           aria-label={t('calendar.page.types')}
-          className="-mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto px-4 sm:mx-0 sm:w-auto sm:flex-wrap sm:overflow-visible sm:px-0"
+          ref={trackScrollEdges}
+          className="app-scroll-fade -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto px-4 sm:mx-0 sm:w-auto sm:flex-wrap sm:overflow-visible sm:px-0"
         >
           {TIME_OFF_TYPES.map((type) => {
             const { icon: Icon, tone } = TYPE_VISUALS[type];

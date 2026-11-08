@@ -13,6 +13,7 @@ import { AccountSection } from '../components/AccountSection';
 import { SecuritySection } from '../components/SecuritySection';
 import { SessionsSection } from '../components/SessionsSection';
 import { isSettingsSection, sectionAccessPart, SETTINGS_SECTIONS } from '../sections';
+import { trackScrollEdges } from '@/shared/lib/scrollEdges';
 
 /**
  * Your account, sessions and security log, and (by role) holidays, the company and its
@@ -60,7 +61,10 @@ export default function SettingsPage() {
       {/* One-off geometry: the section menu keeps a fixed width beside the content. */}
       <div className="grid grid-cols-1 gap-6 md:grid-cols-[13rem_minmax(0,1fr)]">
         <nav ref={navRef} aria-label={t('menu')}>
-          <ul className="m-0 flex list-none gap-1 overflow-x-auto p-0 md:flex-col">
+          <ul
+            ref={trackScrollEdges}
+            className="app-scroll-fade m-0 flex list-none gap-1 overflow-x-auto p-0 md:flex-col"
+          >
             {sections.map(({ key, icon: Icon }) => (
               <li key={key} className="shrink-0">
                 <NavLink

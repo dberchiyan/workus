@@ -3,6 +3,7 @@ import CardContent from '@mui/material/CardContent';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import type { ReactNode } from 'react';
+import { RevealValue } from './RevealValue';
 
 export interface StatCardProps {
   title: string;
@@ -20,7 +21,9 @@ export function StatCard({ title, value, hint }: StatCardProps) {
         <Typography variant="subtitle2" component="h2" color="textSecondary">
           {title}
         </Typography>
-        <Typography variant="metric">{value ?? <Skeleton width="3ch" />}</Typography>
+        <Typography variant="metric">
+          <RevealValue value={value} fallback={<Skeleton width="3ch" />} />
+        </Typography>
         {hint}
       </CardContent>
     </Card>

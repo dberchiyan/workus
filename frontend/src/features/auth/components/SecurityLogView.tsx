@@ -13,6 +13,7 @@ import { previousDay, todayUtcIso } from '@/shared/lib/utcDay';
 import { groupSecurityEvents, isSecurityCategory, SECURITY_CATEGORIES } from '../securityLog';
 import type { SecurityCategory, SecurityLog } from '../types';
 import { SecurityEventRow } from './SecurityEventRow';
+import { trackScrollEdges } from '@/shared/lib/scrollEdges';
 
 const ALL = 'ALL';
 
@@ -53,7 +54,7 @@ export function SecurityLogView({ log, category, onCategory }: SecurityLogViewPr
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
         {/* On a phone the options stay on one line and scroll sideways. */}
-        <div className="overflow-x-auto">
+        <div ref={trackScrollEdges} className="app-scroll-fade overflow-x-auto">
           <ToggleButtonGroup
             exclusive
             size="small"
