@@ -3,6 +3,11 @@
   "version": "0.0.0",
   "private": true,
   "type": "module",
+  "sideEffects": [
+    "*.css",
+    "./src/app/i18n.ts",
+    "./src/app/main.tsx"
+  ],
   "engines": {
     "node": ">=26.13.0 <27"
   },
