@@ -1,14 +1,16 @@
 import HistoryOutlined from '@mui/icons-material/HistoryOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import Pagination from '@mui/material/Pagination';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
-import { useId } from 'react';
+import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { previousDay, todayUtcIso } from '@/shared/lib/utcDay';
 import { isApiError } from '@/shared/api/apiError';
+import { cn } from '@/shared/lib/cn';
 import { formatDayHeading, dayKey } from '../activityFormat';
-import { useEmployeeActivity } from '../hooks/useEmployeeActivity';
+import { ACTIVITY_PAGE_SIZE, useEmployeeActivity } from '../hooks/useEmployeeActivity';
 import type { ActivityEvent } from '../types';
 import { ActivityEventItem } from './ActivityEventItem';
 import { ProfileEmptyState } from './ProfileEmptyState';
@@ -47,12 +49,13 @@ const useDayHeading = () => {
         : formatDayHeading(group.date, i18n.language);
 };
 
-/** Who changed what and when — the employee's audit trail as a timeline of cards. */
+/** Who changed what and when — the employee's audit trail as a timeline of cards, ten a page. */
 export function ProfileActivityTab({ employeeId }: { employeeId: string }) {
   const { t, i18n } = useTranslation(['employee', 'errors']);
   const headingId = useId();
   const dayHeading = useDayHeading();
-  const query = useEmployeeActivity(employeeId);
+  const [page, setPage] = useState(0);
+  const query = useEmployeeActivity(employeeId, page);
 
   if (query.isPending) {
     return (
@@ -68,7 +71,6 @@ export function ProfileActivityTab({ employeeId }: { employeeId: string }) {
       </div>
     );
   }
-  // A failed "Show older" keeps the loaded list (TanStack marks the whole query as errored).
   if (!query.data) {
     return (
       <div className="p-4 sm:p-6">
@@ -87,8 +89,9 @@ export function ProfileActivityTab({ employeeId }: { employeeId: string }) {
     );
   }
 
-  const events = query.data.pages.flatMap((page) => page.content);
-  const total = query.data.pages[0]?.totalElements ?? 0;
+  const events = query.data.content;
+  const total = query.data.totalElements;
+  const pages = Math.ceil(total / ACTIVITY_PAGE_SIZE);
   if (events.length === 0) {
     return (
       <ProfileEmptyState
@@ -112,7 +115,13 @@ export function ProfileActivityTab({ employeeId }: { employeeId: string }) {
           {t('profile.activity.summary', { count: total })}
         </Typography>
       </div>
-      <div className="flex flex-col gap-2 px-4 pt-4 sm:px-6 sm:pt-5">
+      <div
+        aria-busy={query.isPlaceholderData}
+        className={cn(
+          'flex flex-col gap-2 px-4 pt-4 sm:px-6 sm:pt-5',
+          query.isPlaceholderData && 'opacity-60',
+        )}
+      >
         {groups.map((group) => (
           <section key={group.key} aria-labelledby={`${headingId}-${group.key}`}>
             <Typography
@@ -132,38 +141,28 @@ export function ProfileActivityTab({ employeeId }: { employeeId: string }) {
           </section>
         ))}
       </div>
-      <div className="flex flex-col items-center gap-2 border-t border-divider px-4 py-4">
-        {query.isFetchNextPageError && (
-          <Alert severity="error" role="alert" className="w-full">
-            {t(`errors:${isApiError(query.error) ? query.error.code : 'INTERNAL_ERROR'}`)}
-          </Alert>
-        )}
-        <Typography
-          variant="caption"
-          color="textSecondary"
-          aria-live="polite"
-          className="app-tabular"
-        >
-          {query.hasNextPage
-            ? t('profile.activity.shown', {
-                shown: count.format(events.length),
-                total: count.format(total),
-              })
-            : t('profile.activity.end')}
-        </Typography>
-        {query.hasNextPage && (
-          <Button
-            variant="outlined"
-            onClick={() => void query.fetchNextPage()}
-            disabled={query.isFetchingNextPage}
-            aria-busy={query.isFetchingNextPage}
-          >
-            {query.isFetchingNextPage
-              ? t('profile.activity.loadingMore')
-              : t('profile.activity.loadMore')}
-          </Button>
-        )}
-      </div>
+      {pages > 1 && (
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-divider px-4 py-3 sm:px-6">
+          <Typography variant="caption" color="textSecondary" className="app-tabular">
+            {t('profile.activity.range', {
+              from: count.format(page * ACTIVITY_PAGE_SIZE + 1),
+              to: count.format(Math.min(total, (page + 1) * ACTIVITY_PAGE_SIZE)),
+              count: count.format(total),
+            })}
+          </Typography>
+          <Pagination
+            shape="rounded"
+            color="primary"
+            count={pages}
+            page={Math.min(page + 1, pages)}
+            siblingCount={0}
+            aria-label={t('profile.activity.pages')}
+            onChange={(_event, value) => {
+              setPage(value - 1);
+            }}
+          />
+        </div>
+      )}
     </section>
   );
 }

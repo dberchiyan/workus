@@ -21,7 +21,7 @@ export {
   useUpdateOwnName,
 } from './hooks/useAccount';
 export { SecurityLogView } from './components/SecurityLogView';
-export { isSecurityCategory, nextSecurityLogPage } from './securityLog';
+export { isSecurityCategory } from './securityLog';
 export { describeUserAgent } from './userAgent';
 export { AUTH_SESSION_ENDPOINTS } from './api/authApi';
 export type {

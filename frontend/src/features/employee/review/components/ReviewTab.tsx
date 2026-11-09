@@ -2,6 +2,7 @@ import AddOutlined from '@mui/icons-material/AddOutlined';
 import RateReviewOutlined from '@mui/icons-material/RateReviewOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import Pagination from '@mui/material/Pagination';
 import Skeleton from '@mui/material/Skeleton';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
@@ -28,10 +29,14 @@ export interface ReviewTabProps {
   employeeId: string;
 }
 
-/** Salary overview on top, then the reviews (newest first); add, view, edit and delete. */
+/** Reviews shown a page at a time (the list comes whole — the salary history needs all of it). */
+const REVIEWS_PAGE_SIZE = 10;
+
+/** Salary overview on top, then the reviews (newest first, ten a page); add, view, edit and delete. */
 export function ReviewTab({ employeeId }: ReviewTabProps) {
-  const { t } = useTranslation(['review', 'errors']);
+  const { t, i18n } = useTranslation(['review', 'errors']);
   const { data, isPending, isError, error, refetch } = useEmployeeReviews(employeeId);
+  const [page, setPage] = useState(0);
   const [dialog, setDialog] = useState<DialogState>({ kind: 'none' });
   // The last shown review stays mounted during the closing transition.
   const [lastReview, setLastReview] = useState<Review | null>(null);
@@ -104,6 +109,12 @@ export function ReviewTab({ employeeId }: ReviewTabProps) {
     );
   }
 
+  const pages = Math.ceil(data.content.length / REVIEWS_PAGE_SIZE);
+  // A delete can empty the last page: stay on the last one that exists.
+  const current = Math.max(0, Math.min(page, pages - 1));
+  const shown = data.content.slice(current * REVIEWS_PAGE_SIZE, (current + 1) * REVIEWS_PAGE_SIZE);
+  const number = (value: number) => new Intl.NumberFormat(i18n.language).format(value);
+
   return (
     <div className="flex flex-col">
       <SalaryOverview salary={data.salary} />
@@ -139,11 +150,33 @@ export function ReviewTab({ employeeId }: ReviewTabProps) {
         // Title and Responsible fit.
         <div className="@container">
           <div className="hidden @[44rem]:block">
-            <ReviewTable reviews={data.content} onAction={onAction} />
+            <ReviewTable reviews={shown} onAction={onAction} />
           </div>
           <div className="@[44rem]:hidden">
-            <ReviewCardList reviews={data.content} onAction={onAction} />
+            <ReviewCardList reviews={shown} onAction={onAction} />
           </div>
+        </div>
+      )}
+      {pages > 1 && (
+        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-divider px-4 py-3 sm:px-6">
+          <Typography variant="caption" color="textSecondary" className="app-tabular">
+            {t('list.range', {
+              from: number(current * REVIEWS_PAGE_SIZE + 1),
+              to: number(current * REVIEWS_PAGE_SIZE + shown.length),
+              count: number(data.content.length),
+            })}
+          </Typography>
+          <Pagination
+            shape="rounded"
+            color="primary"
+            count={pages}
+            page={current + 1}
+            siblingCount={0}
+            aria-label={t('list.pages')}
+            onChange={(_event, value) => {
+              setPage(value - 1);
+            }}
+          />
         </div>
       )}
       <ReviewFormDialog
@@ -154,6 +187,10 @@ export function ReviewTab({ employeeId }: ReviewTabProps) {
         onClose={close}
         onSaved={(review) => {
           close();
+          // A new review is the newest: show the first page, where it lands.
+          if (!formReview) {
+            setPage(0);
+          }
           setNotice(
             formReview
               ? t('edit.saved', { title: review.title })

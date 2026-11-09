@@ -9,6 +9,6 @@ export const authKeys = {
   me: () => [...authKeys.all, 'me'] as const,
   sessions: () => [...authKeys.all, 'sessions'] as const,
   sessionsPage: (page: number) => [...authKeys.sessions(), page] as const,
-  securityLog: (category: SecurityCategory | undefined) =>
-    [...authKeys.all, 'security-log', category ?? 'ALL'] as const,
+  securityLog: (category: SecurityCategory | undefined, page: number) =>
+    [...authKeys.all, 'security-log', category ?? 'ALL', page] as const,
 };

@@ -19,7 +19,9 @@
     "empty": "No reviews yet",
     "emptyHint": "Add the first review to start the salary history.",
     "noSalary": "No salary",
-    "retry": "Try again"
+    "retry": "Try again",
+    "range": "{{from}}–{{to}} of {{count}}",
+    "pages": "Review pages"
   },
   "status": {
     "COMPLETED": "Completed",

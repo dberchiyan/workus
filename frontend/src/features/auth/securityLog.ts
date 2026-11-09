@@ -1,4 +1,4 @@
-import type { SecurityCategory, SecurityEvent, SecurityLog } from './types';
+import type { SecurityCategory, SecurityEvent } from './types';
 
 type Action = SecurityEvent['action'];
 
@@ -94,12 +94,3 @@ export const groupSecurityEvents = (events: readonly SecurityEvent[]): SecurityD
   }
   return days;
 };
-
-/** The next page to load, or none when every event is on screen. */
-export const nextSecurityLogPage = (
-  last: SecurityLog,
-  pages: readonly SecurityLog[],
-): number | undefined =>
-  pages.reduce((sum, page) => sum + page.content.length, 0) < last.totalElements
-    ? pages.length
-    : undefined;

@@ -12,7 +12,8 @@ export function ProfileSecurityTab({ employeeId }: { employeeId: string }) {
   const { t } = useTranslation('employee');
   const headingId = useId();
   const [category, setCategory] = useState<SecurityCategory | undefined>(undefined);
-  const log = useEmployeeSecurityLog(employeeId, category);
+  const [page, setPage] = useState(0);
+  const log = useEmployeeSecurityLog(employeeId, category, page);
   return (
     <section aria-labelledby={headingId} className="flex flex-col">
       <div className="flex flex-col gap-0.5 border-b border-divider px-4 py-3 sm:px-6">
@@ -24,7 +25,16 @@ export function ProfileSecurityTab({ employeeId }: { employeeId: string }) {
         </Typography>
       </div>
       <div className="px-4 py-4 sm:px-6 sm:py-5">
-        <SecurityLogView log={log} category={category} onCategory={setCategory} />
+        <SecurityLogView
+          log={log}
+          category={category}
+          onCategory={(next) => {
+            setCategory(next);
+            setPage(0);
+          }}
+          page={page}
+          onPage={setPage}
+        />
       </div>
     </section>
   );

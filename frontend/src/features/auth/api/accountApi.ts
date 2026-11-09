@@ -10,7 +10,7 @@ import type {
 /** Other sessions per page in Settings. */
 export const SESSIONS_PAGE_SIZE = 5;
 /** Security-log entries per "Show more" (grouped on screen, so a page shows fewer rows). */
-export const SECURITY_LOG_PAGE_SIZE = 25;
+export const SECURITY_LOG_PAGE_SIZE = 4;
 
 const BASE = '/api/v1/auth';
 
