@@ -4,6 +4,7 @@ import { lazyWithPreload } from '@/shared/lib/lazyWithPreload';
 export const RequestsPage = lazyWithPreload(() => import('./pages/RequestsPage'));
 export const CalendarPage = lazyWithPreload(() => import('./pages/CalendarPage'));
 export { MyTimeOff } from './components/MyTimeOff';
+export { ManagedRequestDialog } from './components/ManagedRequestDialog';
 export { HolidaysSection } from './components/HolidaysSection';
 export { EmployeeLeaveBalances } from './components/EmployeeLeaveBalances';
 export { TimeOffStatusChip, TimeOffTypeChip } from './components/TimeOffChips';

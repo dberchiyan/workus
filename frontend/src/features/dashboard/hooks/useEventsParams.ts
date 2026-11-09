@@ -13,6 +13,8 @@ export interface EventsParams {
   requestsPage: number;
   reviewsPage: number;
   birthdaysPage: number;
+  /** The request open in the dialog over the dashboard. */
+  request: string | undefined;
 }
 
 const readPage = (raw: string | null): number => {
@@ -20,7 +22,7 @@ const readPage = (raw: string | null): number => {
   return Number.isInteger(value) && value >= 0 ? value : 0;
 };
 
-/** The events tab and each card's month live in the URL (shareable, back works). */
+/** The events tab, each card's month and page, and the open request live in the URL (shareable, back works). */
 export const useEventsParams = (currentMonth: string) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const params = useMemo<EventsParams>(() => {
@@ -35,6 +37,7 @@ export const useEventsParams = (currentMonth: string) => {
       requestsPage: readPage(searchParams.get('requestsPage')),
       reviewsPage: readPage(searchParams.get('reviewsPage')),
       birthdaysPage: readPage(searchParams.get('birthdaysPage')),
+      request: searchParams.get('request') ?? undefined,
     };
   }, [searchParams, currentMonth]);
 
@@ -71,13 +74,27 @@ export const useEventsParams = (currentMonth: string) => {
           if (changes.birthdaysMonth !== undefined) {
             next.delete('birthdaysPage');
           }
+          if ('request' in changes && !changes.request) {
+            next.delete('request');
+          }
           return next;
         },
-        { replace: true },
+        // Closing a request is a step back should undo; the rest replaces.
+        { replace: !('request' in changes) },
       );
     },
     [setSearchParams, currentMonth],
   );
 
-  return { params, update };
+  /** The link that opens a request over the dashboard as it is now (opening is a history step). */
+  const requestHref = useCallback(
+    (requestId: string): string => {
+      const next = new URLSearchParams(searchParams);
+      next.set('request', requestId);
+      return `?${next.toString()}`;
+    },
+    [searchParams],
+  );
+
+  return { params, update, requestHref };
 };

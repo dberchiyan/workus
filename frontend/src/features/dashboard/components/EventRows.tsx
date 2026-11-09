@@ -5,7 +5,6 @@ import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router';
 import { ReviewStatusChip } from '@/features/employee/review';
 import { TimeOffStatusChip, TimeOffTypeChip } from '@/features/time-off';
-import { requestPath } from '@/shared/lib/paths';
 import type { DashboardBirthday, DashboardRequest, DashboardReview } from '../types';
 import { EventPerson } from './EventPerson';
 
@@ -17,8 +16,8 @@ const dayMonth = (iso: string, locale: string): string =>
     new Date(`${iso}T00:00:00Z`),
   );
 
-/** A request made today: who, what, its state, and a way into it. */
-export function RequestEventRow({ request }: { request: DashboardRequest }) {
+/** A request made today: who, what, its state, and a link that opens it over the dashboard. */
+export function RequestEventRow({ request, href }: { request: DashboardRequest; href: string }) {
   const { t, i18n } = useTranslation('dashboard');
   const period =
     request.startDate === request.endDate
@@ -50,7 +49,7 @@ export function RequestEventRow({ request }: { request: DashboardRequest }) {
         </Typography>
         <IconButton
           component={RouterLink}
-          to={requestPath(request.id)}
+          to={href}
           size="small"
           aria-label={t('events.requests.open', { name })}
           className="ml-auto"

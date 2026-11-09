@@ -6,17 +6,15 @@ import Typography from '@mui/material/Typography';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { todayUtcIso } from '@/shared/lib/utcDay';
-import { useAccess, useCurrentUser } from '@/features/auth';
+import { useAccess } from '@/features/auth';
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
 import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
 import { CalendarGrid } from '../components/CalendarGrid';
 import { CalendarToolbar } from '../components/CalendarToolbar';
-import { DecisionFeedback } from '../components/DecisionFeedback';
-import { RequestDialog } from '../components/RequestDialog';
+import { ManagedRequestDialog } from '../components/ManagedRequestDialog';
 import { formatCount } from '../format';
 import { useCalendar } from '../hooks/useCalendar';
 import { CALENDAR_PAGE_SIZES, useCalendarParams } from '../hooks/useCalendarParams';
-import { useRequestDecisions } from '../hooks/useRequestDecisions';
 
 /**
  * Who is away and when: everyone's approved time off and requests still waiting (grey). Admins
@@ -31,8 +29,6 @@ export default function CalendarPage() {
   const calendar = useCalendar(params);
   const can = useAccess();
   const canOpenRequest = can('calendar.openRequest');
-  const { data: user } = useCurrentUser();
-  const decisions = useRequestDecisions();
   useDocumentTitle(t('calendar.page.title'));
   const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
 
@@ -127,20 +123,14 @@ export default function CalendarPage() {
           )}
         </Card>
       )}
-      {canOpenRequest && params.request && user && (
-        <RequestDialog
-          key={params.request}
+      {canOpenRequest && (
+        <ManagedRequestDialog
           requestId={params.request}
-          open
-          viewerId={user.id}
-          busy={decisions.isPending}
-          onDecide={decisions.start}
           onClose={() => {
             update({ request: undefined });
           }}
         />
       )}
-      <DecisionFeedback decisions={decisions} />
     </div>
   );
 }

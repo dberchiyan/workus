@@ -4,6 +4,7 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { ManagedRequestDialog } from '@/features/time-off';
 import { cn } from '@/shared/lib/cn';
 import { currentMonthUtc, todayUtcRange } from '@/shared/lib/utcDay';
 import { useEventBirthdays, useEventReviews, useTodayRequests } from '../hooks/useAdminDashboard';
@@ -26,13 +27,13 @@ const monthRange = (month: string): DateRange => {
   return { from: `${month}-01`, to: `${month}-${String(last).padStart(2, '0')}` };
 };
 
-/** Today's events and events by month (admin dashboard, under the figures). */
+/** Today's events and events by month (admin dashboard, under the figures); a request opens in place. */
 export function AdminEvents() {
   const { t, i18n } = useTranslation('dashboard');
   // Today (UTC, as everywhere), fixed for the visit (no clock in render).
   const [day] = useState<LocalDay>(todayUtcRange);
   const [currentMonth] = useState(currentMonthUtc);
-  const { params, update } = useEventsParams(currentMonth);
+  const { params, update, requestHref } = useEventsParams(currentMonth);
   const onToday = params.tab === 'today';
   // The open tab's cards use the pages in the URL; the other tab's first pages give its count.
   const todayRange = { from: day.date, to: day.date };
@@ -133,6 +134,7 @@ export function AdminEvents() {
             requests={requests}
             requestsPage={params.requestsPage}
             onRequestsPage={onRequestsPage}
+            requestHref={requestHref}
             reviews={todayReviews}
             birthdays={todayBirthdays}
             reviewsPage={params.reviewsPage}
@@ -159,6 +161,12 @@ export function AdminEvents() {
           />
         )}
       </div>
+      <ManagedRequestDialog
+        requestId={params.request}
+        onClose={() => {
+          update({ request: undefined });
+        }}
+      />
     </section>
   );
 }

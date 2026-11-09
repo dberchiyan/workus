@@ -23,6 +23,8 @@ export interface TodayEventsPanelProps {
   requests: UseQueryResult<DashboardRequests>;
   requestsPage: number;
   onRequestsPage: (page: number) => void;
+  /** Where a request opens: a dialog over the dashboard. */
+  requestHref: (requestId: string) => string;
   reviews: UseQueryResult<DashboardReviews>;
   birthdays: UseQueryResult<DashboardBirthdays>;
   reviewsPage: number;
@@ -81,7 +83,11 @@ export function TodayEventsPanel(props: TodayEventsPanelProps) {
           stale={requests.isPlaceholderData}
         >
           {requests.data?.content.map((request) => (
-            <RequestEventRow key={request.id} request={request} />
+            <RequestEventRow
+              key={request.id}
+              request={request}
+              href={props.requestHref(request.id)}
+            />
           ))}
         </EventList>
       </EventCard>
