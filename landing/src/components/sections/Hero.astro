@@ -10,22 +10,32 @@ import { SITE } from '@/content/site';
 const { hero, highlights } = LANDING;
 ---
 
-<section aria-labelledby="hero-title" class="relative isolate overflow-hidden">
+<!-- Pulled up under the header (transparent at the top), so the glow reaches the top edge. -->
+<section aria-labelledby="hero-title" class="relative isolate -mt-16 overflow-hidden pt-16">
   <div class="backdrop-brand absolute inset-0 -z-10" aria-hidden="true"></div>
   <div class="backdrop-grid absolute inset-0 -z-10" aria-hidden="true"></div>
 
   <Container class="pt-16 pb-4 sm:pt-24 lg:pt-28">
     <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
-      <p class="inline-flex items-center gap-2 rounded-full bg-surface/70 px-3.5 py-1.5 text-[0.8125rem] font-medium text-ink-2 ring-glass backdrop-blur">
+      <p
+        style="--d: 0"
+        class="enter inline-flex items-center gap-2 rounded-full bg-surface/70 px-3.5 py-1.5 text-[0.8125rem] font-medium text-ink-2 ring-glass backdrop-blur"
+      >
         <Icon name="sparkle" class="size-4 text-brand" />
         {hero.eyebrow}
       </p>
       <h1 id="hero-title" class="type-display mt-6">
-        {hero.titleStart}
-        <span class="text-gradient block pb-1">{hero.titleAccent}</span>
+        <span style="--d: 1" class="enter block">
+          {hero.titleStart}
+        </span>
+        <span style="--d: 2" class="enter text-gradient block pb-1">
+          {hero.titleAccent}
+        </span>
       </h1>
-      <p class="type-lead mt-6 max-w-2xl text-muted">{hero.lead}</p>
-      <div class="mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+      <p style="--d: 3" class="enter type-lead mt-6 max-w-2xl text-muted">
+        {hero.lead}
+      </p>
+      <div style="--d: 4" class="enter mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
         <Button href="#demo" size="lg">
           {hero.primary}
           <Icon name="arrowRight" class="size-4.5" />
@@ -34,15 +44,19 @@ const { hero, highlights } = LANDING;
           {hero.secondary}
         </Button>
       </div>
-      <p class="mt-4 text-sm text-subtle">{hero.note}</p>
+      <p style="--d: 5" class="enter mt-4 text-sm text-subtle">
+        {hero.note}
+      </p>
     </div>
 
-    <div class="relative mx-auto mt-16 max-w-5xl sm:mt-20">
+    <div style="--d: 5" class="enter tilt-stage relative mx-auto mt-16 max-w-5xl sm:mt-20">
       <div
         class="absolute -inset-x-8 -top-8 -bottom-12 -z-10 rounded-[3rem] bg-gradient-to-b from-brand/15 to-transparent blur-2xl"
         aria-hidden="true"
       ></div>
-      <AppWindow />
+      <div class="tilt">
+        <AppWindow />
+      </div>
       <NoticeCard class="animate-float absolute top-28 -right-4 hidden sm:flex lg:-right-12" />
     </div>
 

@@ -9,7 +9,15 @@ const { features } = LANDING;
 const WIDE = new Set(['reviews', 'calendar', 'insights']);
 ---
 
-<section id="features" aria-labelledby="features-title" class="py-24 sm:py-32">
+<!--
+  The only linked section on the page background (no fill of its own): its top padding would show
+  as empty space under the header, so the jump target is pulled up to land the heading ~3rem below.
+-->
+<section
+  id="features"
+  aria-labelledby="features-title"
+  class="-scroll-mt-18 py-24 sm:-scroll-mt-26 sm:py-32"
+>
   <Container>
     <SectionHeading
       id="features-title"

@@ -4,14 +4,16 @@ import StatusBadge from '@/components/ui/StatusBadge.astro';
 
 const PEOPLE = [
   { name: 'Ava Thompson', role: 'Product Designer', status: 'Active' },
-  { name: 'Liam Foster', role: 'Backend Engineer', status: 'Active' },
   { name: 'Hannah Brooks', role: 'QA Engineer', status: 'Leaves Mar 31' },
 ] as const;
 ---
 
 <ul class="flex flex-col gap-2">
-  {PEOPLE.map((person) => (
-    <li class="flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3 py-2.5 shadow-card">
+  {PEOPLE.map((person, index) => (
+    <li
+      style={`--i: ${index * 2}`}
+      class="anim-rise flex items-center gap-2.5 rounded-xl border border-line bg-surface px-3 py-2.5 shadow-card"
+    >
       <Avatar name={person.name} size="md" />
       <div class="min-w-0 flex-1">
         <p class="truncate text-[0.8125rem] font-medium text-ink">{person.name}</p>

@@ -58,13 +58,12 @@ const svg = `
   </g>
 
   <text font-family="${FONT}" font-size="56" font-weight="700" letter-spacing="-1.5" fill="#ffffff">
-    <tspan x="80" y="250">People, time off</tspan>
-    <tspan x="80" y="316">and reviews.</tspan>
-    <tspan x="80" y="382" fill="#8fd0e0">In one app.</tspan>
+    <tspan x="80" y="290">Day-to-day HR,</tspan>
+    <tspan x="80" y="358" fill="#8fd0e0">without the busywork.</tspan>
   </text>
   <text font-family="${FONT}" font-size="24" fill="#a9bccb">
-    <tspan x="80" y="452">Employee records, salary reviews, time off,</tspan>
-    <tspan x="80" y="486">a shared calendar and yearly reports.</tspan>
+    <tspan x="80" y="440">Employee records, salary reviews, time off,</tspan>
+    <tspan x="80" y="474">a shared calendar and yearly reports.</tspan>
   </text>
 
   ${statusRow(190, 'Ava Thompson', 'Vacation · 5 days', 'Pending', '#e0a53a', '#f4d9a0')}

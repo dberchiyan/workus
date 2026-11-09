@@ -54,8 +54,11 @@ const REQUESTS: readonly {
   </div>
 
   <div class="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
-    {STATS.map((stat) => (
-      <div class="rounded-xl border border-line bg-surface p-3 shadow-card">
+    {STATS.map((stat, index) => (
+      <div
+        class="anim-rise rounded-xl border border-line bg-surface p-3 shadow-card"
+        style={`--i: ${index}`}
+      >
         <p class="truncate text-[0.625rem] font-medium text-muted">{stat.label}</p>
         <p class="mt-1 text-lg font-semibold tracking-[-0.02em] text-ink tabular-nums">
           {stat.value}
@@ -78,8 +81,8 @@ const REQUESTS: readonly {
       <span class="pb-2 text-subtle">Events by month</span>
     </div>
     <ul class="divide-y divide-line">
-      {REQUESTS.map((request) => (
-        <li class="flex items-center gap-2.5 px-3.5 py-2.5">
+      {REQUESTS.map((request, index) => (
+        <li class="anim-rise flex items-center gap-2.5 px-3.5 py-2.5" style={`--i: ${index + 4}`}>
           <Avatar name={request.name} size="sm" />
           <div class="min-w-0 flex-1">
             <p class="truncate text-xs font-medium text-ink">{request.name}</p>

@@ -18,6 +18,10 @@ const { title, description, path, noindex = false } = Astro.props;
 <html lang={SITE.locale}>
   <head>
     <meta charset="utf-8" />
+    <!-- Before first paint: animations that wait for the observer below may hide their parts. -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="color-scheme" content="light dark" />
     <meta
@@ -42,5 +46,22 @@ const { title, description, path, noindex = false } = Astro.props;
       Skip to content
     </a>
     <slot />
+    <script>
+      // Drawings of the app come alive once a third of them is on screen (global.css → motion 3).
+      const observer = new IntersectionObserver(
+        (entries) => {
+          for (const entry of entries) {
+            if (entry.isIntersecting) {
+              entry.target.setAttribute('data-visible', '');
+              observer.unobserve(entry.target);
+            }
+          }
+        },
+        { threshold: 0.35 },
+      );
+      for (const element of document.querySelectorAll('[data-animate]')) {
+        observer.observe(element);
+      }
+    </script>
   </body>
 </html>

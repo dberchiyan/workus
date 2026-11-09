@@ -9,14 +9,14 @@ const MAX = 30;
     <p class="text-[0.8125rem] font-medium text-ink">Headcount</p>
     <p class="text-[0.6875rem] text-success-fg tabular-nums">+12 this year</p>
   </div>
-  <div class="mt-4 flex h-24 items-end gap-1.5">
+  <div class="mt-4 flex h-40 items-end gap-1.5">
     {COLUMNS.map((value, index) => (
       <span
         class:list={[
-          'flex-1 rounded-t-[4px]',
+          'anim-grow-y flex-1 rounded-t-[4px]',
           index === COLUMNS.length - 1 ? 'bg-brand' : 'bg-brand/25',
         ]}
-        style={`height: ${(value / MAX) * 100}%`}
+        style={`height: ${(value / MAX) * 100}%; --i: ${index}`}
       />
     ))}
   </div>

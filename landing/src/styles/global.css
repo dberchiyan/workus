@@ -303,8 +303,11 @@
 
 @media (prefers-reduced-motion: no-preference) {
   @supports (animation-timeline: view()) {
+    /* Longhands only: the minifier would fold a shorthand and the timeline into one invalid value. */
     .reveal {
-      animation: rise-in linear both;
+      animation-name: rise-in;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
       animation-timeline: view();
       animation-range: entry 0% entry 40%;
     }
@@ -317,5 +320,187 @@
   .animate-float-slow {
     animation: float 8s ease-in-out infinite;
     animation-delay: -3s;
+  }
+}
+
+/*
+ * Premium motion — transform and opacity (and a one-off blur on entrance) only; everything here
+ * is skipped under reduced motion, and the page reads fully without it.
+ *
+ * 1. Hero entrance: `.enter` + `--d` (step) — pieces rise in one after another on load.
+ * 2. Hero window: `.tilt` leans back and settles flat over the first 28rem of scrolling.
+ * 3. Drawings come alive once in view: `MockFrame` carries `data-animate`; a small observer
+ *    (Base.astro) sets `data-visible`. Parts use `.anim-rise | -fade | -pop | -grow-x | -grow-y |
+ *    -draw` with `--i` for the stagger and `--base` (on the frame) for an extra delay.
+ * 4. Header: a solid layer (`.site-header::before`) fades in as the page scrolls.
+ */
+:root {
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes enter {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(6px);
+  }
+}
+
+@keyframes tilt-flat {
+  from {
+    transform: rotateX(14deg) scale(0.94);
+  }
+}
+
+@keyframes anim-rise {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+}
+
+@keyframes anim-fade {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes anim-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+}
+
+@keyframes anim-grow-x {
+  from {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes anim-grow-y {
+  from {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes anim-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+}
+
+@keyframes header-solid {
+  from {
+    opacity: 0;
+  }
+}
+
+/* The drawn line is exactly one dash long, so it can be drawn by moving the offset. */
+.anim-draw {
+  stroke-dasharray: 1;
+}
+
+.anim-grow-x {
+  transform-origin: left center;
+}
+
+.anim-grow-y {
+  transform-origin: center bottom;
+}
+
+.anim-pop {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* The header's solid layer: always on where scroll timelines are missing. */
+.site-header::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: color-mix(in oklch, var(--c-canvas) 78%, transparent);
+  border-bottom: 1px solid var(--c-line);
+  box-shadow: 0 8px 24px -16px var(--shadow-strong);
+  backdrop-filter: blur(20px) saturate(1.5);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .enter {
+    animation: enter 800ms var(--ease-out) both;
+    animation-delay: calc(var(--d, 0) * 90ms + 60ms);
+  }
+
+  @supports (animation-timeline: scroll()) {
+    .tilt-stage {
+      perspective: 2000px;
+    }
+
+    .tilt {
+      transform-origin: 50% 0%;
+      animation-name: tilt-flat;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root);
+      animation-range: 0 28rem;
+    }
+
+    .site-header::before {
+      animation-name: header-solid;
+      animation-timing-function: linear;
+      animation-fill-mode: both;
+      animation-timeline: scroll(root);
+      animation-range: 0 5rem;
+    }
+  }
+
+  /* Before the drawing is seen: hidden only when the observer runs (`.js` on <html>). */
+  .js [data-animate]:not([data-visible]) :is(.anim-rise, .anim-fade, .anim-pop) {
+    opacity: 0;
+  }
+
+  .js [data-animate]:not([data-visible]) .anim-grow-x {
+    transform: scaleX(0);
+  }
+
+  .js [data-animate]:not([data-visible]) .anim-grow-y {
+    transform: scaleY(0);
+  }
+
+  .js [data-animate]:not([data-visible]) .anim-draw {
+    stroke-dashoffset: 1;
+  }
+
+  [data-visible] :is(.anim-rise, .anim-fade, .anim-pop, .anim-grow-x, .anim-grow-y, .anim-draw) {
+    animation-duration: 700ms;
+    animation-timing-function: var(--ease-out);
+    animation-fill-mode: both;
+    animation-delay: calc(var(--base, 0ms) + var(--i, 0) * 60ms);
+  }
+
+  [data-visible] .anim-rise {
+    animation-name: anim-rise;
+  }
+
+  [data-visible] .anim-fade {
+    animation-name: anim-fade;
+  }
+
+  [data-visible] .anim-pop {
+    animation-name: anim-pop;
+  }
+
+  [data-visible] .anim-grow-x {
+    animation-name: anim-grow-x;
+  }
+
+  [data-visible] .anim-grow-y {
+    animation-name: anim-grow-y;
+  }
+
+  [data-visible] .anim-draw {
+    animation-name: anim-draw;
+    animation-duration: 1400ms;
   }
 }

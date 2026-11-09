@@ -43,8 +43,8 @@ export const LANDING = {
   ],
   hero: {
     eyebrow: 'HR app for growing teams',
-    titleStart: 'People, time off and reviews.',
-    titleAccent: 'In one app.',
+    titleStart: 'Day-to-day HR,',
+    titleAccent: 'without the busywork.',
     lead: 'Workus keeps employee records, salary reviews, time-off requests and a shared calendar together. Admins manage the company. Employees request time off and see their balances.',
     primary: 'Try the live demo',
     secondary: 'Create your company',
@@ -67,9 +67,9 @@ export const LANDING = {
         title: 'People',
         text: 'One record per person: position, start date, contacts, the admins responsible for them.',
         points: [
-          'Search, tabs by position group, active or left',
-          'Sign-in details generated when you add someone',
-          'Set a leave date ahead. Access ends on that day',
+          'Search and filter by group',
+          'A password made for each new person',
+          'Access ends on the leave date',
         ],
       },
       {
@@ -89,9 +89,9 @@ export const LANDING = {
         title: 'Time off',
         text: 'Vacation, sick days and days off with balances per cycle. Employees ask, the right admins decide.',
         points: [
-          'Working days counted, company holidays skipped',
-          'Comments both ways, reasons with rejections',
-          'Reminders for requests left waiting',
+          'Only working days are counted',
+          'Comments on every request',
+          'Reminders for waiting requests',
         ],
       },
       {

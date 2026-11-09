@@ -8,8 +8,8 @@ const EVENTS = [
 ---
 
 <ol class="relative flex flex-col gap-3 before:absolute before:top-2 before:bottom-2 before:left-[13px] before:w-px before:bg-line">
-  {EVENTS.map((event) => (
-    <li class="relative flex gap-3">
+  {EVENTS.map((event, index) => (
+    <li class="anim-rise relative flex gap-3" style={`--i: ${index * 3}`}>
       <Avatar name={event.actor} size="sm" ring />
       <div class="min-w-0 flex-1 rounded-xl border border-line bg-surface px-3 py-2.5 shadow-card">
         <p class="truncate text-[0.75rem] text-muted">
