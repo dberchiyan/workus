@@ -169,8 +169,8 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
-    /* Anchored sections clear the sticky header. */
-    scroll-padding-top: 5.5rem;
+    /* Anchored sections start right under the sticky header (h-16). */
+    scroll-padding-top: 4rem;
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -412,6 +412,88 @@
 .anim-pop {
   transform-box: fill-box;
   transform-origin: center;
+}
+
+/*
+ * Reading progress: a hairline at the very top that fills as the page scrolls, brightest at its
+ * leading edge. The bar slides in (transform only) inside a box that clips sideways, so the tip's
+ * glow is never squashed. Scroll-linked, not autonomous motion, so it stays under reduced motion;
+ * hidden where scroll timelines are missing.
+ */
+.scroll-progress {
+  display: none;
+}
+
+@supports (animation-timeline: scroll()) {
+  .scroll-progress {
+    display: block;
+    position: absolute;
+    inset: 0 0 auto;
+    height: 0.5rem;
+    overflow-x: clip;
+    pointer-events: none;
+    animation-name: progress-show;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(root);
+    animation-range: 0 3rem;
+  }
+
+  .scroll-progress::before {
+    content: '';
+    position: absolute;
+    inset: 0 0 auto;
+    height: 2px;
+    border-radius: 0 999px 999px 0;
+    background: linear-gradient(
+      90deg,
+      color-mix(in oklch, var(--c-brand-strong) 0%, transparent) 0%,
+      var(--c-brand) 35%,
+      var(--c-brand-glow) 80%,
+      var(--c-sky) 100%
+    );
+    box-shadow:
+      0 0 10px color-mix(in oklch, var(--c-brand-glow) 70%, transparent),
+      0 0 2px color-mix(in oklch, var(--c-sky) 80%, transparent);
+    transform: translateX(-100%);
+    animation-name: progress-fill;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(root);
+  }
+
+  /* The tip: a soft spark at the leading edge, moving with the bar. */
+  .scroll-progress::after {
+    content: '';
+    position: absolute;
+    inset: -3px 0 auto;
+    height: 8px;
+    background: radial-gradient(
+      3rem 4px at 100% 50%,
+      color-mix(in oklch, var(--c-sky) 90%, transparent),
+      transparent
+    );
+    transform: translateX(-100%);
+    animation-name: progress-fill;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(root);
+  }
+}
+
+@keyframes progress-show {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes progress-fill {
+  to {
+    transform: translateX(0);
+  }
 }
 
 /* The header's solid layer: always on where scroll timelines are missing. */
