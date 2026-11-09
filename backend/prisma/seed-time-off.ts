@@ -23,14 +23,17 @@ import { timeOffLabel } from '../src/modules/time-off/service/time-off-label';
 const HOUR_MS = 3_600_000;
 
 /**
- * Pending requests in the seed, by type (11 in all) — enough to fill the Requests page without
- * burying it.
+ * Pending requests in the seed, by type (4 in all): sick days and vacations made this morning and
+ * starting today — the demo resets daily, so "today" always has fresh requests to decide.
  */
 const PENDING_MIX: Readonly<Record<TimeOffType, number>> = {
-  [TimeOffType.VACATION]: 5,
-  [TimeOffType.DAY_OFF]: 3,
-  [TimeOffType.SICK_DAY]: 3,
+  [TimeOffType.VACATION]: 2,
+  [TimeOffType.DAY_OFF]: 0,
+  [TimeOffType.SICK_DAY]: 2,
 };
+
+/** People with a rejected vacation in their history (the rest is approved). */
+const REJECTED_AT = new Set([3, 10]);
 
 /** The Monday on or after `date`. */
 const weekday = (date: Date): Date => {
@@ -60,8 +63,9 @@ interface Plan {
 
 /**
  * Per employee: the previous vacation cycle has an approved vacation; the current one an approved
- * vacation (when it has already started), a rejected and a canceled one; an approved sick day and
- * day off this year. Pending requests come from `seedPendingRequests`. Vacation days stay within the allowance.
+ * vacation (when it has already started); an approved sick day and day off this year. A couple of
+ * people also have a rejected vacation. Pending requests come from `seedPendingRequests`.
+ * Vacation days stay within the allowance.
  */
 const plansFor = (index: number): Plan[] => [
   // Every fifth person is off around today (the admin dashboard's "Out today").
@@ -78,15 +82,18 @@ const plansFor = (index: number): Plan[] => [
     : []),
   { type: TimeOffType.VACATION, offset: -150 + (index % 20), length: 5, status: 'APPROVED' },
   { type: TimeOffType.VACATION, offset: 20 + (index % 15), length: 3, status: 'APPROVED' },
-  {
-    type: TimeOffType.VACATION,
-    offset: 50 + (index % 10),
-    length: 2,
-    status: 'REJECTED',
-    note: 'Family trip',
-    decisionComment: 'Release week — please pick other dates',
-  },
-  { type: TimeOffType.DAY_OFF, offset: 70 + (index % 12), length: 1, status: 'CANCELED' },
+  ...(REJECTED_AT.has(index)
+    ? [
+        {
+          type: TimeOffType.VACATION,
+          offset: 50 + (index % 10),
+          length: 2,
+          status: 'REJECTED',
+          note: 'Family trip',
+          decisionComment: 'Release week — please pick other dates',
+        } satisfies Plan,
+      ]
+    : []),
   {
     type: TimeOffType.SICK_DAY,
     offset: -40 - (index % 30),
@@ -260,43 +267,36 @@ export const seedTimeOff = async (
   return created;
 };
 
-/** The weekday on or before `date`. */
-const weekdayBefore = (date: Date): Date => {
-  const day = date.getUTCDay();
-  return day === 6 ? plusDays(date, -1) : day === 0 ? plusDays(date, -2) : date;
-};
+const MINUTE_MS = 60_000;
 
-/** Slot `k` of a type: dates, note and when it was made (some wait over two days). */
+/**
+ * Slot `k` of a type: it starts today and was made this morning, minutes apart (never before
+ * today's start, UTC); a vacation runs a few working days, a sick leave one or two.
+ */
 const pendingSlot = (
   type: TimeOffType,
   k: number,
   today: Date,
   now: number,
 ): { start: Date; end: Date; note: string | null; createdAt: Date } => {
+  const minutesAgo = (type === TimeOffType.SICK_DAY ? 10 : 25) + 35 * k;
+  const createdAt = new Date(Math.max(today.getTime(), now - minutesAgo * MINUTE_MS));
   if (type === TimeOffType.SICK_DAY) {
-    const start = weekdayBefore(plusDays(today, -2 * k));
     return {
-      start,
-      end: plusWorkingDays(start, 1 + (k % 2)),
+      start: today,
+      end: plusWorkingDays(today, 1 + (k % 2)),
       note: ['Flu', 'Migraine', 'Doctor said to stay home'][k % 3] ?? null,
-      createdAt: new Date(Math.min(start.getTime() + 8 * HOUR_MS, now - HOUR_MS)),
+      createdAt,
     };
   }
   if (type === TimeOffType.DAY_OFF) {
-    const start = weekday(plusDays(today, 5 + 3 * k));
-    return {
-      start,
-      end: start,
-      note: ['Moving house', "Child's school event", null][k % 3] ?? null,
-      createdAt: new Date(now - (3 + 20 * k) * HOUR_MS),
-    };
+    return { start: today, end: plusWorkingDays(today, 1), note: 'Moving house', createdAt };
   }
-  const start = weekday(plusDays(today, 14 + 6 * k));
   return {
-    start,
-    end: plusWorkingDays(start, 3 + (k % 3)),
-    note: ['Summer break', 'Visiting family', null, 'Wedding abroad', 'Hiking trip'][k % 5] ?? null,
-    createdAt: new Date(now - (6 + 30 * k) * HOUR_MS),
+    start: today,
+    end: plusWorkingDays(today, 3 + (k % 2)),
+    note: ['Visiting family', 'Wedding abroad', null][k % 3] ?? null,
+    createdAt,
   };
 };
 
@@ -331,8 +331,7 @@ const decisionEvent = (
 
 /**
  * Brings pending requests to PENDING_MIX (dev only). Per type, those with comments and then the
- * oldest stay; the rest are decided by their first responsible person, alternately approved and
- * rejected, with the matching history event. Missing ones are made for active employees with
+ * oldest stay; the rest are approved by their first responsible person, with the history event. Missing ones are made for active employees with
  * nothing pending, within their allowance and clear of their other requests.
  */
 export const seedPendingRequests = async (
@@ -363,8 +362,8 @@ export const seedPendingRequests = async (
     return count >= limit;
   });
   const events: Prisma.AuditEventCreateManyInput[] = [];
-  for (const [index, request] of surplus.entries()) {
-    const status = index % 2 === 0 ? 'APPROVED' : 'REJECTED';
+  for (const request of surplus) {
+    const status = 'APPROVED';
     const decider = request.responsibles[0]?.responsibleUserId ?? null;
     const decidedAt = new Date(
       Math.max(
@@ -564,8 +563,15 @@ export const seedTimeOffComments = async (
         requestId: request.id,
         authorId: admins[(index + offset) % admins.length] ?? '',
         body: COMMENTS[(index + offset) % COMMENTS.length] ?? body,
+        // Hours after the request, but never before it or in the future (requests made minutes ago).
         createdAt: new Date(
-          Math.min(request.createdAt.getTime() + (offset + 1) * 2 * HOUR_MS, now - HOUR_MS),
+          Math.max(
+            request.createdAt.getTime() + (offset + 1) * MINUTE_MS,
+            Math.min(
+              request.createdAt.getTime() + (offset + 1) * 2 * HOUR_MS,
+              now - (2 - offset) * 3 * MINUTE_MS,
+            ),
+          ),
         ),
       })),
     ),

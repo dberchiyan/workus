@@ -65,6 +65,11 @@ cannot lock the others out:
 
 Everything else — hiring, reviews, requests, comments, holidays — works as usual.
 
+The live demo starts each day afresh: at 08:00 Kyiv time its database is wiped and seeded again
+for that day (`npm run db:demo-reset` — refuses to run without `DEMO_MODE=true`), so what visitors
+entered is gone and every company has a few sick-leave and vacation requests made that morning,
+waiting for a decision.
+
 ## Demo accounts
 
 Try them on the **[live demo](https://demo-workus.osdb.io)** or locally — the seed creates two
@@ -224,7 +229,7 @@ Run with `npm run <script>` inside the package.
 | **Develop** | `start:dev` | `dev` |
 | **Build** | `build` | `build` |
 | **Check** | `typecheck` · `lint` · `format:check` | `typecheck` · `lint` · `format:check` |
-| **Database** | `db:migrate:create` · `db:migrate:deploy` · `db:seed` | — |
+| **Database** | `db:migrate:create` · `db:migrate:deploy` · `db:seed` · `db:demo-reset` | — |
 | **Contract** | `openapi:generate` · `openapi:check` | `generate:api` |
 
 **Changing the API:** `openapi:generate` → `generate:api` → commit both with the change.
