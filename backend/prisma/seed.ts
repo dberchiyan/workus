@@ -18,6 +18,7 @@ import { seedActivity } from './seed-activity';
 import { seedHolidays } from './seed-holidays';
 import { seedNotifications } from './seed-notifications';
 import { seedReviews } from './seed-reviews';
+import { seedSecurityLog } from './seed-security';
 import {
   alignPendingResponsibles,
   seedPendingRequests,
@@ -28,8 +29,8 @@ import {
 /**
  * Development seed (APP_ENV=dev only): two organisations (OSDB, Vortex), each with an owner,
  * admins and employees sharing SEED_PASSWORD, responsibles, reviews, time off, holidays and
- * notifications; the shared catalogue of position categories and positions. Idempotent —
- * existing rows are kept.
+ * notifications; a security log for every employee; the shared catalogue of position
+ * categories and positions. Idempotent — existing rows are kept.
  */
 const seedEnv = z.object({
   APP_ENV: z.literal('dev'),
@@ -226,8 +227,9 @@ const seedOrganisation = async (
   // After the requests, so the ones covering a new holiday give its working day back.
   const holidays = await seedHolidays(prisma, organisationId);
   const notifications = await seedNotifications(prisma, organisationId);
+  const security = await seedSecurityLog(prisma, organisationId);
 
-  return `${notifications} notifications, ${holidays} holidays, ${timeOff} time-off requests (pending: ${pending.created} added, ${pending.decided} decided; ${realigned} pending realigned to admins, ${comments} comments), ${activity} activity events, ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}, dates of birth for ${birthDates}`;
+  return `${security} security events, ${notifications} notifications, ${holidays} holidays, ${timeOff} time-off requests (pending: ${pending.created} added, ${pending.decided} decided; ${realigned} pending realigned to admins, ${comments} comments), ${activity} activity events, ${reviews} reviews, ${users.count} users, ${employees.count} employees, ${responsibles.count} responsibles, contacts for ${contacts}, dates of birth for ${birthDates}`;
 };
 
 const seed = async (): Promise<void> => {
