@@ -68,6 +68,15 @@ export class UserService {
     );
   }
 
+  /** The person's own name (they are the one who changes it). */
+  updateName(
+    organisationId: string,
+    id: string,
+    name: { firstName: string; lastName: string },
+  ): Promise<void> {
+    return this.userRepository.updateName(organisationId, id, name);
+  }
+
   /** Returns the new user's id. Email is stored lower-case. */
   createWithPassword(user: NewUser): Promise<string> {
     return this.userRepository.createWithPassword({ ...user, email: user.email.toLowerCase() });

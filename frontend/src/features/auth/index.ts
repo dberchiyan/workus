@@ -18,6 +18,7 @@ export {
   useEndSession,
   useOwnSecurityLog,
   useSessions,
+  useUpdateOwnName,
 } from './hooks/useAccount';
 export { SecurityLogView } from './components/SecurityLogView';
 export { isSecurityCategory, nextSecurityLogPage } from './securityLog';
@@ -29,6 +30,7 @@ export type {
   SecurityCategory,
   SecurityEvent,
   SecurityLog,
+  UpdateOwnNameRequest,
   UserSession,
   UserSessions,
 } from './types';

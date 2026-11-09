@@ -1,19 +1,12 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+import { personName } from '../../../../../common/dto/person-name';
 import { AmountInputSchema } from '../../../../../common/dto/money';
 
-export const NAME_MAX_LENGTH = 100;
 export const EMAIL_MAX_LENGTH = 254;
 export const MAX_RESPONSIBLES = 10;
 /** Mirrored by ck_employees_date_of_birth. */
 const MIN_DATE_OF_BIRTH = '1900-01-01';
-
-const requiredName = (field: 'firstName' | 'lastName') =>
-  z
-    .string({ error: `validation.${field}.required` })
-    .trim()
-    .min(1, `validation.${field}.required`)
-    .max(NAME_MAX_LENGTH, `validation.${field}.tooLong`);
 
 /** Optional text: blank → absent; otherwise trimmed and checked by `schema`. */
 const optional = <T extends z.ZodType>(schema: T) =>
@@ -25,8 +18,8 @@ const optional = <T extends z.ZodType>(schema: T) =>
 const text = (max: number, key: string) => z.string().trim().max(max, key);
 
 export const CreateEmployeeRequestSchema = z.object({
-  firstName: requiredName('firstName'),
-  lastName: requiredName('lastName'),
+  firstName: personName('firstName'),
+  lastName: personName('lastName'),
   /** Work email — also the sign-in email. */
   email: z
     .string({ error: 'validation.workEmail.required' })

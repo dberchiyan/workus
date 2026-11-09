@@ -77,6 +77,19 @@ export class UserRepository {
     });
   }
 
+  /** The person renames themselves (Settings → Account; admins and owners). */
+  async updateName(
+    organisationId: string,
+    id: string,
+    name: { firstName: string; lastName: string },
+  ): Promise<void> {
+    await this.txHost.tx.user.update({
+      where: { id, organisationId },
+      data: { ...name, updatedBy: id, version: { increment: 1 } },
+      select: { id: true },
+    });
+  }
+
   /** An account an admin creates; its password is generated and shown to the admin once. */
   async createWithPassword(user: {
     organisationId: string;

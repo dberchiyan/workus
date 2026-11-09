@@ -1,9 +1,9 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+import { personName } from '../../../../common/dto/person-name';
 import { NewPasswordSchema } from '../../../../common/dto/password';
 
 export const ORGANISATION_NAME_MAX_LENGTH = 100;
-const NAME_MAX_LENGTH = 100;
 const EMAIL_MAX_LENGTH = 254;
 
 export const OrganisationNameSchema = z
@@ -12,17 +12,10 @@ export const OrganisationNameSchema = z
   .min(1, 'validation.organisationName.required')
   .max(ORGANISATION_NAME_MAX_LENGTH, 'validation.organisationName.tooLong');
 
-const requiredName = (field: 'firstName' | 'lastName') =>
-  z
-    .string({ error: `validation.${field}.required` })
-    .trim()
-    .min(1, `validation.${field}.required`)
-    .max(NAME_MAX_LENGTH, `validation.${field}.tooLong`);
-
 export const RegistrationRequestSchema = z.object({
   organisationName: OrganisationNameSchema,
-  firstName: requiredName('firstName'),
-  lastName: requiredName('lastName'),
+  firstName: personName('firstName'),
+  lastName: personName('lastName'),
   /** Work email — the sign-in email; unique across organisations. */
   email: z
     .string({ error: 'validation.email.required' })

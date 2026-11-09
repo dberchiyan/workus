@@ -14,6 +14,7 @@ import { loginRateLimitKey, RateLimitName } from '../../../common/security/rate-
 import { RateLimitService } from '../../../common/security/rate-limit.service';
 import { EmployeeService } from '../../employee/core/service/employee.service';
 import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
+import { AuditField, auditValue, changeOf } from '../../audit/service/audit-change';
 import type { AuditEventSortField } from '../../audit/service/audit-sort';
 import { AuditService } from '../../audit/service/audit.service';
 import type { SecurityEventPage } from '../../audit/service/audit.types';
@@ -38,6 +39,11 @@ export interface ChangePasswordCommand {
   newPassword: string;
   ip: string;
   userAgent: string | null;
+}
+
+export interface UpdateOwnNameCommand {
+  firstName: string;
+  lastName: string;
 }
 
 export interface LoginResult {
@@ -239,6 +245,42 @@ export class AuthService {
         principal.userId,
       );
     }
+  }
+
+  /**
+   * The caller renames themselves (the policy admits admins and owners only). The same name
+   * writes nothing and logs nothing; a change is logged as `user.updated` with both values.
+   */
+  @Transactional()
+  async updateOwnName(principal: Principal, command: UpdateOwnNameCommand): Promise<void> {
+    const before = await this.currentUser(principal.userId);
+    const changes = [
+      ...changeOf(
+        AuditField.FIRST_NAME,
+        auditValue.text(before.firstName),
+        auditValue.text(command.firstName),
+      ),
+      ...changeOf(
+        AuditField.LAST_NAME,
+        auditValue.text(before.lastName),
+        auditValue.text(command.lastName),
+      ),
+    ];
+    if (changes.length === 0) {
+      return;
+    }
+    await this.userService.updateName(principal.organisationId, principal.userId, command);
+    await this.auditService.record({
+      action: AuditAction.USER_UPDATED,
+      actorUserId: principal.userId,
+      employeeId: null,
+      target: {
+        type: AuditTargetType.USER,
+        id: principal.userId,
+        label: `${command.firstName} ${command.lastName}`,
+      },
+      changes,
+    });
   }
 
   /** The caller's security log, newest first. */

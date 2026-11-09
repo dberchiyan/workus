@@ -40,6 +40,8 @@ export const ACCESS = {
   'settings.administrators': ADMINS,
   'administrators.changeRole': OWNERS,
   'administrators.add': OWNERS,
+  /** Settings → Account: one's own name — admins and owners (an employee's is their HR record). */
+  'account.editName': ADMINS,
   /** Settings → Account / Sessions: one's own password and other sessions. */
   'account.changePassword': [...EVERYONE, ...PLATFORM],
   'account.endSessions': [...EVERYONE, ...PLATFORM],

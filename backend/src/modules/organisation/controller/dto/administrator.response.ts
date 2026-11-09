@@ -1,5 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+import { personName } from '../../../../common/dto/person-name';
 import { pageableOptions } from '../../../../common/dto/pageable';
 import { ADMINISTRATOR_SORT_FIELDS } from '../../../user/service/administrator-sort';
 
@@ -47,20 +48,12 @@ export const ChangeRoleRequestSchema = z.object({
 
 export class ChangeRoleRequest extends createZodDto(ChangeRoleRequestSchema) {}
 
-const NAME_MAX_LENGTH = 100;
 const EMAIL_MAX_LENGTH = 254;
-
-const requiredName = (field: 'firstName' | 'lastName') =>
-  z
-    .string({ error: `validation.${field}.required` })
-    .trim()
-    .min(1, `validation.${field}.required`)
-    .max(NAME_MAX_LENGTH, `validation.${field}.tooLong`);
 
 /** The role is not a field: an owner always adds an admin (and may make them an owner after). */
 export const AddAdministratorRequestSchema = z.object({
-  firstName: requiredName('firstName'),
-  lastName: requiredName('lastName'),
+  firstName: personName('firstName'),
+  lastName: personName('lastName'),
   /** Work email — the sign-in email; unique across organisations. */
   email: z
     .string({ error: 'validation.workEmail.required' })

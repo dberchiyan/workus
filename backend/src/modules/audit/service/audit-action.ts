@@ -25,6 +25,8 @@ export const AuditAction = {
   USER_ROLE_CHANGED: 'user.role_changed',
   /** An owner added an administrator (an account with a generated password). */
   USER_CREATED: 'user.created',
+  /** An admin or owner renamed themselves (Settings → Account). */
+  USER_UPDATED: 'user.updated',
   /** Security log — target type `user`, no employee (never in the Activity tab). */
   AUTH_SIGNED_IN: 'auth.signed_in',
   AUTH_SIGN_IN_FAILED: 'auth.sign_in_failed',

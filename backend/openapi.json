@@ -501,6 +501,63 @@
         ]
       }
     },
+    "/api/v1/auth/profile": {
+      "put": {
+        "operationId": "AuthController_updateOwnName",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateOwnNameRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "400": {
+            "description": "VALIDATION_FAILED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "Change own first and last name (admins and owners)",
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
     "/api/v1/auth/sessions": {
       "get": {
         "operationId": "AuthController_sessions",
@@ -6011,6 +6068,25 @@
         "required": [
           "currentPassword",
           "newPassword"
+        ]
+      },
+      "UpdateOwnNameRequest": {
+        "type": "object",
+        "properties": {
+          "firstName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          },
+          "lastName": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100
+          }
+        },
+        "required": [
+          "firstName",
+          "lastName"
         ]
       },
       "Session_Output": {

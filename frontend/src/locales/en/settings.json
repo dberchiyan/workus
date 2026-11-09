@@ -15,9 +15,19 @@
     "profile": {
       "title": "Profile",
       "description": "Your administrator changes your name and email.",
+      "descriptionEditable": "Your name is shown to everyone in the company. Your email is your sign-in.",
       "name": "Name",
       "email": "Email",
-      "role": "Role"
+      "role": "Role",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "edit": "Edit name",
+      "dialog": {
+        "title": "Edit your name",
+        "description": "Your name is shown to everyone in the company.",
+        "cancel": "Cancel",
+        "submit": "Save"
+      }
     },
     "password": {
       "title": "Password",

@@ -51,6 +51,11 @@ export const can = {
     'platform',
   ),
   admin: policy([], isAdmin),
+  /**
+   * Renaming oneself (Settings → Account): admins and owners only — an employee's name is their
+   * HR record's, which an admin keeps.
+   */
+  renameSelf: policy([], isAdmin),
   /** The organisation's settings and people's roles. */
   owner: policy([], (principal) => principal.hasAuthority('OWNER')),
   /** Change one person's role: an owner, for a user of their organisation. */

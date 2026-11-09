@@ -8,7 +8,7 @@ import {
 import type { ApiError } from '@/shared/api/apiError';
 import { accountApi } from '../api/accountApi';
 import { nextSecurityLogPage } from '../securityLog';
-import type { ChangePasswordRequest, SecurityCategory } from '../types';
+import type { ChangePasswordRequest, SecurityCategory, UpdateOwnNameRequest } from '../types';
 import { authKeys } from './queryKeys';
 
 /** Another page keeps the previous rows on screen until the new ones arrive. */
@@ -18,6 +18,21 @@ export const useSessions = (page: number) =>
     queryFn: () => accountApi.sessions(page),
     placeholderData: keepPreviousData,
   });
+
+/**
+ * The name shows across the app (account menu, people lists, requests, notices), so every query
+ * on screen is read again — /auth/me first.
+ */
+export const useUpdateOwnName = () => {
+  const queryClient = useQueryClient();
+  return useMutation<unknown, ApiError, UpdateOwnNameRequest>({
+    mutationFn: accountApi.updateName,
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: authKeys.me() });
+      void queryClient.invalidateQueries();
+    },
+  });
+};
 
 /** On success the other sessions are gone — the list is read again. */
 export const useChangePassword = () => {

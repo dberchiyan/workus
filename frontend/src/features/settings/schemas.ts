@@ -17,3 +17,22 @@ export const changePasswordSchema = z
   });
 
 export type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
+
+/** Mirrors backend common/dto/person-name.ts (users.first_name / last_name). */
+export const NAME_LIMITS = { firstName: 100, lastName: 100 } as const;
+
+/** Mirrors backend UpdateOwnNameRequest (auth/controller/dto/update-own-name.request.ts). */
+export const editNameSchema = z.object({
+  firstName: z
+    .string()
+    .trim()
+    .min(1, 'validation:firstName.required')
+    .max(NAME_LIMITS.firstName, 'validation:firstName.tooLong'),
+  lastName: z
+    .string()
+    .trim()
+    .min(1, 'validation:lastName.required')
+    .max(NAME_LIMITS.lastName, 'validation:lastName.tooLong'),
+});
+
+export type EditNameValues = z.infer<typeof editNameSchema>;

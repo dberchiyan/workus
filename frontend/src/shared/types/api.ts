@@ -174,6 +174,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/auth/profile": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Change own first and last name (admins and owners) */
+        put: operations["AuthController_updateOwnName"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/auth/sessions": {
         parameters: {
             query?: never;
@@ -1117,6 +1134,10 @@ export interface components {
         ChangePasswordRequest: {
             currentPassword: string;
             newPassword: unknown & unknown & unknown & unknown;
+        };
+        UpdateOwnNameRequest: {
+            firstName: string;
+            lastName: string;
         };
         Session_Output: {
             /** Format: uuid */
@@ -2903,6 +2924,48 @@ export interface operations {
             };
             /** @description RATE_LIMIT_EXCEEDED */
             429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    AuthController_updateOwnName: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateOwnNameRequest"];
+            };
+        };
+        responses: {
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
                 headers: {
                     [name: string]: unknown;
                 };

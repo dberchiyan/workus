@@ -1,5 +1,11 @@
 import { apiClient } from '@/shared/api/client';
-import type { ChangePasswordRequest, SecurityCategory, SecurityLog, UserSessions } from '../types';
+import type {
+  ChangePasswordRequest,
+  SecurityCategory,
+  SecurityLog,
+  UpdateOwnNameRequest,
+  UserSessions,
+} from '../types';
 
 /** Other sessions per page in Settings. */
 export const SESSIONS_PAGE_SIZE = 5;
@@ -8,8 +14,12 @@ export const SECURITY_LOG_PAGE_SIZE = 25;
 
 const BASE = '/api/v1/auth';
 
-/** The signed-in user's own account: password and sessions (Settings). */
+/** The signed-in user's own account: name, password and sessions (Settings). */
 export const accountApi = {
+  /** Admins and owners only (the server refuses everyone else). */
+  updateName: async (request: UpdateOwnNameRequest): Promise<void> => {
+    await apiClient.put(`${BASE}/profile`, request);
+  },
   /** Every session ends; this browser gets a new one (new cookies in the answer). */
   changePassword: async (request: ChangePasswordRequest): Promise<void> => {
     await apiClient.put(`${BASE}/password`, request);

@@ -32,6 +32,7 @@ import { AuthService } from '../service/auth.service';
 import { SessionService } from '../service/session.service';
 import { CurrentUserResponse } from './dto/current-user.response';
 import { ChangePasswordRequest } from './dto/change-password.request';
+import { UpdateOwnNameRequest } from './dto/update-own-name.request';
 import { LoginRequest } from './dto/login.request';
 import {
   SESSIONS_PAGEABLE,
@@ -147,6 +148,18 @@ export class AuthController {
       userAgent: clientUserAgent(httpRequest),
     });
     this.sessionCookies.write(response, session);
+  }
+
+  @Put('profile')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  @Authorize(can.renameSelf)
+  @ApiOperation({ summary: 'Change own first and last name (admins and owners)' })
+  @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+  async updateOwnName(
+    @Body() request: UpdateOwnNameRequest,
+    @CurrentPrincipal() principal: Principal,
+  ): Promise<void> {
+    await this.authService.updateOwnName(principal, request);
   }
 
   @Get('sessions')
