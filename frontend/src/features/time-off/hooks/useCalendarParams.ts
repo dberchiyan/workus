@@ -14,6 +14,8 @@ export interface CalendarParams {
   search: string;
   page: number;
   size: number;
+  /** The request open in the dialog (admins). */
+  request: string | undefined;
 }
 
 const readTypes = (raw: string | null): TimeOffType[] => {
@@ -34,7 +36,7 @@ const readSize = (raw: string | null): number => {
   return (CALENDAR_PAGE_SIZES as readonly number[]).includes(value) ? value : DEFAULT_SIZE;
 };
 
-/** Month, types, search and page live in the URL (shareable, back works). */
+/** Month, types, search, page and the open request live in the URL (shareable, back works). */
 export const useCalendarParams = (currentMonth: string) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const params = useMemo<CalendarParams>(() => {
@@ -45,17 +47,18 @@ export const useCalendarParams = (currentMonth: string) => {
       search: searchParams.get('search') ?? '',
       page: readPage(searchParams.get('page')),
       size: readSize(searchParams.get('size')),
+      request: searchParams.get('request') ?? undefined,
     };
   }, [searchParams, currentMonth]);
 
-  /** Anything but the page itself goes back to the first page. */
+  /** Any filter goes back to the first page; the page and the open request do not. */
   const update = useCallback(
     (changes: Partial<CalendarParams>) => {
       setSearchParams(
         (current) => {
           const next = new URLSearchParams(current);
           for (const [key, value] of Object.entries(changes)) {
-            const text = Array.isArray(value) ? value.join(',') : String(value);
+            const text = Array.isArray(value) ? value.join(',') : String(value ?? '');
             const isDefault =
               text === '' ||
               (key === 'month' && text === currentMonth) ||
@@ -66,17 +69,27 @@ export const useCalendarParams = (currentMonth: string) => {
               next.set(key, text);
             }
           }
-          if (!('page' in changes) || next.get('page') === '0') {
+          if (!('page' in changes || 'request' in changes) || next.get('page') === '0') {
             next.delete('page');
           }
           return next;
         },
-        // Changing the month is a step back should undo; filters replace.
-        { replace: !('month' in changes) },
+        // Changing the month or closing a request is a step back should undo; filters replace.
+        { replace: !('month' in changes || 'request' in changes) },
       );
     },
     [setSearchParams, currentMonth],
   );
 
-  return { params, update };
+  /** The link that opens a request over the calendar as it is now (opening is a history step). */
+  const requestHref = useCallback(
+    (requestId: string): string => {
+      const next = new URLSearchParams(searchParams);
+      next.set('request', requestId);
+      return `?${next.toString()}`;
+    },
+    [searchParams],
+  );
+
+  return { params, update, requestHref };
 };

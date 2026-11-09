@@ -18,8 +18,8 @@ export interface CalendarGridProps {
   /** Company holidays of the month: `YYYY-MM-DD` → name. */
   holidays: ReadonlyMap<string, string>;
   search: string;
-  /** Requests open on the Requests page; names open the profile. */
-  canOpenRequest: boolean;
+  /** Requests open in a dialog over the calendar; names open the profile. */
+  requestHref: ((requestId: string) => string) | undefined;
   canOpenProfile: boolean;
   onSearch: (search: string) => void;
 }
@@ -34,7 +34,7 @@ export function CalendarGrid({
   rows,
   holidays,
   search,
-  canOpenRequest,
+  requestHref,
   canOpenProfile,
   onSearch,
 }: CalendarGridProps) {
@@ -124,7 +124,7 @@ export function CalendarGrid({
               days={days}
               today={today}
               holidays={holidays}
-              canOpenRequest={canOpenRequest}
+              requestHref={requestHref}
               canOpenProfile={canOpenProfile}
             />
           ))}

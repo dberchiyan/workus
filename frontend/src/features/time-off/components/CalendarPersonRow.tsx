@@ -16,7 +16,8 @@ export interface CalendarPersonRowProps {
   days: string[];
   today: string;
   holidays: ReadonlyMap<string, string>;
-  canOpenRequest: boolean;
+  /** Where a request opens (admins), or nothing. */
+  requestHref: ((requestId: string) => string) | undefined;
   canOpenProfile: boolean;
 }
 
@@ -26,7 +27,7 @@ export function CalendarPersonRow({
   days,
   today,
   holidays,
-  canOpenRequest,
+  requestHref,
   canOpenProfile,
 }: CalendarPersonRowProps) {
   const { employee } = row;
@@ -81,7 +82,11 @@ export function CalendarPersonRow({
             colSpan={cell.span}
             className="relative border-b border-l border-divider p-0"
           >
-            <CalendarBar request={cell.request} span={cell.span} linkToRequest={canOpenRequest} />
+            <CalendarBar
+              request={cell.request}
+              span={cell.span}
+              href={requestHref?.(cell.request.id)}
+            />
             <TodayBand offset={todayIn(cell.date, cell.span)} span={cell.span} />
           </td>
         ) : cell.kind === 'outside' ? (

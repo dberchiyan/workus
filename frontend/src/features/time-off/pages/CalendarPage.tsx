@@ -6,24 +6,33 @@ import Typography from '@mui/material/Typography';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { todayUtcIso } from '@/shared/lib/utcDay';
-import { useAccess } from '@/features/auth';
+import { useAccess, useCurrentUser } from '@/features/auth';
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
 import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
 import { CalendarGrid } from '../components/CalendarGrid';
 import { CalendarToolbar } from '../components/CalendarToolbar';
+import { DecisionFeedback } from '../components/DecisionFeedback';
+import { RequestDialog } from '../components/RequestDialog';
 import { formatCount } from '../format';
 import { useCalendar } from '../hooks/useCalendar';
 import { CALENDAR_PAGE_SIZES, useCalendarParams } from '../hooks/useCalendarParams';
+import { useRequestDecisions } from '../hooks/useRequestDecisions';
 
-/** Who is away and when: everyone's approved time off and requests still waiting (grey). */
+/**
+ * Who is away and when: everyone's approved time off and requests still waiting (grey). Admins
+ * open a request in a dialog over the calendar and decide there.
+ */
 export default function CalendarPage() {
   const { t, i18n } = useTranslation('timeOff');
   // Today (UTC, as everywhere), fixed for the visit (no clock in render).
   const [today] = useState(todayUtcIso);
   const currentMonth = today.slice(0, 7);
-  const { params, update } = useCalendarParams(currentMonth);
+  const { params, update, requestHref } = useCalendarParams(currentMonth);
   const calendar = useCalendar(params);
   const can = useAccess();
+  const canOpenRequest = can('calendar.openRequest');
+  const { data: user } = useCurrentUser();
+  const decisions = useRequestDecisions();
   useDocumentTitle(t('calendar.page.title'));
   const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
 
@@ -88,7 +97,7 @@ export default function CalendarPage() {
             rows={rows}
             holidays={holidays}
             search={params.search}
-            canOpenRequest={can('calendar.openRequest')}
+            requestHref={canOpenRequest ? requestHref : undefined}
             canOpenProfile={can('calendar.openProfile')}
             onSearch={onSearch}
           />
@@ -118,6 +127,20 @@ export default function CalendarPage() {
           )}
         </Card>
       )}
+      {canOpenRequest && params.request && user && (
+        <RequestDialog
+          key={params.request}
+          requestId={params.request}
+          open
+          viewerId={user.id}
+          busy={decisions.isPending}
+          onDecide={decisions.start}
+          onClose={() => {
+            update({ request: undefined });
+          }}
+        />
+      )}
+      <DecisionFeedback decisions={decisions} />
     </div>
   );
 }

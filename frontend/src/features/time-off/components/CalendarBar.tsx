@@ -3,7 +3,6 @@ import Typography from '@mui/material/Typography';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router';
 import { cn } from '@/shared/lib/cn';
-import { requestPath } from '@/shared/lib/paths';
 import { formatPeriod } from '../format';
 import type { CalendarRequest } from '../types';
 import { TYPE_VISUALS } from './timeOffVisuals';
@@ -15,15 +14,15 @@ export interface CalendarBarProps {
   request: CalendarRequest;
   /** Days of this month the bar covers. */
   span: number;
-  /** Admins open the request; others see its details in the tooltip. */
-  linkToRequest: boolean;
+  /** Admins open the request in a dialog over the calendar; others see its details in the tooltip. */
+  href: string | undefined;
 }
 
 /**
  * One request across its days. Approved: the type's tint and coloured icon; pending: grey with a
  * dashed outline — never colour alone, the text says the status.
  */
-export function CalendarBar({ request, span, linkToRequest }: CalendarBarProps) {
+export function CalendarBar({ request, span, href }: CalendarBarProps) {
   const { t, i18n } = useTranslation('timeOff');
   const { icon: Icon, text, tint } = TYPE_VISUALS[request.type];
   const pending = request.status === 'PENDING';
@@ -82,8 +81,9 @@ export function CalendarBar({ request, span, linkToRequest }: CalendarBarProps) 
 
   return (
     <Tooltip title={details} describeChild>
-      {linkToRequest ? (
-        <RouterLink to={requestPath(request.id)} className={className}>
+      {href ? (
+        // A link, not a button: open in a new tab works, and back closes the dialog.
+        <RouterLink to={href} className={className}>
           {content}
         </RouterLink>
       ) : (
