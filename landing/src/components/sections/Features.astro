@@ -1,0 +1,26 @@
+---
+import Container from '@/components/ui/Container.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import { LANDING } from '@/content/landing';
+import FeatureCard from './FeatureCard.astro';
+
+const { features } = LANDING;
+// Bento rows of three columns: 1 + 2, 1 + 2, 2 + 1.
+const WIDE = new Set(['reviews', 'calendar', 'insights']);
+---
+
+<section id="features" aria-labelledby="features-title" class="py-24 sm:py-32">
+  <Container>
+    <SectionHeading
+      id="features-title"
+      eyebrow={features.eyebrow}
+      title={features.title}
+      lead={features.lead}
+    />
+    <div class="mt-16 grid gap-5 lg:grid-cols-3">
+      {features.items.map((feature) => (
+        <FeatureCard feature={feature} wide={WIDE.has(feature.id)} />
+      ))}
+    </div>
+  </Container>
+</section>

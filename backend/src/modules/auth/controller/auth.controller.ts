@@ -85,7 +85,7 @@ export class AuthController {
     return toCurrentUserResponse(
       user,
       this.config.get('SESSION_IDLE_TIMEOUT_MINUTES'),
-      this.config.isDemo,
+      this.config.isDemoProtected(user.email),
     );
   }
 
@@ -110,10 +110,11 @@ export class AuthController {
   @ZodResponse({ status: HttpStatus.OK, type: CurrentUserResponse })
   @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED')
   async me(@CurrentPrincipal() principal: Principal): Promise<CurrentUserResponse> {
+    const user = await this.authService.currentUser(principal.userId);
     return toCurrentUserResponse(
-      await this.authService.currentUser(principal.userId),
+      user,
       this.config.get('SESSION_IDLE_TIMEOUT_MINUTES'),
-      this.config.isDemo,
+      this.config.isDemoProtected(user.email),
     );
   }
 

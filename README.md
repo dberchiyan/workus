@@ -192,6 +192,7 @@ flowchart TB
 |---|---|
 | Backend | NestJS · Prisma · PostgreSQL · Zod |
 | Frontend | React · MUI · Tailwind CSS · TanStack Query |
+| Landing | Astro (static, zero JavaScript by default) · Tailwind CSS |
 | Tooling | TypeScript · OpenAPI · Docker |
 
 ### Repository layout
@@ -201,6 +202,7 @@ workus/
 ├── backend/            NestJS API — src/modules/<module>/{controller,service,repository}
 │   └── prisma/         schema, SQL migrations (each with down.sql), seed
 ├── frontend/           React SPA — src/features/<feature> mirrors backend modules
+├── landing/            Astro site — the public page at a signed-out `/` (SEO, share image, sitemap)
 └── docker-compose.yml  local stack: db · migrate · backend · frontend (nginx)
 ```
 
@@ -218,19 +220,22 @@ npm run start:dev                     # local · DEMO_MODE=true npm run start:de
 cd frontend && cp .env.example .env
 npm ci && npm run generate:api
 npm run dev
+
+# landing — http://localhost:4321 (links into the app are relative: /login, /signup)
+cd landing && npm ci && npm run dev
 ```
 
 ### Scripts
 
 Run with `npm run <script>` inside the package.
 
-| Task | `backend/` | `frontend/` |
-|---|---|---|
-| **Develop** | `start:dev` | `dev` |
-| **Build** | `build` | `build` |
-| **Check** | `typecheck` · `lint` · `format:check` | `typecheck` · `lint` · `format:check` |
-| **Database** | `db:migrate:create` · `db:migrate:deploy` · `db:seed` · `db:demo-reset` | — |
-| **Contract** | `openapi:generate` · `openapi:check` | `generate:api` |
+| Task | `backend/` | `frontend/` | `landing/` |
+|---|---|---|---|
+| **Develop** | `start:dev` | `dev` | `dev` |
+| **Build** | `build` | `build` | `build` (runs `astro check` first) |
+| **Check** | `typecheck` · `lint` · `format:check` | `typecheck` · `lint` · `format:check` | `typecheck` · `lint` · `format:check` |
+| **Database** | `db:migrate:create` · `db:migrate:deploy` · `db:seed` · `db:demo-reset` | — | — |
+| **Contract** | `openapi:generate` · `openapi:check` | `generate:api` | — |
 
 **Changing the API:** `openapi:generate` → `generate:api` → commit both with the change.
 

@@ -1,0 +1,62 @@
+---
+import Container from '@/components/ui/Container.astro';
+import Logo from '@/components/ui/Logo.astro';
+import { LANDING } from '@/content/landing';
+import { SITE } from '@/content/site';
+
+const { footer, nav } = LANDING;
+const year = new Date().getUTCFullYear();
+const ACCOUNT_LINKS = [
+  { href: SITE.links.signIn, label: 'Sign in' },
+  { href: SITE.links.signUp, label: LANDING.hero.secondary },
+  { href: '#demo', label: LANDING.hero.primary },
+] as const;
+---
+
+<footer class="border-t border-line py-14">
+  <Container class="grid gap-10 sm:grid-cols-[2fr_1fr_1fr]">
+    <div class="flex flex-col gap-3">
+      <Logo />
+      <p class="max-w-xs text-sm text-muted">{footer.tagline}</p>
+    </div>
+    <nav aria-labelledby="footer-product">
+      <h2 id="footer-product" class="text-sm font-semibold text-ink">
+        {footer.product}
+      </h2>
+      <ul class="mt-3 flex flex-col gap-1">
+        {nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="inline-flex min-h-9 items-center text-sm text-muted hover:text-ink"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <nav aria-labelledby="footer-account">
+      <h2 id="footer-account" class="text-sm font-semibold text-ink">
+        {footer.account}
+      </h2>
+      <ul class="mt-3 flex flex-col gap-1">
+        {ACCOUNT_LINKS.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="inline-flex min-h-9 items-center text-sm text-muted hover:text-ink"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  </Container>
+  <Container class="mt-12 border-t border-line pt-6">
+    <p class="text-xs text-subtle">
+      © {year} {SITE.name}. {footer.rights}
+    </p>
+  </Container>
+</footer>

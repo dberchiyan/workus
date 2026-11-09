@@ -22,8 +22,11 @@ export const CurrentUserResponseSchema = z.object({
   }),
   /** Minutes without activity after which the session ends (the client warns before). */
   idleTimeoutMinutes: z.number().int().min(1),
-  /** The public demo: account actions that would lock other visitors out are turned off. */
-  demoMode: z.boolean(),
+  /**
+   * One of the public demo's shared showcase accounts: actions that would lock other visitors
+   * out are turned off for it. False for everyone else (a company a visitor created included).
+   */
+  demoRestricted: z.boolean(),
 });
 
 export class CurrentUserResponse extends createZodDto(CurrentUserResponseSchema) {}

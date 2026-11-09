@@ -1,0 +1,36 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+const BALANCES = [
+  { label: 'Vacation days', used: 4, total: 10, bar: 'bg-chart-1' },
+  { label: 'Sick days', used: 1, total: 5, bar: 'bg-chart-3' },
+] as const;
+---
+
+<div class="flex flex-col gap-2.5">
+  {BALANCES.map((balance) => (
+    <div class="rounded-xl border border-line bg-surface p-3.5 shadow-card">
+      <div class="flex items-baseline justify-between">
+        <p class="text-[0.8125rem] font-medium text-ink">{balance.label}</p>
+        <p class="text-[0.75rem] text-muted tabular-nums">
+          <span class="font-semibold text-ink">{balance.total - balance.used}</span> of{' '}
+          {balance.total} left
+        </p>
+      </div>
+      <div class="mt-2.5 h-1.5 overflow-hidden rounded-full bg-surface-2">
+        <div
+          class:list={['h-full rounded-full', balance.bar]}
+          style={`width: ${((balance.total - balance.used) / balance.total) * 100}%`}
+        />
+      </div>
+    </div>
+  ))}
+  <div class="flex items-center gap-2.5 rounded-xl border border-line bg-surface p-3 shadow-card">
+    <span class="flex size-8 items-center justify-center rounded-full bg-success-bg text-success-fg">
+      <Icon name="check" class="size-4 [stroke-width:2.25]" />
+    </span>
+    <div class="min-w-0">
+      <p class="truncate text-[0.8125rem] font-medium text-ink">Vacation approved</p>
+      <p class="truncate text-[0.6875rem] text-subtle">Mar 3 – 7 · 5 working days</p>
+    </div>
+  </div>
+</div>

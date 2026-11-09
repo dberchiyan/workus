@@ -1,0 +1,27 @@
+---
+import { SITE } from '@/content/site';
+
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<span class:list={['inline-flex items-center gap-2.5', className]}>
+  <!-- The app's mark (frontend BrandMark / favicon). -->
+  <svg viewBox="0 0 48 48" class="size-8 shrink-0" aria-hidden="true" focusable="false">
+    <defs>
+      <linearGradient id="logo-fill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#2A4A60"></stop>
+        <stop offset="1" stop-color="#1F3A4D"></stop>
+      </linearGradient>
+    </defs>
+    <rect width="48" height="48" rx="12" fill="url(#logo-fill)"></rect>
+    <path
+      d="M9 14h6l3.9 14.6L23 14h2l4.1 14.6L33 14h6l-7.4 21h-5L24 25.8 21.4 35h-5z"
+      fill="#7CC4D6"
+    ></path>
+  </svg>
+  <span class="text-[1.2rem] font-semibold tracking-[-0.02em] text-ink">{SITE.name}</span>
+</span>

@@ -1129,7 +1129,7 @@ export interface components {
                 rejectionReason: string | null;
             };
             idleTimeoutMinutes: number;
-            demoMode: boolean;
+            demoRestricted: boolean;
         };
         ChangePasswordRequest: {
             currentPassword: string;

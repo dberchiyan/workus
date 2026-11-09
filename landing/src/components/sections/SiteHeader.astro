@@ -1,0 +1,100 @@
+---
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import Icon from '@/components/ui/Icon.astro';
+import Logo from '@/components/ui/Logo.astro';
+import { LANDING } from '@/content/landing';
+import { SITE } from '@/content/site';
+---
+
+<header class="sticky top-0 z-40 border-b border-line/0 bg-canvas/70 backdrop-blur-xl backdrop-saturate-150 supports-[backdrop-filter]:bg-canvas/60">
+  <Container class="flex h-16 items-center gap-6">
+    <a href="/" class="-m-1 rounded-lg p-1" aria-label={`${SITE.name} home`}>
+      <Logo />
+    </a>
+
+    <nav aria-label="Main" class="hidden md:block">
+      <ul class="flex items-center gap-1">
+        {LANDING.nav.map((item) => (
+          <li>
+            <a
+              href={item.href}
+              class="rounded-full px-3 py-2 text-[0.9375rem] font-medium text-muted transition-colors hover:text-ink"
+            >
+              {item.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+
+    <div class="ml-auto flex items-center gap-2">
+      <!-- A wrapper hides it on phones: the button sets its own display. -->
+      <div class="hidden sm:block">
+        <Button href={SITE.links.signIn} variant="ghost">
+          Sign in
+        </Button>
+      </div>
+      <Button href="#demo">{LANDING.hero.primary}</Button>
+
+      <!-- Phones: the menu is a native popover — no script, Esc and outside clicks close it. -->
+      <button
+        type="button"
+        popovertarget="mobile-menu"
+        class="-mr-2 inline-flex size-11 items-center justify-center rounded-full text-ink hover:bg-surface-2 md:hidden"
+        aria-label="Open menu"
+      >
+        <Icon name="menu" class="size-6" />
+      </button>
+    </div>
+  </Container>
+</header>
+
+<div
+  id="mobile-menu"
+  popover
+  class="fixed inset-x-3 top-3 m-0 w-auto rounded-panel bg-surface p-3 text-ink-2 shadow-float ring-glass backdrop:bg-navy/30 backdrop:backdrop-blur-sm"
+>
+  <div class="flex items-center justify-between pb-2 pl-2">
+    <Logo />
+    <button
+      type="button"
+      popovertarget="mobile-menu"
+      popovertargetaction="hide"
+      class="inline-flex size-11 items-center justify-center rounded-full hover:bg-surface-2"
+      aria-label="Close menu"
+    >
+      <Icon name="close" class="size-6" />
+    </button>
+  </div>
+  <nav aria-label="Main">
+    <ul class="flex flex-col">
+      {LANDING.nav.map((item) => (
+        <li>
+          <a
+            href={item.href}
+            class="flex min-h-12 items-center rounded-xl px-3 text-base font-medium hover:bg-surface-2"
+          >
+            {item.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </nav>
+  <div class="mt-2 grid grid-cols-2 gap-2 border-t border-line pt-3">
+    <Button href={SITE.links.signIn} variant="secondary">
+      Sign in
+    </Button>
+    <Button href={SITE.links.signUp}>{LANDING.hero.secondary}</Button>
+  </div>
+</div>
+
+<script>
+  // Following a link inside the phone menu closes it (anchors stay on the page).
+  const menu = document.getElementById('mobile-menu');
+  menu?.addEventListener('click', (event) => {
+    if (event.target instanceof Element && event.target.closest('a')) {
+      menu.hidePopover();
+    }
+  });
+</script>

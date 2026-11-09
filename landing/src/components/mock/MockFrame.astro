@@ -1,0 +1,18 @@
+---
+/**
+ * A drawing of the app for a visitor: one accessible image (`label` says what it shows); the
+ * markup inside is decorative and hidden from assistive tech.
+ */
+interface Props {
+  label: string;
+  class?: string;
+}
+
+const { label, class: className } = Astro.props;
+---
+
+<div role="img" aria-label={label} class:list={['select-none', className]}>
+  <div aria-hidden="true" class="contents">
+    <slot />
+  </div>
+</div>

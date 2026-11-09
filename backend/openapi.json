@@ -6022,7 +6022,7 @@
             "minimum": 1,
             "maximum": 9007199254740991
           },
-          "demoMode": {
+          "demoRestricted": {
             "type": "boolean"
           }
         },
@@ -6034,7 +6034,7 @@
           "role",
           "organisation",
           "idleTimeoutMinutes",
-          "demoMode"
+          "demoRestricted"
         ],
         "additionalProperties": false
       },

@@ -1,0 +1,95 @@
+---
+import Avatar from '@/components/ui/Avatar.astro';
+import StatusBadge, { type StatusTone } from '@/components/ui/StatusBadge.astro';
+
+const STATS = [
+  { label: 'Pending requests', value: '4', note: 'Oldest waits 1 day' },
+  { label: 'Out today', value: '3', note: '+2 later this week' },
+  { label: 'Reviews in 30 days', value: '7', note: '1 overdue', alert: true },
+  { label: 'Joining & leaving', value: '+3 / −1', note: 'Next: Mar 3' },
+] as const;
+
+const REQUESTS: readonly {
+  name: string;
+  type: string;
+  period: string;
+  status: string;
+  tone: StatusTone;
+}[] = [
+  {
+    name: 'Ava Thompson',
+    type: 'Vacation',
+    period: 'Mar 3 – 7 · 5 days',
+    status: 'Pending',
+    tone: 'warning',
+  },
+  {
+    name: 'Liam Foster',
+    type: 'Sick day',
+    period: 'Today · 1 day',
+    status: 'Approved',
+    tone: 'success',
+  },
+  {
+    name: 'Noah Bennett',
+    type: 'Day off',
+    period: 'Mar 14 · 1 day',
+    status: 'Pending',
+    tone: 'warning',
+  },
+  {
+    name: 'Emma Hayes',
+    type: 'Vacation',
+    period: 'Apr 1 – 4 · 4 days',
+    status: 'Approved',
+    tone: 'success',
+  },
+];
+---
+
+<div class="flex flex-col gap-4 p-4 sm:p-5">
+  <div>
+    <p class="text-[0.95rem] font-semibold tracking-[-0.01em] text-ink">Good morning, Marcus</p>
+    <p class="text-[0.6875rem] text-subtle">Here is what needs you today</p>
+  </div>
+
+  <div class="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
+    {STATS.map((stat) => (
+      <div class="rounded-xl border border-line bg-surface p-3 shadow-card">
+        <p class="truncate text-[0.625rem] font-medium text-muted">{stat.label}</p>
+        <p class="mt-1 text-lg font-semibold tracking-[-0.02em] text-ink tabular-nums">
+          {stat.value}
+        </p>
+        <p
+          class:list={[
+            'truncate text-[0.625rem]',
+            'alert' in stat ? 'text-danger-fg' : 'text-subtle',
+          ]}
+        >
+          {stat.note}
+        </p>
+      </div>
+    ))}
+  </div>
+
+  <div class="rounded-xl border border-line bg-surface shadow-card">
+    <div class="flex items-center gap-4 border-b border-line px-3.5 pt-2.5 text-[0.6875rem] font-medium">
+      <span class="border-b-2 border-brand pb-2 text-ink">Today’s events</span>
+      <span class="pb-2 text-subtle">Events by month</span>
+    </div>
+    <ul class="divide-y divide-line">
+      {REQUESTS.map((request) => (
+        <li class="flex items-center gap-2.5 px-3.5 py-2.5">
+          <Avatar name={request.name} size="sm" />
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-xs font-medium text-ink">{request.name}</p>
+            <p class="truncate text-[0.625rem] text-subtle">
+              {request.type} · {request.period}
+            </p>
+          </div>
+          <StatusBadge tone={request.tone} label={request.status} />
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>

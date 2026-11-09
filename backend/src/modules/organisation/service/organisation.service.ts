@@ -1,11 +1,13 @@
 import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+import { AppConfigService } from '../../../common/config/app-config.service';
 import type { Pageable } from '../../../common/dto/pageable';
 import {
   BusinessConflictException,
   BusinessRuleException,
   ConcurrentModificationException,
+  DemoRestrictedException,
   ResourceNotFoundException,
 } from '../../../common/exception/api.exception';
 import type { Principal } from '../../../common/security/principal';
@@ -49,6 +51,7 @@ export class OrganisationService {
     private readonly sessionService: SessionService,
     private readonly passwordHasher: PasswordHasher,
     private readonly auditService: AuditService,
+    private readonly config: AppConfigService,
     @InjectPinoLogger(OrganisationService.name) private readonly logger: PinoLogger,
   ) {}
 
@@ -229,6 +232,10 @@ export class OrganisationService {
     const before = await this.userService.findAdministrator(organisationId, userId);
     if (!before) {
       throw new ResourceNotFoundException();
+    }
+    if (this.config.isDemoProtected(before.email)) {
+      // The demo's showcase accounts keep their roles (another visitor may be signed in as one).
+      throw new DemoRestrictedException();
     }
     if (!isAdministrator(before.role)) {
       throw new BusinessRuleException('errors.organisation.notAdministrator');

@@ -11,6 +11,8 @@ export type ClientType = (typeof ClientType)[keyof typeof ClientType];
 export class Principal {
   constructor(
     readonly userId: string,
+    /** Sign-in email (lower-case) — the demo's showcase accounts are told apart by it. */
+    readonly email: string,
     readonly organisationId: string,
     /** The organisation is approved (ACTIVE): its data is reachable. */
     readonly isOrganisationActive: boolean,

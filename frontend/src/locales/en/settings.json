@@ -73,6 +73,6 @@
     "description": "Sign-ins, failed attempts, password changes and signed-out sessions on your account. If you don’t recognise something, change your password."
   },
   "demo": {
-    "passwordOff": "Password changes are turned off in the public demo — the accounts are shared."
+    "passwordOff": "Password changes are turned off for this demo account — other visitors use it too."
   }
 }

@@ -137,6 +137,7 @@ export class EmploymentService {
     employeeId: string,
     actorId: string,
   ): Promise<{ temporaryPassword: string }> {
+    await this.refuseDemoAccount(organisationId, employeeId);
     const userId = await this.employeeService.findUserId(organisationId, employeeId);
     const temporaryPassword = this.passwordHasher.generateTemporary();
     const passwordHash = await this.passwordHasher.hash(temporaryPassword);
@@ -155,7 +156,10 @@ export class EmploymentService {
     await this.employeeService.cancelTermination(organisationId, employeeId, version, actorId);
   }
 
-  /** The demo's showcase accounts stay signable-in: no edits, no termination (DEMO_MODE only). */
+  /**
+   * The demo's showcase accounts stay signable-in: no edits, no termination, no password reset
+   * (DEMO_MODE only).
+   */
   private async refuseDemoAccount(organisationId: string, employeeId: string): Promise<void> {
     if (!this.config.isDemo) {
       return;

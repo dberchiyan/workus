@@ -1,0 +1,60 @@
+---
+import AppWindow from '@/components/mock/AppWindow.astro';
+import NoticeCard from '@/components/mock/NoticeCard.astro';
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { LANDING } from '@/content/landing';
+import { SITE } from '@/content/site';
+
+const { hero, highlights } = LANDING;
+---
+
+<section aria-labelledby="hero-title" class="relative isolate overflow-hidden">
+  <div class="backdrop-brand absolute inset-0 -z-10" aria-hidden="true"></div>
+  <div class="backdrop-grid absolute inset-0 -z-10" aria-hidden="true"></div>
+
+  <Container class="pt-16 pb-4 sm:pt-24 lg:pt-28">
+    <div class="mx-auto flex max-w-4xl flex-col items-center text-center">
+      <p class="inline-flex items-center gap-2 rounded-full bg-surface/70 px-3.5 py-1.5 text-[0.8125rem] font-medium text-ink-2 ring-glass backdrop-blur">
+        <Icon name="sparkle" class="size-4 text-brand" />
+        {hero.eyebrow}
+      </p>
+      <h1 id="hero-title" class="type-display mt-6">
+        {hero.titleStart}
+        <span class="text-gradient block pb-1">{hero.titleAccent}</span>
+      </h1>
+      <p class="type-lead mt-6 max-w-2xl text-muted">{hero.lead}</p>
+      <div class="mt-9 flex w-full flex-col gap-3 sm:w-auto sm:flex-row">
+        <Button href="#demo" size="lg">
+          {hero.primary}
+          <Icon name="arrowRight" class="size-4.5" />
+        </Button>
+        <Button href={SITE.links.signUp} variant="secondary" size="lg">
+          {hero.secondary}
+        </Button>
+      </div>
+      <p class="mt-4 text-sm text-subtle">{hero.note}</p>
+    </div>
+
+    <div class="relative mx-auto mt-16 max-w-5xl sm:mt-20">
+      <div
+        class="absolute -inset-x-8 -top-8 -bottom-12 -z-10 rounded-[3rem] bg-gradient-to-b from-brand/15 to-transparent blur-2xl"
+        aria-hidden="true"
+      ></div>
+      <AppWindow />
+      <NoticeCard class="animate-float absolute top-28 -right-4 hidden sm:flex lg:-right-12" />
+    </div>
+
+    <dl class="mx-auto mt-20 grid max-w-5xl grid-cols-2 gap-x-6 gap-y-8 lg:grid-cols-4">
+      {highlights.map((item) => (
+        <div class="reveal flex flex-col items-center gap-1 text-center">
+          <dt class="order-2 text-sm text-muted">{item.label}</dt>
+          <dd class="order-1 text-3xl font-semibold tracking-[-0.03em] text-ink tabular-nums">
+            {item.value}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  </Container>
+</section>

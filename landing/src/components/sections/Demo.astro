@@ -1,0 +1,96 @@
+---
+import Avatar from '@/components/ui/Avatar.astro';
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import { LANDING } from '@/content/landing';
+import { DEMO, SITE } from '@/content/site';
+
+const { demo } = LANDING;
+---
+
+<section id="demo" aria-labelledby="demo-title" class="py-24 sm:py-32">
+  <Container>
+    <SectionHeading id="demo-title" eyebrow={demo.eyebrow} title={demo.title} lead={demo.lead} />
+
+    <div class="reveal mx-auto mt-14 max-w-5xl rounded-panel bg-surface p-3 shadow-float ring-glass sm:p-4">
+      <ul class="grid gap-3 md:grid-cols-3">
+        {DEMO.accounts.map((account) => (
+          <li class="flex flex-col gap-4 rounded-2xl bg-surface-2 p-5">
+            <div class="flex items-center gap-3">
+              <Avatar name={account.name} size="md" />
+              <div class="min-w-0">
+                <p class="font-semibold text-ink">{account.name}</p>
+                <p class="text-sm text-brand-strong">{account.role}</p>
+              </div>
+            </div>
+            <p class="text-sm leading-relaxed text-muted">{account.sees}</p>
+            <p class="mt-auto">
+              <button
+                type="button"
+                class="copy flex w-full items-center justify-between gap-2 rounded-xl bg-surface px-3 py-2.5 text-left font-mono text-[0.8125rem] text-ink-2 ring-1 ring-line transition-colors hover:ring-line-strong"
+                data-copy={account.email}
+                aria-label={`Copy ${account.email}`}
+              >
+                <span class="truncate">{account.email}</span>
+                <span class="copy-label shrink-0 font-sans text-xs font-medium text-subtle">
+                  Copy
+                </span>
+              </button>
+            </p>
+          </li>
+        ))}
+      </ul>
+      <div class="flex flex-col items-center gap-4 px-3 pt-5 pb-3 sm:flex-row sm:px-4">
+        <p class="flex items-center gap-2 text-sm text-muted">
+          <Icon name="key" class="size-4.5 text-brand" />
+          {demo.passwordLabel}
+          <button
+            type="button"
+            class="copy inline-flex items-center gap-2 rounded-lg bg-surface-2 px-2.5 py-1 font-mono text-[0.8125rem] text-ink ring-1 ring-line hover:ring-line-strong"
+            data-copy={DEMO.password}
+            aria-label="Copy the demo password"
+          >
+            {DEMO.password}
+            <span class="copy-label font-sans text-xs font-medium text-subtle">Copy</span>
+          </button>
+        </p>
+        <Button href={SITE.links.signIn} class="sm:ml-auto">
+          {demo.open}
+          <Icon name="arrowRight" class="size-4.5" />
+        </Button>
+      </div>
+    </div>
+    <p class="mx-auto mt-5 max-w-2xl text-center text-sm text-subtle">{demo.note}</p>
+    <p class="sr-only" aria-live="polite" id="copy-status"></p>
+  </Container>
+</section>
+
+<script>
+  // Copy buttons: the value goes to the clipboard; the label says "Copied" for a moment.
+  const status = document.getElementById('copy-status');
+  for (const button of document.querySelectorAll<HTMLButtonElement>('button.copy')) {
+    button.addEventListener('click', () => {
+      const value = button.dataset['copy'];
+      const label = button.querySelector('.copy-label');
+      if (!value) {
+        return;
+      }
+      navigator.clipboard.writeText(value).then(
+        () => {
+          if (label) {
+            label.textContent = 'Copied';
+            setTimeout(() => (label.textContent = 'Copy'), 1600);
+          }
+          if (status) {
+            status.textContent = `Copied ${value}`;
+          }
+        },
+        () => {
+          // Clipboard refused (permissions): the value stays visible to copy by hand.
+        },
+      );
+    });
+  }
+</script>

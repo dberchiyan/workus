@@ -1,0 +1,55 @@
+---
+import Avatar from '@/components/ui/Avatar.astro';
+
+// One working week; each bar spans its days (1-based columns), pending ones dashed.
+const DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'] as const;
+const ROWS = [
+  {
+    name: 'Ava Thompson',
+    start: 1,
+    span: 5,
+    bar: 'bg-chart-1/20 text-chart-1 border-chart-1/40',
+    label: 'Vacation',
+  },
+  {
+    name: 'Liam Foster',
+    start: 2,
+    span: 1,
+    bar: 'bg-chart-3/20 text-chart-3 border-chart-3/40',
+    label: 'Sick',
+  },
+  {
+    name: 'Noah Bennett',
+    start: 4,
+    span: 2,
+    bar: 'border-dashed bg-chart-4/15 text-chart-4 border-chart-4/50',
+    label: 'Pending',
+  },
+] as const;
+---
+
+<div class="overflow-hidden rounded-xl border border-line bg-surface shadow-card">
+  <div class="grid grid-cols-[5.5rem_repeat(5,1fr)] border-b border-line text-[0.625rem] font-medium text-subtle">
+    <span></span>
+    {DAYS.map((day) => (
+      <span class="py-2 text-center">{day}</span>
+    ))}
+  </div>
+  {ROWS.map((row) => (
+    <div class="grid grid-cols-[5.5rem_repeat(5,1fr)] items-center border-b border-line last:border-0">
+      <span class="flex items-center gap-1.5 truncate py-2.5 pl-2.5 text-[0.6875rem] font-medium text-ink">
+        <Avatar name={row.name} size="xs" />
+        {row.name.split(' ')[0]}
+      </span>
+      <span
+        class:list={[
+          'mx-1 truncate rounded-md border px-1.5 py-1 text-[0.625rem] font-semibold',
+          row.bar,
+        ]}
+        style={`grid-column: ${row.start + 1} / span ${row.span}`}
+      >
+        {row.label}
+      </span>
+    </div>
+  ))}
+</div>

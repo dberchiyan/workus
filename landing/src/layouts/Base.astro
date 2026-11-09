@@ -1,0 +1,46 @@
+---
+import '@fontsource-variable/inter/opsz.css';
+import '@/styles/global.css';
+import Seo from '@/components/seo/Seo.astro';
+import { SITE } from '@/content/site';
+
+interface Props {
+  title: string;
+  description: string;
+  path: string;
+  noindex?: boolean;
+}
+
+const { title, description, path, noindex = false } = Astro.props;
+---
+
+<!doctype html>
+<html lang={SITE.locale}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <meta
+      name="theme-color"
+      content={SITE.themeColor.light}
+      media="(prefers-color-scheme: light)"
+    />
+    <meta name="theme-color" content={SITE.themeColor.dark} media="(prefers-color-scheme: dark)" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    <meta name="generator" content={Astro.generator} />
+    <Seo title={title} description={description} path={path} noindex={noindex}>
+      <slot name="head" />
+    </Seo>
+  </head>
+  <body class="min-h-dvh bg-canvas">
+    <a
+      href="#main"
+      class="sr-only z-50 rounded-full bg-surface px-4 py-2 font-medium text-ink shadow-float focus:not-sr-only focus:fixed focus:top-3 focus:left-3"
+    >
+      Skip to content
+    </a>
+    <slot />
+  </body>
+</html>

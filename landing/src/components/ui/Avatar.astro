@@ -1,0 +1,48 @@
+---
+interface Props {
+  name: string;
+  size?: 'xs' | 'sm' | 'md';
+  /** A ring in the surface colour, for stacks. */
+  ring?: boolean;
+}
+
+const { name, size = 'sm', ring = false } = Astro.props;
+
+const TONES = [
+  'bg-avatar-1',
+  'bg-avatar-2',
+  'bg-avatar-3',
+  'bg-avatar-4',
+  'bg-avatar-5',
+  'bg-avatar-6',
+  'bg-avatar-7',
+  'bg-avatar-8',
+] as const;
+
+// The same person has the same colour everywhere (the app hashes the user id the same way).
+const hash = [...name].reduce((sum, char) => (sum * 31 + char.charCodeAt(0)) >>> 0, 7);
+const tone = TONES[hash % TONES.length];
+const initials = name
+  .split(' ')
+  .map((part) => part[0] ?? '')
+  .join('')
+  .slice(0, 2);
+
+const SIZES = {
+  xs: 'size-5 text-[0.55rem]',
+  sm: 'size-7 text-[0.65rem]',
+  md: 'size-9 text-xs',
+} as const;
+---
+
+<span
+  class:list={[
+    'inline-flex shrink-0 items-center justify-center rounded-full font-semibold text-white',
+    tone,
+    SIZES[size],
+    ring && 'ring-2 ring-surface',
+  ]}
+  aria-hidden="true"
+>
+  {initials}
+</span>

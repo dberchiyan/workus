@@ -1,0 +1,65 @@
+---
+import ActivityMock from '@/components/mock/ActivityMock.astro';
+import CalendarMock from '@/components/mock/CalendarMock.astro';
+import InsightsMock from '@/components/mock/InsightsMock.astro';
+import MockFrame from '@/components/mock/MockFrame.astro';
+import PeopleMock from '@/components/mock/PeopleMock.astro';
+import ReviewMock from '@/components/mock/ReviewMock.astro';
+import TimeOffMock from '@/components/mock/TimeOffMock.astro';
+import Icon from '@/components/ui/Icon.astro';
+import type { Feature } from '@/content/landing';
+
+interface Props {
+  feature: Feature;
+  wide: boolean;
+}
+
+const { feature, wide } = Astro.props;
+
+const VISUALS = {
+  people: PeopleMock,
+  reviews: ReviewMock,
+  timeOff: TimeOffMock,
+  calendar: CalendarMock,
+  insights: InsightsMock,
+  activity: ActivityMock,
+} as const;
+const Visual = VISUALS[feature.id];
+---
+
+<article
+  class:list={[
+    'reveal group flex flex-col overflow-hidden rounded-panel bg-surface shadow-card ring-glass',
+    wide && 'lg:col-span-2',
+    wide ? 'lg:flex-row' : '',
+  ]}
+>
+  <div class:list={['flex flex-col gap-4 p-6 sm:p-8', wide && 'lg:w-1/2']}>
+    <span class="flex size-11 items-center justify-center rounded-xl bg-brand-soft text-brand-strong">
+      <Icon name={feature.icon} class="size-5.5" />
+    </span>
+    <h3 class="text-xl font-semibold tracking-[-0.02em]">{feature.title}</h3>
+    <p class="text-[0.9375rem] leading-relaxed text-muted">{feature.text}</p>
+    <ul class="mt-1 flex flex-col gap-2">
+      {feature.points.map((point) => (
+        <li class="flex items-start gap-2.5 text-sm text-ink-2">
+          <Icon name="check" class="mt-0.5 size-4 shrink-0 text-brand" />
+          {point}
+        </li>
+      ))}
+    </ul>
+  </div>
+  <div
+    class:list={[
+      'relative mt-auto flex items-center px-6 pb-6 sm:px-8 sm:pb-8',
+      wide && 'lg:mt-0 lg:w-1/2 lg:py-8 lg:pl-0',
+    ]}
+  >
+    <MockFrame
+      label={`${feature.title} in Workus`}
+      class="w-full rounded-2xl bg-gradient-to-b from-surface-2 to-surface-2/40 p-4 ring-1 ring-line transition-transform duration-300 ease-out group-hover:-translate-y-1 motion-reduce:group-hover:translate-y-0"
+    >
+      <Visual />
+    </MockFrame>
+  </div>
+</article>

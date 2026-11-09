@@ -1,0 +1,74 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+import Logo from '@/components/ui/Logo.astro';
+import MockFrame from './MockFrame.astro';
+import DashboardMock from './DashboardMock.astro';
+
+const MENU = [
+  { icon: 'home', label: 'Dashboard', active: true },
+  { icon: 'users', label: 'Employees' },
+  { icon: 'inbox', label: 'Requests' },
+  { icon: 'calendar', label: 'Calendar' },
+  { icon: 'chart', label: 'Insights' },
+] as const;
+---
+
+<MockFrame
+  label="The Workus admin dashboard: pending requests, people out today, upcoming reviews and today's time-off requests."
+  class="overflow-hidden rounded-panel bg-surface shadow-window ring-glass"
+>
+  <!-- Browser chrome -->
+  <div class="flex items-center gap-3 border-b border-line bg-surface-2 px-4 py-2.5">
+    <div class="flex gap-1.5">
+      <span class="size-2.5 rounded-full bg-line-strong"></span>
+      <span class="size-2.5 rounded-full bg-line-strong"></span>
+      <span class="size-2.5 rounded-full bg-line-strong"></span>
+    </div>
+    <div class="mx-auto flex h-6 w-full max-w-xs items-center justify-center gap-1.5 rounded-md bg-surface text-[0.6875rem] text-subtle ring-1 ring-line">
+      <Icon name="lock" class="size-3" />
+      demo-workus.osdb.io
+    </div>
+    <span class="w-10"></span>
+  </div>
+
+  <div class="flex min-h-0">
+    <!-- Sidebar (hidden on phones, as the app's drawer) -->
+    <aside class="hidden w-44 shrink-0 flex-col gap-1 border-r border-line p-3 md:flex">
+      <Logo class="mb-3 scale-90 origin-left" />
+      {MENU.map((item) => (
+        <span
+          class:list={[
+            'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium',
+            'active' in item ? 'bg-brand-soft text-brand-strong' : 'text-muted',
+          ]}
+        >
+          <Icon name={item.icon} class="size-4" />
+          {item.label}
+        </span>
+      ))}
+      <span class="mt-auto flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-muted">
+        <Icon name="settings" class="size-4" />
+        Settings
+      </span>
+    </aside>
+
+    <div class="min-w-0 flex-1">
+      <!-- Top bar -->
+      <div class="flex items-center gap-3 border-b border-line px-4 py-2.5 sm:px-5">
+        <span class="flex h-7 flex-1 items-center gap-2 rounded-lg bg-surface-2 px-2.5 text-[0.6875rem] text-subtle sm:max-w-56">
+          <Icon name="search" class="size-3.5" />
+          Search
+          <span class="ml-auto rounded border border-line px-1 text-[0.625rem]">⌘K</span>
+        </span>
+        <span class="relative ml-auto text-muted">
+          <Icon name="bell" class="size-4.5" />
+          <span class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-danger-dot ring-2 ring-surface"></span>
+        </span>
+        <span class="flex size-7 items-center justify-center rounded-full bg-avatar-7 text-[0.6rem] font-semibold text-white">
+          MR
+        </span>
+      </div>
+      <DashboardMock />
+    </div>
+  </div>
+</MockFrame>

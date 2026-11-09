@@ -110,6 +110,7 @@ export class SessionService extends SessionAuthenticator {
       result: SessionLookup.VALID,
       principal: new Principal(
         session.userId,
+        session.user.email,
         session.user.organisationId,
         session.user.organisation.status === OrganisationStatus.ACTIVE,
         session.id,

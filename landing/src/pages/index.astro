@@ -1,0 +1,32 @@
+---
+import Demo from '@/components/sections/Demo.astro';
+import Faq from '@/components/sections/Faq.astro';
+import Features from '@/components/sections/Features.astro';
+import FinalCta from '@/components/sections/FinalCta.astro';
+import Hero from '@/components/sections/Hero.astro';
+import HowItWorks from '@/components/sections/HowItWorks.astro';
+import Roles from '@/components/sections/Roles.astro';
+import Security from '@/components/sections/Security.astro';
+import SiteFooter from '@/components/sections/SiteFooter.astro';
+import SiteHeader from '@/components/sections/SiteHeader.astro';
+import FaqJsonLd from '@/components/seo/FaqJsonLd.astro';
+import { LANDING } from '@/content/landing';
+import { SITE } from '@/content/site';
+import Base from '@/layouts/Base.astro';
+---
+
+<Base title={SITE.title} description={SITE.description} path="/">
+  <FaqJsonLd slot="head" questions={LANDING.faq.items} />
+  <SiteHeader />
+  <main id="main">
+    <Hero />
+    <Features />
+    <HowItWorks />
+    <Roles />
+    <Security />
+    <Demo />
+    <Faq />
+    <FinalCta />
+  </main>
+  <SiteFooter />
+</Base>

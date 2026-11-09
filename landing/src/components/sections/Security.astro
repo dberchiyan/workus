@@ -1,0 +1,39 @@
+---
+import Container from '@/components/ui/Container.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { LANDING } from '@/content/landing';
+
+const { security } = LANDING;
+---
+
+<section
+  id="security"
+  aria-labelledby="security-title"
+  class="relative isolate overflow-hidden bg-navy py-24 text-white sm:py-32"
+>
+  <!-- Always dark: a quiet glow and grid on navy, whatever the visitor's theme. -->
+  <div
+    class="absolute inset-0 -z-10 bg-[radial-gradient(50rem_30rem_at_50%_-10%,color-mix(in_oklch,var(--c-brand-glow)_30%,transparent),transparent_70%)]"
+    aria-hidden="true"
+  ></div>
+  <Container>
+    <div class="reveal mx-auto flex max-w-3xl flex-col items-center gap-4 text-center">
+      <p class="type-eyebrow text-sky">{security.eyebrow}</p>
+      <h2 id="security-title" class="type-title text-white">
+        {security.title}
+      </h2>
+      <p class="type-lead max-w-2xl text-white/70">{security.lead}</p>
+    </div>
+    <ul class="mt-16 grid gap-px overflow-hidden rounded-panel bg-white/10 ring-1 ring-white/10 sm:grid-cols-2 lg:grid-cols-3">
+      {security.items.map((item) => (
+        <li class="reveal flex flex-col gap-3 bg-navy/95 p-7 sm:p-8">
+          <span class="flex size-11 items-center justify-center rounded-xl bg-white/8 text-sky ring-1 ring-white/10">
+            <Icon name={item.icon} class="size-5.5" />
+          </span>
+          <h3 class="text-lg font-semibold tracking-[-0.015em] text-white">{item.title}</h3>
+          <p class="text-[0.9375rem] leading-relaxed text-white/70">{item.text}</p>
+        </li>
+      ))}
+    </ul>
+  </Container>
+</section>

@@ -1,0 +1,62 @@
+---
+import Container from '@/components/ui/Container.astro';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import { LANDING } from '@/content/landing';
+
+const { roles } = LANDING;
+---
+
+<section aria-labelledby="roles-title" class="py-24 sm:py-32">
+  <Container>
+    <SectionHeading id="roles-title" eyebrow={roles.eyebrow} title={roles.title} />
+    <div class="mt-16 grid gap-5 md:grid-cols-3">
+      {roles.items.map((role, index) => (
+        <article
+          class:list={[
+            'reveal flex flex-col rounded-panel p-7 ring-glass',
+            index === 1
+              ? 'bg-navy text-white shadow-float dark:bg-surface-2'
+              : 'bg-surface shadow-card',
+          ]}
+        >
+          <h3
+            class:list={[
+              'text-2xl font-semibold tracking-[-0.02em]',
+              index === 1 && 'text-white dark:text-ink',
+            ]}
+          >
+            {role.role}
+          </h3>
+          <p
+            class:list={[
+              'mt-1 text-[0.9375rem]',
+              index === 1 ? 'text-white/70 dark:text-muted' : 'text-muted',
+            ]}
+          >
+            {role.summary}
+          </p>
+          <ul class="mt-6 flex flex-col gap-3">
+            {role.items.map((item) => (
+              <li
+                class:list={[
+                  'flex items-start gap-2.5 text-[0.9375rem]',
+                  index === 1 ? 'text-white/90 dark:text-ink-2' : 'text-ink-2',
+                ]}
+              >
+                <Icon
+                  name="check"
+                  class:list={[
+                    'mt-0.5 size-4.5 shrink-0',
+                    index === 1 ? 'text-brand-glow dark:text-brand' : 'text-brand',
+                  ]}
+                />
+                {item}
+              </li>
+            ))}
+          </ul>
+        </article>
+      ))}
+    </div>
+  </Container>
+</section>

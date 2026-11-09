@@ -1,0 +1,25 @@
+---
+import Icon from '@/components/ui/Icon.astro';
+/** A floating notification over the hero window (the app's bell). */
+interface Props {
+  class?: string;
+}
+
+const { class: className } = Astro.props;
+---
+
+<div
+  class:list={[
+    'flex items-center gap-3 rounded-2xl bg-surface/90 px-3.5 py-3 shadow-float ring-glass backdrop-blur-md',
+    className,
+  ]}
+  aria-hidden="true"
+>
+  <span class="flex size-9 items-center justify-center rounded-full bg-success-bg text-success-fg">
+    <Icon name="check" class="size-4.5 [stroke-width:2.25]" />
+  </span>
+  <div class="min-w-0">
+    <p class="text-[0.8125rem] font-semibold text-ink">Vacation approved</p>
+    <p class="text-[0.6875rem] text-muted">Mar 3 – 7 · by Sophia Carter</p>
+  </div>
+</div>

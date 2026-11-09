@@ -1,0 +1,25 @@
+---
+import Avatar from '@/components/ui/Avatar.astro';
+
+const EVENTS = [
+  { actor: 'Marcus Reid', what: 'updated a review', change: '$4,100 → $4,500', time: '2 min ago' },
+  { actor: 'Sophia Carter', what: 'approved vacation', change: 'Mar 3 – 7', time: '1 h ago' },
+] as const;
+---
+
+<ol class="relative flex flex-col gap-3 before:absolute before:top-2 before:bottom-2 before:left-[13px] before:w-px before:bg-line">
+  {EVENTS.map((event) => (
+    <li class="relative flex gap-3">
+      <Avatar name={event.actor} size="sm" ring />
+      <div class="min-w-0 flex-1 rounded-xl border border-line bg-surface px-3 py-2.5 shadow-card">
+        <p class="truncate text-[0.75rem] text-muted">
+          <span class="font-medium text-ink">{event.actor}</span> {event.what}
+        </p>
+        <p class="mt-0.5 flex justify-between gap-2 text-[0.6875rem] tabular-nums">
+          <span class="truncate text-ink-2">{event.change}</span>
+          <span class="shrink-0 text-subtle">{event.time}</span>
+        </p>
+      </div>
+    </li>
+  ))}
+</ol>

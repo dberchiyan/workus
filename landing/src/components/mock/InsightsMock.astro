@@ -1,0 +1,28 @@
+---
+// Headcount by month — columns grow from the baseline.
+const COLUMNS = [18, 19, 19, 21, 22, 22, 24, 25, 25, 27, 28, 30] as const;
+const MAX = 30;
+---
+
+<div class="rounded-xl border border-line bg-surface p-4 shadow-card">
+  <div class="flex items-baseline justify-between">
+    <p class="text-[0.8125rem] font-medium text-ink">Headcount</p>
+    <p class="text-[0.6875rem] text-success-fg tabular-nums">+12 this year</p>
+  </div>
+  <div class="mt-4 flex h-24 items-end gap-1.5">
+    {COLUMNS.map((value, index) => (
+      <span
+        class:list={[
+          'flex-1 rounded-t-[4px]',
+          index === COLUMNS.length - 1 ? 'bg-brand' : 'bg-brand/25',
+        ]}
+        style={`height: ${(value / MAX) * 100}%`}
+      />
+    ))}
+  </div>
+  <div class="mt-2 flex justify-between text-[0.625rem] text-subtle">
+    <span>Jan</span>
+    <span>Jun</span>
+    <span>Dec</span>
+  </div>
+</div>

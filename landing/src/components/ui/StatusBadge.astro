@@ -1,0 +1,28 @@
+---
+export type StatusTone = 'success' | 'warning' | 'info' | 'danger';
+
+interface Props {
+  tone: StatusTone;
+  label: string;
+}
+
+const { tone, label } = Astro.props;
+
+// The app's StatusBadge: a soft fill, a dot and the word (never colour alone).
+const TONES: Record<StatusTone, { badge: string; dot: string }> = {
+  success: { badge: 'bg-success-bg text-success-fg', dot: 'bg-success-dot' },
+  warning: { badge: 'bg-warning-bg text-warning-fg', dot: 'bg-warning-dot' },
+  info: { badge: 'bg-info-bg text-info-fg', dot: 'bg-info-dot' },
+  danger: { badge: 'bg-danger-bg text-danger-fg', dot: 'bg-danger-dot' },
+};
+---
+
+<span
+  class:list={[
+    'inline-flex items-center gap-1.5 rounded-full px-2 py-0.5 text-[0.6875rem] font-medium whitespace-nowrap',
+    TONES[tone].badge,
+  ]}
+>
+  <span class:list={['size-1.5 rounded-full', TONES[tone].dot]}></span>
+  {label}
+</span>

@@ -1,0 +1,63 @@
+---
+// A salary history: monthly USD at each completed review (a stepped line, as in the profile).
+const POINTS = [3200, 3200, 3600, 3600, 4100, 4100, 4500] as const;
+const WIDTH = 280;
+const HEIGHT = 96;
+const MIN = 3000;
+const MAX = 4700;
+const x = (index: number) => (index / (POINTS.length - 1)) * WIDTH;
+const y = (value: number) => HEIGHT - ((value - MIN) / (MAX - MIN)) * HEIGHT;
+const line = POINTS.map((value, index) => `${index === 0 ? 'M' : 'L'}${x(index)},${y(value)}`).join(
+  ' ',
+);
+const area = `${line} L${WIDTH},${HEIGHT} L0,${HEIGHT} Z`;
+const last = POINTS.length - 1;
+---
+
+<div class="rounded-xl border border-line bg-surface p-4 shadow-card">
+  <div class="flex items-end justify-between gap-3">
+    <div>
+      <p class="text-[0.6875rem] font-medium text-muted">Current salary</p>
+      <p class="text-xl font-semibold tracking-[-0.02em] text-ink tabular-nums">$4,500.00</p>
+    </div>
+    <span class="rounded-full bg-success-bg px-2 py-0.5 text-[0.6875rem] font-semibold text-success-fg tabular-nums">
+      +9.8%
+    </span>
+  </div>
+  <svg
+    viewBox={`0 -6 ${WIDTH} ${HEIGHT + 12}`}
+    class="mt-3 h-24 w-full overflow-visible"
+    preserveAspectRatio="none"
+  >
+    <defs>
+      <linearGradient id="salary-fill" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="var(--c-brand)" stop-opacity="0.22"></stop>
+        <stop offset="1" stop-color="var(--c-brand)" stop-opacity="0"></stop>
+      </linearGradient>
+    </defs>
+    <path d={area} fill="url(#salary-fill)"></path>
+    <path
+      d={line}
+      fill="none"
+      stroke="var(--c-brand)"
+      stroke-width="2"
+      vector-effect="non-scaling-stroke"
+      stroke-linejoin="round"
+    ></path>
+    <circle
+      cx={x(last)}
+      cy={y(POINTS[last] ?? MAX)}
+      r="4"
+      fill="var(--c-surface)"
+      stroke="var(--c-brand)"
+      stroke-width="2"
+      vector-effect="non-scaling-stroke"
+    ></circle>
+  </svg>
+  <div class="mt-2 flex justify-between text-[0.625rem] text-subtle">
+    <span>Start</span>
+    <span>Review 1</span>
+    <span>Review 2</span>
+    <span>Now</span>
+  </div>
+</div>

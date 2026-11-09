@@ -1,0 +1,33 @@
+---
+import Container from '@/components/ui/Container.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import { LANDING } from '@/content/landing';
+
+const { steps } = LANDING;
+---
+
+<section
+  id="how-it-works"
+  aria-labelledby="how-title"
+  class="border-y border-line bg-surface py-24 sm:py-32"
+>
+  <Container>
+    <SectionHeading id="how-title" eyebrow={steps.eyebrow} title={steps.title} />
+    <ol class="relative mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
+      <!-- The thread joining the steps on wide screens. -->
+      <span
+        class="absolute top-6 right-[16.6%] left-[16.6%] hidden h-px bg-gradient-to-r from-transparent via-line-strong to-transparent md:block"
+        aria-hidden="true"
+      ></span>
+      {steps.items.map((step, index) => (
+        <li class="reveal relative flex flex-col items-center text-center">
+          <span class="relative flex size-12 items-center justify-center rounded-full bg-surface text-lg font-semibold text-brand-strong shadow-card ring-glass tabular-nums">
+            {index + 1}
+          </span>
+          <h3 class="mt-6 text-lg font-semibold tracking-[-0.015em]">{step.title}</h3>
+          <p class="mt-2 max-w-xs text-[0.9375rem] leading-relaxed text-muted">{step.text}</p>
+        </li>
+      ))}
+    </ol>
+  </Container>
+</section>

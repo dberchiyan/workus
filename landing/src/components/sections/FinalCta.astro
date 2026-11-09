@@ -1,0 +1,31 @@
+---
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { LANDING } from '@/content/landing';
+import { SITE } from '@/content/site';
+
+const { cta, hero } = LANDING;
+---
+
+<section aria-labelledby="cta-title" class="py-24 sm:py-32">
+  <Container>
+    <div class="reveal relative isolate overflow-hidden rounded-[2rem] bg-surface px-6 py-16 text-center shadow-float ring-glass sm:px-16 sm:py-20">
+      <div class="backdrop-brand absolute inset-0 -z-10" aria-hidden="true"></div>
+      <div class="backdrop-grid absolute inset-0 -z-10" aria-hidden="true"></div>
+      <h2 id="cta-title" class="type-title mx-auto max-w-3xl">
+        {cta.title}
+      </h2>
+      <p class="type-lead mx-auto mt-5 max-w-xl text-muted">{cta.lead}</p>
+      <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+        <Button href="#demo" size="lg">
+          {hero.primary}
+          <Icon name="arrowRight" class="size-4.5" />
+        </Button>
+        <Button href={SITE.links.signUp} variant="secondary" size="lg">
+          {hero.secondary}
+        </Button>
+      </div>
+    </div>
+  </Container>
+</section>

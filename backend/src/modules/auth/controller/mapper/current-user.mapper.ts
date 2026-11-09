@@ -4,7 +4,7 @@ import type { CurrentUserResponse } from '../dto/current-user.response';
 export const toCurrentUserResponse = (
   user: UserProfile,
   idleTimeoutMinutes: number,
-  demoMode: boolean,
+  demoRestricted: boolean,
 ): CurrentUserResponse => ({
   id: user.id,
   email: user.email,
@@ -18,5 +18,5 @@ export const toCurrentUserResponse = (
     rejectionReason: user.organisation.rejectionReason,
   },
   idleTimeoutMinutes,
-  demoMode,
+  demoRestricted,
 });
