@@ -13,16 +13,21 @@ const { steps } = LANDING;
 >
   <Container>
     <SectionHeading id="how-title" eyebrow={steps.eyebrow} title={steps.title} />
-    <ol class="relative mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
-      <!-- The thread joining the steps on wide screens. -->
+    <!-- Lights up from the first step to the last once in view (`data-animate`, global.css). -->
+    <ol data-animate class="steps relative mt-16 grid gap-10 md:grid-cols-3 md:gap-8">
+      <!-- The thread joining the steps on wide screens, the light that flows along it, its head. -->
       <span
         class="absolute top-6 right-[16.6%] left-[16.6%] hidden h-px bg-gradient-to-r from-transparent via-line-strong to-transparent md:block"
         aria-hidden="true"
       ></span>
+      <span class="steps-track hidden md:block" aria-hidden="true">
+        <span class="steps-fill"></span>
+        <span class="steps-comet"></span>
+      </span>
       {steps.items.map((step, index) => (
-        <li class="reveal relative flex flex-col items-center text-center">
-          <span class="relative flex size-12 items-center justify-center rounded-full bg-surface text-lg font-semibold text-brand-strong shadow-card ring-glass tabular-nums">
-            {index + 1}
+        <li class="reveal relative flex flex-col items-center text-center" style={`--step: ${index}`}>
+          <span class="step-dot relative flex size-12 items-center justify-center rounded-full bg-surface text-lg font-semibold text-brand-strong shadow-card ring-glass tabular-nums">
+            <span class="relative">{index + 1}</span>
           </span>
           <h3 class="mt-6 text-lg font-semibold tracking-[-0.015em]">{step.title}</h3>
           <p class="mt-2 max-w-xs text-[0.9375rem] leading-relaxed text-muted">{step.text}</p>

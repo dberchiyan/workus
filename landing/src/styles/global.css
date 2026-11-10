@@ -586,3 +586,181 @@
     animation-duration: 1400ms;
   }
 }
+
+/*
+ * How it works: once the steps are in view, light flows along the thread from the first step to
+ * the last and each number lights up as it arrives (1.8 s, symmetric easing, so the middle step
+ * lights at half time); afterwards a soft glint keeps travelling the same way. Without motion (or
+ * without the observer) the steps simply show lit.
+ */
+.steps {
+  --flow: 1800ms;
+  --flow-ease: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+.steps-track {
+  position: absolute;
+  top: calc(1.5rem - 4px);
+  right: 16.6%;
+  left: 16.6%;
+  height: 9px;
+  overflow-x: clip;
+  pointer-events: none;
+}
+
+.steps-fill {
+  position: absolute;
+  inset: 4px 0 auto;
+  height: 1.5px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--c-brand-strong), var(--c-brand) 55%, var(--c-sky));
+  box-shadow: 0 0 10px color-mix(in oklch, var(--c-brand-glow) 70%, transparent);
+  transform-origin: left center;
+}
+
+/* A bright head on the fill's leading edge (the box slides, so the glow is never squashed). */
+.steps-comet {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    4rem 4.5px at 100% 50%,
+    color-mix(in oklch, var(--c-sky) 95%, transparent),
+    transparent
+  );
+  opacity: 0;
+}
+
+.step-dot::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(140deg, var(--c-brand), var(--c-brand-strong));
+  box-shadow:
+    inset 0 1px 0 color-mix(in oklch, white 30%, transparent),
+    0 0 0 4px color-mix(in oklch, var(--c-brand-glow) 22%, transparent),
+    0 8px 22px -6px color-mix(in oklch, var(--c-brand) 60%, transparent);
+}
+
+.step-dot {
+  color: var(--c-on-brand);
+}
+
+/* The ripple as a step lights up. */
+.step-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  border: 1.5px solid var(--c-brand-glow);
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .steps:not([data-visible]) .steps-fill {
+    transform: scaleX(0);
+  }
+
+  .js .steps:not([data-visible]) .step-dot {
+    color: var(--c-brand-strong);
+  }
+
+  .js .steps:not([data-visible]) .step-dot::before {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+
+  .steps[data-visible] .steps-fill {
+    animation: steps-fill var(--flow) var(--flow-ease) 200ms both;
+  }
+
+  /* Rides the head while it fills, then keeps glinting along the thread. */
+  .steps[data-visible] .steps-comet {
+    animation:
+      steps-head var(--flow) var(--flow-ease) 200ms both,
+      steps-glint 2600ms cubic-bezier(0.45, 0, 0.25, 1) calc(var(--flow) + 1400ms) infinite;
+  }
+
+  .steps[data-visible] .step-dot {
+    /* The number turns light once the fill behind it is mostly there. */
+    animation: step-text 300ms var(--ease-out) calc(380ms + var(--step) * var(--flow) / 2) both;
+  }
+
+  .steps[data-visible] .step-dot::before {
+    animation: step-light 600ms var(--ease-out) calc(200ms + var(--step) * var(--flow) / 2) both;
+  }
+
+  .steps[data-visible] .step-dot::after {
+    animation: step-ripple 1100ms var(--ease-out) calc(200ms + var(--step) * var(--flow) / 2) both;
+  }
+}
+
+@keyframes steps-fill {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+@keyframes steps-head {
+  from {
+    opacity: 1;
+    transform: translateX(-100%);
+  }
+  85% {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+
+@keyframes steps-glint {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  15% {
+    opacity: 0.9;
+  }
+  60%,
+  to {
+    opacity: 0;
+    transform: translateX(0);
+  }
+}
+
+@keyframes step-text {
+  from {
+    color: var(--c-brand-strong);
+  }
+  to {
+    color: var(--c-on-brand);
+  }
+}
+
+@keyframes step-light {
+  from {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes step-ripple {
+  from {
+    opacity: 0.7;
+    transform: scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: scale(1.9);
+  }
+}
