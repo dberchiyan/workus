@@ -20,7 +20,7 @@ export class PositionCategoryService {
     status: EmployeeStatus,
   ): Promise<CategoryCounts> {
     const [categories, countByPosition] = await Promise.all([
-      this.positionCategoryRepository.findAllOrdered(),
+      this.positionCategoryRepository.findAllOrdered(organisationId),
       this.employeeRepository.countByPosition(organisationId, {
         searchTerms: toSearchTerms(search),
         status,

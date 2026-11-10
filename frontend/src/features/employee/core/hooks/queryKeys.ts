@@ -15,6 +15,7 @@ export const employeeKeys = {
     [...employeeKeys.detail(employeeId), 'security-log', category ?? 'ALL', page] as const,
   categories: (filters: EmployeeFilters) => [...employeeKeys.all, 'categories', filters] as const,
   positions: () => [...employeeKeys.all, 'positions'] as const,
+  structure: () => [...employeeKeys.all, 'structure'] as const,
   responsibleCandidates: (search: string) =>
     [...employeeKeys.all, 'responsible-candidates', search] as const,
 };

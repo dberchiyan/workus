@@ -43,3 +43,8 @@ export type ActivityEvent = ActivityPage['content'][number];
 export type ActivityAction = ActivityEvent['action'];
 export type ActivityChange = ActivityEvent['changes'][number];
 export type ActivityValue = NonNullable<ActivityChange['from']>;
+
+/** Settings → Company structure. */
+export type CompanyStructure = Schemas['CompanyStructureResponse_Output'];
+export type Department = Schemas['Department_Output'];
+export type StructurePosition = Schemas['StructurePosition_Output'];

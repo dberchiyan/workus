@@ -16,8 +16,9 @@ export class PositionCategoryRepository {
     private readonly txHost: TransactionHost<TransactionalAdapterPrisma<PrismaService>>,
   ) {}
 
-  findAllOrdered(): Promise<PositionCategoryRecord[]> {
+  findAllOrdered(organisationId: string): Promise<PositionCategoryRecord[]> {
     return this.txHost.tx.positionCategory.findMany({
+      where: { organisationId },
       select: positionCategorySelect,
       orderBy: [{ sortOrder: 'asc' }, { name: 'asc' }],
       take: MAX_CATEGORIES,

@@ -1,32 +1,41 @@
+/// A department of the organisation's structure (Settings → Company structure); holds positions.
 model PositionCategory {
-  id        String     @id(map: "pk_position_categories") @default(dbgenerated("uuidv7()")) @db.Uuid
-  name      String     @db.VarChar(100)
-  sortOrder Int        @map("sort_order")
-  createdAt DateTime   @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt DateTime   @updatedAt @map("updated_at") @db.Timestamptz(3)
-  createdBy String?    @map("created_by") @db.Uuid
-  updatedBy String?    @map("updated_by") @db.Uuid
-  version   Int        @default(0)
-  positions Position[]
+  id             String       @id(map: "pk_position_categories") @default(dbgenerated("uuidv7()")) @db.Uuid
+  organisationId String       @map("organisation_id") @db.Uuid
+  organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_position_categories_organisation_id")
+  name           String       @db.VarChar(100)
+  sortOrder      Int          @map("sort_order")
+  createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy      String?      @map("created_by") @db.Uuid
+  updatedBy      String?      @map("updated_by") @db.Uuid
+  version        Int          @default(0)
+  positions      Position[]
 
-  @@unique([name], map: "uq_position_categories_name")
+  @@unique([organisationId, name], map: "uq_position_categories_organisation_id_name")
+  @@unique([organisationId, id], map: "uq_position_categories_organisation_id_id")
   @@map("position_categories")
 }
 
+/// A position (job title) in one department of the organisation.
 model Position {
-  id         String           @id(map: "pk_positions") @default(dbgenerated("uuidv7()")) @db.Uuid
-  categoryId String           @map("category_id") @db.Uuid
-  category   PositionCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict, map: "fk_positions_category_id")
-  title      String           @db.VarChar(150)
-  createdAt  DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
-  updatedAt  DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
-  createdBy  String?          @map("created_by") @db.Uuid
-  updatedBy  String?          @map("updated_by") @db.Uuid
-  version    Int              @default(0)
-  employees  Employee[]
+  id             String           @id(map: "pk_positions") @default(dbgenerated("uuidv7()")) @db.Uuid
+  organisationId String           @map("organisation_id") @db.Uuid
+  organisation   Organisation     @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_positions_organisation_id")
+  categoryId     String           @map("category_id") @db.Uuid
+  category       PositionCategory @relation(fields: [organisationId, categoryId], references: [organisationId, id], onDelete: Restrict, map: "fk_positions_category_id")
+  title          String           @db.VarChar(150)
+  createdAt      DateTime         @default(now()) @map("created_at") @db.Timestamptz(3)
+  updatedAt      DateTime         @updatedAt @map("updated_at") @db.Timestamptz(3)
+  createdBy      String?          @map("created_by") @db.Uuid
+  updatedBy      String?          @map("updated_by") @db.Uuid
+  version        Int              @default(0)
+  employees      Employee[]
 
-  @@unique([title], map: "uq_positions_title")
-  @@index([categoryId], map: "idx_positions_category_id")
+  /// Unique across the organisation, so the position picker is never ambiguous.
+  @@unique([organisationId, title], map: "uq_positions_organisation_id_title")
+  @@unique([organisationId, id], map: "uq_positions_organisation_id_id")
+  @@index([organisationId, categoryId], map: "idx_positions_organisation_id_category_id")
   @@map("positions")
 }
 
@@ -38,7 +47,7 @@ model Employee {
   userId             String                @map("user_id") @db.Uuid
   user               User                  @relation("EmployeeUser", fields: [organisationId, userId], references: [organisationId, id], onDelete: Restrict, map: "fk_employees_user_id")
   positionId         String                @map("position_id") @db.Uuid
-  position           Position              @relation(fields: [positionId], references: [id], onDelete: Restrict, map: "fk_employees_position_id")
+  position           Position              @relation(fields: [organisationId, positionId], references: [organisationId, id], onDelete: Restrict, map: "fk_employees_position_id")
   startDate          DateTime              @map("start_date") @db.Date
   terminatedOn       DateTime?             @map("terminated_on") @db.Date // set → terminated from that day
   /// Set together with terminated_on: RESIGNATION | DISMISSAL | END_OF_CONTRACT | LAYOFF | OTHER — CHECK in migration.
@@ -65,7 +74,7 @@ model Employee {
   /// One HR record per user (a user belongs to one organisation, so this is also unique by user).
   @@unique([organisationId, userId], map: "uq_employees_organisation_id_user_id")
   @@unique([organisationId, id], map: "uq_employees_organisation_id_id")
-  @@index([positionId], map: "idx_employees_position_id")
+  @@index([organisationId, positionId], map: "idx_employees_organisation_id_position_id")
   @@index([startDate], map: "idx_employees_start_date")
   @@index([terminatedOn], map: "idx_employees_terminated_on")
   @@map("employees")

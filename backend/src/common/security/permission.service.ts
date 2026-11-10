@@ -30,6 +30,20 @@ export class PermissionService {
     return count > 0;
   }
 
+  /** The department (a position category) belongs to the organisation. */
+  async isOrganisationDepartment(organisationId: string, departmentId: string): Promise<boolean> {
+    const count = await this.prisma.positionCategory.count({
+      where: { id: departmentId, organisationId },
+    });
+    return count > 0;
+  }
+
+  /** The position belongs to the organisation. */
+  async isOrganisationPosition(organisationId: string, positionId: string): Promise<boolean> {
+    const count = await this.prisma.position.count({ where: { id: positionId, organisationId } });
+    return count > 0;
+  }
+
   /** The holiday belongs to the organisation. */
   async isOrganisationHoliday(organisationId: string, holidayId: string): Promise<boolean> {
     const count = await this.prisma.companyHoliday.count({

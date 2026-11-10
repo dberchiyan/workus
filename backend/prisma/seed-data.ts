@@ -28,26 +28,6 @@ export const ADMINS: SeedPerson[] = [
   { firstName: 'Marcus', lastName: 'Reid', email: 'marcus.reid@osdb.io' },
 ];
 
-/** Tab order follows sort_order. */
-export const POSITION_CATEGORIES = [
-  {
-    name: 'Developers',
-    positions: [
-      'Frontend Developer',
-      'Backend Developer',
-      'Full Stack Developer',
-      'Mobile Developer',
-    ],
-  },
-  {
-    name: 'AI Engineers',
-    positions: ['Machine Learning Engineer', 'AI Engineer', 'Data Scientist'],
-  },
-  { name: 'Designers', positions: ['Product Designer', 'UI/UX Designer'] },
-  { name: 'Project Managers', positions: ['Project Manager', 'Delivery Manager'] },
-  { name: 'QA', positions: ['QA Engineer', 'QA Automation Engineer'] },
-];
-
 export interface SeedEmployee {
   firstName: string;
   lastName: string;

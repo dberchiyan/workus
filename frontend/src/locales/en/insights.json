@@ -3,7 +3,7 @@
   "title": "Insights",
   "subtitle": "How the company changes over the year: people, tenure, turnover, time off and pay.",
   "filters": {
-    "category": "Category",
+    "category": "Department",
     "allCategories": "Whole company",
     "year": "Year",
     "previousYear": "Previous year",

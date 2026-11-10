@@ -37,6 +37,10 @@ const MESSAGES = {
   terminationReasonRequired: 'validation:terminationReason.required',
   terminationCommentTooLong: 'validation:terminationComment.tooLong',
   terminationCommentRequired: 'validation:terminationComment.requiredForOther',
+  structureNameRequired: 'validation:structure.nameRequired',
+  structureNameTooLong: 'validation:structure.nameTooLong',
+  structureTitleRequired: 'validation:structure.titleRequired',
+  structureTitleTooLong: 'validation:structure.titleTooLong',
 } as const;
 
 export type EmployeeValidationMessage = (typeof MESSAGES)[keyof typeof MESSAGES];
@@ -179,3 +183,25 @@ export const TERMINATION_REASONS = [
 const TERMINATION_REASON_SET: ReadonlySet<string> = new Set(TERMINATION_REASONS);
 export const isTerminationReason = (value: string): value is TerminationReason =>
   TERMINATION_REASON_SET.has(value);
+
+/** Mirrors backend company-structure.request.ts. */
+export const STRUCTURE_LIMITS = { departmentName: 100, positionTitle: 150 } as const;
+
+/** One name in the company structure: a department's name or a position's title. */
+export const structureNameSchema = (kind: 'department' | 'position') =>
+  z.object({
+    value:
+      kind === 'department'
+        ? z
+            .string()
+            .trim()
+            .min(1, MESSAGES.structureNameRequired)
+            .max(STRUCTURE_LIMITS.departmentName, MESSAGES.structureNameTooLong)
+        : z
+            .string()
+            .trim()
+            .min(1, MESSAGES.structureTitleRequired)
+            .max(STRUCTURE_LIMITS.positionTitle, MESSAGES.structureTitleTooLong),
+  });
+export type StructureNameValues = z.input<ReturnType<typeof structureNameSchema>>;
+export type StructureNameOutput = z.output<ReturnType<typeof structureNameSchema>>;

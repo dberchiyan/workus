@@ -5,12 +5,12 @@ import { PrismaClient } from '../src/generated/prisma/client';
 import { PasswordHasher } from '../src/modules/auth/service/password-hasher.service';
 import { UserRole } from '../src/modules/user/service/user-role';
 import { databaseUrl } from '../src/common/config/database-url';
+import { DEFAULT_STRUCTURE } from '../src/modules/employee/core/service/default-structure';
 import {
   contactsFor,
   ORGANISATIONS,
   PLATFORM_ADMINS,
   PLATFORM_ID,
-  POSITION_CATEGORIES,
   SEED_PASSWORD,
   type SeedOrganisation,
 } from './seed-data';
@@ -27,10 +27,10 @@ import {
 } from './seed-time-off';
 
 /**
- * Development seed (APP_ENV=dev only): two organisations (OSDB, Vortex), each with an owner,
- * admins and employees sharing SEED_PASSWORD, responsibles, reviews, time off, holidays and
- * notifications; a security log for every employee; the shared catalogue of position
- * categories and positions. Idempotent — existing rows are kept.
+ * Development seed (APP_ENV=dev only): organisations (OSDB, Vortex, …), each with its structure
+ * (the default departments and positions), an owner, admins and employees sharing SEED_PASSWORD,
+ * responsibles, reviews, time off, holidays, notifications and a security log for every
+ * employee. Idempotent — existing rows are kept.
  */
 const seedEnv = z.object({
   APP_ENV: z.literal('dev'),
@@ -88,11 +88,26 @@ const seedOrganisation = async (
       })
     ).map((user) => [user.email, user.id]),
   );
+  // The company's structure: the default departments and positions (kept if already there).
+  for (const [index, department] of DEFAULT_STRUCTURE.entries()) {
+    const { id: categoryId } = await prisma.positionCategory.upsert({
+      where: { organisationId_name: { organisationId, name: department.name } },
+      create: { organisationId, name: department.name, sortOrder: index },
+      update: {},
+      select: { id: true },
+    });
+    await prisma.position.createMany({
+      data: department.positions.map((title) => ({ organisationId, title, categoryId })),
+      skipDuplicates: true,
+    });
+  }
   const positionIdByTitle = new Map(
-    (await prisma.position.findMany({ select: { id: true, title: true } })).map((position) => [
-      position.title,
-      position.id,
-    ]),
+    (
+      await prisma.position.findMany({
+        where: { organisationId },
+        select: { id: true, title: true },
+      })
+    ).map((position) => [position.title, position.id]),
   );
   const idOf = (map: Map<string, string>, key: string): string => {
     const id = map.get(key);
@@ -252,19 +267,6 @@ const seed = async (): Promise<void> => {
   });
   try {
     const passwordHash = await new PasswordHasher().hash(SEED_PASSWORD);
-    // Positions are a shared catalogue of job titles: every organisation picks from it.
-    for (const [index, category] of POSITION_CATEGORIES.entries()) {
-      const { id: categoryId } = await prisma.positionCategory.upsert({
-        where: { name: category.name },
-        create: { name: category.name, sortOrder: index },
-        update: {},
-        select: { id: true },
-      });
-      await prisma.position.createMany({
-        data: category.positions.map((title) => ({ title, categoryId })),
-        skipDuplicates: true,
-      });
-    }
     // Platform admins: the internal organisation, no tenant data.
     const platform = await prisma.user.createMany({
       data: PLATFORM_ADMINS.map((admin) => ({

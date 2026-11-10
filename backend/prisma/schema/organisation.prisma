@@ -21,6 +21,8 @@ model Organisation {
   version                    Int                         @default(0)
   users                      User[]
   employees                  Employee[]
+  positionCategories         PositionCategory[]
+  positions                  Position[]
   employeeResponsibles       EmployeeResponsible[]
   employeeReviews            EmployeeReview[]
   employeeReviewResponsibles EmployeeReviewResponsible[]

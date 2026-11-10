@@ -34,6 +34,8 @@ export const ACCESS = {
   'calendar.openProfile': ADMINS,
   /** Settings: the company holidays are kept by admins. */
   'settings.holidays': ADMINS,
+  /** Settings: departments and positions — admins and owners (employees do not see it). */
+  'settings.structure': ADMINS,
   /** Settings: the organisation's name — owners. */
   'settings.organisation': OWNERS,
   /** Settings: who runs the organisation — admins see it, owners change roles. */

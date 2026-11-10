@@ -404,13 +404,14 @@ export class EmployeeRepository {
     });
   }
 
-  /** Positions are a shared catalogue of job titles (not tenant data). */
-  async positionExists(id: string): Promise<boolean> {
-    return (await this.txHost.tx.position.count({ where: { id } })) > 0;
+  /** A position of the organisation's own structure. */
+  async positionExists(organisationId: string, id: string): Promise<boolean> {
+    return (await this.txHost.tx.position.count({ where: { id, organisationId } })) > 0;
   }
 
-  findPositionOptions(): Promise<PositionOptionRecord[]> {
+  findPositionOptions(organisationId: string): Promise<PositionOptionRecord[]> {
     return this.txHost.tx.position.findMany({
+      where: { organisationId },
       select: positionOptionSelect,
       orderBy: [{ category: { sortOrder: 'asc' } }, { title: 'asc' }],
       take: MAX_POSITIONS,

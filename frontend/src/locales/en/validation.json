@@ -125,5 +125,11 @@
   "organisationName": {
     "required": "Enter the company name",
     "tooLong": "Company name must be at most {{max}} characters"
+  },
+  "structure": {
+    "nameRequired": "Enter a name",
+    "nameTooLong": "Name must be at most {{max}} characters",
+    "titleRequired": "Enter a title",
+    "titleTooLong": "Title must be at most {{max}} characters"
   }
 }

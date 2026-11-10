@@ -138,7 +138,7 @@ export class EmployeeService {
     if (await this.userService.existsByEmail(email)) {
       throw new BusinessConflictException('errors.employee.emailTaken', { email }, 'email');
     }
-    if (!(await this.employeeRepository.positionExists(command.positionId))) {
+    if (!(await this.employeeRepository.positionExists(organisationId, command.positionId))) {
       throw new BusinessRuleException('errors.employee.positionNotFound', {}, 'positionId');
     }
     const responsibleUserIds = [...new Set(command.responsibleUserIds)];
@@ -295,7 +295,7 @@ export class EmployeeService {
     if (await this.userService.isEmailTakenByOther(email, before.user.id)) {
       throw new BusinessConflictException('errors.employee.emailTaken', { email }, 'email');
     }
-    if (!(await this.employeeRepository.positionExists(command.positionId))) {
+    if (!(await this.employeeRepository.positionExists(organisationId, command.positionId))) {
       throw new BusinessRuleException('errors.employee.positionNotFound', {}, 'positionId');
     }
     const startDate = new Date(`${command.startDate}T00:00:00Z`);
@@ -722,8 +722,8 @@ export class EmployeeService {
     );
   }
 
-  positionOptions() {
-    return this.employeeRepository.findPositionOptions();
+  positionOptions(organisationId: string) {
+    return this.employeeRepository.findPositionOptions(organisationId);
   }
 
   responsibleCandidates(organisationId: string, search: string | undefined) {

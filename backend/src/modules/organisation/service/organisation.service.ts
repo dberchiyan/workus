@@ -24,6 +24,7 @@ import { UserService } from '../../user/service/user.service';
 import type { Administrator } from '../../user/service/user.types';
 import type { OrganisationRecord } from '../repository/record/organisation.record';
 import { OrganisationRepository } from '../repository/organisation.repository';
+import { CompanyStructureService } from '../../employee/core/service/company-structure.service';
 import type {
   AddAdministratorCommand,
   ChangeRoleCommand,
@@ -51,6 +52,7 @@ export class OrganisationService {
     private readonly sessionService: SessionService,
     private readonly passwordHasher: PasswordHasher,
     private readonly auditService: AuditService,
+    private readonly structureService: CompanyStructureService,
     private readonly config: AppConfigService,
     @InjectPinoLogger(OrganisationService.name) private readonly logger: PinoLogger,
   ) {}
@@ -90,6 +92,8 @@ export class OrganisationService {
       lastName: command.lastName,
       passwordHash,
     });
+    // Starts with the default departments and positions, shaped later in Settings.
+    await this.structureService.createDefault(organisation.id, userId);
     await this.auditService.record({
       action: AuditAction.ORGANISATION_CREATED,
       organisationId: organisation.id,

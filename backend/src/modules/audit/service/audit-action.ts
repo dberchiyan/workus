@@ -27,6 +27,13 @@ export const AuditAction = {
   USER_CREATED: 'user.created',
   /** An admin or owner renamed themselves (Settings → Account). */
   USER_UPDATED: 'user.updated',
+  /** Company structure (Settings) — target types `department`, `position`, no employee. */
+  DEPARTMENT_CREATED: 'department.created',
+  DEPARTMENT_UPDATED: 'department.updated',
+  DEPARTMENT_DELETED: 'department.deleted',
+  POSITION_CREATED: 'position.created',
+  POSITION_UPDATED: 'position.updated',
+  POSITION_DELETED: 'position.deleted',
   /** Security log — target type `user`, no employee (never in the Activity tab). */
   AUTH_SIGNED_IN: 'auth.signed_in',
   AUTH_SIGN_IN_FAILED: 'auth.sign_in_failed',
@@ -55,6 +62,8 @@ export const AuditTargetType = {
   HOLIDAY: 'holiday',
   USER: 'user',
   ORGANISATION: 'organisation',
+  DEPARTMENT: 'department',
+  POSITION: 'position',
 } as const;
 export type AuditTargetType = (typeof AuditTargetType)[keyof typeof AuditTargetType];
 export const AUDIT_TARGET_TYPES = Object.values(AuditTargetType) as [
@@ -64,13 +73,26 @@ export const AUDIT_TARGET_TYPES = Object.values(AuditTargetType) as [
 
 /**
  * Not in any employee's history: the security log (auth.*), company holidays (holiday.*), the
- * organisation (organisation.*) and roles (user.*).
+ * organisation (organisation.*), roles (user.*) and the company structure (department.*,
+ * position.*).
  */
 type CompanyAction = Extract<
   AuditAction,
-  `auth.${string}` | `holiday.${string}` | `organisation.${string}` | `user.${string}`
+  | `auth.${string}`
+  | `holiday.${string}`
+  | `organisation.${string}`
+  | `user.${string}`
+  | `department.${string}`
+  | `position.${string}`
 >;
-const COMPANY_PREFIXES = ['auth.', 'holiday.', 'organisation.', 'user.'] as const;
+const COMPANY_PREFIXES = [
+  'auth.',
+  'holiday.',
+  'organisation.',
+  'user.',
+  'department.',
+  'position.',
+] as const;
 const isCompanyAction = (action: AuditAction): action is CompanyAction =>
   COMPANY_PREFIXES.some((prefix) => action.startsWith(prefix));
 

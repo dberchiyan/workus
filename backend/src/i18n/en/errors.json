@@ -61,5 +61,13 @@
     "noResponsible": "Nobody is responsible for you yet, so no one can approve the request — ask an admin",
     "notCancelable": "This request can no longer be canceled",
     "notPending": "This request has already been decided or canceled — reload to see its status"
+  },
+  "structure": {
+    "departmentNameTaken": "There is already a department called “{name}”",
+    "positionTitleTaken": "There is already a position called “{title}”",
+    "departmentNotEmpty": "Remove or move this department’s positions first",
+    "positionInUse": "People hold this position — give them another one first",
+    "tooManyDepartments": "A company can have at most {max} departments",
+    "tooManyPositions": "A company can have at most {max} positions"
   }
 }

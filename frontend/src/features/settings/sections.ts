@@ -1,3 +1,4 @@
+import AccountTreeOutlined from '@mui/icons-material/AccountTreeOutlined';
 import AdminPanelSettingsOutlined from '@mui/icons-material/AdminPanelSettingsOutlined';
 import BusinessOutlined from '@mui/icons-material/BusinessOutlined';
 import CelebrationOutlined from '@mui/icons-material/CelebrationOutlined';
@@ -13,6 +14,8 @@ export const SETTINGS_SECTIONS = [
   { key: 'security', icon: ShieldOutlined },
   /** Admins only (ACCESS 'settings.holidays'). */
   { key: 'holidays', icon: CelebrationOutlined },
+  /** Admins and owners (ACCESS 'settings.structure'). */
+  { key: 'structure', icon: AccountTreeOutlined },
   /** Owners only (ACCESS 'settings.organisation'). */
   { key: 'organisation', icon: BusinessOutlined },
   /** Admins and owners (ACCESS 'settings.administrators'). */
@@ -22,6 +25,7 @@ export const SETTINGS_SECTIONS = [
 /** Sections only some roles use, and the part of ACCESS that decides. */
 const SECTION_ACCESS: Partial<Record<SettingsSection, AccessPart>> = {
   holidays: 'settings.holidays',
+  structure: 'settings.structure',
   organisation: 'settings.organisation',
   administrators: 'settings.administrators',
 };

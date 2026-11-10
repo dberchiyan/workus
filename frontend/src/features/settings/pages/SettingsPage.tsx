@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Navigate, NavLink, useParams } from 'react-router';
 import { useAccess } from '@/features/auth';
 import { AdministratorsSection, OrganisationSection } from '@/features/organisation';
+import { CompanyStructureSection } from '@/features/employee/core';
 import { HolidaysSection } from '@/features/time-off';
 import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
 import { useDocumentTitle } from '@/shared/hooks/useDocumentTitle';
@@ -16,7 +17,8 @@ import { isSettingsSection, sectionAccessPart, SETTINGS_SECTIONS } from '../sect
 import { trackScrollEdges } from '@/shared/lib/scrollEdges';
 
 /**
- * Your account, sessions and security log, and (by role) holidays, the company and its
+ * Your account, sessions and security log, and (by role) holidays, the company structure, the
+ * company and its
  * administrators — one section at a time, each with its own URL.
  */
 export default function SettingsPage() {
@@ -91,6 +93,7 @@ export default function SettingsPage() {
           {section === 'sessions' && <SessionsSection />}
           {section === 'security' && <SecuritySection />}
           {section === 'holidays' && <HolidaysSection />}
+          {section === 'structure' && <CompanyStructureSection />}
           {section === 'organisation' && <OrganisationSection />}
           {section === 'administrators' && <AdministratorsSection />}
         </div>

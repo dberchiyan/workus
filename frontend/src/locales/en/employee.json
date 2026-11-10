@@ -12,7 +12,7 @@
     "withoutResponsibleHint": "Active, nobody assigned"
   },
   "tabs": {
-    "label": "Position categories",
+    "label": "Departments",
     "all": "All"
   },
   "filters": {
@@ -43,7 +43,7 @@
   },
   "empty": {
     "title": "No employees found",
-    "description": "Try another search, status or category.",
+    "description": "Try another search, status or department.",
     "clear": "Clear search and filters"
   },
   "error": {
@@ -133,7 +133,7 @@
     },
     "fields": {
       "position": "Position",
-      "category": "Category",
+      "category": "Department",
       "level": "Level",
       "workEmail": "Work email",
       "dateOfBirth": "Date of birth",
@@ -334,5 +334,47 @@
     "confirm": "Reset password",
     "doneTitle": "New password for {{name}}",
     "doneDescription": "They were signed out everywhere and sign in again with this password."
+  },
+  "structure": {
+    "title": "Company structure",
+    "description": "Your departments and the positions in them. People get these positions when you add or edit them.",
+    "departments": "Departments",
+    "addDepartment": "Add department",
+    "addPosition": "Add position",
+    "departmentName": "Department name",
+    "positionTitle": "Position title",
+    "departmentSummary_one": "{{positions}} positions · {{people}} person",
+    "departmentSummary_other": "{{positions}} positions · {{people}} people",
+    "people_one": "{{people}} person",
+    "people_other": "{{people}} people",
+    "nobody": "No one yet",
+    "noPositions": "No positions yet. Add the first one below.",
+    "renameDepartment": "Rename {{name}}",
+    "removeDepartment": "Remove {{name}}",
+    "renamePosition": "Rename {{title}}",
+    "removePosition": "Remove {{title}}",
+    "departmentHasPositions": "Remove its positions first",
+    "positionHeld": "People hold this position. Give them another one first.",
+    "positionHeldBefore": "Former employees held this position, so it stays in their history.",
+    "save": "Save",
+    "cancel": "Cancel",
+    "empty": "No departments yet",
+    "emptyHint": "Add your first department, then the positions in it.",
+    "loading": "Loading the company structure…",
+    "error": "The company structure could not be loaded.",
+    "retry": "Try again",
+    "remove": {
+      "department": {
+        "title": "Remove department?",
+        "description": "“{{name}}” will be removed from your company structure."
+      },
+      "position": {
+        "title": "Remove position?",
+        "description": "“{{name}}” will be removed. Nobody holds it, so no one is affected."
+      },
+      "keep": "Keep",
+      "confirm": "Remove",
+      "removing": "Removing…"
+    }
   }
 }

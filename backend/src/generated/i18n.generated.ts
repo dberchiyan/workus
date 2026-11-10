@@ -69,6 +69,14 @@ export type I18nTranslations = {
             "notCancelable": string;
             "notPending": string;
         };
+        "structure": {
+            "departmentNameTaken": string;
+            "positionTitleTaken": string;
+            "departmentNotEmpty": string;
+            "positionInUse": string;
+            "tooManyDepartments": string;
+            "tooManyPositions": string;
+        };
     };
     "validation": {
         "invalid": string;
@@ -200,6 +208,12 @@ export type I18nTranslations = {
         "rejectionReason": {
             "required": string;
             "tooLong": string;
+        };
+        "structure": {
+            "nameRequired": string;
+            "nameTooLong": string;
+            "titleRequired": string;
+            "titleTooLong": string;
         };
     };
 };

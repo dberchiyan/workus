@@ -28,8 +28,10 @@ export class EmployeeOptionController {
   @ApiOperation({ summary: 'List positions grouped by category, for the position picker' })
   @ZodResponse({ status: HttpStatus.OK, type: PositionOptionsResponse })
   @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
-  async positions(): Promise<PositionOptionsResponse> {
-    return toPositionOptionsResponse(await this.employeeService.positionOptions());
+  async positions(@CurrentPrincipal() principal: Principal): Promise<PositionOptionsResponse> {
+    return toPositionOptionsResponse(
+      await this.employeeService.positionOptions(principal.organisationId),
+    );
   }
 
   @Get('responsible-candidates')

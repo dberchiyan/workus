@@ -95,6 +95,29 @@ export const can = {
         await permissions.isOrganisationHoliday(principal.organisationId, args.holidayId ?? ''),
       ),
   ),
+  /** The company structure — departments and positions (Settings → Company structure). */
+  manageStructure: policy([], isAdmin),
+  /** One department: admin, and the department is of the caller's organisation. */
+  manageDepartment: policy(
+    ['departmentId'],
+    async (principal, args, permissions) =>
+      isAdmin(principal) &&
+      orNotFound(
+        await permissions.isOrganisationDepartment(
+          principal.organisationId,
+          args.departmentId ?? '',
+        ),
+      ),
+  ),
+  /** One position: admin, and the position is of the caller's organisation. */
+  managePosition: policy(
+    ['positionId'],
+    async (principal, args, permissions) =>
+      isAdmin(principal) &&
+      orNotFound(
+        await permissions.isOrganisationPosition(principal.organisationId, args.positionId ?? ''),
+      ),
+  ),
   /** The employee directory is an admin screen. */
   viewEmployees: policy([], isAdmin),
   /** One employee's profile: admin, for an employee of the caller's organisation. */
