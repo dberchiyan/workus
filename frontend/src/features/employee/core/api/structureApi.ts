@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/api/client';
-import type { CompanyStructure, Department, StructurePosition } from '../types';
+import type { CompanyStructure, Department, EmployeePage, StructurePosition } from '../types';
 
 const BASE = '/api/v1/structure';
 const enc = encodeURIComponent;
@@ -39,6 +39,13 @@ export const structureApi = {
   renamePosition: async (positionId: string, title: string, version: number): Promise<void> => {
     await apiClient.put(`${BASE}/positions/${enc(positionId)}`, { title, version });
   },
+  /** Active people holding the position, by name. */
+  holders: async (positionId: string, page: number, size: number): Promise<EmployeePage> =>
+    (
+      await apiClient.get<EmployeePage>(`${BASE}/positions/${enc(positionId)}/employees`, {
+        params: { page, size, sort: 'name,asc' },
+      })
+    ).data,
   removePosition: async (positionId: string): Promise<void> => {
     await apiClient.delete(`${BASE}/positions/${enc(positionId)}`);
   },

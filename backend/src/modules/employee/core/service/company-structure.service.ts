@@ -1,5 +1,6 @@
 import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import type { Pageable } from '../../../../common/dto/pageable';
 import {
   BusinessConflictException,
   BusinessRuleException,
@@ -21,7 +22,9 @@ import type {
 } from '../repository/record/company-structure.record';
 import { todayUtc } from './calendar-date';
 import { DEFAULT_STRUCTURE } from './default-structure';
+import type { EmployeeSortField } from './employee-sort';
 import { EmployeeStatus } from './employee-status';
+import type { EmployeePage } from './employee.types';
 
 export interface StructurePosition extends StructurePositionRecord {
   employeeCount: number;
@@ -64,6 +67,27 @@ export class CompanyStructureService {
         removable: !holdersByPosition.has(position.id),
       })),
     }));
+  }
+
+  /** Who holds the position today (active employees), a page at a time. */
+  async findHolders(
+    organisationId: string,
+    positionId: string,
+    pageable: Pageable<EmployeeSortField>,
+  ): Promise<EmployeePage> {
+    const today = todayUtc();
+    const page = await this.employeeRepository.findPage(
+      organisationId,
+      {
+        searchTerms: [],
+        status: EmployeeStatus.ACTIVE,
+        categoryId: undefined,
+        positionId,
+        today,
+      },
+      pageable,
+    );
+    return { ...page, today };
   }
 
   /** A new company's starting structure (registration — joins its transaction). */

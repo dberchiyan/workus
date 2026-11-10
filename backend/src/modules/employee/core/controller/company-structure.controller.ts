@@ -1,6 +1,7 @@
 import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
+import { ApiPageable, type Pageable, PageableQuery } from '../../../../common/dto/pageable';
 import { UuidParam } from '../../../../common/dto/uuid-param';
 import { ApiErrors } from '../../../../common/exception/api-errors.decorator';
 import { Idempotent } from '../../../../common/idempotency/idempotent.decorator';
@@ -9,6 +10,7 @@ import { can } from '../../../../common/security/policies';
 import type { Principal } from '../../../../common/security/principal';
 import { Authorize } from '../../../../common/security/security.decorators';
 import { CompanyStructureService } from '../service/company-structure.service';
+import { EMPLOYEE_PAGEABLE, type EmployeeSortField } from '../service/employee-sort';
 import {
   CreateDepartmentRequest,
   CreatePositionRequest,
@@ -20,11 +22,13 @@ import {
   DepartmentResponse,
   StructurePositionResponse,
 } from './dto/company-structure.response';
+import { EmployeePageResponse } from './dto/employee.response';
 import {
   toCompanyStructureResponse,
   toDepartmentResponse,
   toStructurePositionResponse,
 } from './mapper/company-structure.mapper';
+import { toEmployeePageResponse } from './mapper/employee.mapper';
 
 const READ_ERRORS = ['UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN'] as const;
 
@@ -128,6 +132,22 @@ export class CompanyStructureController {
         request.title,
         principal.userId,
       ),
+    );
+  }
+
+  @Get('positions/:positionId/employees')
+  @Authorize(can.managePosition)
+  @ApiOperation({ summary: 'Active employees holding the position, a page at a time' })
+  @ApiPageable(EMPLOYEE_PAGEABLE)
+  @ZodResponse({ status: HttpStatus.OK, type: EmployeePageResponse })
+  @ApiErrors('INVALID_PARAMETER', ...READ_ERRORS, 'RESOURCE_NOT_FOUND')
+  async findHolders(
+    @CurrentPrincipal() principal: Principal,
+    @UuidParam('positionId') positionId: string,
+    @PageableQuery(EMPLOYEE_PAGEABLE) pageable: Pageable<EmployeeSortField>,
+  ): Promise<EmployeePageResponse> {
+    return toEmployeePageResponse(
+      await this.structureService.findHolders(principal.organisationId, positionId, pageable),
     );
   }
 

@@ -91,6 +91,7 @@ export const RESPONSE_SCHEMAS: readonly { method: string; pattern: RegExp; schem
   { method: 'post', pattern: /^\/api\/v1\/platform\/organisations\/[^/]+\/rejection$/, schema: CompanyResponse_Output },
   { method: 'get', pattern: /^\/api\/v1\/platform\/organisations\/[^/]+\/users$/, schema: CompanyUserPageResponse_Output },
   { method: 'post', pattern: /^\/api\/v1\/structure\/departments\/[^/]+\/positions$/, schema: StructurePositionResponse_Output },
+  { method: 'get', pattern: /^\/api\/v1\/structure\/positions\/[^/]+\/employees$/, schema: EmployeePageResponse_Output },
   { method: 'post', pattern: /^\/api\/v1\/time-off\/requests\/[^/]+\/cancel$/, schema: TimeOffRequestResponse_Output },
   { method: 'post', pattern: /^\/api\/v1\/time-off\/requests\/[^/]+\/comments$/, schema: TimeOffCommentResponse_Output },
   { method: 'get', pattern: /^\/api\/v1\/platform\/organisations\/[^/]+$/, schema: CompanyResponse_Output },

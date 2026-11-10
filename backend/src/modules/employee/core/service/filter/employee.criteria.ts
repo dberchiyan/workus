@@ -6,6 +6,8 @@ export interface EmployeeCriteria {
   searchTerms: string[];
   status: EmployeeStatus;
   categoryId: string | undefined;
+  /** Holders of one position (Settings → Company structure). */
+  positionId?: string | undefined;
   today: Date;
 }
 

@@ -375,6 +375,25 @@
       "keep": "Keep",
       "confirm": "Remove",
       "removing": "Removing…"
+    },
+    "holders": {
+      "open_one": "{{people}} person holds {{title}} — show who",
+      "open_other": "{{people}} people hold {{title}} — show who",
+      "subtitle_one": "{{department}} · {{people}} person",
+      "subtitle_other": "{{department}} · {{people}} people",
+      "close": "Close",
+      "since": "Since {{date}}",
+      "starts": "Starts {{date}}",
+      "loading": "Loading the people in this position…",
+      "error": "The people in this position could not be loaded.",
+      "empty": "No one holds this position now.",
+      "range": "{{from}}–{{to}} of {{count}}",
+      "single": "{{index}} of {{count}}",
+      "pages": "Pages of people",
+      "page": "Go to page {{page}}",
+      "currentPage": "Page {{page}}, current",
+      "previous": "Previous page",
+      "next": "Next page"
     }
   }
 }

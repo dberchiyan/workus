@@ -36,5 +36,6 @@ export const employeeWhere = (
       : { terminatedOn: { lte: criteria.today } },
     ...searchWhere(criteria.searchTerms),
     ...(criteria.categoryId ? [{ position: { categoryId: criteria.categoryId } }] : []),
+    ...(criteria.positionId ? [{ positionId: criteria.positionId }] : []),
   ],
 });

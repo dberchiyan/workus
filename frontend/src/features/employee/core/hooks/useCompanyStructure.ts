@@ -1,4 +1,5 @@
 import {
+  keepPreviousData,
   type MutationFunction,
   useMutation,
   useQuery,
@@ -10,6 +11,16 @@ import { employeeKeys } from './queryKeys';
 
 export const useCompanyStructure = () =>
   useQuery({ queryKey: employeeKeys.structure(), queryFn: structureApi.find });
+
+export const HOLDERS_PAGE_SIZE = 5;
+
+/** Who holds a position, five a page; another page keeps the current one until it arrives. */
+export const usePositionHolders = (positionId: string, page: number) =>
+  useQuery({
+    queryKey: employeeKeys.positionHolders(positionId, page),
+    queryFn: () => structureApi.holders(positionId, page, HOLDERS_PAGE_SIZE),
+    placeholderData: keepPreviousData,
+  });
 
 /**
  * Every change re-reads everything about employees — the structure, the position picker, the

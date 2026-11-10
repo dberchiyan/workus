@@ -1,4 +1,5 @@
 import AddOutlined from '@mui/icons-material/AddOutlined';
+import ChevronRightOutlined from '@mui/icons-material/ChevronRightOutlined';
 import DeleteOutlineOutlined from '@mui/icons-material/DeleteOutlineOutlined';
 import EditOutlined from '@mui/icons-material/EditOutlined';
 import WorkOutlineOutlined from '@mui/icons-material/WorkOutlineOutlined';
@@ -14,6 +15,7 @@ import {
   useRenamePosition,
 } from '../hooks/useCompanyStructure';
 import type { Department, StructurePosition } from '../types';
+import { PositionHoldersDialog } from './PositionHoldersDialog';
 import { StructureNameForm } from './StructureNameForm';
 
 /** Row actions: shown on hover or focus where there is a mouse, always on touch screens. */
@@ -71,6 +73,11 @@ export function DepartmentPanel({
   const [renaming, setRenaming] = useState(false);
   const [renamingPositionId, setRenamingPositionId] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
+  // Kept after closing until the dialog has faded out; `opening` remounts it on page 1.
+  const [holders, setHolders] = useState<{ position: StructurePosition; opening: number } | null>(
+    null,
+  );
+  const [holdersOpen, setHoldersOpen] = useState(false);
   const positionKey = useRef(crypto.randomUUID());
   const number = (value: number) => new Intl.NumberFormat(i18n.language).format(value);
   const people = department.positions.reduce((sum, position) => sum + position.employeeCount, 0);
@@ -176,23 +183,48 @@ export function DepartmentPanel({
                   >
                     {position.title}
                   </Typography>
-                  <Typography
-                    variant="caption"
-                    component="span"
-                    className={cn(
-                      'app-tabular shrink-0 rounded-full py-0.5 sm:px-2',
-                      position.employeeCount > 0
-                        ? 'text-badge-active-text sm:bg-badge-active-background'
-                        : 'text-text-secondary',
-                    )}
-                  >
-                    {position.employeeCount > 0
-                      ? t('structure.people', {
+                  {position.employeeCount > 0 ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHolders((current) => ({
+                          position,
+                          opening: (current?.opening ?? 0) + 1,
+                        }));
+                        setHoldersOpen(true);
+                      }}
+                      aria-label={t('structure.holders.open', {
+                        count: position.employeeCount,
+                        people: number(position.employeeCount),
+                        title: position.title,
+                      })}
+                      className={cn(
+                        'group/count -mx-1 flex shrink-0 cursor-pointer items-center gap-0.5 rounded-full border-0 bg-transparent py-0.5 pr-1 pl-1 text-badge-active-text transition-colors sm:mx-0 sm:bg-badge-active-background sm:pr-1 sm:pl-2.5',
+                        'hover:bg-badge-active-background sm:hover:bg-primary sm:hover:text-primary-contrast-text',
+                        'outline-offset-2 focus-visible:outline-2 focus-visible:outline-primary',
+                      )}
+                    >
+                      <Typography variant="caption" component="span" className="app-tabular">
+                        {t('structure.people', {
                           count: position.employeeCount,
                           people: number(position.employeeCount),
-                        })
-                      : t('structure.nobody')}
-                  </Typography>
+                        })}
+                      </Typography>
+                      <ChevronRightOutlined
+                        aria-hidden
+                        className="size-4 transition-transform group-hover/count:translate-x-0.5"
+                      />
+                    </button>
+                  ) : (
+                    <Typography
+                      variant="caption"
+                      component="span"
+                      color="textSecondary"
+                      className="app-tabular shrink-0 py-0.5"
+                    >
+                      {t('structure.nobody')}
+                    </Typography>
+                  )}
                 </span>
                 <span className={ROW_ACTIONS}>
                   <ActionButton
@@ -270,6 +302,20 @@ export function DepartmentPanel({
           )}
         </li>
       </ul>
+      {holders && (
+        <PositionHoldersDialog
+          key={holders.opening}
+          open={holdersOpen}
+          departmentName={department.name}
+          position={holders.position}
+          onClose={() => {
+            setHoldersOpen(false);
+          }}
+          onExited={() => {
+            setHolders(null);
+          }}
+        />
+      )}
     </div>
   );
 }
