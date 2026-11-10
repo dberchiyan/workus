@@ -32,7 +32,7 @@ export default function LoginPage() {
   }
 
   return (
-    <PageShell className="items-center justify-center px-4 py-8 md:px-8">
+    <PageShell homeLink className="items-center justify-center px-4 py-8 md:px-8">
       <LazyMotion features={domAnimation} strict>
         <div className="flex w-full max-w-7xl items-center justify-center gap-12 lg:items-stretch xl:gap-20">
           <m.div
@@ -41,7 +41,7 @@ export default function LoginPage() {
             transition={{ duration: 0.4, ease: [0.2, 0, 0, 1] }}
             className="flex w-full max-w-md shrink-0 flex-col gap-8"
           >
-            <BrandLogo />
+            <BrandLogo linkHome />
             <Card variant="outlined">
               <CardContent className="flex flex-col gap-6 p-6 sm:p-8">
                 <Typography

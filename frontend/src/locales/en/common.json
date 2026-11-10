@@ -1,7 +1,9 @@
 {
   "app": {
     "name": "Workus",
-    "tagline": "Your day-to-day HR solution"
+    "tagline": "Your day-to-day HR solution",
+    "home": "Workus home page",
+    "about": "About Workus"
   },
   "a11y": {
     "skipToContent": "Skip to content"

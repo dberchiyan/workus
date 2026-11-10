@@ -26,9 +26,9 @@ export default function SignupPage() {
   }
 
   return (
-    <PageShell className="items-center justify-center px-4 py-8 md:px-8">
+    <PageShell homeLink className="items-center justify-center px-4 py-8 md:px-8">
       <div className="flex w-full max-w-md flex-col gap-8">
-        <BrandLogo />
+        <BrandLogo linkHome />
         <Card variant="outlined">
           <CardContent className="flex flex-col gap-6 p-6 sm:p-8">
             <div className="flex flex-col gap-1">
