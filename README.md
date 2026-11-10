@@ -32,49 +32,45 @@ Sign in with any [demo account](#demo-accounts) · password `Workus-Dev-2026!`
 
 ## Quick start
 
-Requires Docker with Compose v2.
+Requires Docker with Compose v2. Set `DATABASE_PASSWORD` in `.env` before the first start.
 
 ```bash
-cp .env.example .env                              # set DATABASE_PASSWORD
-docker compose up --build                         # local — no limits
-DEMO_MODE=true docker compose up --build          # …or run it as the public demo
-docker compose run --rm migrate npm run db:seed  # demo data (once)
+cp .env.example .env
+docker compose up --build -d
+docker compose run --rm migrate npm run db:seed
 ```
 
-Open **http://localhost:8080** and sign in with a [demo account](#demo-accounts). The `migrate`
-service applies migrations before the backend starts; data lives in the `db-data` volume
-(`docker compose down -v` removes it).
+Then open **http://localhost:8080** and sign in with a [demo account](#demo-accounts).
+
+- **Public demo mode:** set `DEMO_MODE=true` in `.env` ([Environments](#environments)).
+- **Start over:** `docker compose down -v` deletes the data.
 
 ## Environments
 
-One build, two modes — switched by `DEMO_MODE` on the backend.
+One build, two modes. `DEMO_MODE` in `.env` switches between them.
 
 | | 💻 Local | 🌐 Demo |
 |---|---|---|
-| **Run** | `docker compose up` | `DEMO_MODE=true docker compose up` |
 | **`DEMO_MODE`** | `false` (default) | `true` |
-| **Limits** | None — every action works | Shared accounts stay usable (below) |
-| **Seen at** | http://localhost:8080 | [demo-workus.osdb.io](https://demo-workus.osdb.io) |
+| **Limits** | None | On the shared demo accounts |
+| **Where** | http://localhost:8080 | [demo-workus.osdb.io](https://demo-workus.osdb.io) |
 
-In demo mode the API answers `403 DEMO_RESTRICTED` and the UI hides the action — so one visitor
-cannot lock the others out:
+**What the demo blocks** on the shared accounts, so one visitor can't lock out the others:
 
-- changing your password, resetting an employee's, changing admin ↔ owner roles;
-- signing out other sessions (they belong to other visitors);
-- editing or terminating the showcase accounts listed in `DEMO_PROTECTED_EMAILS`.
+- changing or resetting passwords;
+- changing roles;
+- signing out other sessions;
+- editing or terminating the shared accounts.
 
-Everything else — hiring, reviews, requests, comments, holidays — works as usual.
+Everything else works. A company you sign up yourself has no limits.
 
-The live demo starts each day afresh: at 08:00 Kyiv time its database is wiped and seeded again
-for that day (`npm run db:demo-reset` — refuses to run without `DEMO_MODE=true`), so what visitors
-entered is gone and every company has a few sick-leave and vacation requests made that morning,
-waiting for a decision.
+**Fresh every day.** At 08:00 Kyiv time the demo database is reset and seeded again, with a few
+new time-off requests waiting for a decision.
 
 ## Demo accounts
 
-Try them on the **[live demo](https://demo-workus.osdb.io)** or locally — the seed creates two
-independent companies and a Workus platform admin. Password for every account:
-**`Workus-Dev-2026!`** (fictional data).
+Two seeded companies and a platform admin, on the **[live demo](https://demo-workus.osdb.io)** or
+locally. Every password is **`Workus-Dev-2026!`** (all data is fictional).
 
 | Role | 🏢 OSDB · 46 people | 🌀 Vortex · 34 people |
 |---|---|---|
@@ -86,105 +82,69 @@ independent companies and a Workus platform admin. Password for every account:
 |---|---|
 | **Platform admin** — approves companies | `admin@workus.io` |
 
-Any other seeded person: `first.last@osdb.io` or `first.last@vortex.io`. **Create a company** on
-the sign-in page registers a new one — it opens after a platform admin approves it.
+Everyone else signs in as `first.last@osdb.io` or `first.last@vortex.io`. A company you create
+with **Create a company** opens once a platform admin approves it.
 
 ## Features
 
 | | Owner | Admin | Employee | Platform admin |
 |---|:---:|:---:|:---:|:---:|
-| **Dashboard** — pending requests, who is out, reviews due, joiners and leavers, birthdays | ✅ | ✅ | — | — |
-| **Dashboard** — own leave balances and requests | — | — | ✅ | — |
-| **Employees** — directory, profiles, hiring, termination, password reset, activity | ✅ | ✅ | — | — |
-| **Reviews** — salary history and rich-text feedback | ✅ | ✅ | — | — |
-| **Requests** — approve, reject, cancel, comment | ✅ | ✅ | — | — |
-| **Time off** — request vacation, sick days and days off | — | — | ✅ | — |
-| **Calendar** — everyone's time off for the month | ✅ | ✅ | ✅ | — |
-| **Insights** — headcount, turnover, tenure, absence, salaries vs last year | ✅ | ✅ | — | — |
-| **Settings** — account, password, sessions, security log | ✅ | ✅ | ✅ | ✅ |
-| **Settings** — company holidays, administrators list | ✅ | ✅ | — | — |
-| **Settings** — rename the company, add admins, make owners | ✅ | — | — | — |
-| **Companies** — approve sign-ups, see each company's people (directory only) | — | — | — | ✅ |
+| **Dashboard** — requests, absences, reviews, birthdays | ✅ | ✅ | — | — |
+| **Dashboard** — own balances and requests | — | — | ✅ | — |
+| **Employees** — profiles, hiring, termination, activity | ✅ | ✅ | — | — |
+| **Reviews** — salary history and feedback | ✅ | ✅ | — | — |
+| **Requests** — approve, reject, comment | ✅ | ✅ | — | — |
+| **Time off** — vacation, sick days, days off | — | — | ✅ | — |
+| **Calendar** — everyone's time off | ✅ | ✅ | ✅ | — |
+| **Insights** — headcount, turnover, absence, salaries | ✅ | ✅ | — | — |
+| **Settings** — account, sessions, security log | ✅ | ✅ | ✅ | ✅ |
+| **Settings** — structure, holidays, administrators | ✅ | ✅ | — | — |
+| **Settings** — company name, admins, owners | ✅ | — | — | — |
+| **Companies** — approve sign-ups | — | — | — | ✅ |
 
-Also: a **⌘K command menu** (pages, settings, people, theme), in-app notifications, an
-append-only change history for every employee, review and request, light and dark themes, and a
-responsive layout from phone to desktop.
+Also: **⌘K command menu**, notifications, full change history, light and dark themes, mobile layout.
 
 ## Architecture
 
-**Request path** — every call passes the guards, then flows down the layers, scoped to the
-caller's organisation.
+**Request path** — one request, from the browser to the database and back.
 
 ```mermaid
+%%{init: {"flowchart": {"wrappingWidth": 400}}}%%
 flowchart TB
+  L["<b>Landing</b><br/>Astro · static"]
   SPA["<b>React SPA</b><br/>browser"]
 
   subgraph API["NestJS · modular monolith"]
     direction LR
-    G["<b>Guards</b><br/>auth · policies"]
+    G["<b>Guards</b><br/>session → tenant<br/>policies"]
     C["<b>Controller</b><br/>routes · DTOs"]
-    S["<b>Service</b><br/>business logic"]
+    S["<b>Service</b><br/>logic + audit<br/>one transaction"]
     R["<b>Repository</b><br/>tenant-scoped"]
     G --> C --> S --> R
   end
 
-  DB[("<b>PostgreSQL</b><br/>tenant data")]
+  DB[("<b>PostgreSQL</b>")]
 
-  SPA -- "JSON · cookie" --> API
-  API -- Prisma --> DB
+  L -- "Sign in" --> SPA
+  SPA -- "HTTPS · JSON · httpOnly cookie + CSRF" --> API
+  API -- "Prisma · only from repositories" --> DB
 
   classDef client fill:#E3F1F5,stroke:#21697C,stroke-width:2px,color:#1F3A4D
   classDef api fill:#21697C,stroke:#174C5A,stroke-width:2px,color:#FFFFFF
   classDef data fill:#1F3A4D,stroke:#7CC4D6,stroke-width:2px,color:#FFFFFF
-  class SPA client
+  class L,SPA client
   class G,C,S,R api
   class DB data
-  style API fill:transparent,stroke:#7CC4D6,stroke-width:2px,stroke-dasharray:6 4,color:#7CC4D6
+  style API fill:transparent,stroke:#2B7A8E,stroke-width:2px,stroke-dasharray:6 4,color:#2B7A8E
 ```
 
-**One contract** — the API is described once, in Zod; the frontend never hand-writes an API type.
-
-```mermaid
-flowchart TB
-  Z["<b>Zod schemas</b><br/>backend DTOs"]
-  O["<b>openapi.json</b><br/>the contract"]
-  T["<b>TS types</b><br/>compile time"]
-  V["<b>Zod validators</b><br/>runtime"]
-  Z -- generate --> O
-  O -- generate --> T & V
-
-  classDef src fill:#21697C,stroke:#174C5A,stroke-width:2px,color:#FFFFFF
-  classDef spec fill:#1F3A4D,stroke:#7CC4D6,stroke-width:2px,color:#FFFFFF
-  classDef out fill:#E3F1F5,stroke:#21697C,stroke-width:2px,color:#1F3A4D
-  class Z src
-  class O spec
-  class T,V out
-```
-
-### Engineering guarantees
-
-| Concern | Guarantee | Enforced by |
-|---|---|---|
-| **Tenancy** | No cross-company access | `organisation_id` · composite FKs |
-| **Platform admins** | Never see company data | Policy scope checked by one guard |
-| **Approval** | Nothing opens before approval | Company status in the session |
-| **Authorisation** | Deny by default | Policy on every route, checked at boot |
-| **Sessions** | Instant revocation | Server-side sessions · CSRF |
-| **Passwords** | Never in plain text | Argon2id · shown once |
-| **Retries** | No double POSTs | `Idempotency-Key` |
-| **Concurrency** | No lost updates | Optimistic locking · row locks |
-| **Money** | Exact | `NUMERIC(19,4)` · `Decimal` |
-| **Audit** | Full, permanent history | Same transaction · append-only |
-| **Public demo** | No visitor locks others out | `DEMO_MODE` guard · hidden in UI |
-| **API contract** | No client–server drift | OpenAPI → generated types |
-
-**Trade-offs, on purpose**
-
-- **Tenant from the session, not the URL** — a user belongs to one company, so URLs stay clean;
-  every id in a path is still checked against the caller's company.
-- **Polling, not WebSockets**, for notifications (60 s) — no extra infrastructure for an HR cadence.
-- **No automated tests yet** — invariants live in types, database constraints and startup checks;
-  tenant isolation is verified with scripted API runs. Policies are the first thing to cover.
+1. **Landing.** A static Astro page for signed-out visitors, served at `/`; it never calls the API.
+2. **React SPA.** Sends JSON over HTTPS with an `HttpOnly` session cookie and a CSRF token.
+3. **Guards.** Find the caller's company from the session and refuse anything their policy doesn't allow.
+4. **Controller.** Validates the request with Zod and passes the company id on explicitly.
+5. **Service.** Applies the business rules and saves the change with its audit record in one transaction.
+6. **Repository.** The only code that queries the database, always filtered by the company.
+7. **PostgreSQL.** Composite foreign keys keep companies apart, and the audit table can't be changed.
 
 ### Tech stack
 
@@ -208,43 +168,48 @@ workus/
 
 ## Development
 
-Requires Node.js 26 (`.nvmrc` in each package) and PostgreSQL 18 with an empty database.
+Requires Node.js 26 and PostgreSQL 18 with an empty database.
+
+**Backend** — http://localhost:3000, API docs at `/docs`. Set `DATABASE_*` in `.env` first.
 
 ```bash
-# backend — http://localhost:3000 (API docs at /docs)
-cd backend && cp .env.example .env    # set DATABASE_* values
-npm ci && npm run db:migrate:deploy && npm run db:seed
-npm run start:dev                     # local · DEMO_MODE=true npm run start:dev → demo
+cd backend && cp .env.example .env
+npm ci && npm run db:migrate:deploy && npm run db:seed && npm run start:dev
+```
 
-# frontend — http://localhost:5173 (proxies /api to :3000)
+**Frontend** — http://localhost:5173, proxies `/api` to the backend.
+
+```bash
 cd frontend && cp .env.example .env
-npm ci && npm run generate:api
-npm run dev
+npm ci && npm run generate:api && npm run dev
+```
 
-# landing — http://localhost:4321 (links into the app are relative: /login, /signup)
+**Landing** — http://localhost:4321.
+
+```bash
 cd landing && npm ci && npm run dev
 ```
 
 ### Scripts
 
-Run with `npm run <script>` inside the package.
+Every package has `build`, `typecheck`, `lint` and `format:check`. The backend adds:
 
-| Task | `backend/` | `frontend/` | `landing/` |
-|---|---|---|---|
-| **Develop** | `start:dev` | `dev` | `dev` |
-| **Build** | `build` | `build` | `build` (runs `astro check` first) |
-| **Check** | `typecheck` · `lint` · `format:check` | `typecheck` · `lint` · `format:check` | `typecheck` · `lint` · `format:check` |
-| **Database** | `db:migrate:create` · `db:migrate:deploy` · `db:seed` · `db:demo-reset` | — | — |
-| **Contract** | `openapi:generate` · `openapi:check` | `generate:api` | — |
+| Script | Does |
+|---|---|
+| `db:migrate:create` | Creates a SQL migration |
+| `db:migrate:deploy` | Applies migrations |
+| `db:seed` | Loads the demo data |
+| `db:demo-reset` | Wipes and reseeds (demo mode only) |
+| `openapi:generate` | Writes `openapi.json` |
 
-**Changing the API:** `openapi:generate` → `generate:api` → commit both with the change.
+**Changing the API:** run `openapi:generate` in the backend and `generate:api` in the frontend, then commit both.
 
 ### Configuration
 
-Copy each `.env.example` to `.env` beside it and fill in the blanks.
+| File | Used by | Fill in |
+|---|---|---|
+| `.env` | Docker Compose | `DATABASE_PASSWORD` |
+| `backend/.env` | Backend without Docker | `DATABASE_*` |
+| `frontend/.env` | Frontend build | Nothing |
 
-| File | For | Required | Demo mode |
-|---|---|---|---|
-| `.env.example` | Docker Compose | `DATABASE_PASSWORD` | `DEMO_MODE` · `DEMO_PROTECTED_EMAILS` |
-| `backend/.env.example` | Backend outside Docker | `DATABASE_PASSWORD` | `DEMO_MODE` · `DEMO_PROTECTED_EMAILS` |
-| `frontend/.env.example` | Frontend build | — | — (read from the API) |
+`DEMO_MODE=true` in `.env` or `backend/.env` turns on the [demo limits](#environments).
