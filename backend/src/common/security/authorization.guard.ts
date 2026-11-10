@@ -3,8 +3,10 @@ import { Reflector } from '@nestjs/core';
 import type { Request } from 'express';
 import { ClsService } from 'nestjs-cls';
 import { type RequestContext, SessionState } from '../context/request-context';
+import { isUuid } from '../dto/uuid-param';
 import {
   AccessDeniedException,
+  InvalidParameterException,
   NotAuthenticatedException,
   OrganisationNotActiveException,
   SessionExpiredException,
@@ -54,10 +56,14 @@ export class AuthorizationGuard implements CanActivate {
       }
     }
     const request = context.switchToHttp().getRequest<Request>();
+    // Policy params are path ids: anything but a UUID is 400 before a policy queries with it.
     const args: PolicyArgs = Object.fromEntries(
       requiredPolicy.params.map((name) => {
         const value: unknown = Reflect.get(request.params, name);
-        return [name, typeof value === 'string' ? value : ''];
+        if (!isUuid(value)) {
+          throw new InvalidParameterException(name);
+        }
+        return [name, value.toLowerCase()];
       }),
     );
     return requiredPolicy.check(principal, args, this.permissions);
