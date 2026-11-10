@@ -9,7 +9,20 @@
     "security": "Security log",
     "holidays": "Holidays",
     "structure": "Company structure",
-    "organisation": "Company",
+    "organisation": "Company details",
+    "administrators": "Administrators"
+  },
+  "groups": {
+    "you": "You",
+    "company": "Company"
+  },
+  "nav": {
+    "account": "Account",
+    "sessions": "Sessions",
+    "security": "Security log",
+    "organisation": "General",
+    "structure": "Structure",
+    "holidays": "Holidays",
     "administrators": "Administrators"
   },
   "account": {
