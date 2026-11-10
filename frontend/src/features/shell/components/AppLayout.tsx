@@ -8,10 +8,15 @@ import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router';
 import { TopProgressBar } from '@/shared/components/TopProgressBar';
 import { cn } from '@/shared/lib/cn';
+import { PATHS } from '@/shared/lib/paths';
 import { useIsPageLoading } from '../hooks/useIsPageLoading';
 import { useSidebarCollapsed } from '../hooks/useSidebarCollapsed';
 import { SidebarContent } from './SidebarContent';
 import { TopBar } from './TopBar';
+
+/** One key per page: Settings' sections (`/settings/<section>`) are one page with its own menu. */
+const pageTransitionKey = (pathname: string): string =>
+  pathname.startsWith(`${PATHS.settings}/`) ? PATHS.settings : pathname;
 
 /**
  * Signed-in layout (ux.md patterns): desktop — persistent sidebar the person can fold to the
@@ -81,8 +86,14 @@ export function AppLayout() {
           {/* One content width for every signed-in page (theme token `container-page`). */}
           <div className="mx-auto flex w-full max-w-page flex-1 flex-col">
             {/* Navigations run in a transition: the old page slides out, the new one in (CSS in
-                theme/tailwind.css); keyed by path, so filters and tabs (search params) don't. */}
-            <ViewTransition key={pathname} enter="page-enter" exit="page-exit" default="none">
+                theme/tailwind.css); keyed by page, so filters and tabs (search params) and
+                Settings' sections (its own menu stays put) don't. */}
+            <ViewTransition
+              key={pageTransitionKey(pathname)}
+              enter="page-enter"
+              exit="page-exit"
+              default="none"
+            >
               <Outlet />
             </ViewTransition>
           </div>
