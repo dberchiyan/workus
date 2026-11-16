@@ -30,6 +30,13 @@ import { SITE } from '@/content/site';
     </nav>
 
     <div class="ml-auto flex items-center gap-2">
+      <a
+        href={SITE.links.github}
+        class="hidden size-11 items-center justify-center rounded-full text-muted transition-colors hover:bg-surface-2 hover:text-ink sm:inline-flex"
+        aria-label={`${SITE.name} on GitHub`}
+      >
+        <Icon name="github" class="size-5" />
+      </a>
       <!-- A wrapper hides it on phones: the button sets its own display. -->
       <div class="hidden sm:block">
         <Button href={SITE.links.signIn} variant="ghost">
@@ -80,6 +87,15 @@ import { SITE } from '@/content/site';
           </a>
         </li>
       ))}
+      <li>
+        <a
+          href={SITE.links.github}
+          class="flex min-h-12 items-center gap-2.5 rounded-xl px-3 text-base font-medium hover:bg-surface-2"
+        >
+          <Icon name="github" class="size-5" />
+          GitHub
+        </a>
+      </li>
     </ul>
   </nav>
   <div class="mt-2 grid grid-cols-2 gap-2 border-t border-line pt-3">

@@ -17,12 +17,6 @@ export interface Step {
   text: string;
 }
 
-export interface RoleCard {
-  role: string;
-  summary: string;
-  items: readonly string[];
-}
-
 export interface TrustPoint {
   icon: IconName;
   title: string;
@@ -42,33 +36,34 @@ export const LANDING = {
     { href: '#faq', label: 'FAQ' },
   ],
   hero: {
-    eyebrow: 'HR app for growing teams',
+    eyebrow: 'Open-source HR for small teams',
     titleStart: 'Day-to-day HR,',
     titleAccent: 'without the busywork.',
-    lead: 'Workus keeps employee records, salary reviews, time-off requests and a shared calendar together. Admins manage the company. Employees request time off and see their balances.',
+    lead: 'People, salaries, time off and a shared calendar in one place. Admins run the company, employees handle their own time off.',
     primary: 'Try the live demo',
     secondary: 'Create your company',
-    note: 'No card, no install. Demo data resets every morning.',
+    note: 'No card, no install.',
+    source: 'Open source on GitHub',
   },
   highlights: [
-    { value: '3', label: 'roles: owner, admin, employee' },
-    { value: '3', label: 'kinds of time off, with balances' },
+    { value: 'Every change', label: 'on record, nobody can edit it' },
+    { value: 'Working days', label: 'counted, not calendar days' },
     { value: '⌘K', label: 'to find anyone or anything' },
-    { value: '0', label: 'data shared between companies' },
+    { value: 'Light & dark', label: 'on any screen' },
   ],
   features: {
     eyebrow: 'Everything in one place',
     title: 'What you can do in Workus',
-    lead: 'The everyday tasks of a small HR team, without a long setup.',
+    lead: 'Everything a small HR team does every week.',
     items: [
       {
         id: 'people',
         icon: 'users',
         title: 'People',
-        text: 'One record per person: position, start date, contacts, the admins responsible for them.',
+        text: 'One record per person: department, position, start date, contacts and the admins responsible for them.',
         points: [
-          'Search and filter by group',
-          'A password made for each new person',
+          'Departments and positions you define',
+          'Search and filter by department',
           'Access ends on the leave date',
         ],
       },
@@ -89,7 +84,7 @@ export const LANDING = {
         title: 'Time off',
         text: 'Vacation, sick days and days off with balances per cycle. Employees ask, the right admins decide.',
         points: [
-          'Only working days are counted',
+          'Weekends and company holidays skipped',
           'Comments on every request',
           'Reminders for waiting requests',
         ],
@@ -105,7 +100,7 @@ export const LANDING = {
         id: 'insights',
         icon: 'chart',
         title: 'Insights',
-        text: 'Headcount, hires and leavers, tenure, absence and average salary. One year at a time, by group.',
+        text: 'Headcount, hires and leavers, tenure, absence and average salary. One year at a time, by department.',
         points: ['Every chart also as a table', 'Compared with the previous year'],
       },
       {
@@ -135,31 +130,6 @@ export const LANDING = {
       },
     ] satisfies readonly Step[],
   },
-  roles: {
-    eyebrow: 'Roles',
-    title: 'Each role sees its own part',
-    items: [
-      {
-        role: 'Owner',
-        summary: 'Runs the company account.',
-        items: ['Everything an admin does', 'Company name', 'Who is an admin or an owner'],
-      },
-      {
-        role: 'Admin',
-        summary: 'Runs people and requests.',
-        items: [
-          'People, reviews, salaries',
-          'Decides time-off requests',
-          'Holidays, insights, history',
-        ],
-      },
-      {
-        role: 'Employee',
-        summary: 'Manages their own time off.',
-        items: ['Balances and requests', 'Comments with admins', 'The company calendar'],
-      },
-    ] satisfies readonly RoleCard[],
-  },
   security: {
     eyebrow: 'Security',
     title: 'How Workus protects your data',
@@ -167,8 +137,8 @@ export const LANDING = {
     items: [
       {
         icon: 'building',
-        title: 'Each company is separate',
-        text: 'Each company’s data is separate. Every request is checked against your company, so other companies’ records are not visible to you.',
+        title: 'Companies never mix',
+        text: 'Every request is checked against your company on the server. Other companies’ records are never visible to you.',
       },
       {
         icon: 'key',
@@ -178,7 +148,7 @@ export const LANDING = {
       {
         icon: 'shield',
         title: 'Role-based access',
-        text: 'The server checks every action against your role. Hidden buttons are not the only protection.',
+        text: 'The server checks every action against your role, not just the buttons you see.',
       },
       {
         icon: 'history',
@@ -193,17 +163,17 @@ export const LANDING = {
       {
         icon: 'lock',
         title: 'Strong passwords',
-        text: 'Argon2id hashing, rate-limited sign-in, and a temporary password shown only once.',
+        text: 'Argon2id hashing, rate-limited sign-in, temporary passwords shown once.',
       },
     ] satisfies readonly TrustPoint[],
   },
   demo: {
     eyebrow: 'Live demo',
-    title: 'Try Workus with sample data',
-    lead: 'Two sample companies with people, reviews and requests. Sign in as any role. All accounts use the same password.',
+    title: 'Try it as any role',
+    lead: 'Two sample companies with people, reviews and requests. Each role sees its own part. One password for every account.',
     passwordLabel: 'Password',
     open: 'Open the demo',
-    note: 'Demo accounts are shared, so their passwords and sessions can’t be changed. Everything resets at 08:00 Kyiv time.',
+    note: 'Shared accounts: passwords and sessions are locked. Data resets daily at 08:00 Kyiv.',
   },
   faq: {
     eyebrow: 'FAQ',
@@ -222,6 +192,14 @@ export const LANDING = {
         a: 'No. Every record belongs to one company and every request is checked against it on the server. An id from another company answers exactly like one that doesn’t exist.',
       },
       {
+        q: 'Can I run it myself?',
+        a: 'Yes. Workus is open source. Clone the repository and start it with Docker Compose. The README has the steps.',
+      },
+      {
+        q: 'Can we set up our own departments?',
+        a: 'Yes. In Settings → Structure admins add departments and positions, rename them and see who holds each position.',
+      },
+      {
         q: 'How are time-off days counted?',
         a: 'In working days. Weekends and company holidays are not counted. Vacation and sick days have a balance per cycle. Days off are unlimited.',
       },
@@ -236,13 +214,18 @@ export const LANDING = {
     ] satisfies readonly Question[],
   },
   cta: {
-    title: 'Try Workus today',
-    lead: 'Open the demo, or create your company.',
+    title: 'See it with real-looking data',
+    lead: 'Sign in as an owner, admin or employee. No sign-up needed.',
+    source: 'Or read the code on GitHub',
   },
   footer: {
-    tagline: 'HR app for growing teams.',
+    tagline: 'Open-source HR for small teams.',
     product: 'Product',
     account: 'Account',
+    resources: 'Resources',
+    github: 'GitHub',
+    readme: 'Documentation',
+    issues: 'Report an issue',
     rights: 'All rights reserved.',
   },
 } as const;

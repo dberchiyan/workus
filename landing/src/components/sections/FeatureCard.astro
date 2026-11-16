@@ -34,7 +34,8 @@ const Visual = VISUALS[feature.id];
     wide ? 'lg:flex-row' : '',
   ]}
 >
-  <div class:list={['flex flex-col gap-4 p-6 sm:p-8', wide && 'lg:w-1/2 lg:justify-center']}>
+  <!-- Text starts at the top in every card; a wide card's drawing fills the row's height. -->
+  <div class:list={['flex flex-col gap-4 p-6 sm:p-8', wide && 'lg:w-1/2']}>
     <span class="flex size-11 items-center justify-center rounded-xl bg-brand-soft text-brand-strong">
       <Icon name={feature.icon} class="size-5.5" />
     </span>
@@ -52,12 +53,12 @@ const Visual = VISUALS[feature.id];
   <div
     class:list={[
       'relative mt-auto flex items-center px-6 pb-6 sm:px-8 sm:pb-8',
-      wide && 'lg:mt-0 lg:w-1/2 lg:py-8 lg:pl-0',
+      wide && 'lg:mt-0 lg:w-1/2 lg:items-stretch lg:py-8 lg:pl-0',
     ]}
   >
     <MockFrame
       label={`${feature.title} in Workus`}
-      class="w-full rounded-2xl bg-gradient-to-b from-surface-2 to-surface-2/40 p-4 ring-1 ring-line transition-transform duration-300 ease-out group-hover:-translate-y-1 motion-reduce:group-hover:translate-y-0"
+      class="flex w-full flex-col justify-center rounded-2xl bg-gradient-to-b from-surface-2 to-surface-2/40 p-4 ring-1 ring-line transition-transform duration-300 ease-out group-hover:-translate-y-1 motion-reduce:group-hover:translate-y-0"
     >
       <Visual />
     </MockFrame>

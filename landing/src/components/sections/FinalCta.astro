@@ -26,6 +26,14 @@ const { cta, hero } = LANDING;
           {hero.secondary}
         </Button>
       </div>
+      <a
+        href={SITE.links.github}
+        class="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-muted underline-offset-4 hover:text-ink hover:underline"
+      >
+        <Icon name="github" class="size-4.5" />
+        {cta.source}
+        <Icon name="arrowRight" class="size-4" />
+      </a>
     </div>
   </Container>
 </section>

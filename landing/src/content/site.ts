@@ -4,19 +4,25 @@
  */
 export const SITE = {
   name: 'Workus',
-  title: 'Workus · HR app for growing teams',
+  title: 'Workus · Open-source HR app for small teams',
   description:
-    'Employee records, salary reviews, time off, a shared calendar and yearly reports in one HR app for owners, admins and employees. Try the live demo.',
+    'Employee records, salary reviews, time off, a shared calendar and yearly reports in one open-source HR app for owners, admins and employees. Try the live demo.',
   locale: 'en',
   ogLocale: 'en_US',
   themeColor: { light: '#f7f9fb', dark: '#0f1a22' },
   links: {
     signIn: '/login',
     signUp: '/signup',
+    github: 'https://github.com/dberchiyan/workus',
+    readme: 'https://github.com/dberchiyan/workus#readme',
+    issues: 'https://github.com/dberchiyan/workus/issues',
   },
 } as const;
 
-/** The public demo's shared accounts (README → Demo accounts); the data resets every morning. */
+/**
+ * The public demo's shared accounts (README → Demo accounts), one per role — the Demo section is
+ * also where the page says what each role can do. The data resets every morning.
+ */
 export const DEMO = {
   password: 'Workus-Dev-2026!',
   accounts: [
@@ -24,19 +30,26 @@ export const DEMO = {
       role: 'Owner',
       name: 'Sophia Carter',
       email: 'sophia.carter@osdb.io',
-      sees: 'Everything an admin sees, plus the company name and who runs it.',
+      summary: 'Runs the company account.',
+      items: ['Everything an admin does', 'Company name', 'Who is an admin or an owner'],
     },
     {
       role: 'Admin',
       name: 'Marcus Reid',
       email: 'marcus.reid@osdb.io',
-      sees: 'People, reviews and salaries, every request, insights.',
+      summary: 'Runs people and requests.',
+      items: [
+        'People, reviews, salaries',
+        'Decides time-off requests',
+        'Departments, holidays, insights',
+      ],
     },
     {
       role: 'Employee',
       name: 'Ava Thompson',
       email: 'ava.thompson@osdb.io',
-      sees: 'Their own balances and requests, and the company calendar.',
+      summary: 'Manages their own time off.',
+      items: ['Balances and requests', 'Comments with admins', 'The company calendar'],
     },
   ],
 } as const;

@@ -25,7 +25,17 @@ const { demo } = LANDING;
                 <p class="text-sm text-brand-strong">{account.role}</p>
               </div>
             </div>
-            <p class="text-sm leading-relaxed text-muted">{account.sees}</p>
+            <div class="flex flex-col gap-2.5">
+              <p class="text-sm font-medium text-ink-2">{account.summary}</p>
+              <ul class="flex flex-col gap-2">
+                {account.items.map((item) => (
+                  <li class="flex items-start gap-2.5 text-sm text-muted">
+                    <Icon name="check" class="mt-0.5 size-4 shrink-0 text-brand" />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
             <p class="mt-auto">
               <button
                 type="button"
