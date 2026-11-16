@@ -129,14 +129,64 @@ export const theme = createTheme({
         }),
       },
     },
-    // Touch targets ≥ 44 px (ux.md), like Button and IconButton above.
-    // 44 px always; the small size (compact panels) is 32 px under a mouse, 44 px under a finger.
+    // Segmented control: the options sit in a soft inset track and the chosen one is a raised
+    // pill (paper + contact shadow; a lighter surface in dark mode). No dividers between options.
+    MuiToggleButtonGroup: {
+      styleOverrides: {
+        root: ({ theme: t }) => ({
+          gap: 2,
+          padding: 3,
+          borderRadius: TOKENS.radius.md,
+          backgroundColor: t.vars.palette.background.default,
+          border: `1px solid ${t.vars.palette.divider}`,
+          '&.MuiToggleButtonGroup-fullWidth': { display: 'flex' },
+        }),
+        grouped: {
+          margin: 0,
+          border: 0,
+          borderRadius: TOKENS.radius.sm,
+          '&:not(:first-of-type), &:not(:last-of-type)': {
+            margin: 0,
+            border: 0,
+            borderRadius: TOKENS.radius.sm,
+          },
+        },
+      },
+    },
+    // Touch targets ≥ 44 px under a finger (ux.md); compact under a mouse — 36 px, the small
+    // size 30 px — so the track (+ 3 px padding) lines up with a 44 px field beside it.
     MuiToggleButton: {
-      styleOverrides: { root: { minHeight: 44 } },
+      styleOverrides: {
+        root: ({ theme: t }) => ({
+          ...t.typography.subtitle2,
+          minHeight: 36,
+          '@media (pointer: coarse)': { minHeight: 44 },
+          paddingInline: 14,
+          textTransform: 'none',
+          color: t.vars.palette.text.secondary,
+          '@media (prefers-reduced-motion: no-preference)': {
+            transition: 'background-color 150ms, box-shadow 150ms, color 150ms',
+          },
+          '&:hover': { color: t.vars.palette.text.primary, backgroundColor: 'transparent' },
+          '&.Mui-selected, &.Mui-selected:hover': {
+            color: t.vars.palette.text.primary,
+            backgroundColor: t.vars.palette.background.paper,
+            boxShadow: `0 1px 2px ${SOFT}, 0 1px 1px ${SOFT}`,
+            ...t.applyStyles('dark', {
+              backgroundColor: `color-mix(in oklch, ${t.vars.palette.background.paper}, white 9%)`,
+            }),
+          },
+          ...focusRing(-2),
+        }),
+      },
       variants: [
         {
           props: { size: 'small' },
-          style: { minHeight: 32, '@media (pointer: coarse)': { minHeight: 44 } },
+          style: {
+            minHeight: 30,
+            paddingInline: 12,
+            '@media (pointer: coarse)': { minHeight: 44 },
+          },
         },
       ],
     },

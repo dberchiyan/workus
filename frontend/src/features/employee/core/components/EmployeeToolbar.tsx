@@ -63,7 +63,7 @@ export function EmployeeToolbar({
         className="sm:ml-auto"
       >
         {STATUSES.map((status) => (
-          <ToggleButton key={status} value={status} className="min-h-10 flex-1 px-4 sm:flex-none">
+          <ToggleButton key={status} value={status} className="flex-1 sm:flex-none">
             {t(`status.${status}`)}
           </ToggleButton>
         ))}
