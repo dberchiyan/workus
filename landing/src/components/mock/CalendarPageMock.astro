@@ -1,0 +1,211 @@
+---
+import Avatar from '@/components/ui/Avatar.astro';
+import MuiIcon from '@/components/ui/MuiIcon.astro';
+import { TYPES, type TypeKey } from './timeOffTypes';
+
+/**
+ * The Calendar page, drawn as it is: November 2026 (the 1st is a Sunday), the type filters and
+ * the legend, people by row, a tile per request. Tiles grow in when the page shows (`scene-bar`,
+ * `--i` staggers them).
+ */
+const WEEKDAYS = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] as const;
+const TODAY = 16;
+const HOLIDAY = 27;
+const DAYS = Array.from({ length: 30 }, (_, index) => {
+  const day = index + 1;
+  const weekday = index % 7;
+  return { day, name: WEEKDAYS[weekday], weekend: weekday === 0 || weekday === 6 };
+});
+
+interface Tile {
+  start: number;
+  span: number;
+  type: TypeKey;
+  pending?: boolean;
+}
+
+const ROWS: readonly {
+  name: string;
+  position: string;
+  notEmployed?: number;
+  tiles: readonly Tile[];
+}[] = [
+  {
+    name: 'Adam Schulz',
+    position: 'Machine Learning Engineer',
+    notEmployed: 1,
+    tiles: [
+      { start: 16, span: 3, type: 'vacation' },
+      { start: 30, span: 1, type: 'vacation' },
+    ],
+  },
+  { name: 'Alexander Byrne', position: 'Frontend Developer', tiles: [] },
+  {
+    name: 'Amelia Costa',
+    position: 'Product Designer',
+    tiles: [{ start: 16, span: 3, type: 'vacation' }],
+  },
+  { name: 'Aria Sato', position: 'AI Engineer', tiles: [] },
+  {
+    name: 'Ava Thompson',
+    position: 'Frontend Developer',
+    tiles: [{ start: 16, span: 1, type: 'sick', pending: true }],
+  },
+  { name: 'Chloe Dubois', position: 'UI/UX Designer', tiles: [] },
+  { name: 'Clara Weiss', position: 'Data Scientist', tiles: [] },
+  { name: 'Daniel Kowalski', position: 'QA Automation Engineer', notEmployed: 3, tiles: [] },
+  {
+    name: 'Elijah Brooks',
+    position: 'Mobile Developer',
+    tiles: [{ start: 16, span: 3, type: 'vacation' }],
+  },
+  {
+    name: 'Emma Novak',
+    position: 'QA Engineer',
+    tiles: [{ start: 30, span: 1, type: 'vacation' }],
+  },
+];
+
+const HATCH = 'bg-[repeating-linear-gradient(135deg,var(--c-line)_0_1px,transparent_1px_5px)]';
+// Phones show the 14th to the 30th only (the app scrolls sideways there): the first columns are
+// hidden and `--skip` (global.css) moves the tiles left by as many tracks.
+const PHONE_SKIP = 13;
+const GRID =
+  'scene-calendar grid-cols-[6.5rem_repeat(17,minmax(0,1fr))] sm:grid-cols-[8rem_repeat(30,minmax(0,1fr))]';
+
+let tileIndex = 0;
+---
+
+<div class="flex flex-col gap-3 p-4 lg:p-5">
+  <div>
+    <p class="text-lg font-semibold tracking-[-0.02em] text-ink">Calendar</p>
+    <p class="text-[0.6875rem] text-muted">
+      Who is away and when: approved time off, and requests still waiting for a decision in grey.
+    </p>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-2.5">
+    <span class="flex items-center gap-1 rounded-lg border border-line bg-surface px-1.5 py-1 text-xs font-medium text-ink">
+      <MuiIcon name="chevronLeft" class="size-4 text-subtle" />
+      <span class="px-1.5 tabular-nums">November 2026</span>
+      <MuiIcon name="chevronRight" class="size-4 text-subtle" />
+    </span>
+    <span class="ml-auto flex items-center gap-1 rounded-lg border border-line bg-canvas p-0.5 text-[0.625rem] font-medium">
+      {(['vacation', 'sick', 'dayOff'] as const).map((key) => (
+        <span class="flex items-center gap-1.5 rounded-md bg-surface px-1.5 py-0.5 text-ink shadow-card">
+          <span
+            class:list={[
+              'flex size-4 items-center justify-center rounded text-white',
+              TYPES[key].tone,
+            ]}
+          >
+            <MuiIcon name={TYPES[key].icon} class="size-3" />
+          </span>
+          {TYPES[key].label}
+        </span>
+      ))}
+    </span>
+    <span class="hidden items-center gap-3 text-[0.625rem] text-muted lg:flex">
+      <span class="flex items-center gap-1.5">
+        <span class="flex size-4 items-center justify-center rounded border border-dashed border-line-strong text-muted">
+          <MuiIcon name="hourglass" class="size-2.5" />
+        </span>
+        Waiting for a decision
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class="size-4 rounded-full border border-danger-dot/40 bg-danger-bg"></span>
+        Company holiday
+      </span>
+      <span class="flex items-center gap-1.5">
+        <span class:list={['size-4 rounded border border-line', HATCH]}></span>
+        Not employed
+      </span>
+    </span>
+  </div>
+
+  <div class="overflow-hidden rounded-xl border border-line bg-surface">
+    <div class:list={['grid border-b border-line', GRID]}>
+      <span class="flex items-center px-2 py-1.5">
+        <span class="relative flex h-7 w-full items-center rounded-md border border-line-strong px-2 text-subtle">
+          <span class="absolute -top-1.5 left-1.5 bg-surface px-1 text-[0.5rem] text-muted whitespace-nowrap">
+            Search by employee
+          </span>
+          <MuiIcon name="search" class="size-3" />
+        </span>
+      </span>
+      {DAYS.map((day, index) => (
+        <span
+          class:list={[
+            'relative flex flex-col items-center justify-center border-l border-line py-1 leading-none',
+            index < PHONE_SKIP && 'max-sm:hidden',
+            day.weekend && 'bg-surface-2',
+            day.day === TODAY && 'bg-brand-soft/60',
+            day.day === HOLIDAY && 'bg-danger-bg',
+          ]}
+        >
+          {day.day === TODAY && <span class="absolute top-0.5 size-1 rounded-full bg-brand"></span>}
+          <span
+            class:list={[
+              'text-[0.625rem] font-semibold tabular-nums',
+              day.day === TODAY
+                ? 'text-brand-strong'
+                : day.day === HOLIDAY
+                  ? 'text-danger-fg'
+                  : 'text-ink',
+            ]}
+          >
+            {day.day}
+          </span>
+          <span
+            class:list={[
+              'mt-0.5 hidden text-[0.4375rem] lg:block',
+              day.day === HOLIDAY ? 'text-danger-fg' : 'text-subtle',
+            ]}
+          >
+            {day.name}
+          </span>
+        </span>
+      ))}
+    </div>
+    {ROWS.map((row) => (
+      <div class:list={['grid border-b border-line last:border-0', GRID]}>
+        <span class="flex items-center gap-2 py-1.5 pl-2">
+          <Avatar name={row.name} size="sm" />
+          <span class="min-w-0">
+            <span class="block truncate text-[0.6875rem] font-medium text-ink">{row.name}</span>
+            <span class="hidden truncate text-[0.5625rem] text-subtle sm:block">
+              {row.position}
+            </span>
+          </span>
+        </span>
+        {DAYS.map((day, index) => (
+          <span
+            class:list={[
+              'min-h-8 border-l border-line',
+              index < PHONE_SKIP && 'max-sm:hidden',
+              day.weekend && 'bg-surface-2',
+              day.day === TODAY && 'bg-brand-soft/60',
+              day.day === HOLIDAY && 'bg-danger-bg',
+              row.notEmployed !== undefined && day.day <= row.notEmployed && HATCH,
+            ]}
+            style={`--c: ${index + 2}; grid-row: 1`}
+          ></span>
+        ))}
+        {row.tiles.map((tile) => (
+          <span
+            class:list={[
+              'scene-bar z-10 m-1 flex items-center gap-1 overflow-hidden rounded-md px-1 text-[0.5rem] font-medium whitespace-nowrap',
+              tile.pending
+                ? 'border border-dashed border-line-strong bg-surface text-muted'
+                : `${TYPES[tile.type].tint} ${TYPES[tile.type].text}`,
+            ]}
+            style={`--c: ${tile.start + 1}; --span: ${tile.span}; grid-row: 1; --i: ${tileIndex++}`}
+          >
+            <MuiIcon name={TYPES[tile.type].icon} class="size-3 shrink-0" />
+            {tile.span > 1 && <span class="truncate">{TYPES[tile.type].label}</span>}
+          </span>
+        ))}
+      </div>
+    ))}
+  </div>
+</div>

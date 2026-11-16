@@ -1,0 +1,203 @@
+---
+import Avatar from '@/components/ui/Avatar.astro';
+import MuiIcon from '@/components/ui/MuiIcon.astro';
+import StatusBadge from '@/components/ui/StatusBadge.astro';
+import StatCardMock from './StatCardMock.astro';
+
+/** The Employees page, drawn as it is: the four figures, department tabs, the toolbar and the table. */
+const TABS = [
+  { label: 'All', count: 39, active: true },
+  { label: 'Developers', count: 15 },
+  { label: 'AI Engineers', count: 8 },
+  { label: 'Designers', count: 5 },
+  { label: 'Project Managers', count: 4 },
+  { label: 'QA', count: 7 },
+] as const;
+
+const PEOPLE: readonly {
+  name: string;
+  email: string;
+  position: string;
+  by: readonly string[];
+  start: string;
+}[] = [
+  {
+    name: 'Adam Schulz',
+    email: 'adam.schulz@osdb.io',
+    position: 'Machine Learning Engineer',
+    by: ['Marcus Reid'],
+    start: 'Nov 2, 2026',
+  },
+  {
+    name: 'Alexander Byrne',
+    email: 'alexander.byrne@osdb.io',
+    position: 'Frontend Developer',
+    by: ['Marcus Reid'],
+    start: 'Jun 15, 2023',
+  },
+  {
+    name: 'Amelia Costa',
+    email: 'amelia.costa@osdb.io',
+    position: 'Product Designer',
+    by: ['Marcus Reid', 'Olivia Bennett'],
+    start: 'Nov 13, 2022',
+  },
+  {
+    name: 'Aria Sato',
+    email: 'aria.sato@osdb.io',
+    position: 'AI Engineer',
+    by: ['Olivia Bennett'],
+    start: 'Nov 12, 2023',
+  },
+  {
+    name: 'Ava Thompson',
+    email: 'ava.thompson@osdb.io',
+    position: 'Frontend Developer',
+    by: ['Marcus Reid', 'Olivia Bennett'],
+    start: 'Feb 15, 2021',
+  },
+  {
+    name: 'Chloe Dubois',
+    email: 'chloe.dubois@osdb.io',
+    position: 'UI/UX Designer',
+    by: ['Olivia Bennett'],
+    start: 'Aug 13, 2026',
+  },
+  {
+    name: 'Clara Weiss',
+    email: 'clara.weiss@osdb.io',
+    position: 'Data Scientist',
+    by: ['Marcus Reid', 'Olivia Bennett'],
+    start: 'Nov 17, 2022',
+  },
+  {
+    name: 'Daniel Kowalski',
+    email: 'daniel.kowalski@osdb.io',
+    position: 'QA Automation Engineer',
+    by: ['Marcus Reid', 'Olivia Bennett'],
+    start: 'Nov 4, 2026',
+  },
+];
+---
+
+<div class="flex flex-col gap-4 p-4 lg:p-5">
+  <div class="flex items-center justify-between gap-3">
+    <p class="text-lg font-semibold tracking-[-0.02em] text-ink">Employees</p>
+    <span class="flex items-center gap-1.5 rounded-lg bg-brand px-3 py-1.5 text-[0.6875rem] font-semibold text-on-brand shadow-card">
+      <MuiIcon name="personAdd" class="size-3.5" />
+      Add employee
+    </span>
+  </div>
+
+  <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <StatCardMock title="Total employees" value="39">
+      <span class="flex items-center gap-1 text-success-fg">
+        <MuiIcon name="trendingUp" class="size-3.5" />
+        +6 in the last 30 days
+      </span>
+    </StatCardMock>
+    <StatCardMock title="Terminated in the last 90 days" value="3">
+      <MuiIcon name="personRemove" class="size-3.5" />
+      Since Aug 18, 2026
+    </StatCardMock>
+    <StatCardMock title="Average tenure" value="2.7 years">
+      <MuiIcon name="workHistory" class="size-3.5" />
+      Across active employees
+    </StatCardMock>
+    <StatCardMock title="No responsible" value="2">
+      <MuiIcon name="personOff" class="size-3.5" />
+      Active, nobody assigned
+    </StatCardMock>
+  </div>
+
+  <div class="flex gap-4 overflow-hidden border-b border-line text-[0.6875rem] font-medium whitespace-nowrap">
+    {TABS.map((tab) => (
+      <span
+        class:list={[
+          'flex items-center gap-1.5 pb-2',
+          'active' in tab ? 'border-b-2 border-brand text-brand-strong' : 'text-muted',
+        ]}
+      >
+        {tab.label}
+        <span
+          class:list={[
+            'rounded-full px-1.5 text-[0.5625rem] tabular-nums',
+            'active' in tab ? 'bg-brand-soft' : 'bg-surface-2',
+          ]}
+        >
+          {tab.count}
+        </span>
+      </span>
+    ))}
+  </div>
+
+  <div class="rounded-xl border border-line bg-surface">
+    <div class="flex items-center gap-3 px-3.5 py-2.5">
+      <span class="relative flex h-8 w-full max-w-56 items-center gap-2 rounded-md border border-line-strong px-2.5 text-subtle">
+        <span class="absolute -top-1.5 left-2 bg-surface px-1 text-[0.5rem] text-muted">
+          Search by name or email
+        </span>
+        <MuiIcon name="search" class="size-3.5" />
+      </span>
+      <span class="hidden text-[0.6875rem] text-muted sm:inline">39 employees</span>
+      <span class="ml-auto flex rounded-lg border border-line bg-canvas p-0.5 text-[0.625rem] font-medium">
+        <span class="rounded-md bg-surface px-2 py-1 text-ink shadow-card">Active</span>
+        <span class="px-2 py-1 text-muted">Terminated</span>
+      </span>
+    </div>
+    <table class="w-full table-fixed border-collapse text-left">
+      <thead>
+        <tr class="bg-surface-2 text-[0.625rem] font-medium text-muted">
+          <th class="px-3.5 py-2 font-medium">
+            <span class="flex items-center gap-1">
+              Name
+              <MuiIcon name="arrowUp" class="size-3" />
+            </span>
+          </th>
+          <th class="hidden w-[24%] px-2 py-2 font-medium md:table-cell">Position</th>
+          <th class="hidden w-[20%] px-2 py-2 font-medium sm:table-cell">Responsible</th>
+          <th class="hidden w-[15%] px-2 py-2 font-medium lg:table-cell">Start date</th>
+          <th class="w-[5.5rem] px-3.5 py-2 font-medium">Status</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-line">
+        {PEOPLE.map((person) => (
+          <tr>
+            <td class="px-3.5 py-1.5">
+              <span class="flex items-center gap-2.5">
+                <Avatar name={person.name} size="sm" />
+                <span class="min-w-0">
+                  <span class="block truncate text-[0.6875rem] font-medium text-ink">
+                    {person.name}
+                  </span>
+                  <span class="block truncate text-[0.5625rem] text-subtle">{person.email}</span>
+                </span>
+              </span>
+            </td>
+            <td class="hidden truncate px-2 py-1.5 text-[0.6875rem] text-ink-2 md:table-cell">
+              {person.position}
+            </td>
+            <td class="hidden px-2 py-1.5 sm:table-cell">
+              <span class="flex items-center gap-1.5">
+                <span class="flex -space-x-1.5">
+                  {person.by.map((name) => (
+                    <Avatar name={name} size="xs" ring />
+                  ))}
+                </span>
+                {person.by.length === 1 && (
+                  <span class="truncate text-[0.6875rem] text-ink-2">{person.by[0]}</span>
+                )}
+              </span>
+            </td>
+            <td class="hidden truncate px-2 py-1.5 text-[0.6875rem] text-ink-2 tabular-nums lg:table-cell">
+              {person.start}
+            </td>
+            <td class="px-3.5 py-1.5">
+              <StatusBadge tone="success" label="Active" />
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>

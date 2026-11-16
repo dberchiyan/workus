@@ -45,6 +45,7 @@
   --c-chart-2: oklch(67.1% 0.175 40.6);
   --c-chart-3: oklch(66.9% 0.141 162.1);
   --c-chart-4: oklch(76.4% 0.161 75.1);
+  --c-chart-5: oklch(71.6% 0.141 357.4);
 
   /* Avatars: white initials ≥ 5:1 on each, the same in both themes. */
   --c-avatar-1: oklch(50.7% 0.12 254.6);
@@ -97,6 +98,7 @@
     --c-chart-2: oklch(62.2% 0.173 40.1);
     --c-chart-3: oklch(62.1% 0.128 163.1);
     --c-chart-4: oklch(67% 0.143 73.2);
+    --c-chart-5: oklch(62.2% 0.171 0.8);
 
     --shadow-soft: oklch(0% 0 0 / 0.3);
     --shadow-strong: oklch(0% 0 0 / 0.55);
@@ -138,6 +140,7 @@
   --color-chart-2: var(--c-chart-2);
   --color-chart-3: var(--c-chart-3);
   --color-chart-4: var(--c-chart-4);
+  --color-chart-5: var(--c-chart-5);
   --color-avatar-1: var(--c-avatar-1);
   --color-avatar-2: var(--c-avatar-2);
   --color-avatar-3: var(--c-avatar-3);
@@ -762,5 +765,692 @@
   to {
     opacity: 0;
     transform: scale(1.9);
+  }
+}
+
+/*
+ * Hero scene: the drawn app plays a sped-up tour on a loop once in view. One clock (`--loop`,
+ * 20.4 s), every part keyed in percent of it; transform, opacity and (as in the steps) the text
+ * colour of the menu only. Without motion (or without the observer) the window is simply its
+ * still: the dashboard, the dialog and the pointer hidden.
+ *
+ *   0–8 %    pointer → James's pending request, the row lights, click
+ *   8–18 %   the request dialog opens, pointer → Approve, click, the dialog closes
+ *   17–21 %  the request turns Approved, the pending count drops, the notice pops in
+ *   24 %     click Employees → the page crossfades, the menu pill slides (the notice leaves at 30 %)
+ *   37 %     click Requests            50 %  click Calendar (its tiles grow in)
+ *   63 %     click Insights (columns grow in; the page scrolls down at 70 %, its bars grow in)
+ *   80 %     click Dashboard — back to the still (its state rewinds while it is hidden)
+ */
+.scene {
+  --loop: 20.4s;
+  /* Pointer stops, in percent of the app's stage (the sidebar included): the last request's name,
+     the Approve button, the menu entries (by row). */
+  --scene-p0: 86%, 95%;
+  --scene-p1: 26%, 80%;
+  --scene-p2: 73%, 81%;
+  --scene-nav-x: 6%;
+  --scene-nav-0: 12.5%;
+  --scene-nav-1: 19%;
+  --scene-nav-2: 25.5%;
+  --scene-nav-3: 32%;
+  --scene-nav-4: 38.5%;
+  /* The menu's item pitch (32 px items, 2 px gap). */
+  --scene-nav-pitch: 34px;
+  /* The page viewport: the stage less the top bar — how far the last page scrolls. */
+  --scene-viewport: 30.25rem;
+}
+
+/* A narrower stage: the sidebar and the dialog take a larger share of it. */
+@media (width < 64rem) {
+  .scene {
+    --scene-p1: 29%, 80%;
+    --scene-p2: 79%, 81%;
+    --scene-nav-x: 7.5%;
+  }
+}
+
+.scene-dialog,
+.scene-pointer {
+  opacity: 0;
+}
+
+/* Calendar columns: `--c` is the day's track; phones hide the first `--skip` days (CalendarPageMock). */
+.scene-calendar {
+  --skip: 13;
+}
+
+.scene-calendar > [style*='--c'] {
+  grid-column: calc(var(--c) - var(--skip)) / span var(--span, 1);
+}
+
+@media (width >= 40rem) {
+  .scene-calendar {
+    --skip: 0;
+  }
+}
+
+/* The stage is a fixed viewport: the pages lie over each other and are cut like in a window. */
+.scene-pages {
+  overflow: hidden;
+}
+
+.scene-page {
+  position: absolute;
+  inset: 0;
+}
+
+.scene-page:not(.scene-page-0) {
+  opacity: 0;
+}
+
+/* Before / after states sit on top of each other; the "after" one is hidden until its moment. */
+.scene-swap {
+  display: grid;
+}
+
+.scene-swap > * {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.scene-after {
+  opacity: 0;
+}
+
+/* The row's hover tint, under its content. */
+.scene-row {
+  isolation: isolate;
+}
+
+.scene-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--c-surface-2);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.scene-sheet {
+  transform-origin: 50% 60%;
+}
+
+.scene-arrow {
+  transform-origin: 5px 3px;
+}
+
+.scene-bar {
+  transform-origin: left center;
+}
+
+.scene-col {
+  transform-origin: center bottom;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .js .scene:not([data-visible]) .scene-notice {
+    opacity: 0;
+  }
+
+  .scene[data-visible]
+    :is(
+      .scene-pointer,
+      .scene-arrow,
+      .scene-row::before,
+      .scene-dialog,
+      .scene-sheet,
+      .scene-approve,
+      .scene-before,
+      .scene-after,
+      .scene-notice,
+      .scene-page,
+      .scene-scroll,
+      .scene-nav-pill,
+      .scene-nav-0,
+      .scene-nav-1,
+      .scene-nav-2,
+      .scene-nav-3,
+      .scene-nav-4
+    ) {
+    animation-duration: var(--loop);
+    animation-timing-function: var(--ease-out);
+    animation-delay: 1.2s;
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+  }
+
+  .scene[data-visible] .scene-pointer {
+    animation-name: scene-pointer;
+    animation-timing-function: cubic-bezier(0.45, 0, 0.2, 1);
+  }
+
+  .scene[data-visible] .scene-arrow {
+    animation-name: scene-click;
+  }
+
+  .scene[data-visible] .scene-row::before {
+    animation-name: scene-row;
+    animation-timing-function: linear;
+  }
+
+  .scene[data-visible] .scene-dialog {
+    animation-name: scene-dialog;
+    animation-timing-function: linear;
+  }
+
+  .scene[data-visible] .scene-sheet {
+    animation-name: scene-sheet;
+  }
+
+  .scene[data-visible] .scene-approve {
+    animation-name: scene-press;
+  }
+
+  .scene[data-visible] .scene-before {
+    animation-name: scene-before;
+  }
+
+  .scene[data-visible] .scene-after {
+    animation-name: scene-after;
+  }
+
+  .scene[data-visible] .scene-notice {
+    animation-name: scene-notice;
+  }
+
+  .scene[data-visible] .scene-page-0 {
+    animation-name: scene-page-0;
+  }
+
+  .scene[data-visible] .scene-page-1 {
+    animation-name: scene-page-1;
+  }
+
+  .scene[data-visible] .scene-page-2 {
+    animation-name: scene-page-2;
+  }
+
+  .scene[data-visible] .scene-page-3 {
+    animation-name: scene-page-3;
+  }
+
+  .scene[data-visible] .scene-page-4 {
+    animation-name: scene-page-4;
+  }
+
+  /* The last page scrolls to its end while it shows (ease in and out, like a wheel). */
+  .scene[data-visible] .scene-scroll {
+    animation-name: scene-scroll;
+    animation-timing-function: cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  .scene[data-visible] .scene-nav-pill {
+    animation-name: scene-nav-pill;
+  }
+
+  .scene[data-visible] .scene-nav-0 {
+    animation-name: scene-nav-text-0;
+  }
+
+  .scene[data-visible] .scene-nav-1 {
+    animation-name: scene-nav-text-1;
+  }
+
+  .scene[data-visible] .scene-nav-2 {
+    animation-name: scene-nav-text-2;
+  }
+
+  .scene[data-visible] .scene-nav-3 {
+    animation-name: scene-nav-text-3;
+  }
+
+  .scene[data-visible] .scene-nav-4 {
+    animation-name: scene-nav-text-4;
+  }
+
+  /* Tiles, columns and bars grow in with their page; `--i` staggers them by shifting their clock a little. */
+  .scene[data-visible] .scene-page-3 .scene-bar,
+  .scene[data-visible] .scene-page-4 :is(.scene-col, .scene-bar) {
+    animation-duration: var(--loop);
+    animation-timing-function: var(--ease-out);
+    animation-delay: calc(1.2s + var(--i, 0) * 40ms);
+    animation-iteration-count: infinite;
+    animation-fill-mode: both;
+  }
+
+  .scene[data-visible] .scene-page-3 .scene-bar {
+    animation-name: scene-grow-x-3;
+  }
+
+  .scene[data-visible] .scene-page-4 .scene-col {
+    animation-name: scene-grow-y-4;
+  }
+
+  /* Below the fold: they grow once the page has scrolled to them. */
+  .scene[data-visible] .scene-page-4 .scene-bar {
+    animation-name: scene-grow-x-4;
+  }
+}
+
+/* Menu rows = pages: 0 Dashboard · 1 Employees · 2 Requests · 3 Calendar · 4 Insights. */
+@keyframes scene-pointer {
+  0%,
+  2% {
+    opacity: 0;
+    transform: translate(var(--scene-p0));
+  }
+  4% {
+    opacity: 1;
+  }
+  7.5%,
+  11% {
+    transform: translate(var(--scene-p1));
+  }
+  14%,
+  20% {
+    transform: translate(var(--scene-p2));
+  }
+  23%,
+  33% {
+    transform: translate(var(--scene-nav-x), var(--scene-nav-1));
+  }
+  36%,
+  46% {
+    transform: translate(var(--scene-nav-x), var(--scene-nav-2));
+  }
+  49%,
+  59% {
+    transform: translate(var(--scene-nav-x), var(--scene-nav-3));
+  }
+  62%,
+  76% {
+    transform: translate(var(--scene-nav-x), var(--scene-nav-4));
+  }
+  79%,
+  83% {
+    transform: translate(var(--scene-nav-x), var(--scene-nav-0));
+  }
+  85% {
+    opacity: 1;
+  }
+  89%,
+  100% {
+    opacity: 0;
+    transform: translate(var(--scene-p0));
+  }
+}
+
+/* The arrow dips on each click. */
+@keyframes scene-click {
+  0%,
+  7%,
+  9.5%,
+  14%,
+  16.5%,
+  23%,
+  25.5%,
+  36%,
+  38.5%,
+  49%,
+  51.5%,
+  62%,
+  64.5%,
+  79%,
+  81.5%,
+  100% {
+    transform: scale(1);
+  }
+  8%,
+  15%,
+  24%,
+  37%,
+  50%,
+  63%,
+  80% {
+    transform: scale(0.82);
+  }
+}
+
+@keyframes scene-row {
+  0%,
+  6.5%,
+  10.5%,
+  100% {
+    opacity: 0;
+  }
+  7.5%,
+  9% {
+    opacity: 1;
+  }
+}
+
+@keyframes scene-dialog {
+  0%,
+  8%,
+  18%,
+  100% {
+    opacity: 0;
+  }
+  10%,
+  16.5% {
+    opacity: 1;
+  }
+}
+
+@keyframes scene-sheet {
+  0%,
+  8% {
+    transform: translateY(10px) scale(0.96);
+  }
+  10.5%,
+  16.5% {
+    transform: none;
+  }
+  18%,
+  100% {
+    transform: translateY(6px) scale(0.98);
+  }
+}
+
+@keyframes scene-press {
+  0%,
+  14.7%,
+  16%,
+  100% {
+    transform: scale(1);
+  }
+  15.3% {
+    transform: scale(0.95);
+  }
+}
+
+/* The dashboard's state: approved from the decision until the page is hidden, then rewound. */
+@keyframes scene-before {
+  0%,
+  17.5%,
+  81%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+  19.5%,
+  80.5% {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes scene-after {
+  0%,
+  17.5%,
+  81%,
+  100% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  19.5%,
+  80.5% {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes scene-notice {
+  0%,
+  18.5% {
+    opacity: 0;
+    transform: translateY(10px) scale(0.94);
+  }
+  20.5%,
+  29% {
+    opacity: 1;
+    transform: none;
+  }
+  31.5%,
+  100% {
+    opacity: 0;
+    transform: translateY(-6px) scale(0.98);
+  }
+}
+
+/* Pages: the leaving one fades, the arriving one rises in. */
+@keyframes scene-page-0 {
+  0%,
+  24.5%,
+  82.5%,
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+  26.5%,
+  80.5% {
+    opacity: 0;
+  }
+  81% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+}
+
+@keyframes scene-page-1 {
+  0%,
+  24.5% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  26.5%,
+  37.5% {
+    opacity: 1;
+    transform: none;
+  }
+  39.5%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes scene-page-2 {
+  0%,
+  37.5% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  39.5%,
+  50.5% {
+    opacity: 1;
+    transform: none;
+  }
+  52.5%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes scene-page-3 {
+  0%,
+  50.5% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  52.5%,
+  63.5% {
+    opacity: 1;
+    transform: none;
+  }
+  65.5%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes scene-page-4 {
+  0%,
+  63.5% {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  65.5%,
+  80.5% {
+    opacity: 1;
+    transform: none;
+  }
+  82.5%,
+  100% {
+    opacity: 0;
+  }
+}
+
+/* Insights scrolls to its end once its columns have grown, and jumps back once hidden. */
+@keyframes scene-scroll {
+  0%,
+  69.5% {
+    transform: translateY(0);
+  }
+  74%,
+  83% {
+    transform: translateY(calc(-100% + var(--scene-viewport)));
+  }
+  83.5%,
+  100% {
+    transform: translateY(0);
+  }
+}
+
+/* The menu pill, by row. */
+@keyframes scene-nav-pill {
+  0%,
+  24.5%,
+  81.5%,
+  100% {
+    transform: translateY(0);
+  }
+  25.5%,
+  37.5% {
+    transform: translateY(var(--scene-nav-pitch));
+  }
+  38.5%,
+  50.5% {
+    transform: translateY(calc(var(--scene-nav-pitch) * 2));
+  }
+  51.5%,
+  63.5% {
+    transform: translateY(calc(var(--scene-nav-pitch) * 3));
+  }
+  64.5%,
+  80.5% {
+    transform: translateY(calc(var(--scene-nav-pitch) * 4));
+  }
+}
+
+@keyframes scene-nav-text-0 {
+  0%,
+  24.5%,
+  81.5%,
+  100% {
+    color: var(--c-brand-strong);
+  }
+  25.5%,
+  80.5% {
+    color: var(--c-muted);
+  }
+}
+
+@keyframes scene-nav-text-1 {
+  0%,
+  24.5%,
+  38.5%,
+  100% {
+    color: var(--c-muted);
+  }
+  25.5%,
+  37.5% {
+    color: var(--c-brand-strong);
+  }
+}
+
+@keyframes scene-nav-text-2 {
+  0%,
+  37.5%,
+  51.5%,
+  100% {
+    color: var(--c-muted);
+  }
+  38.5%,
+  50.5% {
+    color: var(--c-brand-strong);
+  }
+}
+
+@keyframes scene-nav-text-3 {
+  0%,
+  50.5%,
+  64.5%,
+  100% {
+    color: var(--c-muted);
+  }
+  51.5%,
+  63.5% {
+    color: var(--c-brand-strong);
+  }
+}
+
+@keyframes scene-nav-text-4 {
+  0%,
+  63.5%,
+  81.5%,
+  100% {
+    color: var(--c-muted);
+  }
+  64.5%,
+  80.5% {
+    color: var(--c-brand-strong);
+  }
+}
+
+/* Tiles, columns and bars: flat until their page shows, grown shortly after, flat again once it is gone. */
+@keyframes scene-grow-x-3 {
+  0%,
+  52% {
+    transform: scaleX(0);
+  }
+  55.5%,
+  65.5% {
+    transform: scaleX(1);
+  }
+  66%,
+  100% {
+    transform: scaleX(0);
+  }
+}
+
+@keyframes scene-grow-y-4 {
+  0%,
+  65% {
+    transform: scaleY(0);
+  }
+  68.5%,
+  82.5% {
+    transform: scaleY(1);
+  }
+  83%,
+  100% {
+    transform: scaleY(0);
+  }
+}
+
+@keyframes scene-grow-x-4 {
+  0%,
+  71.5% {
+    transform: scaleX(0);
+  }
+  75%,
+  82.5% {
+    transform: scaleX(1);
+  }
+  83%,
+  100% {
+    transform: scaleX(0);
   }
 }

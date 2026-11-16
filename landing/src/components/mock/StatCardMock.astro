@@ -1,0 +1,35 @@
+---
+/**
+ * The app's StatCard: a title, a big number and a hint line (icon + text, in the slot). With
+ * `after`, the number carries a second value the hero scene swaps in.
+ */
+interface Props {
+  title: string;
+  value: string;
+  after?: string;
+  class?: string;
+  style?: string;
+}
+
+const { title, value, after, class: className, style } = Astro.props;
+---
+
+<div
+  class:list={['flex flex-col gap-0.5 rounded-xl border border-line bg-surface p-3', className]}
+  style={style}
+>
+  <p class="truncate text-[0.625rem] font-medium text-muted">{title}</p>
+  {after ? (
+    <p class="scene-swap text-[1.375rem] leading-tight font-bold tracking-[-0.02em] text-ink tabular-nums">
+      <span class="scene-before">{value}</span>
+      <span class="scene-after">{after}</span>
+    </p>
+  ) : (
+    <p class="text-[1.375rem] leading-tight font-bold tracking-[-0.02em] text-ink tabular-nums">
+      {value}
+    </p>
+  )}
+  <p class="flex min-w-0 items-center gap-1 text-[0.625rem] text-muted">
+    <slot />
+  </p>
+</div>

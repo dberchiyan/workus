@@ -1,0 +1,249 @@
+---
+import Avatar from '@/components/ui/Avatar.astro';
+import MuiIcon from '@/components/ui/MuiIcon.astro';
+import StatusBadge from '@/components/ui/StatusBadge.astro';
+import { TYPES, type TypeKey } from './timeOffTypes';
+import TypeChipMock from './TypeChipMock.astro';
+
+/**
+ * The Requests page, drawn as it is, right after the hero scene approved James Okafor's request:
+ * three pending cards (the longest waiting first) and the start of "All other requests", where
+ * his request now leads with Approved.
+ */
+const PENDING: readonly {
+  name: string;
+  position: string;
+  type: TypeKey;
+  days: string;
+  period: string;
+  note: string;
+  by: readonly string[];
+  comments: number;
+  mine: boolean;
+}[] = [
+  {
+    name: 'Grace Lindqvist',
+    position: 'Project Manager',
+    type: 'sick',
+    days: '2 working days',
+    period: 'Nov 16 – 17, 2026',
+    note: 'Migraine',
+    by: ['Marcus Reid', 'Olivia Bennett'],
+    comments: 2,
+    mine: true,
+  },
+  {
+    name: 'Isabella Moreau',
+    position: 'Delivery Manager',
+    type: 'vacation',
+    days: '3 working days',
+    period: 'Nov 16 – 18, 2026',
+    note: 'Visiting family',
+    by: ['Olivia Bennett'],
+    comments: 1,
+    mine: false,
+  },
+  {
+    name: 'Ava Thompson',
+    position: 'Frontend Developer',
+    type: 'sick',
+    days: '1 working day',
+    period: 'Nov 16, 2026',
+    note: 'Flu',
+    by: ['Marcus Reid', 'Olivia Bennett'],
+    comments: 2,
+    mine: true,
+  },
+];
+
+const CLOSED: readonly {
+  name: string;
+  type: TypeKey;
+  period: string;
+  status: string;
+  by: string;
+  comments: string;
+}[] = [
+  {
+    name: 'James Okafor',
+    type: 'vacation',
+    period: 'Nov 16 – 19, 2026',
+    status: 'Approved',
+    by: 'Marcus Reid',
+    comments: '1',
+  },
+  {
+    name: 'Theo Ivanov',
+    type: 'vacation',
+    period: 'Dec 14 – 16, 2026',
+    status: 'Approved',
+    by: 'Olivia Bennett',
+    comments: '—',
+  },
+];
+---
+
+<div class="flex flex-col gap-3 p-4 lg:p-5">
+  <div>
+    <p class="text-lg font-semibold tracking-[-0.02em] text-ink">Requests</p>
+    <p class="text-[0.6875rem] text-muted">
+      Time-off requests from every employee. Responsible people decide; any admin can comment.
+    </p>
+  </div>
+
+  <div class="flex flex-wrap items-center gap-2.5">
+    <span class="relative flex h-8 w-full max-w-52 items-center gap-2 rounded-md border border-line-strong bg-surface px-2.5 text-subtle">
+      <span class="absolute -top-1.5 left-2 bg-surface px-1 text-[0.5rem] text-muted">
+        Search by employee
+      </span>
+      <MuiIcon name="search" class="size-3.5" />
+    </span>
+    <span class="flex items-center gap-0.5 rounded-lg border border-line bg-canvas p-0.5 text-[0.625rem] font-medium">
+      <span class="rounded-md bg-surface px-2 py-1 text-ink shadow-card">All types</span>
+      {(['vacation', 'sick', 'dayOff'] as const).map((key) => (
+        <span class="flex items-center gap-1.5 px-2 py-1 text-muted">
+          <MuiIcon name={TYPES[key].icon} class={`size-3.5 ${TYPES[key].text}`} />
+          {TYPES[key].label}
+        </span>
+      ))}
+    </span>
+    <span class="ml-auto hidden items-center gap-2 text-[0.6875rem] text-ink-2 lg:flex">
+      <span class="flex h-3.5 w-6 items-center rounded-full bg-line-strong p-0.5">
+        <span class="size-2.5 rounded-full bg-surface shadow-card"></span>
+      </span>
+      Only requests I decide
+    </span>
+  </div>
+
+  <div class="mt-1">
+    <p class="flex items-center gap-1.5 text-sm font-semibold text-ink">
+      Pending
+      <span class="rounded-full bg-brand-soft px-1.5 text-[0.5625rem] font-medium text-brand-strong tabular-nums">
+        3
+      </span>
+    </p>
+    <p class="text-[0.6875rem] text-muted">Waiting for a decision — the longest waiting first</p>
+  </div>
+
+  <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+    {PENDING.map((request) => (
+      <div class="flex flex-col gap-2.5 rounded-xl border border-line bg-surface p-3">
+        <div class="flex items-start gap-2">
+          <Avatar name={request.name} size="sm" />
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-[0.6875rem] font-medium text-ink">{request.name}</p>
+            <p class="truncate text-[0.5625rem] text-subtle">{request.position}</p>
+          </div>
+          <span class="flex items-center gap-1 text-[0.5625rem] text-subtle whitespace-nowrap">
+            <MuiIcon name="schedule" class="size-3" />
+            Sent today
+          </span>
+        </div>
+        <div class="flex items-center gap-2.5 rounded-lg bg-surface-2 px-2.5 py-2">
+          <span
+            class:list={[
+              'flex size-7 shrink-0 items-center justify-center rounded-md text-white',
+              TYPES[request.type].tone,
+            ]}
+          >
+            <MuiIcon name={TYPES[request.type].icon} class="size-4" />
+          </span>
+          <div class="min-w-0">
+            <p class="truncate text-[0.6875rem] font-medium text-ink">
+              {TYPES[request.type].label} · {request.days}
+            </p>
+            <p class="truncate text-[0.625rem] text-muted tabular-nums">{request.period}</p>
+          </div>
+        </div>
+        <p class="border-l-2 border-line-strong pl-2 text-[0.6875rem] text-ink-2">{request.note}</p>
+        <div class="flex items-center gap-2">
+          <span class="flex -space-x-1.5">
+            {request.by.map((name) => (
+              <Avatar name={name} size="xs" ring />
+            ))}
+          </span>
+          <span class="flex items-center gap-1 text-[0.625rem] text-muted tabular-nums">
+            <MuiIcon name="inbox" class="size-3" />
+            {request.comments}
+          </span>
+          {request.mine ? (
+            <span class="ml-auto flex items-center gap-1.5">
+              <span class="rounded-md px-2 py-1 text-[0.625rem] font-semibold text-danger-fg ring-1 ring-danger-dot/50">
+                Reject
+              </span>
+              <span class="rounded-md bg-brand px-2.5 py-1 text-[0.625rem] font-semibold text-on-brand">
+                Approve
+              </span>
+            </span>
+          ) : (
+            <span class="ml-auto truncate text-[0.5625rem] text-subtle">
+              Waiting for its responsible people
+            </span>
+          )}
+        </div>
+      </div>
+    ))}
+  </div>
+
+  <div class="mt-1 flex flex-wrap items-end justify-between gap-2">
+    <div>
+      <p class="flex items-center gap-1.5 text-sm font-semibold text-ink">
+        All other requests
+        <span class="rounded-full bg-surface-2 px-1.5 text-[0.5625rem] font-medium text-muted tabular-nums">
+          146
+        </span>
+      </p>
+      <p class="text-[0.6875rem] text-muted">
+        Approved, rejected and canceled — the latest change first
+      </p>
+    </div>
+    <span class="flex rounded-lg border border-line bg-canvas p-0.5 text-[0.625rem] font-medium">
+      <span class="rounded-md bg-surface px-2 py-1 text-ink shadow-card">All</span>
+      <span class="px-2 py-1 text-muted">Approved</span>
+      <span class="px-2 py-1 text-muted">Rejected</span>
+      <span class="px-2 py-1 text-muted">Canceled</span>
+    </span>
+  </div>
+
+  <div class="rounded-xl border border-line bg-surface">
+    <table class="w-full table-fixed border-collapse text-left">
+      <thead>
+        <tr class="bg-surface-2 text-[0.625rem] font-medium text-muted">
+          <th class="px-3.5 py-2 font-medium">Employee</th>
+          <th class="hidden w-[18%] px-2 py-2 font-medium sm:table-cell">Request type</th>
+          <th class="hidden w-[20%] px-2 py-2 font-medium md:table-cell">Period</th>
+          <th class="w-[6rem] px-2 py-2 font-medium">Status</th>
+          <th class="hidden w-[18%] px-2 py-2 font-medium lg:table-cell">Last change</th>
+          <th class="hidden w-[5rem] px-3.5 py-2 text-right font-medium lg:table-cell">Comments</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-line">
+        {CLOSED.map((row) => (
+          <tr>
+            <td class="px-3.5 py-1.5">
+              <span class="flex items-center gap-2.5">
+                <Avatar name={row.name} size="sm" />
+                <span class="truncate text-[0.6875rem] font-medium text-ink">{row.name}</span>
+              </span>
+            </td>
+            <td class="hidden px-2 py-1.5 sm:table-cell">
+              <TypeChipMock type={row.type} />
+            </td>
+            <td class="hidden truncate px-2 py-1.5 text-[0.6875rem] text-ink-2 tabular-nums md:table-cell">
+              {row.period}
+            </td>
+            <td class="px-2 py-1.5">
+              <StatusBadge tone="success" label={row.status} />
+            </td>
+            <td class="hidden truncate px-2 py-1.5 text-[0.6875rem] text-ink-2 lg:table-cell">
+              {row.by}
+            </td>
+            <td class="hidden px-3.5 py-1.5 text-right text-[0.6875rem] text-muted tabular-nums lg:table-cell">
+              {row.comments}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+</div>

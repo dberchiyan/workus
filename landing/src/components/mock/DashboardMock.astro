@@ -1,98 +1,202 @@
 ---
 import Avatar from '@/components/ui/Avatar.astro';
-import StatusBadge, { type StatusTone } from '@/components/ui/StatusBadge.astro';
+import MuiIcon from '@/components/ui/MuiIcon.astro';
+import type { MuiIconName } from '@/components/ui/mui-icons';
+import StatusBadge from '@/components/ui/StatusBadge.astro';
+import StatCardMock from './StatCardMock.astro';
+import type { TypeKey } from './timeOffTypes';
+import TypeChipMock from './TypeChipMock.astro';
 
-const STATS = [
-  { label: 'Pending requests', value: '4', note: 'Oldest waits 1 day' },
-  { label: 'Out today', value: '3', note: '+2 later this week' },
-  { label: 'Reviews in 30 days', value: '7', note: '1 overdue', alert: true },
-  { label: 'Joining & leaving', value: '+3 / −1', note: 'Next: Mar 3' },
-] as const;
+/**
+ * The admin dashboard, drawn as it is: the four figures, today's events (time-off requests made
+ * today, reviews, birthdays). The last request is the one the hero scene approves: its status
+ * and the pending count carry a "before" and an "after" (global.css → "Hero scene").
+ */
+const OUT_TODAY = ['Adam Schulz', 'Amelia Costa', 'Elijah Brooks', 'Hannah Brooks', 'Liam Foster'];
 
 const REQUESTS: readonly {
   name: string;
-  type: string;
+  position: string;
+  type: TypeKey;
   period: string;
-  status: string;
-  tone: StatusTone;
+  days: string;
+  at: string;
 }[] = [
   {
     name: 'Ava Thompson',
-    type: 'Vacation',
-    period: 'Mar 3 – 7 · 5 days',
-    status: 'Pending',
-    tone: 'warning',
+    position: 'Frontend Developer',
+    type: 'sick',
+    period: 'Nov 16',
+    days: '1 working day',
+    at: 'at 5:50 AM',
   },
   {
-    name: 'Liam Foster',
-    type: 'Sick day',
-    period: 'Today · 1 day',
-    status: 'Approved',
-    tone: 'success',
+    name: 'Isabella Moreau',
+    position: 'Delivery Manager',
+    type: 'vacation',
+    period: 'Nov 16 – Nov 18',
+    days: '3 working days',
+    at: 'at 5:35 AM',
   },
   {
-    name: 'Noah Bennett',
-    type: 'Day off',
-    period: 'Mar 14 · 1 day',
-    status: 'Pending',
-    tone: 'warning',
+    name: 'Grace Lindqvist',
+    position: 'Project Manager',
+    type: 'sick',
+    period: 'Nov 16 – Nov 17',
+    days: '2 working days',
+    at: 'at 5:15 AM',
   },
   {
-    name: 'Emma Hayes',
-    type: 'Vacation',
-    period: 'Apr 1 – 4 · 4 days',
-    status: 'Approved',
-    tone: 'success',
+    name: 'James Okafor',
+    position: 'Backend Developer',
+    type: 'vacation',
+    period: 'Nov 16 – Nov 19',
+    days: '4 working days',
+    at: 'at 5:00 AM',
   },
+];
+
+const SECTIONS: readonly {
+  icon: MuiIconName;
+  tile: string;
+  title: string;
+  count: number;
+  text: string;
+}[] = [
+  {
+    icon: 'eventNote',
+    tile: 'bg-avatar-7',
+    title: 'Reviews',
+    count: 0,
+    text: 'Performance reviews dated today',
+  },
+  { icon: 'cake', tile: 'bg-avatar-5', title: 'Birthdays', count: 5, text: 'Team birthdays today' },
 ];
 ---
 
-<div class="flex flex-col gap-4 p-4 sm:p-5">
-  <div>
-    <p class="text-[0.95rem] font-semibold tracking-[-0.01em] text-ink">Good morning, Marcus</p>
-    <p class="text-[0.6875rem] text-subtle">Here is what needs you today</p>
+<div class="flex flex-col gap-4 p-4 lg:p-5">
+  <div class="grid grid-cols-2 gap-3 md:grid-cols-4">
+    <StatCardMock title="Pending requests" value="4" after="3" class="anim-rise" style="--i: 0">
+      <MuiIcon name="schedule" class="size-3.5" />
+      Oldest made today
+    </StatCardMock>
+    <StatCardMock title="Out today" value="9" class="anim-rise" style="--i: 1">
+      <span class="flex -space-x-1.5">
+        {OUT_TODAY.map((name) => (
+          <Avatar name={name} size="xs" ring />
+        ))}
+      </span>
+      <span class="truncate">Nobody else out this week</span>
+    </StatCardMock>
+    <StatCardMock title="Reviews in 30 days" value="6" class="anim-rise" style="--i: 2">
+      <MuiIcon name="checkCircle" class="size-3.5" />
+      None overdue
+    </StatCardMock>
+    <StatCardMock
+      title="Joining & leaving · 30 days"
+      value="+2 / −1"
+      class="anim-rise"
+      style="--i: 3"
+    >
+      <MuiIcon name="event" class="size-3.5" />
+      <span class="truncate">
+        <span class="underline decoration-line-strong">Nora Starling</span> starts Nov 25
+      </span>
+    </StatCardMock>
   </div>
 
-  <div class="grid grid-cols-2 gap-2.5 lg:grid-cols-4">
-    {STATS.map((stat, index) => (
-      <div
-        class="anim-rise rounded-xl border border-line bg-surface p-3 shadow-card"
-        style={`--i: ${index}`}
-      >
-        <p class="truncate text-[0.625rem] font-medium text-muted">{stat.label}</p>
-        <p class="mt-1 text-lg font-semibold tracking-[-0.02em] text-ink tabular-nums">
-          {stat.value}
+  <div class="flex gap-5 border-b border-line text-[0.6875rem] font-medium">
+    <span class="flex items-center gap-1.5 border-b-2 border-brand pb-2 text-brand-strong">
+      Today's events
+      <span class="rounded-full bg-brand-soft px-1.5 text-[0.5625rem] tabular-nums">9</span>
+    </span>
+    <span class="flex items-center gap-1.5 pb-2 text-muted">
+      Events by month
+      <span class="rounded-full bg-surface-2 px-1.5 text-[0.5625rem] tabular-nums">23</span>
+    </span>
+  </div>
+
+  <div class="rounded-xl border border-line bg-surface">
+    <div class="flex items-center gap-2.5 border-b border-line px-3.5 py-2.5">
+      <span class="flex size-8 shrink-0 items-center justify-center rounded-lg bg-brand text-on-brand">
+        <MuiIcon name="inbox" class="size-4" />
+      </span>
+      <div class="min-w-0 flex-1">
+        <p class="flex items-center gap-1.5 text-xs font-semibold text-ink">
+          Requests
+          <span class="rounded-full bg-surface-2 px-1.5 text-[0.5625rem] font-medium text-muted tabular-nums">
+            4
+          </span>
         </p>
-        <p
-          class:list={[
-            'truncate text-[0.625rem]',
-            'alert' in stat ? 'text-danger-fg' : 'text-subtle',
-          ]}
-        >
-          {stat.note}
-        </p>
+        <p class="truncate text-[0.625rem] text-muted">Time-off requests made today</p>
       </div>
-    ))}
-  </div>
-
-  <div class="rounded-xl border border-line bg-surface shadow-card">
-    <div class="flex items-center gap-4 border-b border-line px-3.5 pt-2.5 text-[0.6875rem] font-medium">
-      <span class="border-b-2 border-brand pb-2 text-ink">Today’s events</span>
-      <span class="pb-2 text-subtle">Events by month</span>
+      <span class="text-[0.6875rem] font-semibold text-brand">All requests</span>
     </div>
     <ul class="divide-y divide-line">
       {REQUESTS.map((request, index) => (
-        <li class="anim-rise flex items-center gap-2.5 px-3.5 py-2.5" style={`--i: ${index + 4}`}>
+        <li
+          class:list={[
+            'anim-rise relative flex items-center gap-2.5 px-3.5 py-2',
+            index === REQUESTS.length - 1 && 'scene-row',
+          ]}
+          style={`--i: ${index + 4}`}
+        >
           <Avatar name={request.name} size="sm" />
-          <div class="min-w-0 flex-1">
-            <p class="truncate text-xs font-medium text-ink">{request.name}</p>
-            <p class="truncate text-[0.625rem] text-subtle">
-              {request.type} · {request.period}
-            </p>
+          <div class="w-28 min-w-0 shrink-0 sm:w-32">
+            <p class="truncate text-[0.6875rem] font-medium text-ink">{request.name}</p>
+            <p class="truncate text-[0.5625rem] text-subtle">{request.position}</p>
           </div>
-          <StatusBadge tone={request.tone} label={request.status} />
+          <span class="hidden sm:flex">
+            <TypeChipMock type={request.type} />
+          </span>
+          <p class="hidden min-w-0 truncate text-[0.6875rem] text-ink md:block">
+            {request.period} <span class="ml-1 text-muted">{request.days}</span>
+          </p>
+          <span class="ml-auto flex shrink-0 items-center gap-2.5">
+            {index === REQUESTS.length - 1 ? (
+              <span class="scene-swap">
+                <span class="scene-before">
+                  <StatusBadge tone="warning" label="Pending" />
+                </span>
+                <span class="scene-after">
+                  <StatusBadge tone="success" label="Approved" />
+                </span>
+              </span>
+            ) : (
+              <StatusBadge tone="warning" label="Pending" />
+            )}
+            <span class="hidden text-[0.625rem] text-subtle lg:inline">{request.at}</span>
+            <MuiIcon name="chevronRight" class="size-3.5 text-subtle" />
+          </span>
         </li>
       ))}
     </ul>
+  </div>
+
+  <div class="grid gap-4 lg:grid-cols-2">
+    {SECTIONS.map((section) => (
+      <div class="rounded-xl border border-line bg-surface">
+        <div class="flex items-center gap-2.5 border-b border-line px-3.5 py-2.5">
+          <span
+            class:list={[
+              'flex size-8 shrink-0 items-center justify-center rounded-lg text-white',
+              section.tile,
+            ]}
+          >
+            <MuiIcon name={section.icon} class="size-4" />
+          </span>
+          <div class="min-w-0 flex-1">
+            <p class="flex items-center gap-1.5 text-xs font-semibold text-ink">
+              {section.title}
+              <span class="rounded-full bg-surface-2 px-1.5 text-[0.5625rem] font-medium text-muted tabular-nums">
+                {section.count}
+              </span>
+            </p>
+            <p class="truncate text-[0.625rem] text-muted">{section.text}</p>
+          </div>
+        </div>
+        <div class="h-10"></div>
+      </div>
+    ))}
   </div>
 </div>

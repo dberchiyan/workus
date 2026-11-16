@@ -1,0 +1,19 @@
+---
+import MuiIcon from '@/components/ui/MuiIcon.astro';
+
+import { TYPES, type TypeKey } from './timeOffTypes';
+
+/** The app's time-off type chip: the icon in the type's colour and the word, outlined. */
+
+interface Props {
+  type: TypeKey;
+}
+
+const { type } = Astro.props;
+const visual = TYPES[type];
+---
+
+<span class="inline-flex items-center gap-1 rounded-md border border-line bg-surface px-1.5 py-0.5 text-[0.625rem] font-medium whitespace-nowrap text-ink-2">
+  <MuiIcon name={visual.icon} class={`size-3 ${visual.text}`} />
+  {visual.label}
+</span>

@@ -1,21 +1,43 @@
 ---
 import Icon from '@/components/ui/Icon.astro';
 import Logo from '@/components/ui/Logo.astro';
+import MuiIcon from '@/components/ui/MuiIcon.astro';
+import type { MuiIconName } from '@/components/ui/mui-icons';
 import MockFrame from './MockFrame.astro';
+import CalendarPageMock from './CalendarPageMock.astro';
 import DashboardMock from './DashboardMock.astro';
+import EmployeesPageMock from './EmployeesPageMock.astro';
+import InsightsPageMock from './InsightsPageMock.astro';
+import RequestDialogMock from './RequestDialogMock.astro';
+import RequestsPageMock from './RequestsPageMock.astro';
 
-const MENU = [
-  { icon: 'home', label: 'Dashboard', active: true },
-  { icon: 'users', label: 'Employees' },
+/**
+ * The app's shell at about two thirds of its real size: the sidebar (brand row, menu, Settings and
+ * "Collapse menu" at the bottom), the top bar (command search, notifications, who is signed in)
+ * and the page. The hero scene (global.css → "Hero scene") moves the pointer, opens the dialog and
+ * switches the pages in the menu's order, scrolling the last one.
+ */
+const MENU: readonly { icon: MuiIconName; label: string }[] = [
+  { icon: 'dashboard', label: 'Dashboard' },
+  { icon: 'people', label: 'Employees' },
   { icon: 'inbox', label: 'Requests' },
   { icon: 'calendar', label: 'Calendar' },
-  { icon: 'chart', label: 'Insights' },
+  { icon: 'insights', label: 'Insights' },
+];
+
+// In the menu's order, which is the order the scene visits them.
+const PAGES = [
+  DashboardMock,
+  EmployeesPageMock,
+  RequestsPageMock,
+  CalendarPageMock,
+  InsightsPageMock,
 ] as const;
 ---
 
 <MockFrame
-  label="The Workus admin dashboard: pending requests, people out today, upcoming reviews and today's time-off requests."
-  class="overflow-hidden rounded-panel bg-surface shadow-window ring-glass"
+  label="A tour of Workus: on the admin dashboard (pending requests, people out today, reviews due, joiners and leavers, today's time-off requests) the admin opens James Okafor's vacation request, reads the note and the comments and approves it; then the Employees page with its figures and table, the Requests page (the pending cards, the closed ones below), the Calendar with everyone's time off by day for the month, and Insights, scrolled through: the number of employees by month and department, staff turnover, average tenure and absence."
+  class="overflow-hidden rounded-panel bg-canvas shadow-window ring-glass"
   delay={700}
 >
   <!-- Browser chrome -->
@@ -32,44 +54,85 @@ const MENU = [
     <span class="w-10"></span>
   </div>
 
-  <div class="flex min-h-0">
+  <!-- The stage of the hero scene: a fixed viewport; the dialog and the pointer move over the whole app. -->
+  <div class="scene-stage relative flex h-[33rem]">
     <!-- Sidebar (hidden on phones, as the app's drawer) -->
-    <aside class="hidden w-44 shrink-0 flex-col gap-1 border-r border-line p-3 md:flex">
-      <Logo class="mb-3 scale-90 origin-left" />
-      {MENU.map((item) => (
-        <span
-          class:list={[
-            'flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium',
-            'active' in item ? 'bg-brand-soft text-brand-strong' : 'text-muted',
-          ]}
-        >
-          <Icon name={item.icon} class="size-4" />
-          {item.label}
+    <aside class="hidden w-40 shrink-0 flex-col border-r border-line bg-surface md:flex">
+      <div class="flex h-11 items-center border-b border-line px-3">
+        <Logo class="origin-left scale-90" />
+      </div>
+      <!-- The active item slides between the entries (one transform); each label lights in turn. -->
+      <div class="scene-nav relative flex flex-col gap-0.5 p-2">
+        <span class="scene-nav-pill absolute inset-x-2 top-2 h-8 rounded-lg border-l-[3px] border-brand bg-brand-soft"></span>
+        {MENU.map((item, row) => (
+          <span
+            class:list={[
+              'relative flex h-8 items-center gap-2.5 rounded-lg px-2.5 text-[0.6875rem] font-medium',
+              `scene-nav-${row}`,
+              row === 0 ? 'text-brand-strong' : 'text-muted',
+            ]}
+          >
+            <MuiIcon name={item.icon} class="size-4" />
+            {item.label}
+          </span>
+        ))}
+      </div>
+      <div class="mt-auto flex flex-col gap-0.5 border-t border-line p-2">
+        <span class="flex h-8 items-center gap-2.5 px-2.5 text-[0.6875rem] font-medium text-muted">
+          <MuiIcon name="settings" class="size-4" />
+          Settings
         </span>
-      ))}
-      <span class="mt-auto flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs font-medium text-muted">
-        <Icon name="settings" class="size-4" />
-        Settings
-      </span>
+        <span class="flex h-8 items-center gap-2.5 px-2.5 text-[0.6875rem] font-medium text-muted">
+          <MuiIcon name="collapse" class="size-4" />
+          Collapse menu
+        </span>
+      </div>
     </aside>
 
-    <div class="min-w-0 flex-1">
+    <div class="flex min-w-0 flex-1 flex-col">
       <!-- Top bar -->
-      <div class="flex items-center gap-3 border-b border-line px-4 py-2.5 sm:px-5">
-        <span class="flex h-7 flex-1 items-center gap-2 rounded-lg bg-surface-2 px-2.5 text-[0.6875rem] text-subtle sm:max-w-56">
-          <Icon name="search" class="size-3.5" />
-          Search
-          <span class="ml-auto rounded border border-line px-1 text-[0.625rem]">⌘K</span>
+      <div class="flex h-11 shrink-0 items-center gap-3 border-b border-line bg-surface px-4">
+        <span class="flex h-7 w-full max-w-56 items-center gap-2 rounded-lg bg-surface-2 px-2.5 text-[0.6875rem] text-subtle">
+          <MuiIcon name="search" class="size-3.5" />
+          Search or jump to…
+          <span class="ml-auto rounded border border-line px-1 text-[0.5625rem]">⌘K</span>
         </span>
         <span class="relative ml-auto text-muted">
-          <Icon name="bell" class="size-4.5" />
-          <span class="absolute -top-0.5 -right-0.5 size-2 rounded-full bg-danger-dot ring-2 ring-surface"></span>
+          <MuiIcon name="bell" class="size-4.5" />
+          <span class="absolute -top-1.5 -right-1.5 flex h-3.5 min-w-3.5 items-center justify-center rounded-full bg-danger-dot px-1 text-[0.5rem] font-semibold text-white ring-2 ring-surface">
+            3
+          </span>
+        </span>
+        <span class="hidden text-right leading-tight sm:block">
+          <span class="block text-[0.6875rem] font-semibold text-ink">Marcus Reid</span>
+          <span class="block text-[0.5625rem] text-muted">Administrator</span>
         </span>
         <span class="flex size-7 items-center justify-center rounded-full bg-avatar-7 text-[0.6rem] font-semibold text-white">
           MR
         </span>
       </div>
-      <DashboardMock />
+      <!-- The pages lie on top of each other; the scene crossfades between them. -->
+      <div class="scene-pages relative min-h-0 flex-1">
+        {PAGES.map((Page, index) => (
+          <div class:list={['scene-page', `scene-page-${index}`]}>
+            <Page />
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <RequestDialogMock />
+
+    <!-- The pointer: a layer the stage's size, moved by percentages of it; the arrow at its corner. -->
+    <div class="scene-pointer pointer-events-none absolute inset-0 z-30 hidden md:block">
+      <svg viewBox="0 0 24 24" class="scene-arrow size-5 drop-shadow-sm" aria-hidden="true">
+        <path
+          d="M5.5 3.5 18.5 12l-5.6 1.2-2.9 5.3z"
+          class="fill-ink stroke-surface"
+          stroke-width="1.5"
+          stroke-linejoin="round"
+        ></path>
+      </svg>
     </div>
   </div>
 </MockFrame>

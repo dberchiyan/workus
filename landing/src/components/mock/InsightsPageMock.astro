@@ -1,0 +1,529 @@
+---
+import Avatar from '@/components/ui/Avatar.astro';
+import MuiIcon from '@/components/ui/MuiIcon.astro';
+import { TYPES } from './timeOffTypes';
+
+/**
+ * The Insights page, drawn as it is: the year's filters, then "Number of employees" (stacked
+ * columns by department), "Staff turnover" (hires and leavers), "Average tenure" (a card per
+ * department) and "Absence" (the top 10), each with its figure beside. The hero scene scrolls
+ * the page down while it shows (`scene-scroll`); columns and bars grow in (`scene-col`,
+ * `scene-bar`).
+ */
+const GROUPS = [
+  {
+    label: 'Developers',
+    color: 'bg-chart-1',
+    count: 14,
+    values: [9, 9, 9, 9, 9, 11, 12, 12, 12, 13, 14],
+  },
+  {
+    label: 'AI Engineers',
+    color: 'bg-chart-2',
+    count: 8,
+    values: [5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 8],
+  },
+  { label: 'Designers', color: 'bg-chart-3', count: 4, values: [3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4] },
+  {
+    label: 'Project Managers',
+    color: 'bg-chart-4',
+    count: 4,
+    values: [4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4],
+  },
+  { label: 'QA', color: 'bg-chart-5', count: 7, values: [4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 7] },
+] as const;
+
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const CURRENT = 10;
+const MAX = 40;
+const AXIS = [40, 30, 20, 10, 0];
+
+const TURNOVER = {
+  hired: [0, 0, 0, 0, 0, 3, 1, 2, 1, 3, 4],
+  left: [0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 1],
+} as const;
+const TURNOVER_MAX = 4;
+const TURNOVER_AXIS = [4, 3, 2, 1, 0];
+const HIRED = [
+  { name: 'Adam Schulz', position: 'Machine Learning Engineer', date: 'Nov 2' },
+  { name: 'Daniel Kowalski', position: 'QA Automation Engineer', date: 'Nov 4' },
+  { name: 'Theo Ivanov', position: 'Frontend Developer', date: 'Nov 13' },
+  { name: 'Victoria Lund', position: 'QA Engineer', date: 'Nov 9' },
+] as const;
+const LEFT = [{ name: 'Mateo Gruber', position: 'Full Stack Developer', date: 'Nov 11' }] as const;
+
+const TENURE = [
+  {
+    label: 'Developers',
+    color: 'bg-chart-1',
+    edge: 'border-chart-1',
+    people: 14,
+    months: 35,
+    text: '2 y 11 m',
+    rows: [
+      ['Backend Developer', 44],
+      ['Frontend Developer', 35],
+      ['Full Stack Developer', 44],
+      ['Mobile Developer', 16],
+    ],
+  },
+  {
+    label: 'AI Engineers',
+    color: 'bg-chart-2',
+    edge: 'border-chart-2',
+    people: 8,
+    months: 34,
+    text: '2 y 10 m',
+    rows: [
+      ['AI Engineer', 45],
+      ['Data Scientist', 33],
+      ['Machine Learning Engineer', 29],
+    ],
+  },
+  {
+    label: 'Designers',
+    color: 'bg-chart-3',
+    edge: 'border-chart-3',
+    people: 4,
+    months: 26,
+    text: '2 y 2 m',
+    rows: [
+      ['Product Designer', 33],
+      ['UI/UX Designer', 3],
+    ],
+  },
+  {
+    label: 'Project Managers',
+    color: 'bg-chart-4',
+    edge: 'border-chart-4',
+    people: 4,
+    months: 66,
+    text: '5 y 6 m',
+    rows: [
+      ['Delivery Manager', 83],
+      ['Project Manager', 60],
+    ],
+  },
+] as const;
+const TENURE_MAX = 83;
+
+// Days off by type (vacation, sick, day off) and the total.
+const ABSENCE = [
+  { name: 'Elijah Brooks', position: 'Mobile Developer', days: [9, 2, 1], total: 12 },
+  { name: 'Ava Thompson', position: 'Frontend Developer', days: [8, 2, 1], total: 11 },
+  { name: 'Benjamin Varga', position: 'Backend Developer', days: [8, 2, 1], total: 11 },
+  { name: 'Evelyn Horvat', position: 'Machine Learning Engineer', days: [8, 2, 1], total: 11 },
+  { name: 'Henry Silva', position: 'Frontend Developer', days: [8, 2, 1], total: 11 },
+  { name: 'Jack Lambert', position: 'Backend Developer', days: [8, 2, 1], total: 11 },
+] as const;
+const ABSENCE_MAX = 12;
+const ABSENCE_COLORS = [TYPES.vacation.tone, TYPES.sick.tone, TYPES.dayOff.tone];
+
+let barIndex = 0;
+---
+
+<div class="scene-scroll flex flex-col gap-4 p-4 lg:p-5">
+  <div class="flex items-start justify-between gap-3">
+    <div>
+      <p class="text-lg font-semibold tracking-[-0.02em] text-ink">Insights</p>
+      <p class="text-[0.6875rem] text-muted">
+        How the company changes over the year: people, tenure, turnover, time off and pay.
+      </p>
+    </div>
+    <div class="flex shrink-0 items-center gap-2">
+      <span class="relative hidden h-8 items-center gap-6 rounded-md border border-line-strong bg-surface px-2.5 text-[0.6875rem] text-ink sm:flex">
+        <span class="absolute -top-1.5 left-2 bg-surface px-1 text-[0.5rem] text-muted">
+          Department
+        </span>
+        Whole company
+        <MuiIcon name="dropDown" class="size-4 text-subtle" />
+      </span>
+      <span class="flex h-8 items-center gap-1 rounded-lg border border-line bg-surface px-1.5 text-xs font-medium text-ink">
+        <MuiIcon name="chevronLeft" class="size-4 text-subtle" />
+        <span class="px-1.5 tabular-nums">2026</span>
+        <MuiIcon name="chevronRight" class="size-4 text-subtle" />
+      </span>
+    </div>
+  </div>
+
+  <!-- Number of employees -->
+  <div class="grid gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]">
+    <div class="rounded-xl border border-line bg-surface">
+      <div class="flex items-center justify-between gap-3 border-b border-line px-3.5 py-2.5">
+        <div>
+          <p class="text-xs font-semibold text-ink">Number of employees</p>
+          <p class="text-[0.625rem] text-muted">People employed at the end of each month</p>
+        </div>
+        <span class="flex items-center gap-1.5 rounded-md border border-line px-2 py-1 text-[0.625rem] font-medium text-ink">
+          <MuiIcon name="tableRows" class="size-3.5 text-muted" />
+          Table
+        </span>
+      </div>
+      <div class="flex flex-col gap-3 px-3.5 py-3">
+        <div class="flex flex-wrap gap-1.5">
+          {GROUPS.map((group) => (
+            <span class="flex items-center gap-1.5 rounded-full border border-line px-2 py-0.5 text-[0.625rem] font-medium text-ink-2">
+              <span class:list={['size-1.5 rounded-full', group.color]}></span>
+              {group.label}
+            </span>
+          ))}
+        </div>
+        <div class="grid grid-cols-[1.25rem_1fr] gap-x-2">
+          <div class="relative h-36 text-[0.5625rem] text-subtle tabular-nums">
+            {AXIS.map((value) => (
+              <span
+                class="absolute right-0 -translate-y-1/2"
+                style={`top: ${(1 - value / MAX) * 100}%`}
+              >
+                {value}
+              </span>
+            ))}
+          </div>
+          <div class="relative h-36">
+            {AXIS.map((value) => (
+              <span
+                class="absolute inset-x-0 border-t border-dashed border-line"
+                style={`top: ${(1 - value / MAX) * 100}%`}
+              ></span>
+            ))}
+            <div class="absolute inset-0 flex items-end gap-[6%] px-[1.5%]">
+              {MONTHS.map((_month, index) => (
+                <span class="relative flex h-full flex-1 items-end justify-center">
+                  {index === CURRENT && (
+                    <span class="absolute -inset-x-[45%] -top-2 bottom-0 rounded-md bg-surface-2"></span>
+                  )}
+                  {index <= CURRENT && (
+                    <span
+                      class="scene-col relative flex h-full w-full flex-col-reverse"
+                      style={`--i: ${index}`}
+                    >
+                      {GROUPS.map((group, groupIndex) => (
+                        <span
+                          class:list={[
+                            'w-full',
+                            group.color,
+                            groupIndex === GROUPS.length - 1 && 'rounded-t-[3px]',
+                            groupIndex > 0 && 'border-t border-surface',
+                          ]}
+                          style={`height: ${((group.values[index] ?? 0) / MAX) * 100}%`}
+                        ></span>
+                      ))}
+                    </span>
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
+          <span></span>
+          <div class="mt-1 flex gap-[6%] px-[1.5%] text-[0.5625rem] text-subtle">
+            {MONTHS.map((month, index) => (
+              <span
+                class:list={[
+                  'flex-1 text-center',
+                  index === CURRENT && 'font-medium text-brand-strong',
+                ]}
+              >
+                {month}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2.5 rounded-xl border border-line bg-surface p-3.5">
+      <p class="text-[1.625rem] leading-none font-bold tracking-[-0.02em] text-brand-strong tabular-nums">
+        37
+      </p>
+      <p class="text-[0.6875rem] text-ink-2">Employed at the end of November</p>
+      <p class="flex items-center gap-1 text-[0.6875rem] font-medium text-success-fg">
+        <MuiIcon name="trendingUp" class="size-3.5" />
+        +10 vs 2025
+      </p>
+      <span class="border-t border-line"></span>
+      <p class="flex items-center gap-1.5 text-[0.6875rem] font-semibold text-ink">
+        <MuiIcon name="info" class="size-3.5 text-brand" />
+        Number of employees
+      </p>
+      <p class="text-[0.625rem] leading-snug text-muted">
+        The base every other figure is built on — turnover, tenure and averages are all relative to
+        it.
+      </p>
+      <ul class="flex flex-col gap-1 text-[0.625rem] text-ink-2">
+        {GROUPS.map((group) => (
+          <li class="flex items-center gap-1.5">
+            <span class:list={['size-1.5 rounded-full', group.color]}></span>
+            {group.label}
+            <span class="ml-auto font-medium text-ink tabular-nums">{group.count}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Staff turnover -->
+  <div class="grid gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]">
+    <div class="rounded-xl border border-line bg-surface">
+      <div class="flex items-center justify-between gap-3 border-b border-line px-3.5 py-2.5">
+        <div>
+          <p class="text-xs font-semibold text-ink">Staff turnover</p>
+          <p class="text-[0.625rem] text-muted">Hires and leavers by month</p>
+        </div>
+        <span class="flex items-center gap-1.5 rounded-md border border-line px-2 py-1 text-[0.625rem] font-medium text-ink">
+          <MuiIcon name="tableRows" class="size-3.5 text-muted" />
+          Table
+        </span>
+      </div>
+      <div class="flex flex-col gap-3 px-3.5 py-3">
+        <div class="flex gap-1.5">
+          <span class="flex items-center gap-1.5 rounded-full border border-line px-2 py-0.5 text-[0.625rem] font-medium text-ink-2">
+            <span class="size-1.5 rounded-full bg-chart-1"></span>
+            Hired
+          </span>
+          <span class="flex items-center gap-1.5 rounded-full border border-line px-2 py-0.5 text-[0.625rem] font-medium text-ink-2">
+            <span class="size-1.5 rounded-full bg-chart-2"></span>
+            Left
+          </span>
+        </div>
+        <div class="grid grid-cols-[1.25rem_1fr] gap-x-2">
+          <div class="relative h-28 text-[0.5625rem] text-subtle tabular-nums">
+            {TURNOVER_AXIS.map((value) => (
+              <span
+                class="absolute right-0 -translate-y-1/2"
+                style={`top: ${(1 - value / TURNOVER_MAX) * 100}%`}
+              >
+                {value}
+              </span>
+            ))}
+          </div>
+          <div class="relative h-28">
+            {TURNOVER_AXIS.map((value) => (
+              <span
+                class="absolute inset-x-0 border-t border-dashed border-line"
+                style={`top: ${(1 - value / TURNOVER_MAX) * 100}%`}
+              ></span>
+            ))}
+            <div class="absolute inset-0 flex items-end gap-[6%] px-[1.5%]">
+              {MONTHS.map((_month, index) => (
+                <span class="relative flex h-full flex-1 items-end justify-center gap-0.5">
+                  {index === CURRENT && (
+                    <span class="absolute -inset-x-[45%] -top-2 bottom-0 rounded-md bg-surface-2"></span>
+                  )}
+                  {index <= CURRENT && (
+                    <>
+                      <span
+                        class="scene-col relative w-1/2 rounded-t-[3px] bg-chart-1"
+                        style={`height: ${((TURNOVER.hired[index] ?? 0) / TURNOVER_MAX) * 100}%; --i: ${index}`}
+                      ></span>
+                      <span
+                        class="scene-col relative w-1/2 rounded-t-[3px] bg-chart-2"
+                        style={`height: ${((TURNOVER.left[index] ?? 0) / TURNOVER_MAX) * 100}%; --i: ${index}`}
+                      ></span>
+                    </>
+                  )}
+                </span>
+              ))}
+            </div>
+          </div>
+          <span></span>
+          <div class="mt-1 flex gap-[6%] px-[1.5%] text-[0.5625rem] text-subtle">
+            {MONTHS.map((month, index) => (
+              <span
+                class:list={[
+                  'flex-1 text-center',
+                  index === CURRENT && 'font-medium text-brand-strong',
+                ]}
+              >
+                {month}
+              </span>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2.5 rounded-xl border border-line bg-surface p-3.5">
+      <p class="text-[1.625rem] leading-none font-bold tracking-[-0.02em] text-brand-strong tabular-nums">
+        13.3 %
+      </p>
+      <p class="text-[0.6875rem] text-ink-2">Turnover rate · 14 hired · 4 left this year</p>
+      <p class="flex items-center gap-1 text-[0.6875rem] font-medium text-danger-fg">
+        <MuiIcon name="trendingUp" class="size-3.5" />
+        +13.3 pp vs 2025
+      </p>
+      <span class="border-t border-line"></span>
+      <p class="flex items-center gap-1.5 text-[0.6875rem] font-semibold text-ink">
+        <MuiIcon name="info" class="size-3.5 text-brand" />
+        Turnover rate
+      </p>
+      <p class="text-[0.625rem] leading-snug text-muted">
+        People who left in the year as a share of the average month-end headcount.
+      </p>
+      <span class="border-t border-line"></span>
+      <p class="text-[0.6875rem] font-semibold text-ink">November</p>
+      <p class="text-[0.5rem] font-semibold tracking-[0.08em] text-muted uppercase">Hired · 4</p>
+      <ul class="flex flex-col gap-1.5">
+        {HIRED.map((person) => (
+          <li class="flex items-center gap-2">
+            <Avatar name={person.name} size="xs" />
+            <span class="min-w-0 flex-1">
+              <span class="block truncate text-[0.625rem] font-medium text-ink">{person.name}</span>
+              <span class="block truncate text-[0.5rem] text-subtle">{person.position}</span>
+            </span>
+            <span class="text-[0.5625rem] text-muted tabular-nums">{person.date}</span>
+          </li>
+        ))}
+      </ul>
+      <p class="text-[0.5rem] font-semibold tracking-[0.08em] text-muted uppercase">Left · 1</p>
+      <ul class="flex flex-col gap-1.5">
+        {LEFT.map((person) => (
+          <li class="flex items-center gap-2">
+            <Avatar name={person.name} size="xs" />
+            <span class="min-w-0 flex-1">
+              <span class="block truncate text-[0.625rem] font-medium text-ink">{person.name}</span>
+              <span class="block truncate text-[0.5rem] text-subtle">{person.position}</span>
+            </span>
+            <span class="text-[0.5625rem] text-muted tabular-nums">{person.date}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+
+  <!-- Average tenure -->
+  <div class="grid gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]">
+    <div class="rounded-xl border border-line bg-surface">
+      <div class="border-b border-line px-3.5 py-2.5">
+        <p class="text-xs font-semibold text-ink">Average tenure</p>
+        <p class="text-[0.625rem] text-muted">
+          Whole months worked by the people employed at the end of the year
+        </p>
+      </div>
+      <div class="grid gap-3 px-3.5 py-3 sm:grid-cols-2">
+        {TENURE.map((group) => (
+          <div
+            class:list={[
+              'flex flex-col gap-2 rounded-lg border border-line border-l-[3px] p-3',
+              group.edge,
+            ]}
+          >
+            <p class="flex items-baseline justify-between text-xs font-semibold text-ink">
+              {group.label}
+              <span class="text-[0.5625rem] font-normal text-muted">{group.people} employees</span>
+            </p>
+            <p class="text-[0.6875rem] text-muted">
+              <span class="text-lg font-bold text-brand-strong tabular-nums">{group.months}</span>{' '}
+              months · {group.text}
+            </p>
+            {group.rows.map(([title, months]) => (
+              <div>
+                <p class="flex justify-between text-[0.625rem] text-ink-2">
+                  {title}
+                  <span class="text-muted tabular-nums">{months} months</span>
+                </p>
+                <span class="mt-0.5 block h-1 overflow-hidden rounded-full bg-surface-2">
+                  <span
+                    class:list={['scene-bar block h-full rounded-full', group.color]}
+                    style={`width: ${(months / TENURE_MAX) * 100}%; --i: ${barIndex++}`}
+                  ></span>
+                </span>
+              </div>
+            ))}
+          </div>
+        ))}
+      </div>
+    </div>
+
+    <div class="flex flex-col gap-2.5 rounded-xl border border-line bg-surface p-3.5">
+      <p class="text-[1.625rem] leading-none font-bold tracking-[-0.02em] text-brand-strong tabular-nums">
+        2 y 10 m
+      </p>
+      <p class="text-[0.6875rem] text-ink-2">Average tenure</p>
+      <p class="flex items-center gap-1 text-[0.6875rem] font-medium text-danger-fg">
+        <MuiIcon name="trendingUp" class="size-3.5 -scale-y-100" />
+        −6 months vs 2025
+      </p>
+      <span class="border-t border-line"></span>
+      <p class="flex items-center gap-1.5 text-[0.6875rem] font-semibold text-ink">
+        <MuiIcon name="info" class="size-3.5 text-brand" />
+        Average tenure
+      </p>
+      <p class="text-[0.625rem] leading-snug text-muted">
+        How long people stay. Short tenure in one area points to a retention problem worth a closer
+        look.
+      </p>
+    </div>
+  </div>
+
+  <!-- Absence -->
+  <div class="grid gap-3 lg:grid-cols-[minmax(0,3fr)_minmax(0,1fr)]">
+    <div class="rounded-xl border border-line bg-surface">
+      <div class="border-b border-line px-3.5 py-2.5">
+        <p class="text-xs font-semibold text-ink">Absence</p>
+        <p class="text-[0.625rem] text-muted">Top 10 by approved working days off this year</p>
+      </div>
+      <ul class="divide-y divide-line">
+        {ABSENCE.map((person, index) => (
+          <li class="flex items-center gap-2.5 px-3.5 py-1.5">
+            <span class="flex size-5 items-center justify-center rounded-md bg-surface-2 text-[0.5625rem] text-muted tabular-nums">
+              {index + 1}
+            </span>
+            <Avatar name={person.name} size="sm" />
+            <span class="w-32 min-w-0 shrink-0">
+              <span class="block truncate text-[0.6875rem] font-medium text-ink">
+                {person.name}
+              </span>
+              <span class="block truncate text-[0.5625rem] text-subtle">{person.position}</span>
+            </span>
+            <span class="flex h-1.5 min-w-0 flex-1 gap-0.5 overflow-hidden rounded-full bg-surface-2">
+              {person.days.map((days, typeIndex) => (
+                <span
+                  class:list={['scene-bar block h-full', ABSENCE_COLORS[typeIndex]]}
+                  style={`width: ${(days / ABSENCE_MAX) * 100}%; --i: ${barIndex++}`}
+                ></span>
+              ))}
+            </span>
+            <span class="rounded-full bg-surface-2 px-2 py-0.5 text-[0.625rem] font-medium text-ink tabular-nums">
+              {person.total} days
+            </span>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="flex flex-col gap-2.5 rounded-xl border border-line bg-surface p-3.5">
+      <p class="text-[1.625rem] leading-none font-bold tracking-[-0.02em] text-brand-strong tabular-nums">
+        8
+      </p>
+      <p class="text-[0.6875rem] text-ink-2">Average days off per person</p>
+      <p class="flex items-center gap-1 text-[0.6875rem] font-medium text-danger-fg">
+        <MuiIcon name="trendingUp" class="size-3.5" />
+        +7.6 vs 2025
+      </p>
+      <span class="border-t border-line"></span>
+      <p class="flex items-center gap-1.5 text-[0.6875rem] font-semibold text-ink">
+        <MuiIcon name="info" class="size-3.5 text-brand" />
+        Absence
+      </p>
+      <p class="text-[0.625rem] leading-snug text-muted">
+        Who takes the most time off, by type. A rise in sick days can signal burnout or
+        dissatisfaction early.
+      </p>
+      <ul class="flex flex-col gap-1.5">
+        {(['vacation', 'sick', 'dayOff'] as const).map((key) => (
+          <li class="flex items-center gap-2 text-[0.625rem] text-ink-2">
+            <span
+              class:list={[
+                'flex size-4 items-center justify-center rounded text-white',
+                TYPES[key].tone,
+              ]}
+            >
+              <MuiIcon name={TYPES[key].icon} class="size-3" />
+            </span>
+            {TYPES[key].label}
+          </li>
+        ))}
+      </ul>
+    </div>
+  </div>
+</div>

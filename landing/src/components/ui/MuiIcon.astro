@@ -1,0 +1,17 @@
+---
+import { MUI_ICONS, type MuiIconName } from './mui-icons';
+
+/** One of the app's own (filled, Material) icons — decorative, inside drawings of the app. */
+interface Props {
+  name: MuiIconName;
+  class?: string;
+}
+
+const { name, class: className = 'size-4' } = Astro.props;
+---
+
+<svg class={className} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false">
+  {MUI_ICONS[name].map((d) => (
+    <path d={d} />
+  ))}
+</svg>
