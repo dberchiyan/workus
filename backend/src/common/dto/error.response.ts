@@ -1,5 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
 import { ERROR_CODES } from '../exception/error-code';
 
 export const ErrorCodeSchema = z.enum(ERROR_CODES).meta({ id: 'ErrorCode' });

@@ -1,8 +1,11 @@
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { compareMoney, formatMoney, ratioBetween } from '@/shared/lib/money';
+
 import { formatReviewDate } from '../format';
 import type { SalaryPoint } from '../types';
 
@@ -29,6 +32,7 @@ const useWidth = () => {
     }, []);
     return { ref, width };
 };
+const CONTROL_POINT_DIVISOR = 3;
 const DAY_MS = 86_400_000;
 
 /**
@@ -61,7 +65,7 @@ const smoothPath = (points: readonly { cx: number; cy: number }[]): string => {
                 return `M ${p.cx} ${p.cy}`;
             }
             const prev = points[i - 1] ?? p;
-            const third = (p.cx - prev.cx) / 3;
+            const third = (p.cx - prev.cx) / CONTROL_POINT_DIVISOR;
             const c1y = prev.cy + (tangents[i - 1] ?? 0) * third;
             const c2y = p.cy - (tangents[i] ?? 0) * third;
             return `C ${prev.cx + third} ${c1y} ${p.cx - third} ${c2y} ${p.cx} ${p.cy}`;
@@ -78,7 +82,7 @@ export interface SalaryHistoryChartProps {
  * 2 px line, 8 px markers with a surface ring, recessive baseline. Values are on hover/focus of
  * each marker and in the screen-reader table below.
  */
-export function SalaryHistoryChart({ history }: SalaryHistoryChartProps) {
+export function SalaryHistoryChart({ history }: SalaryHistoryChartProps): ReactElement | null {
     const { t, i18n } = useTranslation('review');
     const locale = i18n.language;
     // "Now" for the right edge, fixed once per mount (render stays pure).

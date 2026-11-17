@@ -1,5 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
+import { MAX_PLAN_FEATURES, MAX_PLAN_NAME_LENGTH, MAX_PLAN_OFFERS } from '../../../../common/dto/limits';
 import { MoneySchema } from '../../../../common/dto/money';
 import { FeatureSchema, PlanSchema } from '../../../../common/dto/plan';
 import { PAID_PLANS } from '../../../../common/plan/plan';
@@ -11,11 +13,11 @@ export const SubscriptionStatusSchema = z.enum(SUBSCRIPTION_STATUSES).meta({ id:
 export const PlanOfferSchema = z
     .object({
         plan: PlanSchema,
-        name: z.string().max(32),
+        name: z.string().max(MAX_PLAN_NAME_LENGTH),
         monthlyPrice: MoneySchema,
         /** Active employees the plan allows; null = unlimited. */
         maxEmployees: z.number().int().min(1).nullable(),
-        features: z.array(FeatureSchema).max(16),
+        features: z.array(FeatureSchema).max(MAX_PLAN_FEATURES),
     })
     .meta({ id: 'PlanOffer' });
 
@@ -35,7 +37,7 @@ export const BillingResponseSchema = z.object({
     isGrantedPlan: z.boolean(),
     /** Test keys: payments are not real (the demo). */
     isTestMode: z.boolean(),
-    plans: z.array(PlanOfferSchema).max(8),
+    plans: z.array(PlanOfferSchema).max(MAX_PLAN_OFFERS),
 });
 export class BillingResponse extends createZodDto(BillingResponseSchema) {}
 

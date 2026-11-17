@@ -1,5 +1,8 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
+import { MAX_REJECTION_REASON_LENGTH } from '../../../../common/dto/limits';
+import { MAX_SEARCH_LENGTH } from '../../../../common/dto/limits';
 import { pageableOptions } from '../../../../common/dto/pageable';
 import { ORGANISATION_STATUSES } from '../../../user/service/organisation-status';
 import { COMPANY_PEOPLE, COMPANY_SORT_FIELDS, COMPANY_USER_SORT_FIELDS } from '../../service/company-sort';
@@ -31,7 +34,7 @@ export const CompanySchema = z
         /** The latest approval or rejection; null while it waits for the first decision. */
         decidedAt: z.iso.datetime().nullable(),
         decidedBy: z.object({ firstName: z.string(), lastName: z.string() }).nullable(),
-        rejectionReason: z.string().max(500).nullable(),
+        rejectionReason: z.string().max(MAX_REJECTION_REASON_LENGTH).nullable(),
         /** Up to 3, oldest first. */
         owners: z.array(PersonSchema),
         adminCount: z.number().int().min(0),
@@ -55,7 +58,7 @@ export class CompanyCountsResponse extends createZodDto(
 
 export const CompanyFilterQuerySchema = z.object({
     status: CompanyStatusSchema.default('PENDING'),
-    search: z.string().trim().max(100, 'validation.search.tooLong').optional(),
+    search: z.string().trim().max(MAX_SEARCH_LENGTH, 'validation.search.tooLong').optional(),
 });
 export class CompanyFilterQuery extends createZodDto(CompanyFilterQuerySchema) {}
 
@@ -79,7 +82,7 @@ export class CompanyUserPageResponse extends createZodDto(
 export const CompanyUserQuerySchema = z.object({
     /** Owners, admins, or employees (managers included); absent → everyone. */
     people: z.enum(COMPANY_PEOPLE).optional(),
-    search: z.string().trim().max(100, 'validation.search.tooLong').optional(),
+    search: z.string().trim().max(MAX_SEARCH_LENGTH, 'validation.search.tooLong').optional(),
 });
 export class CompanyUserQuery extends createZodDto(CompanyUserQuerySchema) {}
 
@@ -88,6 +91,6 @@ export const RejectCompanyRequestSchema = z.object({
         .string({ error: 'validation.rejectionReason.required' })
         .trim()
         .min(1, 'validation.rejectionReason.required')
-        .max(500, 'validation.rejectionReason.tooLong'),
+        .max(MAX_REJECTION_REASON_LENGTH, 'validation.rejectionReason.tooLong'),
 });
 export class RejectCompanyRequest extends createZodDto(RejectCompanyRequestSchema) {}

@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { HealthIndicatorService, type HealthIndicatorResult } from '@nestjs/terminus';
+import { type HealthIndicatorResult, HealthIndicatorService } from '@nestjs/terminus';
+
 import { PrismaService } from './prisma.service';
 
 @Injectable()

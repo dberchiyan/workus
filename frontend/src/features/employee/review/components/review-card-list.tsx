@@ -1,7 +1,10 @@
 import ButtonBase from '@mui/material/ButtonBase';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatMoney } from '@/shared/lib/money';
+
 import { formatReviewDate } from '../format';
 import type { Review } from '../types';
 import { ReviewPeople } from './review-people';
@@ -9,7 +12,13 @@ import { type OnReviewAction, ReviewDeleteButton, ReviewEditButton } from './rev
 import { ReviewStatusChip } from './review-status-chip';
 
 /** Phones: the table becomes stacked cards with the same actions (ux.md → Patterns). */
-export function ReviewCardList({ reviews, onAction }: { reviews: readonly Review[]; onAction: OnReviewAction }) {
+export function ReviewCardList({
+    reviews,
+    onAction,
+}: {
+    reviews: readonly Review[];
+    onAction: OnReviewAction;
+}): ReactElement {
     const { t, i18n } = useTranslation('review');
     return (
         <ul className="m-0 flex list-none flex-col divide-y divide-divider p-0">

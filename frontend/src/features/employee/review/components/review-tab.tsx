@@ -6,14 +6,17 @@ import Pagination from '@mui/material/Pagination';
 import Skeleton from '@mui/material/Skeleton';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
+
 import { useEmployeeReviews } from '../hooks/use-review-queries';
 import type { Review } from '../types';
 import { DeleteReviewDialog } from './delete-review-dialog';
-import { ReviewFormDialog } from './review-form-dialog';
 import { ReviewCardList } from './review-card-list';
+import { ReviewFormDialog } from './review-form-dialog';
 import type { ReviewAction } from './review-row-actions';
 import { ReviewTable } from './review-table';
 import { ReviewViewDialog } from './review-view-dialog';
@@ -33,7 +36,7 @@ export interface ReviewTabProps {
 const REVIEWS_PAGE_SIZE = 10;
 
 /** Salary overview on top, then the reviews (newest first, ten a page); add, view, edit and delete. */
-export function ReviewTab({ employeeId }: ReviewTabProps) {
+export function ReviewTab({ employeeId }: ReviewTabProps): ReactElement {
     const { t, i18n } = useTranslation(['review', 'errors']);
     const { data, isPending, isError, error, refetch } = useEmployeeReviews(employeeId);
     const [page, setPage] = useState(0);

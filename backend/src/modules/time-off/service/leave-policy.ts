@@ -1,3 +1,5 @@
+import { isoDay } from '../../../common/time/iso-day';
+import { MONTHS_PER_YEAR, SATURDAY, SUNDAY } from '../../../common/time/units';
 import { TimeOffType } from './time-off-type';
 
 /**
@@ -23,9 +25,9 @@ export const plusDays = (date: Date, days: number): Date => new Date(date.getTim
 
 /** Calendar months later; the day is clamped to the month's length (31 Jan + 1 → 28/29 Feb). */
 export const plusMonths = (date: Date, months: number): Date => {
-    const total = date.getUTCFullYear() * 12 + date.getUTCMonth() + months;
-    const year = Math.floor(total / 12);
-    const month = total % 12;
+    const total = date.getUTCFullYear() * MONTHS_PER_YEAR + date.getUTCMonth() + months;
+    const year = Math.floor(total / MONTHS_PER_YEAR);
+    const month = total % MONTHS_PER_YEAR;
     const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
     return new Date(Date.UTC(year, month, Math.min(date.getUTCDate(), lastDay)));
 };
@@ -33,7 +35,7 @@ export const plusMonths = (date: Date, months: number): Date => {
 /** The cycle (start, last day — inclusive) of `months` counted from `origin` that holds `date`. */
 export const cycleOf = (origin: Date, months: number, date: Date): { start: Date; end: Date } => {
     const monthsSince =
-        (date.getUTCFullYear() - origin.getUTCFullYear()) * 12 + date.getUTCMonth() - origin.getUTCMonth();
+        (date.getUTCFullYear() - origin.getUTCFullYear()) * MONTHS_PER_YEAR + date.getUTCMonth() - origin.getUTCMonth();
     let index = Math.max(0, Math.floor(monthsSince / months));
     if (plusMonths(origin, index * months) > date) {
         index = Math.max(0, index - 1);
@@ -43,11 +45,11 @@ export const cycleOf = (origin: Date, months: number, date: Date): { start: Date
 };
 
 /** `YYYY-MM-DD` of a `@db.Date` value. */
-export const isoDay = (date: Date): string => date.toISOString().slice(0, 10);
+export { isoDay };
 
 export const isWeekday = (date: Date): boolean => {
     const weekday = date.getUTCDay();
-    return weekday !== 0 && weekday !== 6;
+    return weekday !== SUNDAY && weekday !== SATURDAY;
 };
 
 /** Mon–Fri days in [start, end] that are not company holidays (`YYYY-MM-DD`). */

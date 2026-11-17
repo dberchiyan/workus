@@ -10,16 +10,19 @@ import { useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useState } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
 import { PeoplePicker } from '@/shared/components/people-picker';
-import { FeedbackTabsField } from './feedback-tabs-field';
-import { useReviewForm } from '../hooks/use-review-form';
+
 import { RESERVED_LINE, useFieldMessage } from '../hooks/use-field-message';
+import { useReviewForm } from '../hooks/use-review-form';
 import { useReviewCandidates } from '../hooks/use-review-queries';
 import { REVIEW_LIMITS, REVIEW_STATUSES } from '../schemas';
 import type { Review } from '../types';
+import { FeedbackTabsField } from './feedback-tabs-field';
 
 export interface ReviewFormDialogProps {
     employeeId: string;
@@ -32,7 +35,14 @@ export interface ReviewFormDialogProps {
 }
 
 /** Add or edit: review details + feedback. Centred modal; full-screen on phones (ux.md). */
-export function ReviewFormDialog({ employeeId, review, open, onClose, onSaved, onExited }: ReviewFormDialogProps) {
+export function ReviewFormDialog({
+    employeeId,
+    review,
+    open,
+    onClose,
+    onSaved,
+    onExited,
+}: ReviewFormDialogProps): ReactElement {
     const { t } = useTranslation(['review', 'errors', 'validation']);
     const theme = useTheme();
     const isPhone = useMediaQuery(theme.breakpoints.down('sm'));

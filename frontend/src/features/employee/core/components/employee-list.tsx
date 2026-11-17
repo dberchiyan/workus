@@ -3,7 +3,9 @@ import LinearProgress from '@mui/material/LinearProgress';
 import { useTheme } from '@mui/material/styles';
 import TablePagination from '@mui/material/TablePagination';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { PAGE_SIZES } from '../hooks/use-employee-list-params';
 import { useEmployees } from '../hooks/use-employee-queries';
 import type { EmployeeListParams, EmployeeStatus } from '../types';
@@ -23,7 +25,15 @@ export interface EmployeeListProps {
 }
 
 /** Toolbar, list and pagination as one block; table ↔ cards by width. */
-export function EmployeeList({ id, params, onSort, onSearch, onStatus, onPage, onClear }: EmployeeListProps) {
+export function EmployeeList({
+    id,
+    params,
+    onSort,
+    onSearch,
+    onStatus,
+    onPage,
+    onClear,
+}: EmployeeListProps): ReactElement {
     const { t } = useTranslation('employee');
     const theme = useTheme();
     // Behaviour CSS cannot express: which markup (table or cards) is rendered.

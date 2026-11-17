@@ -1,4 +1,5 @@
 import { useLocation } from 'react-router';
+
 import { PATHS } from '@/shared/lib/paths';
 
 export interface LoginLocationState {

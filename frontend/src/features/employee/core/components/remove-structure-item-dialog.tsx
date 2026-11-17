@@ -5,10 +5,13 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormHelperText from '@mui/material/FormHelperText';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
 import type { ErrorCode } from '@/shared/types';
+
 import { RESERVED_LINE } from '../hooks/use-field-message';
 
 export interface RemoveStructureItem {
@@ -34,7 +37,7 @@ export function RemoveStructureItemDialog({
     onConfirm,
     onClose,
     onExited,
-}: RemoveStructureItemDialogProps) {
+}: RemoveStructureItemDialogProps): ReactElement {
     const { t } = useTranslation(['employee', 'errors']);
     const titleId = useId();
     const descriptionId = useId();

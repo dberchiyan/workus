@@ -1,7 +1,10 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { formatCount, formatDateTime, formatPeriod } from '../format';
 import { useEmployeeBalances } from '../hooks/use-time-off-queries';
 import type { ManagedRequest } from '../types';
@@ -27,7 +30,7 @@ export interface RequestSummaryProps {
 }
 
 /** What is requested, the employee's balance for that type, the note and who decides. */
-export function RequestSummary({ request, viewerId }: RequestSummaryProps) {
+export function RequestSummary({ request, viewerId }: RequestSummaryProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const locale = i18n.language;
     const { icon: Icon, tone } = TYPE_VISUALS[request.type];

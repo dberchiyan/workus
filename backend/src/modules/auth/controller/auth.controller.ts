@@ -2,31 +2,32 @@ import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, Query, 
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { ZodResponse } from 'nestjs-zod';
+
 import { AppConfigService } from '../../../common/config/app-config.service';
+import { ApiPageable, type Pageable, PageableQuery } from '../../../common/dto/pageable';
+import { SecurityLogQuery, toSecurityEventPage } from '../../../common/dto/security-event.response';
+import { UuidParam } from '../../../common/dto/uuid-param';
 import { ApiErrors } from '../../../common/exception/api-errors.decorator';
 import { IdempotencyExempt } from '../../../common/idempotency/idempotent.decorator';
 import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
+import { DemoRestricted } from '../../../common/security/demo.guard';
 import { can } from '../../../common/security/policies';
 import type { Principal } from '../../../common/security/principal';
 import { RateLimit, RateLimitName } from '../../../common/security/rate-limit';
 import { clientIp, clientUserAgent, readCookie } from '../../../common/security/request-client';
-import { DemoRestricted } from '../../../common/security/demo.guard';
 import { Authorize, Public } from '../../../common/security/security.decorators';
-import { ApiPageable, type Pageable, PageableQuery } from '../../../common/dto/pageable';
-import { UuidParam } from '../../../common/dto/uuid-param';
-import { SecurityLogQuery, toSecurityEventPage } from '../../../common/dto/security-event.response';
+import { SessionCookies } from '../../../common/security/session-cookies';
 import { AUDIT_EVENT_PAGEABLE, type AuditEventSortField } from '../../audit/service/audit-sort';
 import { AuthService } from '../service/auth.service';
 import { SessionService } from '../service/session.service';
-import { CurrentUserResponse } from './dto/current-user.response';
 import { ChangePasswordRequest } from './dto/change-password.request';
-import { UpdateOwnNameRequest } from './dto/update-own-name.request';
+import { CurrentUserResponse } from './dto/current-user.response';
 import { LoginRequest } from './dto/login.request';
-import { SESSIONS_PAGEABLE, type SessionSortField, SessionsResponse } from './dto/sessions.response';
 import { SecurityLogResponse } from './dto/security-log.response';
+import { SESSIONS_PAGEABLE, type SessionSortField, SessionsResponse } from './dto/sessions.response';
+import { UpdateOwnNameRequest } from './dto/update-own-name.request';
 import { toCurrentUserResponse } from './mapper/current-user.mapper';
 import { toSessionsResponse } from './mapper/session.mapper';
-import { SessionCookies } from '../../../common/security/session-cookies';
 
 @ApiTags('Auth')
 @Controller('api/v1/auth')

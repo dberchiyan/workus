@@ -7,16 +7,19 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Pagination from '@mui/material/Pagination';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { SESSIONS_PAGE_SIZE, useAccess, useEndOtherSessions, useEndSession, useSessions } from '@/features/auth';
+import { RowSkeleton } from '@/shared/components/row-skeleton';
+
 import { useUrlPage } from '../use-url-page';
 import { SessionRow } from './session-row';
 import { SettingsCard } from './settings-card';
-import { RowSkeleton } from '@/shared/components/row-skeleton';
 
 /** This device first, then the others five a page; sign out one or all of them. */
-export function SessionsSection() {
+export function SessionsSection(): ReactElement {
     const { t, i18n } = useTranslation(['settings', 'errors']);
     const [page, goTo] = useUrlPage();
     const sessions = useSessions(page);

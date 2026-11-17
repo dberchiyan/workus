@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/client';
+
 import type { CompanyStructure, Department, EmployeePage, StructurePosition } from '../types';
 
 const BASE = '/api/v1/structure';

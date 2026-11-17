@@ -1,13 +1,15 @@
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { FEEDBACK_SOURCES, type FeedbackSource, type Review } from '../types';
 import { RichTextView } from './rich-text-view';
 
 /** Feedback by source, one at a time; opens on the first source that has any. */
-export function ViewFeedbackTabs({ review }: { review: Review }) {
+export function ViewFeedbackTabs({ review }: { review: Review }): ReactElement {
     const { t } = useTranslation('review');
     const baseId = useId();
     const [source, setSource] = useState<FeedbackSource>(

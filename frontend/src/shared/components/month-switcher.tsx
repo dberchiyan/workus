@@ -3,6 +3,8 @@ import ChevronRightOutlined from '@mui/icons-material/ChevronRightOutlined';
 import Card from '@mui/material/Card';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
+
 import { cn } from '@/shared/lib/cn';
 import { shiftMonth } from '@/shared/lib/month';
 
@@ -27,7 +29,7 @@ export function MonthSwitcher({
     nextLabel,
     headingComponent = 'span',
     className,
-}: MonthSwitcherProps) {
+}: MonthSwitcherProps): ReactElement {
     const label = new Intl.DateTimeFormat(locale, {
         month: 'long',
         year: 'numeric',

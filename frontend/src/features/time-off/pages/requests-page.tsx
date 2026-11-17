@@ -1,9 +1,12 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useCurrentUser } from '@/features/auth';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
+
 import { ClosedRequests } from '../components/closed-requests';
 import { DecisionFeedback } from '../components/decision-feedback';
 import { PendingRequests } from '../components/pending-requests';
@@ -13,7 +16,7 @@ import { useRequestDecisions } from '../hooks/use-request-decisions';
 import { useRequestsParams } from '../hooks/use-requests-params';
 
 /** Every employee's time-off requests (admin): what waits for a decision, then the rest. */
-export default function RequestsPage() {
+export function RequestsPage(): ReactElement {
     const { t } = useTranslation('timeOff');
     useDocumentTitle(t('manage.pageTitle'));
     const headingRef = usePageHeadingFocus<HTMLHeadingElement>();

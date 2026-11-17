@@ -1,11 +1,14 @@
 import Chip from '@mui/material/Chip';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { StatusBadge, type StatusTone } from '@/shared/components/status-badge';
+
 import type { TimeOffStatus, TimeOffType } from '../types';
 import { TYPE_VISUALS } from './time-off-visuals';
 
 /** Type: its icon and name; colour only supports the text. */
-export function TimeOffTypeChip({ type }: { type: TimeOffType }) {
+export function TimeOffTypeChip({ type }: { type: TimeOffType }): ReactElement {
     const { t } = useTranslation('timeOff');
     const { icon: Icon, text } = TYPE_VISUALS[type];
     return (
@@ -25,7 +28,7 @@ const STATUS_TONE: Record<TimeOffStatus, StatusTone> = {
     CANCELED: 'neutral',
 };
 
-export function TimeOffStatusChip({ status }: { status: TimeOffStatus }) {
+export function TimeOffStatusChip({ status }: { status: TimeOffStatus }): ReactElement {
     const { t } = useTranslation('timeOff');
     return <StatusBadge tone={STATUS_TONE[status]} label={t(`status.${status}`)} />;
 }

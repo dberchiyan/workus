@@ -13,6 +13,7 @@ import { I18nContext, I18nService } from 'nestjs-i18n';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { ZodValidationException } from 'nestjs-zod';
 import { ZodError } from 'zod';
+
 import type { I18nTranslations } from '../../generated/i18n.generated';
 import type { RequestContext } from '../context/request-context';
 import type { ErrorResponse } from '../dto/error.response';
@@ -21,6 +22,8 @@ import type { I18nPath } from '../i18n/i18n-path';
 import { classifyPrismaError, PrismaErrorKind } from '../persistence/prisma-error';
 import { ApiException, type MessageArgs, RateLimitExceededException } from './api.exception';
 import { ErrorCode } from './error-code';
+
+const BAD_REQUEST = 400;
 
 interface ResolvedError {
     code: ErrorCode;
@@ -124,7 +127,7 @@ export class GlobalExceptionFilter implements ExceptionFilter {
             case undefined:
                 break;
         }
-        if (exception instanceof HttpException && exception.getStatus() === 400) {
+        if (exception instanceof HttpException && exception.getStatus() === BAD_REQUEST) {
             return simple('MALFORMED_REQUEST');
         }
         return simple('INTERNAL_ERROR');

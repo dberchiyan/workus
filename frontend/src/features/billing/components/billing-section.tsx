@@ -4,13 +4,22 @@ import Card from '@mui/material/Card';
 import Skeleton from '@mui/material/Skeleton';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
+
 import { isApiError } from '@/shared/api/api-error';
 import { StatusBadge } from '@/shared/components/status-badge';
+
 import { formatBillingDate } from '../format';
-import { useBilling, useChangePlan, useOpenPortal, useStartCheckout, useSyncBilling } from '../hooks/use-billing-queries';
+import {
+    useBilling,
+    useChangePlan,
+    useOpenPortal,
+    useStartCheckout,
+    useSyncBilling,
+} from '../hooks/use-billing-queries';
 import type { Billing, Plan } from '../types';
 import { PlanCard } from './plan-card';
 import { type PlanChange, PlanChangeDialog } from './plan-change-dialog';
@@ -99,7 +108,7 @@ function CurrentPlan({ billing, onKeep }: { billing: Billing; onKeep: () => void
 }
 
 /** Settings → Billing (owners): the current plan, the pricing table, and the portal. */
-export function BillingSection() {
+export function BillingSection(): ReactElement {
     const { t, i18n } = useTranslation(['billing', 'errors']);
     const titleId = useId();
     const plansId = useId();

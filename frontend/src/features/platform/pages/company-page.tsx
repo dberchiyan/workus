@@ -10,26 +10,29 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useDeferredValue, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useParams } from 'react-router';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
+import { RowSkeleton } from '@/shared/components/row-skeleton';
+import { StatusBadge } from '@/shared/components/status-badge';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
 import { cn } from '@/shared/lib/cn';
 import { PATHS } from '@/shared/lib/paths';
+
 import { COMPANY_PEOPLE_PAGE_SIZE } from '../api/platform-api';
 import { CompanyStatusChip } from '../components/company-status-chip';
 import { DecideCompanyDialog } from '../components/decide-company-dialog';
 import { useCompany, useCompanyPeople } from '../hooks/use-platform';
 import type { Company, CompanyPeople } from '../types';
-import { RowSkeleton } from '@/shared/components/row-skeleton';
-import { StatusBadge } from '@/shared/components/status-badge';
 
 const PEOPLE: readonly CompanyPeople[] = ['OWNER', 'ADMIN', 'EMPLOYEE'];
 
 /** One company (platform admins): who owns it, how big it is, the decision, and its people. */
-export default function CompanyPage() {
+export function CompanyPage(): ReactElement {
     const { t } = useTranslation('platform');
     const { organisationId = '' } = useParams();
     const company = useCompany(organisationId);

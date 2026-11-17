@@ -1,10 +1,13 @@
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { StatusBadge, type StatusTone } from '@/shared/components/status-badge';
+
 import type { EmployeeStatus } from '../types';
 
 const TONE: Record<EmployeeStatus, StatusTone> = { ACTIVE: 'success', TERMINATED: 'neutral' };
 
-export function EmployeeStatusChip({ status }: { status: EmployeeStatus }) {
+export function EmployeeStatusChip({ status }: { status: EmployeeStatus }): ReactElement {
     const { t } = useTranslation('employee');
     return <StatusBadge tone={TONE[status]} label={t(`status.${status}`)} />;
 }

@@ -1,11 +1,17 @@
 import { z } from 'zod';
 
+const MAX_PORT = 65535;
+const MAX_POOL_SIZE = 100;
+const MAX_PROXY_HOPS = 10;
+const MAX_DOMAIN_LENGTH = 253;
+const MAX_SECRET_LENGTH = 255;
+
 const booleanString = z.enum(['true', 'false']).transform((value) => value === 'true');
 
 /** An optional secret or id: unset or empty both mean "none". */
 const optionalString = z
     .string()
-    .max(255)
+    .max(MAX_SECRET_LENGTH)
     .optional()
     .transform((value) => (value ? value : undefined));
 
@@ -22,21 +28,21 @@ const commaSeparated = z
 export const envSchema = z.object({
     APP_ENV: z.enum(['dev', 'prod']),
     NODE_ENV: z.enum(['development', 'production']),
-    PORT: z.coerce.number().int().min(1).max(65535),
+    PORT: z.coerce.number().int().min(1).max(MAX_PORT),
     TZ: z.literal('UTC'),
     DATABASE_HOST: z.string().min(1),
-    DATABASE_PORT: z.coerce.number().int().min(1).max(65535),
+    DATABASE_PORT: z.coerce.number().int().min(1).max(MAX_PORT),
     DATABASE_NAME: z.string().min(1),
     DATABASE_USERNAME: z.string().min(1),
     DATABASE_PASSWORD: z.string().min(1),
-    DB_POOL_SIZE: z.coerce.number().int().min(1).max(100),
+    DB_POOL_SIZE: z.coerce.number().int().min(1).max(MAX_POOL_SIZE),
     DB_QUERY_LOG: booleanString.default(false),
-    TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(10),
+    TRUST_PROXY_HOPS: z.coerce.number().int().min(0).max(MAX_PROXY_HOPS),
     SESSION_COOKIE_NAME: z.string().regex(/^[A-Za-z0-9_-]{1,64}$/),
     // Empty → host-only cookie (local development).
     COOKIE_DOMAIN: z
         .string()
-        .max(253)
+        .max(MAX_DOMAIN_LENGTH)
         .optional()
         .transform((value) => (value ? value : undefined)),
     COOKIE_SECURE: booleanString,

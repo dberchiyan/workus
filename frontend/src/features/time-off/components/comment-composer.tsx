@@ -2,7 +2,9 @@ import SendOutlined from '@mui/icons-material/SendOutlined';
 import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
 import TextField from '@mui/material/TextField';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useCommentForm } from '../hooks/use-comment-form';
 import { RESERVED_LINE, useFieldMessage } from '../hooks/use-field-message';
 import type { CommentScope } from '../hooks/use-managed-requests';
@@ -15,7 +17,7 @@ export interface CommentComposerProps {
 }
 
 /** Write a comment; Ctrl/⌘ + Enter sends it. Every admin and the employee see it. */
-export function CommentComposer({ requestId, scope }: CommentComposerProps) {
+export function CommentComposer({ requestId, scope }: CommentComposerProps): ReactElement {
     const { t } = useTranslation(['timeOff', 'errors']);
     const message = useFieldMessage();
     const { form, submit, errorCode, isSubmitting } = useCommentForm(requestId, scope);

@@ -1,7 +1,10 @@
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { InitialsAvatar } from './initials-avatar';
 
 export interface StackPerson {
@@ -31,7 +34,7 @@ const RING = 'ring-2 ring-background-paper';
  * Responsible people as overlapping avatars — how many and who at a glance; every name in the
  * tooltip and the accessible name. Always the same width (≤ 3 circles), so table columns hold.
  */
-export function ResponsibleStack({ people, total, showSoleName = false }: ResponsibleStackProps) {
+export function ResponsibleStack({ people, total, showSoleName = false }: ResponsibleStackProps): ReactElement | null {
     const { t } = useTranslation();
     const count = Math.max(total ?? people.length, people.length);
     const [first] = people;

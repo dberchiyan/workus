@@ -1,14 +1,16 @@
-import HourglassEmptyOutlined from '@mui/icons-material/HourglassEmptyOutlined';
 import HighlightOffOutlined from '@mui/icons-material/HighlightOffOutlined';
+import HourglassEmptyOutlined from '@mui/icons-material/HourglassEmptyOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
 import { useQueryClient } from '@tanstack/react-query';
+import type { ReactElement } from 'react';
 import { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet } from 'react-router';
+
 import { authKeys, BrandLogo, PageShell, useAccess, useCurrentUser, useLogout } from '@/features/auth';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
@@ -21,7 +23,7 @@ const RECHECK_MS = 60_000;
  * rejected) its owner sees this screen — the status re-checked every minute, so approval opens the
  * app without signing in again. Platform admins have no company to wait for.
  */
-export function OrganisationGate() {
+export function OrganisationGate(): ReactElement {
     const { data: user } = useCurrentUser();
     const can = useAccess();
     const status = user?.organisation.status;

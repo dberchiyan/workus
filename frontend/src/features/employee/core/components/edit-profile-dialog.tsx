@@ -6,8 +6,10 @@ import DialogTitle from '@mui/material/DialogTitle';
 import FormHelperText from '@mui/material/FormHelperText';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useEditProfileForm } from '../hooks/use-edit-profile-form';
 import { RESERVED_LINE } from '../hooks/use-field-message';
 import type { EmployeeProfile } from '../types';
@@ -22,7 +24,7 @@ export interface EditProfileDialogProps {
 }
 
 /** The Add employee details, prefilled. Centred modal; full-screen sheet on phones (ux.md). */
-export function EditProfileDialog({ employee, open, onClose, onExited }: EditProfileDialogProps) {
+export function EditProfileDialog({ employee, open, onClose, onExited }: EditProfileDialogProps): ReactElement {
     const { t } = useTranslation(['employee', 'errors']);
     const theme = useTheme();
     const isPhone = useMediaQuery(theme.breakpoints.down('sm'));

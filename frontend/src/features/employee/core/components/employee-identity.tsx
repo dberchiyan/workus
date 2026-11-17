@@ -1,13 +1,16 @@
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
+import { ViewTransition } from 'react';
 import { Link as RouterLink, useLocation } from 'react-router';
-import { employeeProfilePath } from '@/shared/lib/paths';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { cn } from '@/shared/lib/cn';
+import { employeeProfilePath } from '@/shared/lib/paths';
+import { personAvatarTransition } from '@/shared/lib/view-transition-names';
+
 import { usePrefetchEmployeeProfile } from '../hooks/use-employee-queries';
 import type { EmployeeListItem } from '../types';
-import { ViewTransition } from 'react';
-import { personAvatarTransition } from '@/shared/lib/view-transition-names';
 
 export interface EmployeeIdentityProps {
     employee: Pick<EmployeeListItem, 'id' | 'userId' | 'firstName' | 'lastName' | 'email'>;
@@ -22,7 +25,7 @@ export interface EmployeeIdentityProps {
 const STRETCHED_LINK = 'after:absolute after:inset-0';
 
 /** Avatar, full name and email. */
-export function EmployeeIdentity({ employee, isCompact = false }: EmployeeIdentityProps) {
+export function EmployeeIdentity({ employee, isCompact = false }: EmployeeIdentityProps): ReactElement {
     const name = `${employee.firstName} ${employee.lastName}`;
     const { search } = useLocation();
     const prefetch = usePrefetchEmployeeProfile();

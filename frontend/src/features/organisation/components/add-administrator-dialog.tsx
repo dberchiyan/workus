@@ -9,16 +9,19 @@ import FormHelperText from '@mui/material/FormHelperText';
 import { useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { type FieldError, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
 import { CredentialsCard } from '@/shared/components/credentials-card';
 import type { ErrorCode } from '@/shared/types';
+
 import { useAddAdministrator } from '../hooks/use-organisation';
 import {
-    addAdministratorSchema,
     type AddAdministratorOutput,
+    addAdministratorSchema,
     type AddAdministratorValues,
     ORGANISATION_LIMITS,
 } from '../schemas';
@@ -40,7 +43,7 @@ export interface AddAdministratorDialogProps {
  * the generated password, shown this once. That step closes only through Done, after the
  * password was copied or marked as saved. Remounted on each opening (one Idempotency-Key).
  */
-export function AddAdministratorDialog({ open, onClose, onExited }: AddAdministratorDialogProps) {
+export function AddAdministratorDialog({ open, onClose, onExited }: AddAdministratorDialogProps): ReactElement {
     const { t } = useTranslation(['organisation', 'common', 'validation', 'errors']);
     const titleId = useId();
     const doneHintId = useId();

@@ -1,7 +1,10 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { Ref } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { TIME_OFF_TYPES, type TimeOffType } from '../types';
 import { TYPE_VISUALS } from './time-off-visuals';
 
@@ -14,7 +17,7 @@ export interface TypeOptionsProps {
 }
 
 /** Native radio buttons styled as cards: arrow keys and screen readers work as for any radio. */
-export function TypeOptions({ name, value, onChange, inputRef }: TypeOptionsProps) {
+export function TypeOptions({ name, value, onChange, inputRef }: TypeOptionsProps): ReactElement {
     const { t } = useTranslation('timeOff');
     return (
         <fieldset className="m-0 flex min-w-0 flex-col gap-3 border-0 p-0">

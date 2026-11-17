@@ -1,5 +1,6 @@
 import { applyDecorators, SetMetadata } from '@nestjs/common';
 import { ApiCookieAuth } from '@nestjs/swagger';
+
 import type { Policy } from './policy';
 
 export const PUBLIC_KEY = 'security:public';

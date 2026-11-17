@@ -1,3 +1,5 @@
+import { MONTHS_PER_YEAR } from '@/shared/lib/units';
+import { todayUtcIso, utcDayOf } from '@/shared/lib/utc-day';
 /** `YYYY-MM-DD` → a localised calendar date (UTC, so the day never shifts). */
 export const formatCalendarDate = (isoDate: string, locale: string): string =>
     new Intl.DateTimeFormat(locale, { dateStyle: 'medium', timeZone: 'UTC' }).format(new Date(`${isoDate}T00:00:00Z`));
@@ -27,16 +29,16 @@ export const formatTenure = (days: number, locale: string): string =>
 export const yearsAndMonthsBetween = (from: string, to: string): { years: number; months: number } => {
     const [fy, fm, fd] = from.split('-').map(Number) as [number, number, number];
     const [ty, tm, td] = to.split('-').map(Number) as [number, number, number];
-    let months = (ty - fy) * 12 + (tm - fm) - (td < fd ? 1 : 0);
+    let months = (ty - fy) * MONTHS_PER_YEAR + (tm - fm) - (td < fd ? 1 : 0);
     months = Math.max(0, months);
-    return { years: Math.floor(months / 12), months: months % 12 };
+    return { years: Math.floor(months / MONTHS_PER_YEAR), months: months % MONTHS_PER_YEAR };
 };
 
-export const todayIso = (): string => new Date().toISOString().slice(0, 10);
+export const todayIso = (): string => todayUtcIso();
 
 /** `YYYY-MM-DD` plus whole months. */
 export const addMonthsIso = (isoDate: string, months: number): string => {
     const date = new Date(`${isoDate}T00:00:00Z`);
     date.setUTCMonth(date.getUTCMonth() + months);
-    return date.toISOString().slice(0, 10);
+    return utcDayOf(date);
 };

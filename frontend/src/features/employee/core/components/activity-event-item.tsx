@@ -13,10 +13,13 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useId, useState } from 'react';
 import { Trans, useTranslation } from 'react-i18next';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { cn } from '@/shared/lib/cn';
+
 import { formatDateTime, formatTime } from '../activity-format';
 import type { ActivityAction, ActivityEvent } from '../types';
 import { ActivityChangeRow } from './activity-change-row';
@@ -94,7 +97,7 @@ export interface ActivityEventItemProps {
 }
 
 /** A timeline entry: kind icon on the rail, then a card — who, what, when, before → after. */
-export function ActivityEventItem({ event, isLast }: ActivityEventItemProps) {
+export function ActivityEventItem({ event, isLast }: ActivityEventItemProps): ReactElement {
     const { t, i18n } = useTranslation('employee');
     const [isExpanded, setIsExpanded] = useState(false);
     const changesId = useId();

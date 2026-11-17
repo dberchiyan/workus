@@ -12,7 +12,7 @@ const readCollapsed = (): boolean => {
 };
 
 /** Desktop sidebar folded to the icon rail — a per-browser preference, not account data. */
-export const useSidebarCollapsed = () => {
+export const useSidebarCollapsed = (): { isCollapsed: boolean; toggle: () => void } => {
     const [isCollapsed, setIsCollapsed] = useState(readCollapsed);
     const toggle = (): void => {
         setIsCollapsed((current) => {

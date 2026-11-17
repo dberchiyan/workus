@@ -1,7 +1,9 @@
 import Button from '@mui/material/Button';
 import DialogActions from '@mui/material/DialogActions';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { ManagedRequest, TimeOffDecision } from '../types';
 
 export interface RequestDecisionActionsProps {
@@ -11,7 +13,7 @@ export interface RequestDecisionActionsProps {
 }
 
 /** Cancel apart on the left; reject and approve on the right; otherwise why nothing can be done. */
-export function RequestDecisionActions({ request, busy, onDecide }: RequestDecisionActionsProps) {
+export function RequestDecisionActions({ request, busy, onDecide }: RequestDecisionActionsProps): ReactElement {
     const { t } = useTranslation('timeOff');
     const { can } = request;
     return (

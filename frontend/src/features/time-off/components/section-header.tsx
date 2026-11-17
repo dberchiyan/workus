@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 
 export interface SectionHeaderProps {
@@ -11,7 +12,7 @@ export interface SectionHeaderProps {
 }
 
 /** A section title with its count badge, a line under it and room for controls on the right. */
-export function SectionHeader({ id, title, subtitle, count, children }: SectionHeaderProps) {
+export function SectionHeader({ id, title, subtitle, count, children }: SectionHeaderProps): ReactElement {
     return (
         <div className="flex flex-wrap items-end justify-between gap-3">
             <div className="flex min-w-0 flex-col gap-1">

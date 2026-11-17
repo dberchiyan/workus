@@ -1,8 +1,9 @@
 import { PrismaPg } from '@prisma/adapter-pg';
 import Stripe from 'stripe';
 import { z } from 'zod';
-import { PrismaClient } from '../src/generated/prisma/client';
+
 import { databaseUrl } from '../src/common/config/database-url';
+import { PrismaClient } from '../src/generated/prisma/client';
 
 /**
  * Empties the demo database (DEMO_MODE=true only): drops the `public` schema with every table,

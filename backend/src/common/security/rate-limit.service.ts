@@ -1,23 +1,29 @@
 import { createHash } from 'node:crypto';
+
 import { Inject, Injectable } from '@nestjs/common';
 import type { Pool } from 'pg';
 import { RateLimiterPostgres, RateLimiterRes } from 'rate-limiter-flexible';
+
 import { RateLimitExceededException } from '../exception/api.exception';
 import { MetricsService } from '../observability/metrics.service';
 import { PG_POOL } from '../persistence/pg-pool';
+import { HOUR_SECONDS, MINUTE_SECONDS, MS_PER_SECOND } from '../time/units';
 import { RateLimitName } from './rate-limit';
 
 const TABLE_NAME = 'rate_limits';
 const SESSION_LIMIT = 'SESSION';
 type LimiterName = RateLimitName | typeof SESSION_LIMIT;
 
+const LOGIN_ATTEMPTS = 5;
+const LOGIN_WINDOW_MINUTES = 15;
+const REGISTRATIONS_PER_HOUR = 3;
 const LIMITS: Readonly<Record<LimiterName, { points: number; durationSeconds: number }>> = {
     // security.md: login 5 / 15 min keyed by IP and email.
-    [RateLimitName.LOGIN]: { points: 5, durationSeconds: 15 * 60 },
+    [RateLimitName.LOGIN]: { points: LOGIN_ATTEMPTS, durationSeconds: LOGIN_WINDOW_MINUTES * MINUTE_SECONDS },
     // Same budget for guesses at the current password, keyed by user.
-    [RateLimitName.PASSWORD_CHANGE]: { points: 5, durationSeconds: 15 * 60 },
+    [RateLimitName.PASSWORD_CHANGE]: { points: LOGIN_ATTEMPTS, durationSeconds: LOGIN_WINDOW_MINUTES * MINUTE_SECONDS },
     // security.md: registration 3 / h per IP.
-    [RateLimitName.REGISTRATION]: { points: 3, durationSeconds: 60 * 60 },
+    [RateLimitName.REGISTRATION]: { points: REGISTRATIONS_PER_HOUR, durationSeconds: HOUR_SECONDS },
     // Per-session ceiling on everything else.
     [SESSION_LIMIT]: { points: 300, durationSeconds: 60 },
 };
@@ -75,7 +81,7 @@ export class RateLimitService {
         } catch (rejection: unknown) {
             if (rejection instanceof RateLimiterRes) {
                 this.metrics.rateLimitHits.inc({ limiter: name.toLowerCase() });
-                throw new RateLimitExceededException(Math.ceil(rejection.msBeforeNext / 1000));
+                throw new RateLimitExceededException(Math.ceil(rejection.msBeforeNext / MS_PER_SECOND));
             }
             throw rejection;
         }

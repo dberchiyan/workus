@@ -1,16 +1,17 @@
+import { Injectable } from '@nestjs/common';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import type { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
+
 import type { Pageable } from '../../../common/dto/pageable';
 import { toPrismaPage } from '../../../common/persistence/pageable';
 import type { PrismaService } from '../../../common/persistence/prisma.service';
 import { Prisma } from '../../../generated/prisma/client';
-import type { AuditEventSortField } from '../service/audit-sort';
 import { AuditAction, AuditTargetType } from '../service/audit-action';
+import type { AuditEventSortField } from '../service/audit-sort';
 import {
-    auditEventSelect,
     type AuditEventRecord,
+    auditEventSelect,
     type SecurityEventRecord,
     securityEventSelect,
 } from './record/audit-event.record';

@@ -1,10 +1,13 @@
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
+
 import { isSecurityCategory, SecurityLogView, useOwnSecurityLog } from '@/features/auth';
+
 import { SettingsCard } from './settings-card';
 
 /** Your security log: sign-ins (and failed ones), password changes, signed-out sessions. */
-export function SecuritySection() {
+export function SecuritySection(): ReactElement {
     const { t } = useTranslation('settings');
     // The filter and the page live in the URL (`?category=&logPage=`; "All" and the first page
     // leave them out — `page` is the sessions list's, on the same screen).

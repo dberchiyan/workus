@@ -1,24 +1,25 @@
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { Transactional } from '@nestjs-cls/transactional';
+
 import type { Pageable } from '../../../common/dto/pageable';
 import {
     BusinessRuleException,
     ConcurrentModificationException,
     ResourceNotFoundException,
 } from '../../../common/exception/api.exception';
+import { AuditService } from '../../audit/service/audit.service';
 import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
 import { AuditField, auditValue, changeOf } from '../../audit/service/audit-change';
-import { AuditService } from '../../audit/service/audit.service';
+import { EmployeeService } from '../../employee/core/service/employee.service';
 import { NotificationType } from '../../notification/service/notification-type';
 import type { ManagedTimeOffRequestRecord } from '../repository/record/time-off-request.record';
 import { TimeOffRequestRepository } from '../repository/time-off-request.repository';
+import type { ManagedTimeOffRequestPage, ManagedTimeOffRequestView } from './time-off.types';
 import { timeOffLabel } from './time-off-label';
 import { TimeOffNotifier } from './time-off-notifier';
-import { EmployeeService } from '../../employee/core/service/employee.service';
 import type { TimeOffRequestCriteria } from './time-off-request.criteria';
 import type { ManagedRequestSortField } from './time-off-sort';
 import { TimeOffStatus } from './time-off-type';
-import type { ManagedTimeOffRequestPage, ManagedTimeOffRequestView } from './time-off.types';
 
 /** Status changes a responsible person can make, with what they lead to. */
 const DECISIONS = {

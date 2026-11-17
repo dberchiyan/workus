@@ -1,5 +1,8 @@
+import type { UseMutationResult } from '@tanstack/react-query';
 import { useMutation } from '@tanstack/react-query';
+
 import type { ApiError } from '@/shared/api/api-error';
+
 import { employeeApi } from '../api/employee-api';
 
 export type EmployeeExportKind = 'activity' | 'security';
@@ -15,7 +18,10 @@ const saveFile = (blob: Blob, fileName: string): void => {
 };
 
 /** Answers the saved file's name. */
-export const useEmployeeExport = (employeeId: string, kind: EmployeeExportKind) =>
+export const useEmployeeExport = (
+    employeeId: string,
+    kind: EmployeeExportKind,
+): UseMutationResult<string, ApiError, void> =>
     useMutation<string, ApiError>({
         mutationFn: async () => {
             const blob =

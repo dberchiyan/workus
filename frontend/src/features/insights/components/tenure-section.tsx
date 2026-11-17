@@ -1,9 +1,13 @@
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import { m, useReducedMotion } from 'motion/react';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
-import { yearsAndMonths, signed } from '../chart';
+import { MONTHS_PER_YEAR, PERCENT } from '@/shared/lib/units';
+
+import { signed, yearsAndMonths } from '../chart';
 import { useTenure } from '../hooks/use-insights';
 import type { InsightsFilter } from '../types';
 import { DeltaLine } from './delta-line';
@@ -17,7 +21,7 @@ export interface TenureSectionProps {
 }
 
 /** One card per category: its average tenure, then each position's, as bars. */
-export function TenureSection({ filter, colorFor }: TenureSectionProps) {
+export function TenureSection({ filter, colorFor }: TenureSectionProps): ReactElement {
     const { t, i18n } = useTranslation('insights');
     const reduceMotion = useReducedMotion();
     const query = useTenure(filter);
@@ -96,7 +100,8 @@ export function TenureSection({ filter, colorFor }: TenureSectionProps) {
                                             </Typography>
                                             <Typography variant="body2" color="textSecondary">
                                                 {t('common.monthsUnit', { count: group.averageMonths })}
-                                                {group.averageMonths >= 12 && ` · ${span(group.averageMonths)}`}
+                                                {group.averageMonths >= MONTHS_PER_YEAR &&
+                                                    ` · ${span(group.averageMonths)}`}
                                             </Typography>
                                         </div>
                                         <ul className="m-0 flex list-none flex-col gap-2 p-0">
@@ -125,7 +130,7 @@ export function TenureSection({ filter, colorFor }: TenureSectionProps) {
                                                                 colorFor(group.id, index),
                                                             )}
                                                             style={{
-                                                                width: `${String((item.averageMonths / longest) * 100)}%`,
+                                                                width: `${String((item.averageMonths / longest) * PERCENT)}%`,
                                                             }}
                                                             {...(reduceMotion
                                                                 ? {}

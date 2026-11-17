@@ -2,10 +2,13 @@ import CheckOutlined from '@mui/icons-material/CheckOutlined';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { StatusBadge } from '@/shared/components/status-badge';
 import { cn } from '@/shared/lib/cn';
 import { formatMoney } from '@/shared/lib/money';
+
 import type { PlanOffer } from '../types';
 
 /** What every plan has, listed before the plan's own features. */
@@ -21,7 +24,7 @@ export interface PlanCardProps {
 }
 
 /** One column of the pricing table: price, limit, features, the current plan marked. */
-export function PlanCard({ offer, isCurrent, isScheduled = false, action }: PlanCardProps) {
+export function PlanCard({ offer, isCurrent, isScheduled = false, action }: PlanCardProps): ReactElement {
     const { t, i18n } = useTranslation('billing');
     const number = new Intl.NumberFormat(i18n.language);
     return (

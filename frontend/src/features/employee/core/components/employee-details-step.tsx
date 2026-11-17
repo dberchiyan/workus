@@ -3,9 +3,11 @@ import ListSubheader from '@mui/material/ListSubheader';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
 import type { AddEmployeeForm } from '../hooks/use-add-employee-form';
 import { usePositionOptions } from '../hooks/use-employee-queries';
 import { useFieldMessage } from '../hooks/use-field-message';
@@ -16,7 +18,7 @@ export interface EmployeeDetailsStepProps {
 }
 
 /** Step 1: overall info (required) and contact info (optional). */
-export function EmployeeDetailsStep({ form }: EmployeeDetailsStepProps) {
+export function EmployeeDetailsStep({ form }: EmployeeDetailsStepProps): ReactElement {
     const { t } = useTranslation('employee');
     const message = useFieldMessage();
     const positions = usePositionOptions(true);

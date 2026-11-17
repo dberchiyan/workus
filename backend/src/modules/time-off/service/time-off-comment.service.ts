@@ -1,8 +1,9 @@
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { Transactional } from '@nestjs-cls/transactional';
+
 import { ResourceNotFoundException } from '../../../common/exception/api.exception';
-import type { TimeOffCommentRecord } from '../repository/record/time-off-request.record';
 import { NotificationType } from '../../notification/service/notification-type';
+import type { TimeOffCommentRecord } from '../repository/record/time-off-request.record';
 import { TimeOffRequestRepository } from '../repository/time-off-request.repository';
 import { TimeOffNotifier } from './time-off-notifier';
 

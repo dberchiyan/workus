@@ -1,7 +1,4 @@
-const MINUTE_MS = 60_000;
-const HOUR_MS = 60 * MINUTE_MS;
-const DAY_MS = 24 * HOUR_MS;
-const WEEK_MS = 7 * DAY_MS;
+import { DAY_MS, HOUR_MS, MINUTE_MS, WEEK_MS } from '@/shared/lib/units';
 
 /**
  * "5 minutes ago", "yesterday", "3 days ago"; a date (UTC, as every time in the app) after a

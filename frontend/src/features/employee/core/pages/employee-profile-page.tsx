@@ -1,13 +1,16 @@
 import ArrowBackOutlined from '@mui/icons-material/ArrowBackOutlined';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink, useLocation, useParams } from 'react-router';
+
 import { EmployeeLeaveBalances } from '@/features/time-off';
 import { isApiError } from '@/shared/api/api-error';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
 import { PATHS } from '@/shared/lib/paths';
+
 import { EmployeeListError, EmployeeListLoading } from '../components/employee-list-states';
 import { ProfileEmptyState } from '../components/profile-empty-state';
 import { ProfileHeader } from '../components/profile-header';
@@ -25,7 +28,7 @@ const backHref = (state: unknown): string => {
     return from.startsWith('?') ? `${PATHS.employees}${from}` : PATHS.employees;
 };
 
-export default function EmployeeProfilePage() {
+export function EmployeeProfilePage(): ReactElement {
     const { t } = useTranslation('employee');
     const { employeeId = '' } = useParams();
     const location = useLocation();

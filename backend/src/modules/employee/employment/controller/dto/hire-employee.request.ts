@@ -1,7 +1,15 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
-import { personName } from '../../../../../common/dto/person-name';
+
+import {
+    MAX_ADDRESS_LENGTH,
+    MAX_MOBILE_LENGTH,
+    MAX_TELEGRAM_LENGTH,
+    MAX_URL_LENGTH,
+} from '../../../../../common/dto/limits';
 import { AmountInputSchema } from '../../../../../common/dto/money';
+import { personName } from '../../../../../common/dto/person-name';
+import { isoDay } from '../../../../../common/time/iso-day';
 
 export const EMAIL_MAX_LENGTH = 254;
 export const MAX_RESPONSIBLES = 10;
@@ -33,28 +41,34 @@ export const CreateEmployeeRequestSchema = z.object({
         .min(1, 'validation.startingSalary.required')
         .pipe(AmountInputSchema),
     mobile: optional(
-        text(32, 'validation.mobile.invalid').regex(/^\+?[0-9][0-9 ()-]{5,30}$/, 'validation.mobile.invalid'),
+        text(MAX_MOBILE_LENGTH, 'validation.mobile.invalid').regex(
+            /^\+?[0-9][0-9 ()-]{5,30}$/,
+            'validation.mobile.invalid',
+        ),
     ),
     personalEmail: optional(
         text(EMAIL_MAX_LENGTH, 'validation.email.tooLong').pipe(z.email('validation.personalEmail.invalid')),
     ),
     linkedinUrl: optional(
-        text(255, 'validation.linkedin.invalid').regex(
+        text(MAX_URL_LENGTH, 'validation.linkedin.invalid').regex(
             /^https:\/\/(www\.)?linkedin\.com\/in\/[A-Za-z0-9_-]{2,100}\/?$/,
             'validation.linkedin.invalid',
         ),
     ),
     /** Stored as "@handle". */
     telegram: optional(
-        text(33, 'validation.telegram.invalid').regex(/^@?[A-Za-z0-9_]{5,32}$/, 'validation.telegram.invalid'),
+        text(MAX_TELEGRAM_LENGTH, 'validation.telegram.invalid').regex(
+            /^@?[A-Za-z0-9_]{5,32}$/,
+            'validation.telegram.invalid',
+        ),
     ),
-    address: optional(text(500, 'validation.address.tooLong')),
+    address: optional(text(MAX_ADDRESS_LENGTH, 'validation.address.tooLong')),
     /** Optional; from 1900-01-01 up to today (the server's UTC date). */
     bornAt: optional(
         z.iso
             .date('validation.dateOfBirth.invalid')
             .refine((value) => value >= MIN_DATE_OF_BIRTH, 'validation.dateOfBirth.invalid')
-            .refine((value) => value <= new Date().toISOString().slice(0, 10), 'validation.dateOfBirth.inFuture'),
+            .refine((value) => value <= isoDay(new Date()), 'validation.dateOfBirth.inFuture'),
     ),
     responsibleUserIds: z
         .array(z.uuid('validation.invalid'))

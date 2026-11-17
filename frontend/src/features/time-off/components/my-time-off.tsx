@@ -6,9 +6,11 @@ import Card from '@mui/material/Card';
 import Skeleton from '@mui/material/Skeleton';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSearchParams } from 'react-router';
+
 import { useOwnBalances, useOwnRequests } from '../hooks/use-time-off-queries';
 import type { TimeOffRequest } from '../types';
 import { CancelRequestDialog } from './cancel-request-dialog';
@@ -20,7 +22,7 @@ import { RequestsTable } from './requests-table';
 type Notice = 'created' | 'canceled';
 
 /** The signed-in employee's balances and requests (dashboard). */
-export function MyTimeOff() {
+export function MyTimeOff(): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const balances = useOwnBalances();
     const requests = useOwnRequests();

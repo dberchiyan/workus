@@ -1,4 +1,7 @@
 import { z } from 'zod';
+
+import { todayUtcIso } from '@/shared/lib/utc-day';
+
 import type { TerminationReason } from './types';
 
 /** Mirrors backend CreateEmployeeRequestSchema (employee/controller/dto/create-employee.request.ts). */
@@ -94,10 +97,7 @@ export const createEmployeeSchema = z.object({
             (value) => value === '' || (/^\d{4}-\d{2}-\d{2}$/.test(value) && value >= '1900-01-01'),
             MESSAGES.dateOfBirthInvalid,
         )
-        .refine(
-            (value) => value === '' || value <= new Date().toISOString().slice(0, 10),
-            MESSAGES.dateOfBirthInFuture,
-        ),
+        .refine((value) => value === '' || value <= todayUtcIso(), MESSAGES.dateOfBirthInFuture),
     responsibleUserIds: z.array(z.uuid()).max(EMPLOYEE_LIMITS.responsibles, MESSAGES.responsiblesTooMany),
 });
 
@@ -162,7 +162,7 @@ export const isTerminationReason = (value: string): value is TerminationReason =
 export const STRUCTURE_LIMITS = { departmentName: 100, positionTitle: 150 } as const;
 
 /** One name in the company structure: a department's name or a position's title. */
-export const structureNameSchema = (kind: 'department' | 'position') =>
+export const structureNameSchema = (kind: 'department' | 'position'): z.ZodObject<{ value: z.ZodString }> =>
     z.object({
         value:
             kind === 'department'

@@ -1,6 +1,9 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { ResponsibleStack } from '@/shared/components/responsible-stack';
+
 import type { EmployeeListItem } from '../types';
 
 export interface ResponsibleAvatarsProps {
@@ -8,7 +11,7 @@ export interface ResponsibleAvatarsProps {
 }
 
 /** One person: avatar and name; more: overlapping avatars, all names on hover. */
-export function ResponsibleAvatars({ employee }: ResponsibleAvatarsProps) {
+export function ResponsibleAvatars({ employee }: ResponsibleAvatarsProps): ReactElement {
     const { t } = useTranslation('employee');
     if (employee.responsibles.length === 0) {
         return (

@@ -7,12 +7,15 @@ import DialogTitle from '@mui/material/DialogTitle';
 import FormHelperText from '@mui/material/FormHelperText';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
-import type { ErrorCode } from '@/shared/types';
-import { useResetPassword } from '../hooks/use-employee-queries';
 import { CredentialsCard } from '@/shared/components/credentials-card';
+import type { ErrorCode } from '@/shared/types';
+
+import { useResetPassword } from '../hooks/use-employee-queries';
 import { RESERVED_LINE } from '../hooks/use-field-message';
 import type { EmployeeProfile } from '../types';
 
@@ -28,7 +31,7 @@ export interface ResetPasswordDialogProps {
  * stops working, the person is signed out everywhere) with Cancel focused first; the result step
  * closes only through Done, once the password was copied or marked as saved.
  */
-export function ResetPasswordDialog({ employee, open, onClose, onExited }: ResetPasswordDialogProps) {
+export function ResetPasswordDialog({ employee, open, onClose, onExited }: ResetPasswordDialogProps): ReactElement {
     const { t } = useTranslation(['employee', 'common', 'errors']);
     const titleId = useId();
     const descriptionId = useId();

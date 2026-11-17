@@ -1,16 +1,17 @@
 import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
-import type { Principal } from '../../../common/security/principal';
-import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
+
 import { ApiPageable, type Pageable, PageableQuery } from '../../../common/dto/pageable';
 import { ApiErrors } from '../../../common/exception/api-errors.decorator';
+import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
 import { can } from '../../../common/security/policies';
+import type { Principal } from '../../../common/security/principal';
 import { Authorize } from '../../../common/security/security.decorators';
-import { CALENDAR_PAGEABLE, type CalendarSortField } from '../service/time-off-sort';
 import { TimeOffService } from '../service/time-off.service';
-import { TimeOffCalendarQuery } from './dto/time-off-calendar.query';
+import { CALENDAR_PAGEABLE, type CalendarSortField } from '../service/time-off-sort';
 import { TimeOffCalendarResponse } from './dto/time-off.response';
+import { TimeOffCalendarQuery } from './dto/time-off-calendar.query';
 import { toTimeOffCalendarResponse } from './mapper/time-off.mapper';
 
 /** The company's time-off calendar — every signed-in user sees everyone's. */

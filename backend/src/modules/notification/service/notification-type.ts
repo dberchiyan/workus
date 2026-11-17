@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+import { MAX_PERSON_NAME_LENGTH, MAX_TYPE_LENGTH } from '../../../common/dto/limits';
+
 /** Mirrored by ck_notifications_type. */
 export const NotificationType = {
     /** An employee asked for time off — to the request's responsible people. */
@@ -35,14 +37,14 @@ export type NotificationSubjectType = (typeof NotificationSubjectType)[keyof typ
  * and status values are the time-off module's; they are kept as strings, like the audit log.
  */
 export const TimeOffNoticeParamsSchema = z.object({
-    requestType: z.string().max(16),
+    requestType: z.string().max(MAX_TYPE_LENGTH),
     startsAt: z.iso.date(),
     endsAt: z.iso.date(),
     /** Whose request it is; the recipient's own when they are this user. */
     employee: z.object({
         userId: z.uuid(),
-        firstName: z.string().max(100),
-        lastName: z.string().max(100),
+        firstName: z.string().max(MAX_PERSON_NAME_LENGTH),
+        lastName: z.string().max(MAX_PERSON_NAME_LENGTH),
     }),
     /** Reminders: whole days since the request was made. */
     waitingDays: z.number().int().min(0).optional(),

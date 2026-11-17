@@ -7,9 +7,13 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+import { ISO_DAY_LENGTH } from '@/shared/lib/units';
+
 import { formatDay, formatPeriod } from '../format';
 import type { TimeOffRequest } from '../types';
 import { RequestDetails } from './request-details';
@@ -34,7 +38,7 @@ export interface RequestsTableProps {
 }
 
 /** Tablet and desktop: one row per request; the last cell expands its details below the row. */
-export function RequestsTable({ requests, expandedId, onToggle, onCancel }: RequestsTableProps) {
+export function RequestsTable({ requests, expandedId, onToggle, onCancel }: RequestsTableProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     return (
         <Table size="small" className="table-fixed">
@@ -80,7 +84,7 @@ export function RequestsTable({ requests, expandedId, onToggle, onCancel }: Requ
                                 </TableCell>
                                 <TableCell>
                                     <Typography variant="body2" className="app-tabular">
-                                        {formatDay(request.createdAt.slice(0, 10), i18n.language)}
+                                        {formatDay(request.createdAt.slice(0, ISO_DAY_LENGTH), i18n.language)}
                                     </Typography>
                                 </TableCell>
                                 <TableCell>

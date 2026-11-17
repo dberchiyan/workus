@@ -1,13 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { ClsService } from 'nestjs-cls';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
-import type { Pageable } from '../../../common/dto/pageable';
+
 import type { RequestContext } from '../../../common/context/request-context';
-import type { AuditEventRecord } from '../repository/record/audit-event.record';
+import { MAX_LABEL_LENGTH } from '../../../common/dto/limits';
+import type { Pageable } from '../../../common/dto/pageable';
 import { AuditEventRepository, type NewAuditEventRow } from '../repository/audit-event.repository';
+import type { AuditEventRecord } from '../repository/record/audit-event.record';
+import type { AuditEvent, AuditEventPage, NewAuditEvent, SecurityEvent, SecurityEventPage } from './audit.types';
 import { AUDIT_ACTIONS, AUDIT_TARGET_TYPES, type AuditAction, type AuditTargetType } from './audit-action';
 import { AuditChangesSchema } from './audit-change';
-import type { AuditEvent, AuditEventPage, NewAuditEvent, SecurityEvent, SecurityEventPage } from './audit.types';
 import type { AuditEventSortField } from './audit-sort';
 import { ALL_SECURITY_ACTIONS, SECURITY_CATEGORY_ACTIONS, type SecurityCategory } from './security-category';
 
@@ -50,7 +52,7 @@ export class AuditService {
             employeeId: event.employeeId,
             targetType: event.target.type,
             targetId: event.target.id,
-            targetLabel: event.target.label.slice(0, 255),
+            targetLabel: event.target.label.slice(0, MAX_LABEL_LENGTH),
             changes: AuditChangesSchema.parse(event.changes),
             ipAddress: this.cls.get('clientIp') ?? null,
             userAgent: this.cls.get('userAgent') ?? null,

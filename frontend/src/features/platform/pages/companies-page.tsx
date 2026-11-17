@@ -10,13 +10,16 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useDeferredValue, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router';
+
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
 import { cn } from '@/shared/lib/cn';
 import { platformCompanyPath } from '@/shared/lib/paths';
+
 import { COMPANIES_PAGE_SIZE } from '../api/platform-api';
 import { CompanyStatusChip } from '../components/company-status-chip';
 import { useCompanies, useCompanyCounts } from '../hooks/use-platform';
@@ -26,7 +29,7 @@ const STATUSES: readonly CompanyStatus[] = ['PENDING', 'ACTIVE', 'REJECTED'];
 const SKELETON_ROWS = ['s1', 's2', 's3', 's4'];
 
 /** Companies (platform admins): the approval queue first, then active and rejected ones. */
-export default function CompaniesPage() {
+export function CompaniesPage(): ReactElement {
     const { t, i18n } = useTranslation('platform');
     useDocumentTitle(t('companies.pageTitle'));
     const headingRef = usePageHeadingFocus<HTMLHeadingElement>();

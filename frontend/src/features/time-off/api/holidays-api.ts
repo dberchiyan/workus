@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/client';
+
 import type { CreateHolidayRequest, Holiday, UpdateHolidayRequest } from '../types';
 
 const BASE = '/api/v1/holidays';

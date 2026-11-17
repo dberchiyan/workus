@@ -3,10 +3,12 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useMarkAllRead, useMarkRead, useNotificationList } from '../hooks/use-notifications';
+
 import { useNotificationView } from '../hooks/use-notification-view';
+import { useMarkAllRead, useMarkRead, useNotificationList } from '../hooks/use-notifications';
 import type { AppNotification } from '../types';
 import { NotificationItem } from './notification-item';
 
@@ -20,7 +22,7 @@ export interface NotificationPanelProps {
 }
 
 /** The bell's content: title, "Mark all as read", the list with its states, "Show more". */
-export function NotificationPanel({ titleId, viewerId, unreadCount, onClose }: NotificationPanelProps) {
+export function NotificationPanel({ titleId, viewerId, unreadCount, onClose }: NotificationPanelProps): ReactElement {
     const { t } = useTranslation('notification');
     const list = useNotificationList(true);
     const markRead = useMarkRead();

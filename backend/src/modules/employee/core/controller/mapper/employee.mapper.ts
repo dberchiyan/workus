@@ -1,16 +1,32 @@
+import { isUserRole } from '../../../../user/service/user-role';
 import type {
     EmployeeListItemRecord,
     PositionOptionRecord,
     ResponsibleCandidateRecord,
 } from '../../repository/record/employee.record';
 import { toIsoDate } from '../../service/calendar-date';
-import { statusOn } from '../../service/employee-status';
 import type { EmployeePage } from '../../service/employee.types';
-import { isUserRole } from '../../../../user/service/user-role';
-import type { PositionOptionsResponse, ResponsibleCandidatesResponse } from '../dto/employee-options.response';
+import type { EmployeeStatus } from '../../service/employee-status';
+import { statusOn } from '../../service/employee-status';
 import type { EmployeePageResponse } from '../dto/employee.response';
+import type { PositionOptionsResponse, ResponsibleCandidatesResponse } from '../dto/employee-options.response';
 
-export const toEmployeeListItem = (employee: EmployeeListItemRecord, today: Date) => ({
+export const toEmployeeListItem = (
+    employee: EmployeeListItemRecord,
+    today: Date,
+): {
+    id: string;
+    userId: string;
+    firstName: string;
+    lastName: string;
+    email: string;
+    position: { id: string; title: string; category: { id: string; name: string } };
+    responsibles: { id: string; firstName: string; lastName: string }[];
+    responsibleCount: number;
+    startsAt: string;
+    terminatedAt: string | null;
+    status: EmployeeStatus;
+} => ({
     id: employee.id,
     userId: employee.user.id,
     firstName: employee.user.firstName,

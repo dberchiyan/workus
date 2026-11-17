@@ -1,11 +1,14 @@
 import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router';
+
 import type { InsightsFilter } from '../types';
 
 export const FIRST_YEAR = 2000;
 
 /** Year and category live in the URL (shareable, back works); the year defaults to this one. */
-export const useInsightsParams = (currentYear: number) => {
+export const useInsightsParams = (
+    currentYear: number,
+): { filter: InsightsFilter; update: (changes: Partial<InsightsFilter>) => void } => {
     const [searchParams, setSearchParams] = useSearchParams();
     const filter = useMemo<InsightsFilter>(() => {
         const year = Number(searchParams.get('year'));

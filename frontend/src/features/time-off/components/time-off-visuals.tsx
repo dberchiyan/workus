@@ -1,6 +1,7 @@
 import BeachAccessOutlined from '@mui/icons-material/BeachAccessOutlined';
 import EventBusyOutlined from '@mui/icons-material/EventBusyOutlined';
 import LocalHospitalOutlined from '@mui/icons-material/LocalHospitalOutlined';
+
 import type { TimeOffType } from '../types';
 
 /**

@@ -7,10 +7,13 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
 import type { ErrorCode } from '@/shared/types';
+
 import type { Plan } from '../types';
 
 /** What the owner is about to do with the plan. */
@@ -66,7 +69,7 @@ export function PlanChangeDialog({
     onConfirm,
     onClose,
     onExited,
-}: PlanChangeDialogProps) {
+}: PlanChangeDialogProps): ReactElement | null {
     const { t, i18n } = useTranslation(['billing', 'errors']);
     const titleId = useId();
     const descriptionId = useId();

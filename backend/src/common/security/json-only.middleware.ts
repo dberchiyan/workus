@@ -1,5 +1,6 @@
 import { Injectable, type NestMiddleware } from '@nestjs/common';
 import type { NextFunction, Request, Response } from 'express';
+
 import { UnsupportedMediaTypeException } from '../exception/api.exception';
 
 /** Only JSON bodies are accepted; anything else is 415 (api.md). */

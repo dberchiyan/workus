@@ -1,3 +1,4 @@
+import { DAYS_PER_LEAP_YEAR, ISO_DAY_LENGTH, SATURDAY, SUNDAY } from '@/shared/lib/units';
 /** "26 Jun 2026" for a `YYYY-MM-DD` calendar date (UTC, so the day never shifts). */
 export const formatDay = (isoDate: string, locale: string): string =>
     new Intl.DateTimeFormat(locale, {
@@ -41,14 +42,14 @@ export const workingDaysBetween = (
     const DAY_MS = 86_400_000;
     const from = Date.parse(`${start}T00:00:00Z`);
     const to = Date.parse(`${end}T00:00:00Z`);
-    if (Number.isNaN(from) || Number.isNaN(to) || to < from || to - from > 366 * DAY_MS) {
+    if (Number.isNaN(from) || Number.isNaN(to) || to < from || to - from > DAYS_PER_LEAP_YEAR * DAY_MS) {
         return 0;
     }
     let days = 0;
     for (let day = from; day <= to; day += DAY_MS) {
         const weekday = new Date(day).getUTCDay();
-        const iso = new Date(day).toISOString().slice(0, 10);
-        if (weekday !== 0 && weekday !== 6 && !holidays.has(iso)) {
+        const iso = new Date(day).toISOString().slice(0, ISO_DAY_LENGTH);
+        if (weekday !== SUNDAY && weekday !== SATURDAY && !holidays.has(iso)) {
             days += 1;
         }
     }

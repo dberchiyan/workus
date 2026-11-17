@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 
 export interface ProfileEmptyStateProps {
@@ -7,7 +8,7 @@ export interface ProfileEmptyStateProps {
     hint?: string;
 }
 
-export function ProfileEmptyState({ icon, title, hint }: ProfileEmptyStateProps) {
+export function ProfileEmptyState({ icon, title, hint }: ProfileEmptyStateProps): ReactElement {
     return (
         <div className="flex flex-col items-center gap-2 px-4 py-12 text-center">
             <span aria-hidden className="text-text-disabled">

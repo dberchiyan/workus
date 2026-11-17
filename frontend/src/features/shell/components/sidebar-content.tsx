@@ -6,9 +6,12 @@ import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { BrandMark } from '@/shared/components/brand-mark';
 import { cn } from '@/shared/lib/cn';
+
 import { useNavigationItems } from '../hooks/use-navigation-items';
 import { NavItemLink } from './nav-item-link';
 
@@ -20,7 +23,7 @@ export interface SidebarContentProps {
 }
 
 /** Brand, main items and the separate bottom group (Settings, then the fold toggle). */
-export function SidebarContent({ isCollapsed, onNavigate, onToggleCollapsed }: SidebarContentProps) {
+export function SidebarContent({ isCollapsed, onNavigate, onToggleCollapsed }: SidebarContentProps): ReactElement {
     const { t } = useTranslation(['common', 'shell']);
     const { main, bottom } = useNavigationItems();
 

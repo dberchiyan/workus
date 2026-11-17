@@ -1,5 +1,6 @@
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { Transactional } from '@nestjs-cls/transactional';
+
 import type { Pageable } from '../../../../common/dto/pageable';
 import {
     BusinessConflictException,
@@ -7,17 +8,17 @@ import {
     ConcurrentModificationException,
     ResourceNotFoundException,
 } from '../../../../common/exception/api.exception';
+import { AuditService } from '../../../audit/service/audit.service';
 import { AuditAction, AuditTargetType } from '../../../audit/service/audit-action';
 import { AuditField, auditValue, changeOf } from '../../../audit/service/audit-change';
-import { AuditService } from '../../../audit/service/audit.service';
 import { CompanyStructureRepository, MAX_DEPARTMENTS, MAX_POSITIONS } from '../repository/company-structure.repository';
 import { EmployeeRepository } from '../repository/employee.repository';
 import type { DepartmentRecord, StructurePositionRecord } from '../repository/record/company-structure.record';
 import { todayUtc } from './calendar-date';
 import { DEFAULT_STRUCTURE } from './default-structure';
+import type { EmployeePage } from './employee.types';
 import type { EmployeeSortField } from './employee-sort';
 import { EmployeeStatus } from './employee-status';
-import type { EmployeePage } from './employee.types';
 
 export interface StructurePosition extends StructurePositionRecord {
     employeeCount: number;

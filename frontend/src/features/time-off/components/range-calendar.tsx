@@ -2,10 +2,14 @@ import ChevronLeftOutlined from '@mui/icons-material/ChevronLeftOutlined';
 import ChevronRightOutlined from '@mui/icons-material/ChevronRightOutlined';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { type KeyboardEvent, useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { todayUtcIso } from '@/shared/lib/utc-day';
+
 import { cn } from '@/shared/lib/cn';
+import { DAYS_PER_WEEK, ISO_DAY_OF_MONTH_START, ISO_MONTH_LENGTH, SATURDAY } from '@/shared/lib/units';
+import { todayUtcIso } from '@/shared/lib/utc-day';
+
 import { addDaysIso, addMonthsIso, isWeekendIso, monthGrid } from '../calendar';
 
 export interface DateRange {
@@ -27,11 +31,11 @@ export interface RangeCalendarProps {
  */
 const NO_HOLIDAYS: ReadonlyMap<string, string> = new Map();
 
-export function RangeCalendar({ value, onChange, holidays = NO_HOLIDAYS }: RangeCalendarProps) {
+export function RangeCalendar({ value, onChange, holidays = NO_HOLIDAYS }: RangeCalendarProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const locale = i18n.language;
     const titleId = useId();
-    const [month, setMonth] = useState(() => value.start.slice(0, 7));
+    const [month, setMonth] = useState(() => value.start.slice(0, ISO_MONTH_LENGTH));
     const [focused, setFocused] = useState(value.start);
     // After a first click the next one picks the last day.
     const [isPickingEnd, setIsPickingEnd] = useState(false);
@@ -68,19 +72,19 @@ export function RangeCalendar({ value, onChange, holidays = NO_HOLIDAYS }: Range
 
     const moveTo = (date: string): void => {
         setFocused(date);
-        setMonth(date.slice(0, 7));
+        setMonth(date.slice(0, ISO_MONTH_LENGTH));
         shouldMoveFocus.current = true;
     };
 
     const onKeyDown = (event: KeyboardEvent<HTMLButtonElement>, date: string): void => {
-        const weekday = (new Date(`${date}T00:00:00Z`).getUTCDay() - weekdays.firstDay + 7) % 7;
+        const weekday = (new Date(`${date}T00:00:00Z`).getUTCDay() - weekdays.firstDay + DAYS_PER_WEEK) % DAYS_PER_WEEK;
         const moves: Record<string, () => string> = {
             ArrowLeft: () => addDaysIso(date, -1),
             ArrowRight: () => addDaysIso(date, 1),
-            ArrowUp: () => addDaysIso(date, -7),
-            ArrowDown: () => addDaysIso(date, 7),
+            ArrowUp: () => addDaysIso(date, -DAYS_PER_WEEK),
+            ArrowDown: () => addDaysIso(date, DAYS_PER_WEEK),
             Home: () => addDaysIso(date, -weekday),
-            End: () => addDaysIso(date, 6 - weekday),
+            End: () => addDaysIso(date, SATURDAY - weekday),
             PageUp: () => addMonthsIso(date, -1),
             PageDown: () => addMonthsIso(date, 1),
         };
@@ -92,7 +96,7 @@ export function RangeCalendar({ value, onChange, holidays = NO_HOLIDAYS }: Range
     };
 
     const showMonth = (months: number): void => {
-        const next = addMonthsIso(`${month}-01`, months).slice(0, 7);
+        const next = addMonthsIso(`${month}-01`, months).slice(0, ISO_MONTH_LENGTH);
         setMonth(next);
         setFocused(`${next}-01`);
     };
@@ -185,7 +189,7 @@ export function RangeCalendar({ value, onChange, holidays = NO_HOLIDAYS }: Range
                                                 isEdge && 'bg-primary text-primary-contrast-text hover:bg-primary-dark',
                                             )}
                                         >
-                                            {Number(date.slice(8))}
+                                            {Number(date.slice(ISO_DAY_OF_MONTH_START))}
                                         </button>
                                     </td>
                                 );

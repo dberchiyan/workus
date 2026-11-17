@@ -1,13 +1,18 @@
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { type CSSProperties, useCallback, useEffect, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { trackScrollEdges } from '@/shared/lib/scroll-edges';
+
 import { monthDays } from '../calendar';
 import type { CalendarRow } from '../types';
 import { CalendarDayHeader } from './calendar-day-header';
 import { CalendarPersonRow } from './calendar-person-row';
 import { RequestSearchField } from './request-search-field';
+
+const LEAD_COLUMNS = 3;
 
 const SKELETON_ROWS = ['s1', 's2', 's3', 's4', 's5', 's6'];
 
@@ -37,7 +42,7 @@ export function CalendarGrid({
     requestHref,
     canOpenProfile,
     onSearch,
-}: CalendarGridProps) {
+}: CalendarGridProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const days = monthDays(month);
     const weekday = new Intl.DateTimeFormat(i18n.language, { weekday: 'short', timeZone: 'UTC' });
@@ -57,7 +62,7 @@ export function CalendarGrid({
         }
         // Today a few days in from the sticky name column.
         const nameWidth = box.querySelector('thead td')?.getBoundingClientRect().width ?? 0;
-        box.scrollLeft = Math.max(0, cell.offsetLeft - nameWidth - cell.offsetWidth * 3);
+        box.scrollLeft = Math.max(0, cell.offsetLeft - nameWidth - cell.offsetWidth * LEAD_COLUMNS);
     }, [month, loaded]);
 
     return (

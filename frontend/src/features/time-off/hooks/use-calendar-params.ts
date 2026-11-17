@@ -1,8 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router';
+
 import { isTimeOffType, TIME_OFF_TYPES, type TimeOffType } from '../types';
 
-export const CALENDAR_PAGE_SIZES = [25, 50, 100] as const;
+const SMALL_PAGE = 25;
+const MEDIUM_PAGE = 50;
+const LARGE_PAGE = 100;
+
+export const CALENDAR_PAGE_SIZES = [SMALL_PAGE, MEDIUM_PAGE, LARGE_PAGE] as const;
 const DEFAULT_SIZE = 50;
 const MONTH = /^(19|20)\d{2}-(0[1-9]|1[0-2])$/;
 
@@ -35,7 +40,13 @@ const readSize = (raw: string | null): number => {
 };
 
 /** Month, types, search, page and the open request live in the URL (shareable, back works). */
-export const useCalendarParams = (currentMonth: string) => {
+export const useCalendarParams = (
+    currentMonth: string,
+): {
+    params: CalendarParams;
+    update: (changes: Partial<CalendarParams>) => void;
+    requestHref: (requestId: string) => string;
+} => {
     const [searchParams, setSearchParams] = useSearchParams();
     const params = useMemo<CalendarParams>(() => {
         const month = searchParams.get('month') ?? '';

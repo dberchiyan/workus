@@ -3,8 +3,11 @@ import ScheduleOutlined from '@mui/icons-material/ScheduleOutlined';
 import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { daysSince, formatPeriod, fullName } from '../format';
 import type { ManagedRequest, TimeOffDecision } from '../types';
 import { RequestPerson } from './request-person';
@@ -22,7 +25,7 @@ export interface PendingRequestCardProps {
 }
 
 /** One request waiting for a decision: who, what, how long it waits, and the decision buttons. */
-export function PendingRequestCard({ request, now, busy, onDecide }: PendingRequestCardProps) {
+export function PendingRequestCard({ request, now, busy, onDecide }: PendingRequestCardProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const { icon: Icon, tone } = TYPE_VISUALS[request.type];
     const waited = daysSince(request.createdAt, now);

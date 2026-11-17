@@ -1,12 +1,14 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatPeriod, fullName } from '../format';
 import type { ManagedRequest } from '../types';
 import { RequestPerson } from './request-person';
 import { TimeOffStatusChip, TimeOffTypeChip } from './time-off-chips';
 
 /** Phones: the table becomes stacked items (ux.md → Patterns). */
-export function ClosedRequestCards({ requests }: { requests: readonly ManagedRequest[] }) {
+export function ClosedRequestCards({ requests }: { requests: readonly ManagedRequest[] }): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     return (
         <ul className="m-0 flex list-none flex-col divide-y divide-divider p-0">

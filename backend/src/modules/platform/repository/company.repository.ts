@@ -1,6 +1,7 @@
+import { Injectable } from '@nestjs/common';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import type { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { Injectable } from '@nestjs/common';
+
 import type { Pageable, SortDirection } from '../../../common/dto/pageable';
 import { toPrismaPage } from '../../../common/persistence/pageable';
 import type { PrismaService } from '../../../common/persistence/prisma.service';

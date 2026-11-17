@@ -2,9 +2,12 @@ import ListItemButton from '@mui/material/ListItemButton';
 import ListItemIcon from '@mui/material/ListItemIcon';
 import ListItemText from '@mui/material/ListItemText';
 import Tooltip from '@mui/material/Tooltip';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { NavLink, useMatch } from 'react-router';
+
 import { cn } from '@/shared/lib/cn';
+
 import type { NavItem } from '../navigation';
 
 export interface NavItemLinkProps {
@@ -14,7 +17,7 @@ export interface NavItemLinkProps {
     onNavigate?: () => void;
 }
 
-export function NavItemLink({ item, isCollapsed, onNavigate }: NavItemLinkProps) {
+export function NavItemLink({ item, isCollapsed, onNavigate }: NavItemLinkProps): ReactElement {
     const { t } = useTranslation('shell');
     // A section stays active on its sub-pages (/settings/sessions, /employees/:id); the Dashboard
     // ('/') only on itself.

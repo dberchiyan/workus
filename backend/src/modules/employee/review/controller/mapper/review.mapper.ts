@@ -1,12 +1,12 @@
 import { toMoney } from '../../../../../common/persistence/money';
+import { isoDay as isoDate } from '../../../../../common/time/iso-day';
 import type { ReviewRecord } from '../../repository/record/review.record';
+import type { EmployeeReviews, SalaryPoint } from '../../service/review.types';
 import { isReviewKind, ReviewKind } from '../../service/review-kind';
 import { isReviewStatus, ReviewStatus } from '../../service/review-status';
 import { readRichText } from '../../service/rich-text';
-import type { EmployeeReviews, SalaryPoint } from '../../service/review.types';
 import type { EmployeeReviewsResponse, ReviewResponse } from '../dto/review.response';
 
-const isoDate = (reviewedAt: Date): string => reviewedAt.toISOString().slice(0, 10);
 const money = (point: SalaryPoint | null) => (point ? toMoney(point.amount, point.currency) : null);
 
 export const toReviewResponse = (review: ReviewRecord): ReviewResponse => ({

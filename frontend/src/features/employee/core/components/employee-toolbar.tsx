@@ -1,9 +1,11 @@
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
-import Typography from '@mui/material/Typography';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { EmployeeListParams, EmployeeStatus } from '../types';
 import { EmployeeSearchField } from './employee-search-field';
 
@@ -21,7 +23,7 @@ export interface EmployeeToolbarProps {
 }
 
 /** Search, Active/Terminated and — on phones, where there are no column headers — sort. */
-export function EmployeeToolbar({ params, total, onSearch, onStatus, onSort }: EmployeeToolbarProps) {
+export function EmployeeToolbar({ params, total, onSearch, onStatus, onSort }: EmployeeToolbarProps): ReactElement {
     const { t, i18n } = useTranslation('employee');
     const sort: SortOption = `${params.sortField},${params.sortDirection}`;
 

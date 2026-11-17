@@ -15,7 +15,9 @@ const readKeys = async (locale: string): Promise<Set<string>> => {
     const keys = await Promise.all(
         files.map(async (file) => {
             const content: unknown = JSON.parse(await readFile(new URL(file, dir), 'utf8'));
-            const namespace = file.replace(/\.json$/, '').replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
+            const namespace = file
+                .replace(/\.json$/, '')
+                .replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
             return flatten(content, namespace).map((key) => key.replace('.', ':'));
         }),
     );

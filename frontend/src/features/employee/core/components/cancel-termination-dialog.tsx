@@ -5,10 +5,13 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormHelperText from '@mui/material/FormHelperText';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
 import type { ErrorCode } from '@/shared/types';
+
 import { formatCalendarDate } from '../format';
 import { useCancelTermination } from '../hooks/use-employee-queries';
 import { RESERVED_LINE } from '../hooks/use-field-message';
@@ -22,7 +25,12 @@ export interface CancelTerminationDialogProps {
 }
 
 /** Confirmation; Cancel has focus first. Reviews canceled by the termination stay canceled. */
-export function CancelTerminationDialog({ employee, open, onClose, onExited }: CancelTerminationDialogProps) {
+export function CancelTerminationDialog({
+    employee,
+    open,
+    onClose,
+    onExited,
+}: CancelTerminationDialogProps): ReactElement {
     const { t, i18n } = useTranslation(['employee', 'errors']);
     const titleId = useId();
     const descriptionId = useId();

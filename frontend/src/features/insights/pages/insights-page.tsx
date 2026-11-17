@@ -1,13 +1,16 @@
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
 import { domAnimation, LazyMotion } from 'motion/react';
+import type { ReactElement } from 'react';
 import { useCallback, useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useUpgrade } from '@/features/auth';
 import { UpgradePrompt } from '@/shared/components/upgrade-prompt';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
-import { nowUtc } from '@/shared/lib/utc-day';
 import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
+import { nowUtc } from '@/shared/lib/utc-day';
+
 import { seriesClass } from '../chart';
 import { AbsenceSection } from '../components/absence-section';
 import { HeadcountSection } from '../components/headcount-section';
@@ -19,7 +22,7 @@ import { useInsightCategories } from '../hooks/use-insights';
 import { useInsightsParams } from '../hooks/use-insights-params';
 
 /** Company figures for a year (admin): headcount, turnover, tenure, absence, salary. */
-export default function InsightsPage() {
+export function InsightsPage(): ReactElement {
     const { t } = useTranslation('insights');
     useDocumentTitle(t('pageTitle'));
     const headingRef = usePageHeadingFocus<HTMLHeadingElement>();

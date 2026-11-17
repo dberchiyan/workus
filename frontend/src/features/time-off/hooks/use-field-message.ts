@@ -1,11 +1,15 @@
 import { useTranslation } from 'react-i18next';
+
 import { isTimeOffValidationMessage } from '../schemas';
 
 /** Keeps one helper line under every field, so the form never shifts (data.md → Forms). */
 export const RESERVED_LINE = ' ';
 
 /** Client errors carry i18n keys; server field errors arrive already localised. */
-export const useFieldMessage = () => {
+export const useFieldMessage = (): ((
+    error: { type?: string | undefined; message?: string | undefined } | undefined,
+    options?: { max?: number; hint?: string },
+) => string) => {
     const { t } = useTranslation(['timeOff', 'validation']);
     return (
         error: { type?: string | undefined; message?: string | undefined } | undefined,

@@ -5,32 +5,36 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import { useQueryClient } from '@tanstack/react-query';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useNavigate } from 'react-router';
+
 import { lastApiActivity } from '@/shared/api/activity';
 import { PATHS } from '@/shared/lib/paths';
+import { MINUTE_MS, SECOND_MS, SECONDS_PER_MINUTE } from '@/shared/lib/units';
+
 import { authKeys } from '../hooks/query-keys';
 import { useCurrentUser } from '../hooks/use-current-user';
-import { useLogout } from '../hooks/use-logout';
 import type { LoginLocationState } from '../hooks/use-login-redirect';
+import { useLogout } from '../hooks/use-logout';
 
 /** The warning shows this long before the session ends. */
-const WARNING_MS = 2 * 60_000;
+const WARNING_MS = 2 * MINUTE_MS;
 /** The server records activity at most once a minute — count a minute short to be safe. */
 const SAFETY_MS = 60_000;
 const TICK_MS = 1_000;
 
 const countdown = (ms: number): string => {
-    const seconds = Math.max(0, Math.ceil(ms / 1000));
-    return `${String(Math.floor(seconds / 60))}:${String(seconds % 60).padStart(2, '0')}`;
+    const seconds = Math.max(0, Math.ceil(ms / SECOND_MS));
+    return `${String(Math.floor(seconds / SECONDS_PER_MINUTE))}:${String(seconds % SECONDS_PER_MINUTE).padStart(2, '0')}`;
 };
 
 /**
  * Two minutes before an idle session ends, an accessible dialog offers "Stay signed in"
  * (ux.md → idle-timeout warning); when time is up the app returns to sign-in, saying why.
  */
-export function IdleSessionWarning() {
+export function IdleSessionWarning(): ReactElement {
     const { t } = useTranslation('auth');
     const idleMinutes = useCurrentUser().data?.idleTimeoutMinutes;
     const queryClient = useQueryClient();
@@ -52,7 +56,8 @@ export function IdleSessionWarning() {
         };
     }, []);
 
-    const remaining = idleMinutes === undefined ? Infinity : lastApiActivity() + idleMinutes * 60_000 - SAFETY_MS - now;
+    const remaining =
+        idleMinutes === undefined ? Infinity : lastApiActivity() + idleMinutes * MINUTE_MS - SAFETY_MS - now;
     const open = remaining > 0 && remaining <= WARNING_MS;
 
     // Time is up: the session is gone on the server too — go to sign-in and say why.

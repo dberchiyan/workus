@@ -1,4 +1,5 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { type ReactNode, useId } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -16,7 +17,7 @@ export interface DetailSectionProps {
 }
 
 /** A titled section of label/value pairs (a real <dl>). */
-export function DetailSection({ title, icon, rows }: DetailSectionProps) {
+export function DetailSection({ title, icon, rows }: DetailSectionProps): ReactElement {
     const { t } = useTranslation('employee');
     const headingId = useId();
     return (

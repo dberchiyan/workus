@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { collectDefaultMetrics, Counter, Histogram, Registry } from '@prometheus-io/client';
+import { collectDefaultMetrics, Counter, exponentialBuckets, Histogram, Registry } from '@prometheus-io/client';
+
+const FIRST_BUCKET_SECONDS = 0.025;
+const BUCKET_FACTOR = 2;
+const BUCKET_COUNT = 8;
+const DURATION_BUCKETS_SECONDS = exponentialBuckets(FIRST_BUCKET_SECONDS, BUCKET_FACTOR, BUCKET_COUNT);
 
 @Injectable()
 export class MetricsService {
@@ -9,7 +14,7 @@ export class MetricsService {
         name: 'http_request_duration_seconds',
         help: 'HTTP request duration by route pattern',
         labelNames: ['method', 'route', 'status'] as const,
-        buckets: [0.025, 0.05, 0.1, 0.25, 0.5, 1, 2.5, 5],
+        buckets: DURATION_BUCKETS_SECONDS,
         registers: [this.registry],
     });
 

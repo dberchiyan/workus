@@ -1,7 +1,10 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { PeoplePicker } from '@/shared/components/people-picker';
+
 import type { AddEmployeeForm } from '../hooks/use-add-employee-form';
 import { useResponsibleCandidates } from '../hooks/use-employee-queries';
 import { useFieldMessage } from '../hooks/use-field-message';
@@ -15,7 +18,7 @@ export interface ResponsibleStepProps {
 }
 
 /** Step 2: optional — the employee can be saved with nobody assigned. */
-export function ResponsibleStep({ form, responsibles, onChange }: ResponsibleStepProps) {
+export function ResponsibleStep({ form, responsibles, onChange }: ResponsibleStepProps): ReactElement {
     const { t } = useTranslation('employee');
     const message = useFieldMessage();
     const [search, setSearch] = useState('');

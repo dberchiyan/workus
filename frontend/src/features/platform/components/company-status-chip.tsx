@@ -1,5 +1,8 @@
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { StatusBadge, type StatusTone } from '@/shared/components/status-badge';
+
 import type { CompanyStatus } from '../types';
 
 const TONE: Record<CompanyStatus, StatusTone> = {
@@ -8,7 +11,7 @@ const TONE: Record<CompanyStatus, StatusTone> = {
     REJECTED: 'danger',
 };
 
-export function CompanyStatusChip({ status }: { status: CompanyStatus }) {
+export function CompanyStatusChip({ status }: { status: CompanyStatus }): ReactElement {
     const { t } = useTranslation('platform');
     return <StatusBadge tone={TONE[status]} label={t(`status.${status}`)} />;
 }

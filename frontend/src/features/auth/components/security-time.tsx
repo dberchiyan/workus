@@ -1,6 +1,9 @@
 import Tooltip from '@mui/material/Tooltip';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatAgo } from '@/shared/lib/format-ago';
+import { ISO_DAY_LENGTH } from '@/shared/lib/units';
 
 export interface SecurityTimeProps {
     /** The (oldest) instant. */
@@ -29,7 +32,7 @@ const FULL: Intl.DateTimeFormatOptions = {
  * which), "5:06–5:07 PM" for a group. The full date and time (UTC) on hover and for screen
  * readers.
  */
-export function SecurityTime({ from, to, today, now }: SecurityTimeProps) {
+export function SecurityTime({ from, to, today, now }: SecurityTimeProps): ReactElement {
     const { t, i18n } = useTranslation('auth');
     const locale = i18n.language;
     const time = new Intl.DateTimeFormat(locale, { timeStyle: 'short', timeZone: 'UTC' });
@@ -39,7 +42,7 @@ export function SecurityTime({ from, to, today, now }: SecurityTimeProps) {
     let shown: string;
     if (to !== null) {
         shown = time.formatRange(start, new Date(to));
-    } else if (from.slice(0, 10) === today) {
+    } else if (from.slice(0, ISO_DAY_LENGTH) === today) {
         shown = formatAgo(from, now, locale) ?? t('securityLog.justNow');
     } else {
         shown = time.format(start);

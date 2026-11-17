@@ -1,5 +1,5 @@
-import type { Params } from 'nestjs-pino';
 import { ClsServiceManager } from 'nestjs-cls';
+import type { Params } from 'nestjs-pino';
 
 /** Nest bootstrap chatter that is logged at `log` level; dropped so only our code logs at info. */
 const SILENCED_CONTEXTS: ReadonlySet<string> = new Set([
@@ -15,6 +15,9 @@ const currentTraceId = (): string | undefined => {
     const cls = ClsServiceManager.getClsService();
     return cls.isActive() ? cls.getId() : undefined;
 };
+
+/** pino's numeric level for `info`. */
+const INFO_LEVEL = 30;
 
 export const createLoggerOptions = (isDev: boolean): Params => ({
     pinoHttp: {
@@ -47,7 +50,7 @@ export const createLoggerOptions = (isDev: boolean): Params => ({
             logMethod(args, method, level) {
                 const [first] = args;
                 const isSilenced =
-                    level <= 30 &&
+                    level <= INFO_LEVEL &&
                     typeof first === 'object' &&
                     first !== null &&
                     'context' in first &&

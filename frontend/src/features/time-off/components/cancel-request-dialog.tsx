@@ -5,10 +5,13 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormHelperText from '@mui/material/FormHelperText';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
 import type { ErrorCode } from '@/shared/types';
+
 import { formatPeriod } from '../format';
 import { RESERVED_LINE } from '../hooks/use-field-message';
 import { useCancelTimeOffRequest } from '../hooks/use-time-off-queries';
@@ -24,7 +27,13 @@ export interface CancelRequestDialogProps {
 }
 
 /** Irreversible confirmation: names the request; "Keep it" has the initial focus. */
-export function CancelRequestDialog({ request, open, onClose, onCanceled, onExited }: CancelRequestDialogProps) {
+export function CancelRequestDialog({
+    request,
+    open,
+    onClose,
+    onCanceled,
+    onExited,
+}: CancelRequestDialogProps): ReactElement {
     const { t, i18n } = useTranslation(['timeOff', 'errors']);
     const titleId = useId();
     const descriptionId = useId();

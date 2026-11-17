@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/client';
+
 import { TIME_OFF_TYPES, type TimeOffCalendar, type TimeOffType } from '../types';
 
 export interface CalendarQuery {

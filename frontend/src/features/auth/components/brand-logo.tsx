@@ -1,7 +1,10 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { BrandMark } from '@/shared/components/brand-mark';
 import { cn } from '@/shared/lib/cn';
+
 import { LANDING_PATH } from '../landing';
 
 export interface BrandLogoProps {
@@ -10,7 +13,7 @@ export interface BrandLogoProps {
 }
 
 /** Workus mark + wordmark + tagline. */
-export function BrandLogo({ linkHome = false }: BrandLogoProps) {
+export function BrandLogo({ linkHome = false }: BrandLogoProps): ReactElement {
     const { t } = useTranslation();
     const name = (
         <>

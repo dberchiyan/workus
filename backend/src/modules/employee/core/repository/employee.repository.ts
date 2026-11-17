@@ -1,7 +1,8 @@
+import { Injectable } from '@nestjs/common';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import type { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { Injectable } from '@nestjs/common';
 import { z } from 'zod';
+
 import type { Pageable, SortDirection } from '../../../../common/dto/pageable';
 import { toPrismaPage } from '../../../../common/persistence/pageable';
 import type { PrismaService } from '../../../../common/persistence/prisma.service';
@@ -13,20 +14,20 @@ import { activeOn, employedBetween, employeeWhere, searchWhere } from './employe
 import {
     type EmployeeCalendarRecord,
     employeeCalendarSelect,
-    type EmployeeRosterRecord,
-    employeeRosterSelect,
     type EmployeeListItemRecord,
     employeeListItemSelect,
+    type EmployeeMovementRecord,
+    employeeMovementSelect,
     type EmployeeProfileRecord,
     employeeProfileSelect,
+    type EmployeeRosterRecord,
+    employeeRosterSelect,
+    type EmployeeTimeOffRecord,
+    employeeTimeOffSelect,
     type PositionOptionRecord,
     positionOptionSelect,
     type ResponsibleCandidateRecord,
     responsibleCandidateSelect,
-    type EmployeeTimeOffRecord,
-    employeeTimeOffSelect,
-    type EmployeeMovementRecord,
-    employeeMovementSelect,
 } from './record/employee.record';
 
 const orderByFor = (field: EmployeeSortField, direction: SortDirection): Prisma.EmployeeOrderByWithRelationInput[] =>

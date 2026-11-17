@@ -9,9 +9,11 @@ import MenuItem from '@mui/material/MenuItem';
 import { useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useEffect, useId } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
 import { formatCalendarDate, todayIso } from '../format';
 import { RESERVED_LINE, useFieldMessage } from '../hooks/use-field-message';
 import { useTerminateForm } from '../hooks/use-terminate-form';
@@ -29,7 +31,7 @@ export interface TerminateDialogProps {
  * Terminate from a terminatedAt (today, past or future) with a reason; or change the termination. Says
  * what happens before the confirm button, which names the person (data.md → irreversible forms).
  */
-export function TerminateDialog({ employee, open, onClose, onExited }: TerminateDialogProps) {
+export function TerminateDialog({ employee, open, onClose, onExited }: TerminateDialogProps): ReactElement {
     const { t, i18n } = useTranslation(['employee', 'errors']);
     const theme = useTheme();
     const isPhone = useMediaQuery(theme.breakpoints.down('sm'));

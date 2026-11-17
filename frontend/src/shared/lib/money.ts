@@ -9,6 +9,10 @@ export interface Money {
 }
 
 const SCALE = 4;
+const BIGINT_TEN = 10n;
+const UNIT_FACTOR = BIGINT_TEN ** BigInt(SCALE);
+const CENT_DIGITS = 2;
+const MIDPOINT = 0.5;
 const AMOUNT = /^(-?)(\d+)(?:\.(\d{1,4}))?$/;
 
 /** Exact integer in ten-thousandths, e.g. "4500.5" → 45005000n. */
@@ -18,7 +22,7 @@ export const toUnits = (amount: string): bigint => {
         throw new Error('Not a decimal amount');
     }
     const [, sign = '', whole = '0', fraction = ''] = match;
-    const units = BigInt(whole) * 10n ** BigInt(SCALE) + BigInt(fraction.padEnd(SCALE, '0'));
+    const units = BigInt(whole) * UNIT_FACTOR + BigInt(fraction.padEnd(SCALE, '0'));
     return sign === '-' ? -units : units;
 };
 
@@ -32,7 +36,7 @@ export const formatMoney = (money: Money, locale: string): string =>
     new Intl.NumberFormat(locale, {
         style: 'currency',
         currency: money.currency,
-        maximumFractionDigits: toUnits(money.amount) % 10_000n === 0n ? 0 : 2,
+        maximumFractionDigits: toUnits(money.amount) % UNIT_FACTOR === 0n ? 0 : CENT_DIGITS,
         // The amount is a validated decimal string (API contract); Intl formats it without a float.
     }).format(money.amount as Intl.StringNumericLiteral);
 
@@ -43,7 +47,7 @@ export const formatMoney = (money: Money, locale: string): string =>
 export const ratioBetween = (value: Money, min: Money, max: Money): number => {
     const range = toUnits(max.amount) - toUnits(min.amount);
     if (range === 0n) {
-        return 0.5;
+        return MIDPOINT;
     }
-    return Number(((toUnits(value.amount) - toUnits(min.amount)) * 10_000n) / range) / 10_000;
+    return Number(((toUnits(value.amount) - toUnits(min.amount)) * UNIT_FACTOR) / range) / Number(UNIT_FACTOR);
 };

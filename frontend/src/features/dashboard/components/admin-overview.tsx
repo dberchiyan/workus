@@ -7,12 +7,16 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { StatCard } from '@/shared/components/stat-card';
 import { employeeProfilePath } from '@/shared/lib/paths';
+import { ISO_DAY_LENGTH } from '@/shared/lib/units';
+
 import { useAdminDashboard } from '../hooks/use-admin-dashboard';
 
 const DAY_MS = 86_400_000;
@@ -35,7 +39,7 @@ function Hint({ icon, tone, children }: { icon?: ReactNode; tone?: 'error'; chil
 }
 
 /** Admin dashboard: four cards that each lead to something to do. */
-export function AdminOverview() {
+export function AdminOverview(): ReactElement {
     const { t, i18n } = useTranslation('dashboard');
     const locale = i18n.language;
     const dashboard = useAdminDashboard();
@@ -67,7 +71,7 @@ export function AdminOverview() {
               0,
               Math.floor(
                   (Date.parse(`${data.today}T00:00:00Z`) -
-                      Date.parse(`${data.pendingRequests.oldestCreatedAt.slice(0, 10)}T00:00:00Z`)) /
+                      Date.parse(`${data.pendingRequests.oldestCreatedAt.slice(0, ISO_DAY_LENGTH)}T00:00:00Z`)) /
                       DAY_MS,
               ),
           )

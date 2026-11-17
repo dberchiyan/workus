@@ -1,6 +1,7 @@
 import { Global, Inject, Module, type OnApplicationShutdown } from '@nestjs/common';
 import { TerminusModule } from '@nestjs/terminus';
 import type { Pool } from 'pg';
+
 import { AppConfigService } from '../config/app-config.service';
 import { IdempotencyKeyStore } from './idempotency-key.store';
 import { PersistenceHealthIndicator } from './persistence-health.indicator';

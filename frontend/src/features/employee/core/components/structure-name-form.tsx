@@ -1,15 +1,18 @@
+import { zodResolver } from '@hookform/resolvers/zod';
 import CheckOutlined from '@mui/icons-material/CheckOutlined';
 import CloseOutlined from '@mui/icons-material/CloseOutlined';
 import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
-import { zodResolver } from '@hookform/resolvers/zod';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
 import type { ErrorCode } from '@/shared/types';
+
 import { useFieldMessage } from '../hooks/use-field-message';
-import { STRUCTURE_LIMITS, structureNameSchema, type StructureNameOutput, type StructureNameValues } from '../schemas';
+import { STRUCTURE_LIMITS, type StructureNameOutput, structureNameSchema, type StructureNameValues } from '../schemas';
 
 export interface StructureNameFormProps {
     kind: 'department' | 'position';
@@ -28,6 +31,8 @@ export interface StructureNameFormProps {
  * One name typed in place — a department's or a position's. Enter saves, Escape cancels; errors
  * appear under the field on submit only, on a reserved line, so the list never shifts.
  */
+const OVERFLOW_ALLOWANCE = 20;
+
 export function StructureNameForm({
     kind,
     label,
@@ -36,7 +41,7 @@ export function StructureNameForm({
     onCancel,
     keepOpen = false,
     className,
-}: StructureNameFormProps) {
+}: StructureNameFormProps): ReactElement {
     const { t } = useTranslation(['employee', 'errors']);
     const message = useFieldMessage();
     const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);
@@ -100,7 +105,7 @@ export function StructureNameForm({
                     helperText={helper}
                     disabled={isSubmitting}
                     slotProps={{
-                        htmlInput: { 'aria-label': label, autoComplete: 'off', maxLength: max + 20 },
+                        htmlInput: { 'aria-label': label, autoComplete: 'off', maxLength: max + OVERFLOW_ALLOWANCE },
                     }}
                 />
                 <IconButton

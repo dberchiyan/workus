@@ -1,8 +1,10 @@
 import EditOutlined from '@mui/icons-material/EditOutlined';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { ManagedRequest } from '../types';
 import { EditRequestResponsiblesDialog } from './edit-request-responsibles-dialog';
 import { PersonLine } from './person-line';
@@ -13,7 +15,7 @@ export interface RequestResponsiblesProps {
 }
 
 /** Who decides the request ("You" marked); any admin may change it while it is pending. */
-export function RequestResponsibles({ request, viewerId }: RequestResponsiblesProps) {
+export function RequestResponsibles({ request, viewerId }: RequestResponsiblesProps): ReactElement {
     const { t } = useTranslation('timeOff');
     const [open, setOpen] = useState(false);
     const [opening, setOpening] = useState(0);

@@ -9,10 +9,11 @@ import Button from '@mui/material/Button';
 import Checkbox from '@mui/material/Checkbox';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import IconButton from '@mui/material/IconButton';
-import Tooltip from '@mui/material/Tooltip';
 import { useTheme } from '@mui/material/styles';
+import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -43,7 +44,7 @@ export function CredentialsCard({
     onSavedChange,
     title,
     description,
-}: CredentialsCardProps) {
+}: CredentialsCardProps): ReactElement {
     const { t } = useTranslation('common');
     const [copied, setCopied] = useState<Copied>(null);
     const [copyFailed, setCopyFailed] = useState(false);

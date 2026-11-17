@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
+
 import { EmployeeRepository } from '../repository/employee.repository';
 import { PositionCategoryRepository } from '../repository/position-category.repository';
 import { todayUtc } from './calendar-date';
-import type { EmployeeStatus } from './employee-status';
 import type { CategoryCounts } from './employee.types';
+import type { EmployeeStatus } from './employee-status';
 import { toSearchTerms } from './filter/employee.criteria';
 
 @Injectable()

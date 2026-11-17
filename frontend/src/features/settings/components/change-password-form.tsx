@@ -2,16 +2,19 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { type FieldError, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
 import { useChangePassword } from '@/features/auth';
 import { isApiError } from '@/shared/api/api-error';
-import type { ErrorCode } from '@/shared/types';
 import { PasswordField } from '@/shared/components/password-field';
 import { PasswordRules } from '@/shared/components/password-rules';
 import { PASSWORD_LIMITS } from '@/shared/lib/password-rules';
-import { type ChangePasswordValues, changePasswordSchema } from '../schemas';
+import type { ErrorCode } from '@/shared/types';
+
+import { changePasswordSchema, type ChangePasswordValues } from '../schemas';
 
 /** Keeps every helper line's height while it is empty, so the form never shifts. */
 const RESERVED_LINE = ' ';
@@ -22,7 +25,7 @@ const isField = (field: string): field is keyof ChangePasswordValues => FIELDS.h
  * Current password, new one twice. Success signs out every other device (the server ends all
  * sessions and gives this browser a new one) and says so.
  */
-export function ChangePasswordForm() {
+export function ChangePasswordForm(): ReactElement {
     const { t } = useTranslation(['settings', 'validation', 'errors']);
     const change = useChangePassword();
     const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);

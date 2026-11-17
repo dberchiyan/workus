@@ -1,7 +1,8 @@
 import { Module } from '@nestjs/common';
-import { EmployeeModule } from '../employee/core/employee.module';
+
 import { AuditModule } from '../audit/audit.module';
 import { AuthModule } from '../auth/auth.module';
+import { EmployeeModule } from '../employee/core/employee.module';
 import { UserModule } from '../user/user.module';
 import { OrganisationController } from './controller/organisation.controller';
 import { RegistrationController } from './controller/registration.controller';

@@ -1,7 +1,8 @@
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { Transactional } from '@nestjs-cls/transactional';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+
 import { AppConfigService } from '../../../common/config/app-config.service';
 import { BusinessRuleException, ResourceNotFoundException } from '../../../common/exception/api.exception';
 import { MetricsService } from '../../../common/observability/metrics.service';
@@ -15,14 +16,14 @@ import {
     PLANS,
 } from '../../../common/plan/plan';
 import type { Principal } from '../../../common/security/principal';
+import { AuditService } from '../../audit/service/audit.service';
 import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
 import { AuditField, auditValue, changeOf } from '../../audit/service/audit-change';
-import { AuditService } from '../../audit/service/audit.service';
 import { UserService } from '../../user/service/user.service';
 import { BillingRepository, type SubscriptionColumns } from '../repository/billing.repository';
 import type { OrganisationBillingRecord } from '../repository/record/billing.record';
-import { BillingGateway, type ProviderSubscription, SubscriptionState } from './billing-gateway';
 import type { BillingSummary, EmployeeLimit } from './billing.types';
+import { BillingGateway, type ProviderSubscription, SubscriptionState } from './billing-gateway';
 import { isSubscriptionStatus, SubscriptionStatus } from './subscription-status';
 
 const DAY_MS = 86_400_000;

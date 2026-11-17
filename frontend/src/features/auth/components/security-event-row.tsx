@@ -12,9 +12,12 @@ import WarningAmberOutlined from '@mui/icons-material/WarningAmberOutlined';
 import Button from '@mui/material/Button';
 import type { SvgIconProps } from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { type ComponentType, useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { SECURITY_TONES, type SecurityEventGroup } from '../security-log';
 import type { SecurityEvent } from '../types';
 import { describeUserAgent } from '../user-agent';
@@ -50,7 +53,7 @@ export interface SecurityEventRowProps {
  * One row of the security log: an event, or several alike from one device folded together
  * ("Signed in / out ×4"), which opens to show each of them.
  */
-export function SecurityEventRow({ group, today, now }: SecurityEventRowProps) {
+export function SecurityEventRow({ group, today, now }: SecurityEventRowProps): ReactElement {
     const { t } = useTranslation('auth');
     const [open, setOpen] = useState(false);
     const listId = useId();

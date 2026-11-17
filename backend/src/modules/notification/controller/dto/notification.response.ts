@@ -1,5 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
+import { MAX_PERSON_NAME_LENGTH, MAX_TYPE_LENGTH } from '../../../../common/dto/limits';
 import { pageResponseSchema } from '../../../../common/dto/page.response';
 import { NOTIFICATION_TYPES } from '../../service/notification-type';
 
@@ -11,18 +13,24 @@ export const NotificationSchema = z
         /** Null = not read yet. */
         readAt: z.iso.datetime().nullable(),
         /** Who caused it; null = the system (reminders). */
-        actor: z.object({ id: z.uuid(), firstName: z.string().max(100), lastName: z.string().max(100) }).nullable(),
+        actor: z
+            .object({
+                id: z.uuid(),
+                firstName: z.string().max(MAX_PERSON_NAME_LENGTH),
+                lastName: z.string().max(MAX_PERSON_NAME_LENGTH),
+            })
+            .nullable(),
         /** What it is about — the client links to it. */
         subject: z.object({ type: z.enum(['time_off_request']), id: z.uuid() }),
         /** The time-off request as it was when the notice was sent. */
         request: z.object({
-            type: z.string().max(16),
+            type: z.string().max(MAX_TYPE_LENGTH),
             startsAt: z.iso.date(),
             endsAt: z.iso.date(),
             employee: z.object({
                 userId: z.uuid(),
-                firstName: z.string().max(100),
-                lastName: z.string().max(100),
+                firstName: z.string().max(MAX_PERSON_NAME_LENGTH),
+                lastName: z.string().max(MAX_PERSON_NAME_LENGTH),
             }),
             /** Reminders only: whole days it has waited. */
             waitingDays: z.number().int().min(0).nullable(),

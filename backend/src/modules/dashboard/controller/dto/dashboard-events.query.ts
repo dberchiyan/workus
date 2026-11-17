@@ -1,6 +1,8 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
 import { pageableOptions } from '../../../../common/dto/pageable';
+import { ISO_MONTH_LENGTH } from '../../../../common/time/iso-day';
 
 const HOUR_MS = 3_600_000;
 /** A day is 24 hours in UTC; a little slack, never more. */
@@ -35,7 +37,7 @@ export const DateRangeQuerySchema = z
         from: z.iso.date('validation.invalid'),
         to: z.iso.date('validation.invalid'),
     })
-    .refine(({ from, to }) => from <= to && from.slice(0, 7) === to.slice(0, 7), {
+    .refine(({ from, to }) => from <= to && from.slice(0, ISO_MONTH_LENGTH) === to.slice(0, ISO_MONTH_LENGTH), {
         message: 'validation.invalid',
         path: ['to'],
     });

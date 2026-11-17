@@ -6,6 +6,7 @@ import CreditCardOutlined from '@mui/icons-material/CreditCardOutlined';
 import DevicesOutlined from '@mui/icons-material/DevicesOutlined';
 import PersonOutlineOutlined from '@mui/icons-material/PersonOutlineOutlined';
 import ShieldOutlined from '@mui/icons-material/ShieldOutlined';
+
 import type { AccessPart } from '@/features/auth';
 
 /** The menu's groups, in order: the person's own settings, then the company's. */

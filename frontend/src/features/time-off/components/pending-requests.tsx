@@ -3,8 +3,10 @@ import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatCount } from '../format';
 import { useManagedRequests } from '../hooks/use-managed-requests';
 import type { RequestsParams } from '../hooks/use-requests-params';
@@ -24,7 +26,7 @@ export interface PendingRequestsProps {
 }
 
 /** Requests waiting for a decision, the longest waiting first. */
-export function PendingRequests({ params, now, busyId, onDecide }: PendingRequestsProps) {
+export function PendingRequests({ params, now, busyId, onDecide }: PendingRequestsProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const [size, setSize] = useState(STEP);
     const requests = useManagedRequests({

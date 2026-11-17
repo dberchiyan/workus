@@ -2,12 +2,15 @@ import HourglassEmptyOutlined from '@mui/icons-material/HourglassEmptyOutlined';
 import Button from '@mui/material/Button';
 import ToggleButton from '@mui/material/ToggleButton';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { MonthSwitcher } from '@/shared/components/month-switcher';
 import { cn } from '@/shared/lib/cn';
+import { trackScrollEdges } from '@/shared/lib/scroll-edges';
+
 import { TIME_OFF_TYPES, type TimeOffType } from '../types';
 import { NOT_EMPLOYED_PATTERN, TYPE_VISUALS } from './time-off-visuals';
-import { trackScrollEdges } from '@/shared/lib/scroll-edges';
 
 export interface CalendarToolbarProps {
     month: string;
@@ -18,7 +21,7 @@ export interface CalendarToolbarProps {
 }
 
 /** Month switcher on the left; type toggles (also the legend) and the pending key on the right. */
-export function CalendarToolbar({ month, currentMonth, types, onMonth, onTypes }: CalendarToolbarProps) {
+export function CalendarToolbar({ month, currentMonth, types, onMonth, onTypes }: CalendarToolbarProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const toggle = (type: TimeOffType) => {
         const next = types.includes(type) ? types.filter((item) => item !== type) : [...types, type];

@@ -1,5 +1,7 @@
 import type { ErrorCode, ErrorResponse } from '@/shared/types';
 
+import { HttpStatus } from './http-status';
+
 export interface ApiErrorDetail {
     field: string;
     message: string;
@@ -23,7 +25,7 @@ export class ApiError extends Error {
     }
 
     get isClientError(): boolean {
-        return this.status >= 400 && this.status < 500;
+        return this.status >= HttpStatus.BAD_REQUEST && this.status < HttpStatus.INTERNAL_ERROR;
     }
 }
 

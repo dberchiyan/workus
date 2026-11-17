@@ -2,11 +2,14 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Switch from '@mui/material/Switch';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { trackScrollEdges } from '@/shared/lib/scroll-edges';
+
 import { isTimeOffType, TIME_OFF_TYPES, type TimeOffType } from '../types';
 import { RequestSearchField } from './request-search-field';
 import { TYPE_VISUALS } from './time-off-visuals';
-import { trackScrollEdges } from '@/shared/lib/scroll-edges';
 
 const ALL = 'ALL';
 
@@ -20,7 +23,7 @@ export interface RequestsFiltersProps {
 }
 
 /** Name search, request type and "only mine to decide" — apply to both sections. */
-export function RequestsFilters({ search, type, mine, onSearch, onType, onMine }: RequestsFiltersProps) {
+export function RequestsFilters({ search, type, mine, onSearch, onType, onMine }: RequestsFiltersProps): ReactElement {
     const { t } = useTranslation('timeOff');
     return (
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">

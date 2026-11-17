@@ -5,7 +5,9 @@ import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { FIRST_YEAR } from '../hooks/use-insights-params';
 import type { CategoryCounts, InsightsFilter } from '../types';
 
@@ -19,7 +21,7 @@ export interface InsightsToolbarProps {
 }
 
 /** Category and year for every figure on the page. */
-export function InsightsToolbar({ filter, currentYear, categories, onChange }: InsightsToolbarProps) {
+export function InsightsToolbar({ filter, currentYear, categories, onChange }: InsightsToolbarProps): ReactElement {
     const { t } = useTranslation('insights');
     return (
         <div className="flex flex-wrap items-center gap-3">

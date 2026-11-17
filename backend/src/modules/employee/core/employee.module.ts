@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
+
 import { AuditModule } from '../../audit/audit.module';
 import { UserModule } from '../../user/user.module';
-import { EmployeeActivityController } from './controller/employee-activity.controller';
-import { EmployeeSecurityLogController } from './controller/employee-security-log.controller';
-import { EmployeeOptionController } from './controller/employee-option.controller';
 import { CompanyStructureController } from './controller/company-structure.controller';
 import { EmployeeController } from './controller/employee.controller';
+import { EmployeeActivityController } from './controller/employee-activity.controller';
+import { EmployeeOptionController } from './controller/employee-option.controller';
+import { EmployeeSecurityLogController } from './controller/employee-security-log.controller';
 import { PositionCategoryController } from './controller/position-category.controller';
 import { CompanyStructureRepository } from './repository/company-structure.repository';
 import { EmployeeRepository } from './repository/employee.repository';

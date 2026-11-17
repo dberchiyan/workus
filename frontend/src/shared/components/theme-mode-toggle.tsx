@@ -3,10 +3,11 @@ import LightModeOutlined from '@mui/icons-material/LightModeOutlined';
 import IconButton from '@mui/material/IconButton';
 import { useColorScheme } from '@mui/material/styles';
 import Tooltip from '@mui/material/Tooltip';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
 /** Explicit light/dark choice; MUI persists it, initial mode follows the system. */
-export function ThemeModeToggle() {
+export function ThemeModeToggle(): ReactElement {
     const { t } = useTranslation();
     const { mode, systemMode, setMode } = useColorScheme();
     const resolved = mode === 'system' ? systemMode : mode;

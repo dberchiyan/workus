@@ -1,5 +1,6 @@
 // @ts-check
 import eslint from '@eslint/js';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -20,6 +21,7 @@ export default tseslint.config(
     eslint.configs.recommended,
     ...tseslint.configs.strictTypeChecked,
     {
+        plugins: { 'simple-import-sort': simpleImportSort },
         languageOptions: {
             globals: { ...globals.node },
             parserOptions: {
@@ -37,7 +39,27 @@ export default tseslint.config(
             '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
             '@typescript-eslint/no-extraneous-class': ['error', { allowWithDecorator: true }],
             '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
-            'no-restricted-syntax': ['error', { selector: 'TSEnumDeclaration', message: 'Use an `as const` object.' }],
+            'no-restricted-syntax': [
+                'error',
+                { selector: 'TSEnumDeclaration', message: 'Use an `as const` object.' },
+                { selector: 'ExportDefaultDeclaration', message: 'Named exports only.' },
+            ],
+            '@typescript-eslint/no-magic-numbers': [
+                'error',
+                {
+                    ignore: [-1, 0, 1, 2, '0n', '1n', '-1n'],
+                    ignoreArrayIndexes: true,
+                    ignoreDefaultValues: true,
+                    ignoreClassFieldInitialValues: true,
+                    ignoreEnums: true,
+                    ignoreNumericLiteralTypes: true,
+                    ignoreReadonlyClassProperties: true,
+                    ignoreTypeIndexes: true,
+                },
+            ],
+            '@typescript-eslint/explicit-module-boundary-types': 'error',
+            'simple-import-sort/imports': 'error',
+            'simple-import-sort/exports': 'error',
             'no-restricted-imports': [
                 'error',
                 {
@@ -99,5 +121,13 @@ export default tseslint.config(
                 },
             ],
         },
+    },
+    {
+        files: ['*.config.ts'],
+        rules: { 'no-restricted-syntax': 'off' },
+    },
+    {
+        files: ['prisma/**/*.ts', 'scripts/**/*.ts'],
+        rules: { '@typescript-eslint/no-magic-numbers': 'off' },
     },
 );

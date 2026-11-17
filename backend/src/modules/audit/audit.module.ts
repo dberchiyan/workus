@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { AuditEventRepository } from './repository/audit-event.repository';
 import { AuditService } from './service/audit.service';
 

@@ -1,6 +1,7 @@
 import { applyDecorators, createParamDecorator, type ExecutionContext } from '@nestjs/common';
 import { ApiQuery } from '@nestjs/swagger';
 import type { Request } from 'express';
+
 import { InvalidParameterException } from '../exception/api.exception';
 
 export const DEFAULT_PAGE_SIZE = 20;

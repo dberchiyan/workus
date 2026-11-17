@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common';
+
 import type { Pageable } from '../../../common/dto/pageable';
+import { isPlan, Plan } from '../../../common/plan/plan';
 import type { AdministratorRecord } from '../repository/record/user.record';
 import { UserRepository } from '../repository/user.repository';
 import type { AdministratorSortField } from './administrator-sort';
-import { isPlan, Plan } from '../../../common/plan/plan';
 import { isOrganisationStatus, OrganisationStatus } from './organisation-status';
-import { isUserRole, UserRole } from './user-role';
 import type { Administrator, NewOwner, NewUser, UserCredentials, UserProfile } from './user.types';
+import { isUserRole, UserRole } from './user-role';
 
 const toRole = (role: string): UserRole => {
     if (!isUserRole(role)) {

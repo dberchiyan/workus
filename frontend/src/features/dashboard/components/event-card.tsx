@@ -3,10 +3,12 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import type { SvgIconProps } from '@mui/material/SvgIcon';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { ComponentType, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { cn } from '@/shared/lib/cn';
+
 import { RowSkeleton } from '@/shared/components/row-skeleton';
+import { cn } from '@/shared/lib/cn';
 
 const SKELETON_ROWS = ['a', 'b'];
 
@@ -31,7 +33,7 @@ export interface EventCardProps {
 }
 
 /** A titled event list with its count; loading, error and empty states in the body. */
-export function EventCard(props: EventCardProps) {
+export function EventCard(props: EventCardProps): ReactElement {
     const { t } = useTranslation('dashboard');
     const { icon: Icon, tone } = props;
     return (

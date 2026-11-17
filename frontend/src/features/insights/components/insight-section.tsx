@@ -6,6 +6,7 @@ import Card from '@mui/material/Card';
 import Skeleton from '@mui/material/Skeleton';
 import ToggleButton from '@mui/material/ToggleButton';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -29,7 +30,7 @@ export interface InsightSectionProps {
 }
 
 /** A figure's card (title, chart or list) with its side card (headline, about, details). */
-export function InsightSection(props: InsightSectionProps) {
+export function InsightSection(props: InsightSectionProps): ReactElement {
     const { t } = useTranslation('insights');
     return (
         <section

@@ -1,6 +1,9 @@
 import { randomUUID } from 'node:crypto';
+
 import { Injectable } from '@nestjs/common';
+
 import { BusinessRuleException, WebhookSignatureException } from '../../../../common/exception/api.exception';
+import { DAY_MS } from '../../../../common/time/units';
 import {
     BillingGateway,
     type CheckoutRequest,
@@ -11,7 +14,8 @@ import {
 } from '../../service/billing-gateway';
 
 /** A fake month, so "next charge" shows a date. */
-const PERIOD_MS = 30 * 86_400_000;
+const FAKE_PERIOD_DAYS = 30;
+const PERIOD_MS = FAKE_PERIOD_DAYS * DAY_MS;
 
 /**
  * Local work without Stripe (BILLING_PROVIDER=fake): a checkout "pays" at once and sends the

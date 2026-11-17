@@ -1,15 +1,22 @@
 import Typography from '@mui/material/Typography';
 import { m, useReducedMotion } from 'motion/react';
-import { signed } from '../chart';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { TIME_OFF_TYPE_VISUALS } from '@/features/time-off';
 import { cn } from '@/shared/lib/cn';
+import { STAGGER_BASE } from '@/shared/lib/motion';
+import { PERCENT, TENTHS } from '@/shared/lib/units';
+
+import { signed } from '../chart';
 import { useAbsence } from '../hooks/use-insights';
 import type { Absence, InsightsFilter } from '../types';
 import { DeltaLine } from './delta-line';
 import { Figure } from './figure';
 import { InsightSection } from './insight-section';
 import { PersonLine } from './person-line';
+
+const TOP_RANKS = 3;
 
 type AbsenceType = keyof Absence['top'][number]['byType'];
 /** The time-off types in their usual order, coloured as on the Calendar and the Requests page. */
@@ -18,7 +25,7 @@ const TYPES: { type: AbsenceType; className: string }[] = (['VACATION', 'SICK_DA
 );
 
 /** The ten people with the most approved days off, each split by type. */
-export function AbsenceSection({ filter }: { filter: InsightsFilter }) {
+export function AbsenceSection({ filter }: { filter: InsightsFilter }): ReactElement {
     const { t, i18n } = useTranslation(['insights', 'timeOff']);
     const reduceMotion = useReducedMotion();
     const query = useAbsence(filter);
@@ -46,7 +53,7 @@ export function AbsenceSection({ filter }: { filter: InsightsFilter }) {
                             data.averageDays !== null &&
                             data.previousAverageDays !== null && (
                                 <DeltaLine
-                                    direction={Math.round((data.averageDays - data.previousAverageDays) * 10)}
+                                    direction={Math.round((data.averageDays - data.previousAverageDays) * TENTHS)}
                                     change={signed(data.averageDays - data.previousAverageDays, i18n.language)}
                                     previousYear={filter.year - 1}
                                     better="down"
@@ -100,7 +107,7 @@ export function AbsenceSection({ filter }: { filter: InsightsFilter }) {
                                         component="span"
                                         className={cn(
                                             'app-tabular flex size-7 shrink-0 items-center justify-center rounded-full',
-                                            index < 3
+                                            index < TOP_RANKS
                                                 ? 'bg-badge-active-background text-badge-active-text'
                                                 : 'bg-badge-neutral-background text-badge-neutral-text',
                                         )}
@@ -114,7 +121,7 @@ export function AbsenceSection({ filter }: { filter: InsightsFilter }) {
                                         <m.span
                                             key={`${animationKey}-${row.person.employeeId}`}
                                             className="flex h-full origin-left"
-                                            style={{ width: `${String((row.days / most) * 100)}%` }}
+                                            style={{ width: `${String((row.days / most) * PERCENT)}%` }}
                                             {...(reduceMotion
                                                 ? {}
                                                 : {
@@ -122,7 +129,7 @@ export function AbsenceSection({ filter }: { filter: InsightsFilter }) {
                                                       animate: { scaleX: 1 },
                                                       transition: {
                                                           duration: 0.5,
-                                                          delay: index * 0.04,
+                                                          delay: index * STAGGER_BASE,
                                                           ease: 'easeOut' as const,
                                                       },
                                                   })}

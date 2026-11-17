@@ -1,6 +1,9 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
+import { MAX_NOTE_LENGTH } from '../../../../common/dto/limits';
 import { pageResponseSchema } from '../../../../common/dto/page.response';
+import { MAX_DAYS_IN_MONTH } from '../../../../common/time/units';
 import { TIME_OFF_STATUSES } from '../../service/time-off-type';
 import { TimeOffTypeSchema } from './create-time-off-request.request';
 
@@ -55,8 +58,8 @@ const requestShape = {
     /** Working days. */
     days: z.number().int(),
     status: TimeOffStatusSchema,
-    note: z.string().max(500).nullable(),
-    decisionComment: z.string().max(500).nullable(),
+    note: z.string().max(MAX_NOTE_LENGTH).nullable(),
+    decisionComment: z.string().max(MAX_NOTE_LENGTH).nullable(),
     createdAt: z.iso.datetime(),
     decidedAt: z.iso.datetime().nullable(),
     decidedBy: PersonSchema.nullable(),
@@ -143,6 +146,6 @@ export class TimeOffCalendarResponse extends createZodDto(
         from: z.iso.date(),
         to: z.iso.date(),
         /** Company holidays in the month, by date. */
-        holidays: z.array(z.object({ heldAt: z.iso.date(), name: z.string() })).max(31),
+        holidays: z.array(z.object({ heldAt: z.iso.date(), name: z.string() })).max(MAX_DAYS_IN_MONTH),
     }),
 ) {}

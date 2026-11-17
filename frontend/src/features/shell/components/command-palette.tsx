@@ -2,9 +2,12 @@ import SearchOutlined from '@mui/icons-material/SearchOutlined';
 import Dialog from '@mui/material/Dialog';
 import InputBase from '@mui/material/InputBase';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useCallback, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { type Command, useCommands } from '../hooks/use-commands';
 
 export interface CommandPaletteProps {
@@ -17,7 +20,7 @@ export interface CommandPaletteProps {
  * WAI-ARIA combobox with a listbox — focus stays in the input, the active option is named by
  * aria-activedescendant. The dialog remounts on each opening (empty query).
  */
-export function CommandPalette({ open, onClose }: CommandPaletteProps) {
+export function CommandPalette({ open, onClose }: CommandPaletteProps): ReactElement {
     const { t } = useTranslation('shell');
     const [query, setQuery] = useState('');
     const [activeIndex, setActiveIndex] = useState(0);

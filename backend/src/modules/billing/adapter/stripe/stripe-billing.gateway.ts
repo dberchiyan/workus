@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import Stripe from 'stripe';
+
 import { AppConfigService } from '../../../../common/config/app-config.service';
 import {
     BusinessRuleException,
@@ -9,6 +10,7 @@ import {
 } from '../../../../common/exception/api.exception';
 import { MetricsService } from '../../../../common/observability/metrics.service';
 import { type Plan, Plan as PlanValue } from '../../../../common/plan/plan';
+import { MS_PER_SECOND } from '../../../../common/time/units';
 import {
     BillingGateway,
     type CheckoutRequest,
@@ -45,7 +47,7 @@ const idOf = (value: string | { id: string } | null | undefined): string | null 
     value === null || value === undefined ? null : typeof value === 'string' ? value : value.id;
 
 const toDate = (seconds: number | null | undefined): Date | null =>
-    seconds === null || seconds === undefined ? null : new Date(seconds * 1000);
+    seconds === null || seconds === undefined ? null : new Date(seconds * MS_PER_SECOND);
 
 /**
  * Stripe behind the BillingGateway port: Checkout for the first payment, the Customer Portal for
@@ -283,7 +285,7 @@ export class StripeBillingGateway extends BillingGateway {
         return {
             id: event.id,
             type: event.type,
-            occurredAt: new Date(event.created * 1000),
+            occurredAt: new Date(event.created * MS_PER_SECOND),
             ...this.referencesOf(event),
         };
     }
@@ -325,7 +327,7 @@ export class StripeBillingGateway extends BillingGateway {
         if (!schedule || typeof schedule === 'string') {
             return null;
         }
-        const now = Math.floor(Date.now() / 1000);
+        const now = Math.floor(Date.now() / MS_PER_SECOND);
         const next = schedule.phases.find((phase) => phase.start_date > now);
         const price = next?.items[0]?.price;
         return price ? this.planOfPrice(idOf(price)) : null;

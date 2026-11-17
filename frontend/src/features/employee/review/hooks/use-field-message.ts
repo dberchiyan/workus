@@ -1,10 +1,15 @@
 import { useTranslation } from 'react-i18next';
+
 import { isReviewValidationMessage } from '../schemas';
 
 /** Keeps one helper line under every field, so the form never shifts (data.md → Forms). */
 export const RESERVED_LINE = ' ';
 
-export const useFieldMessage = () => {
+export const useFieldMessage = (): ((
+    error: { type?: string | undefined; message?: string | undefined } | undefined,
+    max?: number,
+    hint?: string,
+) => string) => {
     const { t } = useTranslation(['review', 'validation']);
     return (
         error: { type?: string | undefined; message?: string | undefined } | undefined,

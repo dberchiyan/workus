@@ -2,15 +2,18 @@ import EventBusyOutlined from '@mui/icons-material/EventBusyOutlined';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { RefObject } from 'react';
+import { ViewTransition } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
+import { personAvatarTransition } from '@/shared/lib/view-transition-names';
+
 import { formatCalendarDate } from '../format';
 import type { EmployeeProfile } from '../types';
 import { EmployeeStatusChip } from './employee-status-chip';
 import { ProfileActions } from './profile-actions';
-import { ViewTransition } from 'react';
-import { personAvatarTransition } from '@/shared/lib/view-transition-names';
 
 export interface ProfileHeaderProps {
     employee: EmployeeProfile;
@@ -18,7 +21,7 @@ export interface ProfileHeaderProps {
 }
 
 /** Name, position, status (with the termination, if any) and the profile actions. */
-export function ProfileHeader({ employee, headingRef }: ProfileHeaderProps) {
+export function ProfileHeader({ employee, headingRef }: ProfileHeaderProps): ReactElement {
     const { t, i18n } = useTranslation('employee');
     const termination =
         employee.termination && employee.terminatedAt

@@ -2,16 +2,19 @@ import InboxOutlined from '@mui/icons-material/InboxOutlined';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import type { UseQueryResult } from '@tanstack/react-query';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router';
+
 import { PATHS } from '@/shared/lib/paths';
+
 import { type DashboardBirthdays, type DashboardRequests, type DashboardReviews, EVENTS_PAGE_SIZE } from '../types';
 import { BirthdaysEventCard } from './birthdays-event-card';
-import { EVENT_TONES } from './event-tones';
 import { EventCard } from './event-card';
 import { EventList } from './event-list';
 import { EventPagination } from './event-pagination';
 import { RequestEventRow } from './event-rows';
+import { EVENT_TONES } from './event-tones';
 import { ReviewsEventCard } from './reviews-event-card';
 
 export interface TodayEventsPanelProps {
@@ -29,7 +32,7 @@ export interface TodayEventsPanelProps {
 }
 
 /** Requests made today (full width, five a page), then reviews and birthdays side by side. */
-export function TodayEventsPanel(props: TodayEventsPanelProps) {
+export function TodayEventsPanel(props: TodayEventsPanelProps): ReactElement {
     const { t, i18n } = useTranslation('dashboard');
     const { requests, reviews, birthdays } = props;
     const totals = [requests, reviews, birthdays].map((query) => query.data?.totalElements);

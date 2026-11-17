@@ -1,6 +1,7 @@
 import SearchOutlined from '@mui/icons-material/SearchOutlined';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
+import type { ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
@@ -13,7 +14,7 @@ export interface RequestSearchFieldProps {
 }
 
 /** Typing is local; the URL gets the value after a short pause. */
-export function RequestSearchField({ value, onSearch }: RequestSearchFieldProps) {
+export function RequestSearchField({ value, onSearch }: RequestSearchFieldProps): ReactElement {
     const { t } = useTranslation('timeOff');
     const [text, setText] = useState(value);
     const [urlValue, setUrlValue] = useState(value);

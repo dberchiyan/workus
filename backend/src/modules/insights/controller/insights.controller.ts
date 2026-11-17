@@ -1,16 +1,17 @@
 import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
-import type { Principal } from '../../../common/security/principal';
-import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
+
 import { ApiErrors } from '../../../common/exception/api-errors.decorator';
-import { can } from '../../../common/security/policies';
 import { Feature } from '../../../common/plan/plan';
+import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
 import { RequiresFeature } from '../../../common/security/plan.guard';
+import { can } from '../../../common/security/policies';
+import type { Principal } from '../../../common/security/principal';
 import { Authorize } from '../../../common/security/security.decorators';
 import { InsightsService } from '../service/insights.service';
-import { InsightsFilterQuery } from './dto/insights-filter.query';
 import { InsightsResponse } from './dto/insights.response';
+import { InsightsFilterQuery } from './dto/insights-filter.query';
 import { toInsightsResponse } from './mapper/insights.mapper';
 
 /** Company figures for one year, for the whole company or one position category (admin). */

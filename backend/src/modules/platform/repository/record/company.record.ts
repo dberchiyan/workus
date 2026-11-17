@@ -11,7 +11,30 @@ const ownersSelect = {
 } satisfies Prisma.Organisation$usersArgs;
 
 /** A company as the platform's list shows it: who owns it and how big it is — no HR data. */
-export const companySelect = (today: Date) =>
+export const companySelect = (
+    today: Date,
+): {
+    id: true;
+    name: true;
+    status: true;
+    createdAt: true;
+    decidedAt: true;
+    rejectionReason: true;
+    version: true;
+    decider: { select: { firstName: true; lastName: true } };
+    users: {
+        where: { role: string };
+        select: { id: true; firstName: true; lastName: true; email: true };
+        orderBy: ({ createdAt: 'asc'; id?: undefined } | { id: 'asc'; createdAt?: undefined })[];
+        take: number;
+    };
+    _count: {
+        select: {
+            users: { where: { role: string } };
+            employees: { where: { OR: ({ terminatedAt: null } | { terminatedAt: { gt: Date } })[] } };
+        };
+    };
+} =>
     ({
         id: true,
         name: true,

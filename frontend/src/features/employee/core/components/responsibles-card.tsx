@@ -5,13 +5,16 @@ import CardContent from '@mui/material/CardContent';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
+
 import type { EmployeeProfile } from '../types';
 import { EditResponsiblesDialog } from './edit-responsibles-dialog';
 
-export function ResponsiblesCard({ employee }: { employee: EmployeeProfile }) {
+export function ResponsiblesCard({ employee }: { employee: EmployeeProfile }): ReactElement {
     const { t } = useTranslation('employee');
     const [isEditing, setIsEditing] = useState(false);
     // Each opening starts from the profile as read (and its version).

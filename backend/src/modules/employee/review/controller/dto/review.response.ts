@@ -1,8 +1,9 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
 import { MoneySchema } from '../../../../../common/dto/money';
-import { RichTextDocSchema } from '../../service/rich-text';
 import { REVIEW_KINDS } from '../../service/review-kind';
+import { RichTextDocSchema } from '../../service/rich-text';
 import { ReviewStatusSchema } from './create-review.request';
 
 export const ReviewKindSchema = z.enum(REVIEW_KINDS).meta({ id: 'ReviewKind' });

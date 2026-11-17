@@ -1,5 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
 import { TerminationReason, TerminationReasonSchema } from '../../../core/service/termination-reason';
 
 export const COMMENT_MAX_LENGTH = 500;

@@ -1,3 +1,4 @@
+import { useMediaQuery, useTheme } from '@mui/material';
 import Button from '@mui/material/Button';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
@@ -5,12 +6,14 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormHelperText from '@mui/material/FormHelperText';
 import Typography from '@mui/material/Typography';
-import { useMediaQuery, useTheme } from '@mui/material';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
 import { PeoplePicker } from '@/shared/components/people-picker';
 import type { ErrorCode } from '@/shared/types';
+
 import { fullName } from '../format';
 import { useRequestResponsibleCandidates, useUpdateRequestResponsibles } from '../hooks/use-managed-requests';
 import type { ManagedRequest } from '../types';
@@ -43,7 +46,7 @@ export function EditRequestResponsiblesDialog({
     open,
     onClose,
     onExited,
-}: EditRequestResponsiblesDialogProps) {
+}: EditRequestResponsiblesDialogProps): ReactElement {
     const { t } = useTranslation(['timeOff', 'errors', 'validation']);
     const theme = useTheme();
     const isPhone = useMediaQuery(theme.breakpoints.down('sm'));

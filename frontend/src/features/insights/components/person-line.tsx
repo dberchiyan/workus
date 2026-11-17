@@ -1,13 +1,16 @@
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 import { Link as RouterLink } from 'react-router';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { employeeProfilePath } from '@/shared/lib/paths';
+
 import type { InsightPerson } from '../types';
 
 /** Avatar, name (to the profile), position, and something on the right. */
-export function PersonLine({ person, end }: { person: InsightPerson; end?: ReactNode }) {
+export function PersonLine({ person, end }: { person: InsightPerson; end?: ReactNode }): ReactElement {
     return (
         <span className="flex min-w-0 flex-1 items-center gap-3">
             <InitialsAvatar id={person.userId} firstName={person.firstName} lastName={person.lastName} />

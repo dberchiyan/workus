@@ -1,8 +1,9 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
+import { pageResponseSchema } from '../../../../../common/dto/page.response';
 import { AUDIT_TARGET_TYPES, RECORD_ACTIONS } from '../../../../audit/service/audit-action';
 import { AuditChangeSchema } from '../../../../audit/service/audit-change';
-import { pageResponseSchema } from '../../../../../common/dto/page.response';
 
 const ActivityEventSchema = z.object({
     id: z.uuid(),

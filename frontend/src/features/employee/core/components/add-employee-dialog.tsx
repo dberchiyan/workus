@@ -9,10 +9,13 @@ import StepLabel from '@mui/material/StepLabel';
 import Stepper from '@mui/material/Stepper';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import { AddEmployeeStep, useAddEmployeeForm } from '../hooks/use-add-employee-form';
+
 import { CredentialsCard } from '@/shared/components/credentials-card';
+
+import { AddEmployeeStep, useAddEmployeeForm } from '../hooks/use-add-employee-form';
 import { RESERVED_LINE } from '../hooks/use-field-message';
 import type { CreatedEmployee } from '../types';
 import { EmployeeDetailsStep } from './employee-details-step';
@@ -27,7 +30,7 @@ export interface AddEmployeeDialogProps {
 }
 
 /** Centred modal on tablet/desktop, full-screen sheet on phones (ux.md → Patterns). */
-export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmployeeDialogProps) {
+export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmployeeDialogProps): ReactElement {
     const { t } = useTranslation(['employee', 'common', 'errors']);
     const theme = useTheme();
     // Behaviour CSS cannot express: the dialog variant.

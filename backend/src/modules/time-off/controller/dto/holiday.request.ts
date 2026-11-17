@@ -1,6 +1,8 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
+import { MAX_YEAR, MIN_YEAR } from '../../../../common/dto/limits';
+
 export const HOLIDAY_NAME_MAX = 100;
 
 const holidayFields = {
@@ -25,7 +27,7 @@ export class HolidayYearQuery extends createZodDto(
         year: z.coerce
             .number({ error: 'validation.invalid' })
             .int('validation.invalid')
-            .min(2000, 'validation.invalid')
-            .max(2100, 'validation.invalid'),
+            .min(MIN_YEAR, 'validation.invalid')
+            .max(MAX_YEAR, 'validation.invalid'),
     }),
 ) {}

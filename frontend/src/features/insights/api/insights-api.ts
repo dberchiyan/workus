@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/client';
+
 import type { CategoryCounts, Insights, InsightsFilter } from '../types';
 
 /** Company figures for one year (admin). */

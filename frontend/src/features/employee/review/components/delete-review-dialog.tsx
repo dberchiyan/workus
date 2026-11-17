@@ -5,11 +5,14 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormHelperText from '@mui/material/FormHelperText';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
 import { formatMoney } from '@/shared/lib/money';
 import type { ErrorCode } from '@/shared/types';
+
 import { formatReviewDate } from '../format';
 import { useDeleteReview } from '../hooks/use-review-queries';
 import type { Review } from '../types';
@@ -31,7 +34,7 @@ export function DeleteReviewDialog({
     onClose,
     onDeleted,
     onExited,
-}: DeleteReviewDialogProps) {
+}: DeleteReviewDialogProps): ReactElement | null {
     const { t, i18n } = useTranslation(['review', 'errors']);
     const titleId = useId();
     const descriptionId = useId();

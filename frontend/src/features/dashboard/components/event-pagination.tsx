@@ -1,6 +1,8 @@
 import Pagination from '@mui/material/Pagination';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { EVENTS_PAGE_SIZE } from '../types';
 
 export interface EventPaginationProps {
@@ -12,7 +14,7 @@ export interface EventPaginationProps {
 }
 
 /** "6–10 of 14" and numbered pages under a card's rows; nothing when one page holds them all. */
-export function EventPagination({ label, page, total, onPage }: EventPaginationProps) {
+export function EventPagination({ label, page, total, onPage }: EventPaginationProps): ReactElement | null {
     const { t, i18n } = useTranslation('dashboard');
     const pages = Math.ceil(total / EVENTS_PAGE_SIZE);
     if (pages <= 1) {

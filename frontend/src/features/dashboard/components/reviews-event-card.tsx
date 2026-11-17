@@ -1,13 +1,15 @@
 import EventNoteOutlined from '@mui/icons-material/EventNoteOutlined';
 import type { UseQueryResult } from '@tanstack/react-query';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { type DashboardReviews, EVENTS_PAGE_SIZE } from '../types';
-import { EVENT_TONES } from './event-tones';
 import { EventCard } from './event-card';
 import { EventList } from './event-list';
 import { EventPagination } from './event-pagination';
 import { ReviewEventRow } from './event-rows';
+import { EVENT_TONES } from './event-tones';
 
 export interface ReviewsEventCardProps {
     id: string;
@@ -20,7 +22,15 @@ export interface ReviewsEventCardProps {
 }
 
 /** Reviews of a day or a month, five a page. */
-export function ReviewsEventCard({ id, query, page, onPage, subtitle, emptyText, action }: ReviewsEventCardProps) {
+export function ReviewsEventCard({
+    id,
+    query,
+    page,
+    onPage,
+    subtitle,
+    emptyText,
+    action,
+}: ReviewsEventCardProps): ReactElement {
     const { t, i18n } = useTranslation('dashboard');
     const total = query.data?.totalElements;
     return (

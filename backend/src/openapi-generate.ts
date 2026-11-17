@@ -1,7 +1,10 @@
 import 'reflect-metadata';
+
 import { writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+
 import { NestFactory } from '@nestjs/core';
+
 import { AppModule } from './app.module';
 import { AppConfigService } from './common/config/app-config.service';
 import { buildOpenApiDocument } from './openapi';

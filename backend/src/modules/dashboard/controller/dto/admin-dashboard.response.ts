@@ -1,6 +1,8 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
+import { MAX_DAYS_IN_MONTH, MONTHS_PER_YEAR } from '../../../../common/time/units';
+
 const PersonSchema = z.object({
     /** User id (avatar colour). */
     id: z.uuid(),
@@ -82,8 +84,8 @@ const DashboardReviewSchema = z
 /** Day and month only — the year (age) is personal data. */
 const DashboardBirthdaySchema = z
     .object({
-        month: z.number().int().min(1).max(12),
-        day: z.number().int().min(1).max(31),
+        month: z.number().int().min(1).max(MONTHS_PER_YEAR),
+        day: z.number().int().min(1).max(MAX_DAYS_IN_MONTH),
         employee: EmployeeSchema,
     })
     .meta({ id: 'DashboardBirthday' });

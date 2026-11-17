@@ -1,6 +1,8 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
+import { MAX_HOLIDAYS_PER_LIST } from '../../../../common/dto/limits';
+
 export const HolidaySchema = z
     .object({
         id: z.uuid(),
@@ -16,4 +18,6 @@ export const HolidaySchema = z
 
 export class HolidayResponse extends createZodDto(z.object(HolidaySchema.shape)) {}
 
-export class HolidayListResponse extends createZodDto(z.object({ content: z.array(HolidaySchema).max(400) })) {}
+export class HolidayListResponse extends createZodDto(
+    z.object({ content: z.array(HolidaySchema).max(MAX_HOLIDAYS_PER_LIST) }),
+) {}

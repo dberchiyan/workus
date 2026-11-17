@@ -1,8 +1,10 @@
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { Transactional } from '@nestjs-cls/transactional';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+
 import { AppConfigService } from '../../../common/config/app-config.service';
+import { isPlan, Plan } from '../../../common/plan/plan';
 import { ClientType, Principal } from '../../../common/security/principal';
 import {
     type SessionAuthentication,
@@ -10,11 +12,10 @@ import {
     SessionLookup,
 } from '../../../common/security/session-authenticator';
 import { generateToken, hashToken } from '../../../common/security/token-hash';
-import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
 import { AuditService } from '../../audit/service/audit.service';
-import { isPlan, Plan } from '../../../common/plan/plan';
-import { OrganisationStatus } from '../../user/service/organisation-status';
+import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
 import { EmployeeService } from '../../employee/core/service/employee.service';
+import { OrganisationStatus } from '../../user/service/organisation-status';
 import type { SessionListRecord } from '../repository/record/session.record';
 import { SessionRepository } from '../repository/session.repository';
 

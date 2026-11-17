@@ -1,17 +1,20 @@
 import { Injectable } from '@nestjs/common';
+
+import { PERCENT } from '../../../common/dto/limits';
 import { Currency, type Decimal, roundToCents, toDecimal } from '../../../common/persistence/money';
-import type { RosterEmployee } from '../../employee/core/service/employee.types';
+import { MONTHS_PER_YEAR } from '../../../common/time/units';
 import { EmployeeService } from '../../employee/core/service/employee.service';
+import type { RosterEmployee } from '../../employee/core/service/employee.types';
 import { ReviewService } from '../../employee/review/service/review.service';
-import { TIME_OFF_TYPES, type TimeOffType } from '../../time-off/service/time-off-type';
 import { TimeOffService } from '../../time-off/service/time-off.service';
+import { TIME_OFF_TYPES, type TimeOffType } from '../../time-off/service/time-off-type';
 import type {
     Absence,
     AbsenceLeader,
     Headcount,
     InsightGroup,
-    Insights,
     InsightPerson,
+    Insights,
     Salary,
     SalaryGroup,
     Tenure,
@@ -36,14 +39,15 @@ const monthEnd = (year: number, month: number): Date => new Date(Date.UTC(year, 
 const earlier = (a: Date, b: Date): Date => (a < b ? a : b);
 
 /** The day a year is measured on: its last day, or today while it lasts. */
-const referenceDay = (year: number, today: Date): Date => earlier(monthEnd(year, 12), today);
+const referenceDay = (year: number, today: Date): Date => earlier(monthEnd(year, MONTHS_PER_YEAR), today);
 
 const employedOn = (employee: RosterEmployee, day: Date): boolean =>
     employee.startsAt <= day && (employee.terminatedAt === null || employee.terminatedAt > day);
 
 /** Whole months from `start` to `end` (0 within the first month). */
 const wholeMonths = (start: Date, end: Date): number => {
-    const months = (end.getUTCFullYear() - start.getUTCFullYear()) * 12 + end.getUTCMonth() - start.getUTCMonth();
+    const months =
+        (end.getUTCFullYear() - start.getUTCFullYear()) * MONTHS_PER_YEAR + end.getUTCMonth() - start.getUTCMonth();
     return Math.max(0, end.getUTCDate() < start.getUTCDate() ? months - 1 : months);
 };
 
@@ -52,7 +56,8 @@ const positionGroup = (person: RosterEmployee): InsightGroup => ({
     name: person.position.title,
 });
 
-const oneDecimal = (value: number): number => Math.round(value * 10) / 10;
+const TENTHS = 10;
+const oneDecimal = (value: number): number => Math.round(value * TENTHS) / TENTHS;
 
 const personOf = (employee: RosterEmployee): InsightPerson => ({
     employeeId: employee.id,
@@ -110,7 +115,7 @@ export class InsightsService {
             return { month, counts };
         });
         const day = referenceDay(filter.year, today);
-        const previousDay = monthEnd(filter.year - 1, 12);
+        const previousDay = monthEnd(filter.year - 1, MONTHS_PER_YEAR);
         // Groups nobody belonged to all year add nothing to the chart.
         const used = groups.map((_, index) => months.some((month) => (month.counts?.[index] ?? 0) > 0));
         return {
@@ -142,7 +147,7 @@ export class InsightsService {
         const categories = this.groupsOf(employed, (person) => person.category);
         return {
             averageMonths: average(day),
-            previousAverageMonths: average(monthEnd(filter.year - 1, 12)),
+            previousAverageMonths: average(monthEnd(filter.year - 1, MONTHS_PER_YEAR)),
             groups: categories.map((category) => {
                 const members = employed.filter((person) => person.category.id === category.id);
                 const positions = this.groupsOf(members, positionGroup);
@@ -192,7 +197,7 @@ export class InsightsService {
                     return people.filter((person) => employedOn(person, day)).length;
                 });
             const average = counts.reduce((sum, count) => sum + count, 0) / counts.length;
-            return counts.length === 0 || average === 0 ? null : oneDecimal((left / average) * 100);
+            return counts.length === 0 || average === 0 ? null : oneDecimal((left / average) * PERCENT);
         };
         return {
             months,
@@ -283,7 +288,7 @@ export class InsightsService {
         };
         const [current, previous] = await Promise.all([
             measure(referenceDay(filter.year, today)),
-            measure(monthEnd(filter.year - 1, 12)),
+            measure(monthEnd(filter.year - 1, MONTHS_PER_YEAR)),
         ]);
         const groups: SalaryGroup[] = this.groupsOf(
             current.paid.map((row) => row.person),

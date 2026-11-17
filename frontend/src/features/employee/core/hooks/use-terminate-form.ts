@@ -1,13 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useEffect, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { type BaseSyntheticEvent, type RefObject, useEffect, useRef, useState } from 'react';
+import { useForm, type UseFormReturn } from 'react-hook-form';
+
 import { isApiError } from '@/shared/api/api-error';
+import { todayUtcIso as todayIso } from '@/shared/lib/utc-day';
 import type { ErrorCode } from '@/shared/types';
+
 import { isTerminationReason, type TerminateEmployeeFormValues, terminateEmployeeSchema } from '../schemas';
 import type { EmployeeProfile } from '../types';
 import { useTerminateEmployee } from './use-employee-queries';
-
-const todayIso = (): string => new Date().toISOString().slice(0, 10);
 
 const FORM_FIELDS: ReadonlySet<string> = new Set(['terminatedAt', 'reason', 'comment']);
 const isFormField = (field: string): field is keyof TerminateEmployeeFormValues => FORM_FIELDS.has(field);
@@ -16,7 +17,16 @@ const isFormField = (field: string): field is keyof TerminateEmployeeFormValues 
  * Terminate, or change an existing termination (prefilled). Sends the version read when the
  * dialog opened (it remounts per opening).
  */
-export const useTerminateForm = (employee: EmployeeProfile, onSaved: () => void) => {
+export const useTerminateForm = (
+    employee: EmployeeProfile,
+    onSaved: () => void,
+): {
+    form: UseFormReturn<TerminateEmployeeFormValues>;
+    submit: (event?: BaseSyntheticEvent) => Promise<void>;
+    errorCode: ErrorCode | null;
+    errorRef: RefObject<HTMLDivElement | null>;
+    isSubmitting: boolean;
+} => {
     const terminate = useTerminateEmployee(employee.id);
     const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);
     const [errorCount, setErrorCount] = useState(0);

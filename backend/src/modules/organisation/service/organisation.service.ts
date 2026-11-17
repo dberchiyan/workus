@@ -1,6 +1,7 @@
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { Transactional } from '@nestjs-cls/transactional';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+
 import { AppConfigService } from '../../../common/config/app-config.service';
 import type { Pageable } from '../../../common/dto/pageable';
 import {
@@ -11,20 +12,20 @@ import {
     ResourceNotFoundException,
 } from '../../../common/exception/api.exception';
 import type { Principal } from '../../../common/security/principal';
+import { AuditService } from '../../audit/service/audit.service';
 import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
 import { AuditField, auditValue, changeOf } from '../../audit/service/audit-change';
-import { AuditService } from '../../audit/service/audit.service';
 import { AuthService } from '../../auth/service/auth.service';
 import { PasswordHasher } from '../../auth/service/password-hasher.service';
 import type { StartedSession } from '../../auth/service/session.service';
 import { SessionService } from '../../auth/service/session.service';
+import { CompanyStructureService } from '../../employee/core/service/company-structure.service';
 import type { AdministratorSortField } from '../../user/service/administrator-sort';
-import { ADMIN_ROLES, authoritiesFor, UserRole } from '../../user/service/user-role';
 import { UserService } from '../../user/service/user.service';
 import type { Administrator } from '../../user/service/user.types';
-import type { OrganisationRecord } from '../repository/record/organisation.record';
+import { ADMIN_ROLES, authoritiesFor, UserRole } from '../../user/service/user-role';
 import { OrganisationRepository } from '../repository/organisation.repository';
-import { CompanyStructureService } from '../../employee/core/service/company-structure.service';
+import type { OrganisationRecord } from '../repository/record/organisation.record';
 import type { AddAdministratorCommand, ChangeRoleCommand, RegisterCommand } from './organisation.types';
 
 const MAX_SEARCH_TERMS = 5;

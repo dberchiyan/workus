@@ -1,11 +1,14 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
+
 import { fullName } from '../format';
 import type { TimeOffPerson } from '../types';
 
 /** Avatar, name and position (admins: "Administrator"). */
-export function PersonLine({ person }: { person: TimeOffPerson }) {
+export function PersonLine({ person }: { person: TimeOffPerson }): ReactElement {
     const { t } = useTranslation('timeOff');
     return (
         <span className="flex min-w-0 items-center gap-3">

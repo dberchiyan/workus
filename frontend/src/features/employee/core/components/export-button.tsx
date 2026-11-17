@@ -4,11 +4,14 @@ import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import Snackbar from '@mui/material/Snackbar';
+import type { ReactElement } from 'react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useUpgrade } from '@/features/auth';
 import { UpgradePrompt } from '@/shared/components/upgrade-prompt';
-import { useEmployeeExport, type EmployeeExportKind } from '../hooks/use-employee-export';
+
+import { type EmployeeExportKind, useEmployeeExport } from '../hooks/use-employee-export';
 
 export interface ExportButtonProps {
     employeeId: string;
@@ -19,7 +22,7 @@ export interface ExportButtonProps {
  * Downloads the tab's CSV (Business plan). On a lower plan the click opens the upgrade prompt
  * — the API would refuse the download anyway.
  */
-export function ExportButton({ employeeId, kind }: ExportButtonProps) {
+export function ExportButton({ employeeId, kind }: ExportButtonProps): ReactElement {
     const { t } = useTranslation('employee');
     const upgrade = useUpgrade('exports');
     const download = useEmployeeExport(employeeId, kind);

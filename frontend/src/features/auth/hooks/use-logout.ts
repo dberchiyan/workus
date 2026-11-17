@@ -1,5 +1,8 @@
+import type { UseMutationResult } from '@tanstack/react-query';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+
 import { PATHS } from '@/shared/lib/paths';
+
 import { authApi } from '../api/auth-api';
 
 /**
@@ -7,7 +10,7 @@ import { authApi } from '../api/auth-api';
  * page load of `/`: without the session cookie the server answers it with the landing page (where
  * there is no landing — local Vite — the app shows sign-in, as before).
  */
-export const useLogout = () => {
+export const useLogout = (): UseMutationResult<void, Error, void> => {
     const queryClient = useQueryClient();
     return useMutation({
         mutationFn: authApi.logout,

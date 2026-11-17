@@ -1,7 +1,10 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { monthLabels, signed } from '../chart';
 import { useHeadcount } from '../hooks/use-insights';
 import type { InsightsFilter } from '../types';
@@ -19,7 +22,7 @@ export interface HeadcountSectionProps {
 }
 
 /** People employed at the end of each month, stacked by group; a month opens its breakdown. */
-export function HeadcountSection({ filter, colorFor }: HeadcountSectionProps) {
+export function HeadcountSection({ filter, colorFor }: HeadcountSectionProps): ReactElement {
     const { t, i18n } = useTranslation('insights');
     const query = useHeadcount(filter);
     const [hidden, setHidden] = useState<ReadonlySet<string>>(new Set());

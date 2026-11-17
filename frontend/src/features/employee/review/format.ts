@@ -1,3 +1,4 @@
+import { PERCENT } from '@/shared/lib/units';
 /** `YYYY-MM-DD` → localised reviewedAt (UTC, so the day never shifts). */
 export const formatReviewDate = (isoDate: string, locale: string, style: 'medium' | 'monthYear' = 'medium'): string =>
     new Intl.DateTimeFormat(
@@ -14,4 +15,4 @@ export const formatPercentChange = (percent: string, locale: string): string =>
         signDisplay: 'exceptZero',
         minimumFractionDigits: 1,
         maximumFractionDigits: 1,
-    }).format(Number(percent) / 100);
+    }).format(Number(percent) / PERCENT);

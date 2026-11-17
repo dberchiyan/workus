@@ -1,4 +1,5 @@
 import { useAccess } from '@/features/auth';
+
 import { NAV_ITEMS, type NavItem } from '../navigation';
 
 /** Menu items the signed-in user's role uses (see `ACCESS`), split into the main list and the bottom group. */

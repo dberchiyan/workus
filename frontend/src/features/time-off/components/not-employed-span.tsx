@@ -1,5 +1,7 @@
 import Tooltip from '@mui/material/Tooltip';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatDay } from '../format';
 
 export interface NotEmployedSpanProps {
@@ -8,7 +10,7 @@ export interface NotEmployedSpanProps {
 }
 
 /** Fills a hatched run of days; hover or focus says why: not started yet, or no longer employed. */
-export function NotEmployedSpan({ reason, employee }: NotEmployedSpanProps) {
+export function NotEmployedSpan({ reason, employee }: NotEmployedSpanProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const date = reason === 'before' ? employee.startsAt : employee.terminatedAt;
     const description = date

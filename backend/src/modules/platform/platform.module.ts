@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { AuditModule } from '../audit/audit.module';
 import { CompanyController } from './controller/company.controller';
 import { CompanyRepository } from './repository/company.repository';

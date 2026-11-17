@@ -2,13 +2,15 @@ import SearchOffOutlined from '@mui/icons-material/SearchOffOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
 import { RowSkeleton } from '@/shared/components/row-skeleton';
 
 const SKELETON_ROWS = ['s1', 's2', 's3', 's4', 's5'] as const;
 
-export function EmployeeListLoading() {
+export function EmployeeListLoading(): ReactElement {
     const { t } = useTranslation();
     return (
         <div role="status" aria-busy="true" className="flex flex-col divide-y divide-divider px-4 py-2">
@@ -20,7 +22,7 @@ export function EmployeeListLoading() {
     );
 }
 
-export function EmployeeListEmpty({ onClear }: { onClear: () => void }) {
+export function EmployeeListEmpty({ onClear }: { onClear: () => void }): ReactElement {
     const { t } = useTranslation('employee');
     return (
         <div className="flex flex-col items-center gap-3 px-4 py-12 text-center">
@@ -38,7 +40,7 @@ export function EmployeeListEmpty({ onClear }: { onClear: () => void }) {
     );
 }
 
-export function EmployeeListError({ error, onRetry }: { error: unknown; onRetry: () => void }) {
+export function EmployeeListError({ error, onRetry }: { error: unknown; onRetry: () => void }): ReactElement {
     const { t } = useTranslation(['employee', 'errors']);
     return (
         <div className="p-4">

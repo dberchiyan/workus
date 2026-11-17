@@ -3,17 +3,21 @@ import ButtonBase from '@mui/material/ButtonBase';
 import IconButton from '@mui/material/IconButton';
 import { styled } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { CommandPalette } from './command-palette';
+
+const GAP_UNITS = 1.5;
 
 /** A search-box look: hairline, the page's background, muted text. */
 const SearchBox = styled(ButtonBase)(({ theme }) => {
     const { palette } = theme.vars ?? theme;
     return {
         height: 40,
-        gap: theme.spacing(1.5),
-        padding: theme.spacing(0, 1, 0, 1.5),
+        gap: theme.spacing(GAP_UNITS),
+        padding: theme.spacing(0, 1, 0, GAP_UNITS),
         borderRadius: theme.shape.borderRadius,
         border: `1px solid ${palette.divider}`,
         backgroundColor: palette.background.default,
@@ -31,7 +35,7 @@ const isApple = (): boolean => /Mac|iPhone|iPad/.test(navigator.userAgent);
  * Opens the command menu: a search box in the top bar (an icon on phones) and ⌘K / Ctrl+K
  * anywhere. Each opening mounts a fresh menu (empty query).
  */
-export function CommandPaletteButton() {
+export function CommandPaletteButton(): ReactElement {
     const { t } = useTranslation('shell');
     const [open, setOpen] = useState(false);
     const [opening, setOpening] = useState(0);

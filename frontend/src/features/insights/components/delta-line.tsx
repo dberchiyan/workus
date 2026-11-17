@@ -2,6 +2,7 @@ import TrendingDownOutlined from '@mui/icons-material/TrendingDownOutlined';
 import TrendingFlatOutlined from '@mui/icons-material/TrendingFlatOutlined';
 import TrendingUpOutlined from '@mui/icons-material/TrendingUpOutlined';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface DeltaLineProps {
@@ -15,7 +16,7 @@ export interface DeltaLineProps {
 }
 
 /** "↗ +3 vs 2025": the change against the previous year, never colour alone. */
-export function DeltaLine({ direction, change, previousYear, better }: DeltaLineProps) {
+export function DeltaLine({ direction, change, previousYear, better }: DeltaLineProps): ReactElement | null {
     const { t } = useTranslation('insights');
     if (direction === null) {
         return null;

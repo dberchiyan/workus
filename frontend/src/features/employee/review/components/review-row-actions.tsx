@@ -2,14 +2,16 @@ import DeleteOutlineOutlined from '@mui/icons-material/DeleteOutlineOutlined';
 import EditOutlined from '@mui/icons-material/EditOutlined';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import type { Review } from '../types';
 
 export type ReviewAction = 'view' | 'edit' | 'delete';
 export type OnReviewAction = (action: ReviewAction, review: Review, trigger: HTMLElement | null) => void;
 
 /** Icon buttons named after the review, so a screen reader says which one. */
-export function ReviewEditButton({ review, onAction }: { review: Review; onAction: OnReviewAction }) {
+export function ReviewEditButton({ review, onAction }: { review: Review; onAction: OnReviewAction }): ReactElement {
     const { t } = useTranslation('review');
     const label = t('actions.editNamed', { title: review.title });
     return (
@@ -26,7 +28,13 @@ export function ReviewEditButton({ review, onAction }: { review: Review; onActio
     );
 }
 
-export function ReviewDeleteButton({ review, onAction }: { review: Review; onAction: OnReviewAction }) {
+export function ReviewDeleteButton({
+    review,
+    onAction,
+}: {
+    review: Review;
+    onAction: OnReviewAction;
+}): ReactElement | null {
     const { t } = useTranslation('review');
     // The starting salary opens the salary history: it can be edited, never deleted.
     if (review.kind === 'STARTING') {

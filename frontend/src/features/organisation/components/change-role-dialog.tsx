@@ -5,9 +5,12 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
+
 import { useChangeRole } from '../hooks/use-organisation';
 import { NEXT_ROLE } from '../roles';
 import type { Administrator } from '../types';
@@ -26,7 +29,13 @@ export interface ChangeRoleDialogProps {
  * signed out everywhere (their rights are re-read at the next sign-in) — or, for oneself, stays
  * signed in here with the new rights. Cancel takes focus first.
  */
-export function ChangeRoleDialog({ open, administrator, isSelf, onClose, onExited }: ChangeRoleDialogProps) {
+export function ChangeRoleDialog({
+    open,
+    administrator,
+    isSelf,
+    onClose,
+    onExited,
+}: ChangeRoleDialogProps): ReactElement {
     const { t } = useTranslation(['organisation', 'errors']);
     const changeRole = useChangeRole();
     const [error, setError] = useState<string | null>(null);

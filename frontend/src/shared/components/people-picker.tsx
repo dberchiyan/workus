@@ -1,7 +1,9 @@
 import Autocomplete from '@mui/material/Autocomplete';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { type Ref, useEffect, useState } from 'react';
+
 import { InitialsAvatar } from './initials-avatar';
 
 export interface PickerPerson {
@@ -48,7 +50,7 @@ export function PeoplePicker<P extends PickerPerson>({
     noOptionsText,
     loadingText,
     inputRef,
-}: PeoplePickerProps<P>) {
+}: PeoplePickerProps<P>): ReactElement {
     const [input, setInput] = useState('');
 
     useEffect(() => {

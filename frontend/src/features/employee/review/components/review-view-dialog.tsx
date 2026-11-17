@@ -6,10 +6,13 @@ import DialogTitle from '@mui/material/DialogTitle';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { formatMoney } from '@/shared/lib/money';
+
 import { formatReviewDate } from '../format';
 import type { Review } from '../types';
 import { ReviewStatusChip } from './review-status-chip';
@@ -25,7 +28,14 @@ export interface ReviewViewDialogProps {
 }
 
 /** Read-only review with everything at once, plus Edit and Delete. */
-export function ReviewViewDialog({ review, open, onClose, onEdit, onDelete, onExited }: ReviewViewDialogProps) {
+export function ReviewViewDialog({
+    review,
+    open,
+    onClose,
+    onEdit,
+    onDelete,
+    onExited,
+}: ReviewViewDialogProps): ReactElement | null {
     const { t, i18n } = useTranslation('review');
     const theme = useTheme();
     const isPhone = useMediaQuery(theme.breakpoints.down('sm'));

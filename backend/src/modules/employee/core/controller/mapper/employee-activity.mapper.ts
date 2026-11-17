@@ -1,5 +1,5 @@
-import { isRecordAction } from '../../../../audit/service/audit-action';
 import type { AuditEventPage } from '../../../../audit/service/audit.types';
+import { isRecordAction } from '../../../../audit/service/audit-action';
 import type { EmployeeActivityPageResponse } from '../dto/employee-activity.response';
 
 export const toEmployeeActivityPageResponse = (page: AuditEventPage): EmployeeActivityPageResponse => ({

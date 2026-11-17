@@ -1,18 +1,19 @@
+import { Injectable } from '@nestjs/common';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import type { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { Injectable } from '@nestjs/common';
+
 import type { Pageable } from '../../../common/dto/pageable';
 import { toPrismaPage } from '../../../common/persistence/pageable';
 import type { PrismaService } from '../../../common/persistence/prisma.service';
 import type { Prisma } from '../../../generated/prisma/client';
-import { ADMIN_ROLES } from '../service/user-role';
 import type { AdministratorSortField } from '../service/administrator-sort';
+import { ADMIN_ROLES } from '../service/user-role';
 import {
     type AdministratorRecord,
     administratorSelect,
     type UserCredentialsRecord,
-    type UserProfileRecord,
     userCredentialsSelect,
+    type UserProfileRecord,
     userProfileSelect,
 } from './record/user.record';
 

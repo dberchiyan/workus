@@ -1,6 +1,8 @@
 import Alert from '@mui/material/Alert';
 import Snackbar from '@mui/material/Snackbar';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatPeriod, fullName } from '../format';
 import type { useRequestDecisions } from '../hooks/use-request-decisions';
 import { ConfirmDecisionDialog } from './confirm-decision-dialog';
@@ -10,7 +12,7 @@ export interface DecisionFeedbackProps {
 }
 
 /** What follows a decision wherever it is made: the reject / cancel confirmation and the notice. */
-export function DecisionFeedback({ decisions }: DecisionFeedbackProps) {
+export function DecisionFeedback({ decisions }: DecisionFeedbackProps): ReactElement {
     const { t, i18n } = useTranslation(['timeOff', 'errors']);
     const notice = decisions.notice;
     return (

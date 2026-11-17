@@ -1,8 +1,11 @@
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { Link as RouterLink } from 'react-router';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { requestPath } from '@/shared/lib/paths';
+
 import { fullName } from '../format';
 import type { ManagedRequest } from '../types';
 
@@ -13,7 +16,7 @@ export interface RequestPersonProps {
 }
 
 /** Whose request it is: avatar, name (opens the request) and position. */
-export function RequestPerson({ request, label }: RequestPersonProps) {
+export function RequestPerson({ request, label }: RequestPersonProps): ReactElement {
     const { employee } = request;
     return (
         <span className="flex min-w-0 items-center gap-3">

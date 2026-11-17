@@ -7,7 +7,9 @@ import TablePagination from '@mui/material/TablePagination';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatCount } from '../format';
 import { useManagedRequests } from '../hooks/use-managed-requests';
 import { CLOSED_PAGE_SIZES, type RequestsParams } from '../hooks/use-requests-params';
@@ -15,6 +17,8 @@ import { CLOSED_STATUSES, type ClosedStatus } from '../types';
 import { ClosedRequestCards } from './closed-request-cards';
 import { ClosedRequestsTable } from './closed-requests-table';
 import { SectionHeader } from './section-header';
+
+const SKELETON_ROWS = 4;
 
 const ALL = 'ALL';
 
@@ -25,7 +29,7 @@ export interface ClosedRequestsProps {
 }
 
 /** Approved, rejected and canceled requests, the latest change first, a page at a time. */
-export function ClosedRequests({ params, onStatus, onPage }: ClosedRequestsProps) {
+export function ClosedRequests({ params, onStatus, onPage }: ClosedRequestsProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const requests = useManagedRequests({
         state: 'CLOSED',
@@ -71,7 +75,7 @@ export function ClosedRequests({ params, onStatus, onPage }: ClosedRequestsProps
                 {requests.isPending ? (
                     <div className="flex flex-col gap-2 p-4">
                         <span className="sr-only">{t('manage.loading')}</span>
-                        {[0, 1, 2, 3].map((row) => (
+                        {Array.from({ length: SKELETON_ROWS }, (_, row) => row).map((row) => (
                             <Skeleton key={row} variant="rounded" className="h-12" />
                         ))}
                     </div>

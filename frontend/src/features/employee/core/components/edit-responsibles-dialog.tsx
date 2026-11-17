@@ -8,13 +8,16 @@ import FormHelperText from '@mui/material/FormHelperText';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { z } from 'zod';
+
 import { isApiError } from '@/shared/api/api-error';
 import { PeoplePicker } from '@/shared/components/people-picker';
 import type { ErrorCode } from '@/shared/types';
+
 import { useResponsibleCandidates, useUpdateResponsibles } from '../hooks/use-employee-queries';
 import { RESERVED_LINE, useFieldMessage } from '../hooks/use-field-message';
 import { EMPLOYEE_LIMITS } from '../schemas';
@@ -37,7 +40,12 @@ export interface EditResponsiblesDialogProps {
  * Replaces who is responsible for the employee (0–10 people). Remounts on every opening (parent
  * `key`), so it always starts from the profile as read; the version it read goes with the save.
  */
-export function EditResponsiblesDialog({ employee, open, onClose, onExited }: EditResponsiblesDialogProps) {
+export function EditResponsiblesDialog({
+    employee,
+    open,
+    onClose,
+    onExited,
+}: EditResponsiblesDialogProps): ReactElement {
     const { t } = useTranslation(['employee', 'errors']);
     const theme = useTheme();
     const isPhone = useMediaQuery(theme.breakpoints.down('sm'));

@@ -1,5 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
 import { NewPasswordSchema, PASSWORD_MAX_LENGTH } from '../../../../common/dto/password';
 
 export const ChangePasswordRequestSchema = z.object({

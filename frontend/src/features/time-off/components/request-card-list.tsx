@@ -2,8 +2,12 @@ import KeyboardArrowDownOutlined from '@mui/icons-material/KeyboardArrowDownOutl
 import Button from '@mui/material/Button';
 import Collapse from '@mui/material/Collapse';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+import { ISO_DAY_LENGTH } from '@/shared/lib/units';
+
 import { formatDay, formatPeriod } from '../format';
 import type { TimeOffRequest } from '../types';
 import { RequestDetails } from './request-details';
@@ -18,7 +22,7 @@ export interface RequestCardListProps {
 }
 
 /** Phones: the table becomes stacked items with the same details (ux.md → Patterns). */
-export function RequestCardList({ requests, expandedId, onToggle, onCancel }: RequestCardListProps) {
+export function RequestCardList({ requests, expandedId, onToggle, onCancel }: RequestCardListProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     return (
         <ul className="m-0 flex list-none flex-col divide-y divide-divider p-0">
@@ -39,7 +43,7 @@ export function RequestCardList({ requests, expandedId, onToggle, onCancel }: Re
                         <div className="flex items-center justify-between gap-2">
                             <Typography variant="caption" color="textSecondary" className="app-tabular">
                                 {t('requests.columns.created')}:{' '}
-                                {formatDay(request.createdAt.slice(0, 10), i18n.language)}
+                                {formatDay(request.createdAt.slice(0, ISO_DAY_LENGTH), i18n.language)}
                             </Typography>
                             <ResponsibleSummary people={request.responsibles} />
                         </div>

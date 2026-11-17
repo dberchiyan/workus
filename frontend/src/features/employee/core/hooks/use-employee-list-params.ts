@@ -1,9 +1,16 @@
 import { useCallback } from 'react';
 import { useSearchParams } from 'react-router';
 import { z } from 'zod';
+
 import type { EmployeeListParams } from '../types';
 
-export const PAGE_SIZES = [10, 20, 50] as const;
+const SMALL_PAGE = 10;
+const MEDIUM_PAGE = 20;
+const LARGE_PAGE = 50;
+const MAX_SEARCH_LENGTH = 100;
+const MAX_PAGE = 100_000;
+
+export const PAGE_SIZES = [SMALL_PAGE, MEDIUM_PAGE, LARGE_PAGE] as const;
 const DEFAULT_SIZE = 20;
 const DEFAULT_SORT = 'name,asc';
 
@@ -11,8 +18,8 @@ const DEFAULT_SORT = 'name,asc';
 const urlSchema = z.object({
     category: z.uuid().optional().catch(undefined),
     status: z.enum(['active', 'terminated']).catch('active'),
-    q: z.string().max(100).catch(''),
-    page: z.coerce.number().int().min(1).max(100_000).catch(1),
+    q: z.string().max(MAX_SEARCH_LENGTH).catch(''),
+    page: z.coerce.number().int().min(1).max(MAX_PAGE).catch(1),
     size: z.coerce
         .number()
         .refine((size) => (PAGE_SIZES as readonly number[]).includes(size))

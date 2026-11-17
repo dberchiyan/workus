@@ -1,4 +1,5 @@
 import 'i18next';
+
 import type { DEFAULT_NAMESPACE, resources } from './i18n';
 
 declare module 'i18next' {

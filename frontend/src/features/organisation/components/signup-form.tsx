@@ -3,18 +3,21 @@ import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { type FieldError, useForm, useWatch } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
+
 import { isApiError } from '@/shared/api/api-error';
 import { PasswordField } from '@/shared/components/password-field';
 import { PasswordRules } from '@/shared/components/password-rules';
 import { PASSWORD_LIMITS } from '@/shared/lib/password-rules';
 import { PATHS } from '@/shared/lib/paths';
 import type { ErrorCode } from '@/shared/types';
+
 import { useRegister } from '../hooks/use-organisation';
-import { ORGANISATION_LIMITS, registrationSchema, type RegistrationOutput, type RegistrationValues } from '../schemas';
+import { ORGANISATION_LIMITS, type RegistrationOutput, registrationSchema, type RegistrationValues } from '../schemas';
 
 /** Keeps every helper line's height while it is empty, so the form never shifts. */
 const RESERVED_LINE = ' ';
@@ -31,7 +34,7 @@ type Step = 'company' | 'owner';
  * Two steps: the company, then you (its owner). Creating it signs you in and opens the empty
  * company. Errors show when a step is submitted, in reserved lines.
  */
-export function SignupForm() {
+export function SignupForm(): ReactElement {
     const { t } = useTranslation(['organisation', 'validation', 'errors']);
     const navigate = useNavigate();
     const register = useRegister();

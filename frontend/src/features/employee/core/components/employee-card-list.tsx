@@ -1,5 +1,7 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatCalendarDate } from '../format';
 import type { EmployeeListItem } from '../types';
 import { EmployeeIdentity } from './employee-identity';
@@ -11,7 +13,7 @@ export interface EmployeeCardListProps {
 }
 
 /** Phones: the table becomes stacked cards (ux.md → Patterns). */
-export function EmployeeCardList({ employees }: EmployeeCardListProps) {
+export function EmployeeCardList({ employees }: EmployeeCardListProps): ReactElement {
     const { t, i18n } = useTranslation('employee');
     return (
         <ul className="m-0 flex list-none flex-col divide-y divide-divider p-0">

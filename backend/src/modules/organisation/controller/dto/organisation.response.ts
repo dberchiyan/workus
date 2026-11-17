@@ -1,10 +1,12 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
+import { MAX_ORGANISATION_NAME_LENGTH } from '../../../../common/dto/limits';
 import { OrganisationNameSchema } from './registration.request';
 
 export const OrganisationResponseSchema = z.object({
     id: z.uuid(),
-    name: z.string().max(100),
+    name: z.string().max(MAX_ORGANISATION_NAME_LENGTH),
     version: z.number().int(),
 });
 

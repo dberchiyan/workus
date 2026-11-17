@@ -1,5 +1,6 @@
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { Transactional } from '@nestjs-cls/transactional';
+
 import type { Pageable } from '../../../common/dto/pageable';
 import {
     BusinessRuleException,
@@ -7,12 +8,12 @@ import {
     ResourceNotFoundException,
 } from '../../../common/exception/api.exception';
 import type { Principal } from '../../../common/security/principal';
+import { AuditService } from '../../audit/service/audit.service';
 import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
 import { AuditField, auditValue, changeOf } from '../../audit/service/audit-change';
-import { AuditService } from '../../audit/service/audit.service';
 import { OrganisationStatus } from '../../user/service/organisation-status';
-import type { CompanyRecord, CompanyUserRecord } from '../repository/record/company.record';
 import { CompanyRepository } from '../repository/company.repository';
+import type { CompanyRecord, CompanyUserRecord } from '../repository/record/company.record';
 import type { CompanyPeople, CompanySortField, CompanyUserSortField } from './company-sort';
 
 const MAX_SEARCH_TERMS = 5;

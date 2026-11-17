@@ -5,12 +5,15 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useUpgrade } from '@/features/auth';
 import { UpgradePrompt } from '@/shared/components/upgrade-prompt';
 import { cn } from '@/shared/lib/cn';
 import { trackScrollEdges } from '@/shared/lib/scroll-edges';
+
 import {
     useCompanyStructure,
     useCreateDepartment,
@@ -31,7 +34,7 @@ const departmentPeople = (department: Department): number =>
  * in them — what people are given when they are added or edited. Departments on the left (a
  * scrolling row on phones), the open one's positions on the right; names are typed in place.
  */
-export function CompanyStructureSection() {
+export function CompanyStructureSection(): ReactElement {
     const { t, i18n } = useTranslation('employee');
     const titleId = useId();
     const structure = useCompanyStructure();

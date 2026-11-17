@@ -3,7 +3,9 @@ import PhoneIphoneOutlined from '@mui/icons-material/PhoneIphoneOutlined';
 import Button from '@mui/material/Button';
 import Chip from '@mui/material/Chip';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { describeUserAgent, type UserSession } from '@/features/auth';
 
 const dateTime = (iso: string, locale: string): string =>
@@ -21,7 +23,7 @@ export interface SessionRowProps {
 }
 
 /** One session: device, IP and times; another one can be signed out. */
-export function SessionRow({ session, current, ending, onEnd }: SessionRowProps) {
+export function SessionRow({ session, current, ending, onEnd }: SessionRowProps): ReactElement {
     const { t, i18n } = useTranslation('settings');
     const summary = describeUserAgent(session.userAgent);
     const name =

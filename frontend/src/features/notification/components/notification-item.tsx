@@ -1,11 +1,14 @@
 import AccessTimeOutlined from '@mui/icons-material/AccessTimeOutlined';
 import ButtonBase from '@mui/material/ButtonBase';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { cn } from '@/shared/lib/cn';
 import { formatAgo } from '@/shared/lib/format-ago';
+
 import type { NotificationView } from '../hooks/use-notification-view';
 import type { AppNotification } from '../types';
 
@@ -18,7 +21,7 @@ export interface NotificationItemProps {
 }
 
 /** One row of the bell's list: who, what, the dates, how long ago; unread ones are marked. */
-export function NotificationItem({ notification, view, now, onOpen }: NotificationItemProps) {
+export function NotificationItem({ notification, view, now, onOpen }: NotificationItemProps): ReactElement {
     const { t, i18n } = useTranslation('notification');
     const unread = notification.readAt === null;
     const ago = formatAgo(notification.createdAt, now, i18n.language) ?? t('panel.justNow');

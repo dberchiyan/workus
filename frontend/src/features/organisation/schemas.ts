@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { newPasswordSchema } from '@/shared/lib/password-rules';
 
 /** Mirrors backend RegistrationRequest (organisation/controller/dto/registration.request.ts). */

@@ -5,8 +5,11 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatMoney } from '@/shared/lib/money';
+
 import { formatReviewDate } from '../format';
 import type { Review } from '../types';
 import { ReviewPeople } from './review-people';
@@ -33,7 +36,7 @@ export interface ReviewTableProps {
 }
 
 /** Tablet and desktop: Title (opens the review), Date, Status, Salary, Responsible, Edit, Delete. */
-export function ReviewTable({ reviews, onAction }: ReviewTableProps) {
+export function ReviewTable({ reviews, onAction }: ReviewTableProps): ReactElement {
     const { t, i18n } = useTranslation('review');
     return (
         <Table size="small" className="table-fixed">

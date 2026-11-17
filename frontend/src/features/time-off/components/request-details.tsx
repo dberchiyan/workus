@@ -3,9 +3,12 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useCurrentUser } from '@/features/auth';
+
 import { formatDateTime, fullName } from '../format';
 import type { TimeOffRequest } from '../types';
 import { CommentComposer } from './comment-composer';
@@ -32,7 +35,7 @@ export interface RequestDetailsProps {
 }
 
 /** Responsible people, status, history and comments of one request. */
-export function RequestDetails({ request, onCancel }: RequestDetailsProps) {
+export function RequestDetails({ request, onCancel }: RequestDetailsProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     // The employee's note and the reason for a decision first; then the comments, oldest first.
     const comments = [

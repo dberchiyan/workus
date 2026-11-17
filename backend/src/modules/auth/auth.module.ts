@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+
 import { SessionAuthenticator } from '../../common/security/session-authenticator';
 import { AuditModule } from '../audit/audit.module';
 import { EmployeeModule } from '../employee/core/employee.module';

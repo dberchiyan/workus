@@ -1,9 +1,12 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isReviewStatus, ReviewStatusChip } from '@/features/employee/review';
 import { isTimeOffStatus, isTimeOffType, TimeOffStatusChip, TimeOffTypeChip } from '@/features/time-off';
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { formatMoney } from '@/shared/lib/money';
+
 import { fullName } from '../activity-format';
 import { formatCalendarDate } from '../format';
 import { isTerminationReason } from '../schemas';
@@ -12,7 +15,7 @@ import type { ActivityValue } from '../types';
 type Person = Extract<ActivityValue, { kind: 'people' }>['people'][number];
 
 /** Avatar + name chips, wrapping. */
-export function PeopleList({ people }: { people: Person[] }) {
+export function PeopleList({ people }: { people: Person[] }): ReactElement {
     const { t } = useTranslation('employee');
     if (people.length === 0) {
         return (
@@ -36,7 +39,7 @@ export function PeopleList({ people }: { people: Person[] }) {
 }
 
 /** One logged value, formatted by its kind. */
-export function ActivityValueView({ value }: { value: ActivityValue }) {
+export function ActivityValueView({ value }: { value: ActivityValue }): ReactElement | null {
     const { t, i18n } = useTranslation('employee');
     switch (value.kind) {
         case 'text':

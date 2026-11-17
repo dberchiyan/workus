@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
-import { PLAN_FOR_FEATURE, type Plan, type PlanFeature } from '../plan';
+
+import { type Plan, PLAN_FOR_FEATURE, type PlanFeature } from '../plan';
 import { useAccess } from './use-access';
 import { useCurrentUser } from './use-current-user';
 

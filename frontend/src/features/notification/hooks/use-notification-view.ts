@@ -1,6 +1,8 @@
 import { useTranslation } from 'react-i18next';
+
 import { formatTimeOffPeriod, isTimeOffType } from '@/features/time-off';
 import { PATHS, requestPath } from '@/shared/lib/paths';
+
 import type { AppNotification } from '../types';
 
 export interface NotificationView {
@@ -15,7 +17,7 @@ export interface NotificationView {
 const fullName = (person: { firstName: string; lastName: string }): string => `${person.firstName} ${person.lastName}`;
 
 /** The texts and link of one notification, as the viewer reads it. */
-export const useNotificationView = () => {
+export const useNotificationView = (): ((notification: AppNotification, viewerId: string) => NotificationView) => {
     const { t, i18n } = useTranslation('notification');
     return (notification: AppNotification, viewerId: string): NotificationView => {
         const { request } = notification;

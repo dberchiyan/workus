@@ -1,16 +1,17 @@
 import { Controller, Get, HttpStatus, Query, Res } from '@nestjs/common';
-import type { Response } from 'express';
-import type { Principal } from '../../../../common/security/principal';
-import { CurrentPrincipal } from '../../../../common/security/current-principal.decorator';
 import { ApiOkResponse, ApiOperation, ApiProduces, ApiTags } from '@nestjs/swagger';
+import type { Response } from 'express';
 import { ZodResponse } from 'nestjs-zod';
+
 import { ApiPageable, type Pageable, PageableQuery } from '../../../../common/dto/pageable';
 import { SecurityLogQuery, toSecurityEventPage } from '../../../../common/dto/security-event.response';
 import { UuidParam } from '../../../../common/dto/uuid-param';
 import { ApiErrors } from '../../../../common/exception/api-errors.decorator';
-import { can } from '../../../../common/security/policies';
 import { Feature } from '../../../../common/plan/plan';
+import { CurrentPrincipal } from '../../../../common/security/current-principal.decorator';
 import { RequiresFeature } from '../../../../common/security/plan.guard';
+import { can } from '../../../../common/security/policies';
+import type { Principal } from '../../../../common/security/principal';
 import { Authorize } from '../../../../common/security/security.decorators';
 import { AUDIT_EVENT_PAGEABLE, type AuditEventSortField } from '../../../audit/service/audit-sort';
 import { EmployeeService } from '../service/employee.service';

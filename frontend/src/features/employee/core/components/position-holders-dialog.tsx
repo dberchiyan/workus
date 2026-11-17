@@ -6,11 +6,14 @@ import DialogContent from '@mui/material/DialogContent';
 import IconButton from '@mui/material/IconButton';
 import Pagination from '@mui/material/Pagination';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { RowSkeleton } from '@/shared/components/row-skeleton';
 import { cn } from '@/shared/lib/cn';
 import { todayUtcIso } from '@/shared/lib/utc-day';
+
 import { formatCalendarDate, formatTenure } from '../format';
 import { HOLDERS_PAGE_SIZE, usePositionHolders } from '../hooks/use-company-structure';
 import type { EmployeeListItem } from '../types';
@@ -75,7 +78,7 @@ export function PositionHoldersDialog({
     position,
     onClose,
     onExited,
-}: PositionHoldersDialogProps) {
+}: PositionHoldersDialogProps): ReactElement {
     const { t, i18n } = useTranslation('employee');
     const titleId = useId();
     const [page, setPage] = useState(0);

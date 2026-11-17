@@ -1,5 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
+import { MAX_SEARCH_LENGTH } from '../../../../common/dto/limits';
 import { REQUEST_STATES } from '../../service/time-off-request.criteria';
 import { TimeOffStatus } from '../../service/time-off-type';
 import { TimeOffTypeSchema } from './create-time-off-request.request';
@@ -20,7 +22,7 @@ export const ManagedTimeOffRequestFilterQuerySchema = z.object({
         .optional()
         .transform((value) => value === 'true'),
     /** Words matched against the employee's first and last name. */
-    search: z.string().trim().max(100, 'validation.search.tooLong').optional(),
+    search: z.string().trim().max(MAX_SEARCH_LENGTH, 'validation.search.tooLong').optional(),
 });
 
 export class ManagedTimeOffRequestFilterQuery extends createZodDto(ManagedTimeOffRequestFilterQuerySchema) {}

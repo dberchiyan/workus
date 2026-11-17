@@ -2,10 +2,13 @@ import EditOutlined from '@mui/icons-material/EditOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useAccess, useCurrentUser } from '@/features/auth';
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
+
 import { ChangePasswordForm } from './change-password-form';
 import { EditNameDialog } from './edit-name-dialog';
 import { SettingsCard } from './settings-card';
@@ -14,7 +17,7 @@ import { SettingsCard } from './settings-card';
  * Who you are — read-only for employees (an admin changes it); admins and owners edit their own
  * name in a dialog — and your password.
  */
-export function AccountSection() {
+export function AccountSection(): ReactElement {
     const { t } = useTranslation(['settings', 'shell']);
     const user = useCurrentUser().data;
     const can = useAccess();

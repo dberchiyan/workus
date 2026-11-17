@@ -1,44 +1,48 @@
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { Transactional } from '@nestjs-cls/transactional';
+
+import type { Pageable } from '../../../../common/dto/pageable';
 import {
     BusinessConflictException,
     BusinessRuleException,
     ConcurrentModificationException,
     ResourceNotFoundException,
 } from '../../../../common/exception/api.exception';
-import { AuditAction, AuditTargetType } from '../../../audit/service/audit-action';
-import { type AuditChange, AuditField, auditValue, changeOf } from '../../../audit/service/audit-change';
+import { DAY_MS, FEBRUARY, LAST_DAY_OF_SHORT_FEBRUARY, LEAP_DAY } from '../../../../common/time/units';
 import { AuditService } from '../../../audit/service/audit.service';
 import type { AuditEvent, AuditEventPage, SecurityEvent, SecurityEventPage } from '../../../audit/service/audit.types';
+import { AuditAction, AuditTargetType } from '../../../audit/service/audit-action';
+import { type AuditChange, AuditField, auditValue, changeOf } from '../../../audit/service/audit-change';
 import type { AuditEventSortField } from '../../../audit/service/audit-sort';
 import type { SecurityCategory } from '../../../audit/service/security-category';
 import { UserService } from '../../../user/service/user.service';
 import { UserRole } from '../../../user/service/user-role';
-import type { Pageable } from '../../../../common/dto/pageable';
 import { EmployeeRepository } from '../repository/employee.repository';
 import type {
     EmployeeListItemRecord,
     EmployeeMovementRecord,
     EmployeeProfileRecord,
     EmployeeTimeOffRecord,
+    PositionOptionRecord,
+    ResponsibleCandidateRecord,
 } from '../repository/record/employee.record';
 import { minusDays, todayUtc } from './calendar-date';
-import type { EmployeeSortField } from './employee-sort';
-import type { EmployeeStatus } from './employee-status';
 import type {
     CreateEmployeeCommand,
     EmployeeBirthdays,
     EmployeeCalendarPage,
-    RosterEmployee,
     EmployeeForTimeOff,
     EmployeeMovement,
     EmployeeMovements,
+    EmployeePage,
     EmployeeProfile,
+    EmployeeSummary,
+    RosterEmployee,
     TerminateEmployeeCommand,
     UpdateEmployeeCommand,
-    EmployeePage,
-    EmployeeSummary,
 } from './employee.types';
+import type { EmployeeSortField } from './employee-sort';
+import type { EmployeeStatus } from './employee-status';
 import { toSearchTerms } from './filter/employee.criteria';
 import { isTerminationReason } from './termination-reason';
 
@@ -630,13 +634,13 @@ export class EmployeeService {
         const { from, to } = range;
         const year = from.getUTCFullYear();
         const month = from.getUTCMonth() + 1;
-        const isLeap = new Date(Date.UTC(year, 1, 29)).getUTCMonth() === 1;
+        const isLeap = new Date(Date.UTC(year, FEBRUARY, LEAP_DAY)).getUTCMonth() === FEBRUARY;
         const days = Array.from(
             { length: to.getUTCDate() - from.getUTCDate() + 1 },
             (_, index) => from.getUTCDate() + index,
         );
-        if (month === 2 && !isLeap && days.includes(28)) {
-            days.push(29);
+        if (month === FEBRUARY + 1 && !isLeap && days.includes(LAST_DAY_OF_SHORT_FEBRUARY)) {
+            days.push(LEAP_DAY);
         }
         const result = await this.employeeRepository.findBirthdays(
             organisationId,
@@ -669,7 +673,7 @@ export class EmployeeService {
 
     /** For other modules (dashboard): who starts and who leaves in the next `days` days. */
     async movements(organisationId: string, today: Date, days: number): Promise<EmployeeMovements> {
-        const until = new Date(today.getTime() + days * 86_400_000);
+        const until = new Date(today.getTime() + days * DAY_MS);
         const [joining, leaving] = await Promise.all([
             this.employeeRepository.findStartingBetween(organisationId, today, until),
             this.employeeRepository.findLeavingBetween(organisationId, today, until),
@@ -697,11 +701,11 @@ export class EmployeeService {
         );
     }
 
-    positionOptions(organisationId: string) {
+    positionOptions(organisationId: string): Promise<PositionOptionRecord[]> {
         return this.employeeRepository.findPositionOptions(organisationId);
     }
 
-    responsibleCandidates(organisationId: string, search: string | undefined) {
+    responsibleCandidates(organisationId: string, search: string | undefined): Promise<ResponsibleCandidateRecord[]> {
         return this.employeeRepository.findResponsibleCandidates(organisationId, toSearchTerms(search));
     }
 }

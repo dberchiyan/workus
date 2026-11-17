@@ -1,5 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
 import { EMPLOYEE_STATUSES, EmployeeStatus } from '../../service/employee-status';
 
 export const SEARCH_MAX_LENGTH = 100;

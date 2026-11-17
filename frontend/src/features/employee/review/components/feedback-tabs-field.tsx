@@ -1,9 +1,12 @@
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
+import type { ReactElement } from 'react';
 import { useId, useState } from 'react';
 import { type Control, Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { useFieldMessage } from '../hooks/use-field-message';
 import type { CreateReviewFormValues } from '../schemas';
 import { FEEDBACK_SOURCES, type FeedbackSource } from '../types';
@@ -24,7 +27,7 @@ export interface FeedbackTabsFieldProps {
 }
 
 /** One rich-text editor at a time, switched by source tabs; a dot marks sources with feedback. */
-export function FeedbackTabsField({ control, values, errors }: FeedbackTabsFieldProps) {
+export function FeedbackTabsField({ control, values, errors }: FeedbackTabsFieldProps): ReactElement {
     const { t } = useTranslation('review');
     const message = useFieldMessage();
     const baseId = useId();

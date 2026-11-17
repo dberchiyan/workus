@@ -1,5 +1,7 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatDateTime, fullName } from '../format';
 import type { TimeOffComment, TimeOffHistoryItem } from '../types';
 import { CommentItem } from './comment-item';
@@ -18,7 +20,13 @@ export interface RequestTimelineProps {
 }
 
 /** Status changes and comments in one feed, oldest first. */
-export function RequestTimeline({ requestId, history, comments, decisionComment, viewerId }: RequestTimelineProps) {
+export function RequestTimeline({
+    requestId,
+    history,
+    comments,
+    decisionComment,
+    viewerId,
+}: RequestTimelineProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const entries: Entry[] = [
         ...history.map((item): Entry => ({ kind: 'event', at: item.occurredAt, item })),

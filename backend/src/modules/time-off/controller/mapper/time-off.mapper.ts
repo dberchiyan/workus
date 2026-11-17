@@ -1,15 +1,16 @@
-import { AuditAction } from '../../../audit/service/audit-action';
+import { isoDay as isoDate } from '../../../../common/time/iso-day';
 import type { AuditEvent } from '../../../audit/service/audit.types';
-import { isTimeOffStatus, isTimeOffType, TimeOffStatus, TimeOffType } from '../../service/time-off-type';
+import { AuditAction } from '../../../audit/service/audit-action';
 import type { TimeOffCommentRecord, TimeOffRequestRecord } from '../../repository/record/time-off-request.record';
 import type {
     LeaveBalance,
     ManagedTimeOffRequestPage,
-    TimeOffCalendar,
     ManagedTimeOffRequestView,
+    TimeOffCalendar,
     TimeOffRequestPage,
     TimeOffRequestView,
 } from '../../service/time-off.types';
+import { isTimeOffStatus, isTimeOffType, TimeOffStatus, TimeOffType } from '../../service/time-off-type';
 import type {
     LeaveBalancesResponse,
     ManagedTimeOffRequestPageResponse,
@@ -19,8 +20,6 @@ import type {
     TimeOffRequestPageResponse,
     TimeOffRequestResponse,
 } from '../dto/time-off.response';
-
-const isoDate = (date: Date): string => date.toISOString().slice(0, 10);
 
 interface PersonRecord {
     id: string;

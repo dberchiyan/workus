@@ -9,12 +9,15 @@ import MenuItem from '@mui/material/MenuItem';
 import MenuList from '@mui/material/MenuList';
 import Popover from '@mui/material/Popover';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
+
 import { useCurrentUser, useLogout } from '@/features/auth';
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { PATHS, settingsPath } from '@/shared/lib/paths';
+
 import { ThemeModeSwitch } from './theme-mode-switch';
 
 const LINKS = [
@@ -27,7 +30,7 @@ const LINKS = [
  * Name, role and avatar; opens the account panel: who is signed in (and in which company), the
  * theme, links into Settings and Sign out. A dialog rather than a menu, because it holds more than menu items.
  */
-export function UserMenu() {
+export function UserMenu(): ReactElement | null {
     const { t } = useTranslation('shell');
     const { data: user } = useCurrentUser();
     const logout = useLogout();

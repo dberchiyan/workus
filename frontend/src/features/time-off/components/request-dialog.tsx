@@ -9,11 +9,14 @@ import Skeleton from '@mui/material/Skeleton';
 import { useTheme } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { employeeProfilePath } from '@/shared/lib/paths';
+
 import { fullName } from '../format';
 import { useManagedRequest } from '../hooks/use-managed-requests';
 import type { ManagedRequest, TimeOffDecision } from '../types';
@@ -33,7 +36,14 @@ export interface RequestDialogProps {
 }
 
 /** One request: summary and who decides on the left; history and comments on the right. */
-export function RequestDialog({ requestId, open, viewerId, busy, onDecide, onClose }: RequestDialogProps) {
+export function RequestDialog({
+    requestId,
+    open,
+    viewerId,
+    busy,
+    onDecide,
+    onClose,
+}: RequestDialogProps): ReactElement {
     const { t } = useTranslation('timeOff');
     const theme = useTheme();
     const isPhone = useMediaQuery(theme.breakpoints.down('sm'));

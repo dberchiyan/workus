@@ -1,4 +1,6 @@
 import Skeleton from '@mui/material/Skeleton';
+import type { ReactElement } from 'react';
+
 import { cn } from '@/shared/lib/cn';
 
 export interface RowSkeletonProps {
@@ -13,7 +15,7 @@ export interface RowSkeletonProps {
  * One list row while it loads, in the shape of the real one (leading mark, a name over a muted
  * line, a trailing chip), so nothing jumps when the data arrives.
  */
-export function RowSkeleton({ leading = 'avatar', trailing = true, className }: RowSkeletonProps) {
+export function RowSkeleton({ leading = 'avatar', trailing = true, className }: RowSkeletonProps): ReactElement {
     return (
         <div aria-hidden className={cn('flex items-center gap-3 py-2', className)}>
             {leading === 'avatar' && <Skeleton variant="circular" className="size-8 shrink-0" />}

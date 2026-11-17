@@ -1,4 +1,5 @@
 import { randomBytes, randomInt } from 'node:crypto';
+
 import { Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
 
@@ -20,10 +21,15 @@ const HASH_OPTIONS = {
 } as const;
 
 /** The one place passwords are hashed and verified (security.md → Passwords). */
+const DUMMY_SECRET_BYTES = 32;
+
 @Injectable()
 export class PasswordHasher {
     /** Verified against when the email is unknown, so timing does not reveal accounts. */
-    private readonly dummyHash: Promise<string> = argon2.hash(randomBytes(32).toString('hex'), HASH_OPTIONS);
+    private readonly dummyHash: Promise<string> = argon2.hash(
+        randomBytes(DUMMY_SECRET_BYTES).toString('hex'),
+        HASH_OPTIONS,
+    );
 
     hash(password: string): Promise<string> {
         return argon2.hash(password, HASH_OPTIONS);

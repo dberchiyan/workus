@@ -6,9 +6,12 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { EditorContent, useEditor, useEditorState } from '@tiptap/react';
+import type { ReactElement } from 'react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { FEEDBACK_MAX_TEXT, isRichTextDoc, richTextLength } from '../rich-text';
 import type { RichTextDoc } from '../types';
 import { richTextExtensions } from './rich-text-extensions';
@@ -23,7 +26,7 @@ export interface RichTextEditorProps {
 }
 
 /** TipTap editor with a small toolbar; the value is the document JSON, never HTML. */
-export function RichTextEditor({ label, value, onChange, placeholder, error }: RichTextEditorProps) {
+export function RichTextEditor({ label, value, onChange, placeholder, error }: RichTextEditorProps): ReactElement {
     const { t, i18n } = useTranslation('review');
     const helperId = useId();
     const editor = useEditor({

@@ -2,9 +2,11 @@ import ListSubheader from '@mui/material/ListSubheader';
 import MenuItem from '@mui/material/MenuItem';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect } from 'react';
 import { Controller, type UseFormReturn } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
 import { usePositionOptions } from '../hooks/use-employee-queries';
 import { useFieldMessage } from '../hooks/use-field-message';
 import { EMPLOYEE_LIMITS, type UpdateEmployeeFormOutput, type UpdateEmployeeFormValues } from '../schemas';
@@ -16,7 +18,7 @@ export interface EditProfileFieldsProps {
 }
 
 /** Overall info (required) and contact info (optional) — the Add employee details step. */
-export function EditProfileFields({ form }: EditProfileFieldsProps) {
+export function EditProfileFields({ form }: EditProfileFieldsProps): ReactElement {
     const { t } = useTranslation('employee');
     const message = useFieldMessage();
     const positions = usePositionOptions(true);

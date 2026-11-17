@@ -1,16 +1,18 @@
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable, type OnApplicationBootstrap } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { Transactional } from '@nestjs-cls/transactional';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+
 import {
     BusinessConflictException,
     ConcurrentModificationException,
     ResourceNotFoundException,
 } from '../../../common/exception/api.exception';
-import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
-import { type AuditChange, AuditField, auditValue, changeOf } from '../../audit/service/audit-change';
+import { DECEMBER, LAST_DAY_OF_DECEMBER } from '../../../common/time/units';
 import { AuditService } from '../../audit/service/audit.service';
 import type { NewAuditEvent } from '../../audit/service/audit.types';
+import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
+import { type AuditChange, AuditField, auditValue, changeOf } from '../../audit/service/audit-change';
 import { HolidayRepository, type NewHoliday } from '../repository/holiday.repository';
 import type { HolidayDayRecord, HolidayRecord } from '../repository/record/holiday.record';
 import { TimeOffRequestRepository } from '../repository/time-off-request.repository';
@@ -77,7 +79,7 @@ export class HolidayService implements OnApplicationBootstrap {
         return this.holidayRepository.findBetween(
             organisationId,
             new Date(Date.UTC(year, 0, 1)),
-            new Date(Date.UTC(year, 11, 31)),
+            new Date(Date.UTC(year, DECEMBER, LAST_DAY_OF_DECEMBER)),
         );
     }
 
@@ -163,7 +165,7 @@ export class HolidayService implements OnApplicationBootstrap {
         const today = todayUtc();
         const sources = await this.holidayRepository.findToCarryOver(
             organisationId,
-            new Date(Date.UTC(today.getUTCFullYear(), 11, 31)),
+            new Date(Date.UTC(today.getUTCFullYear(), DECEMBER, LAST_DAY_OF_DECEMBER)),
         );
         if (sources.length === 0) {
             return 0;

@@ -1,6 +1,8 @@
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { Link as RouterLink } from 'react-router';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { employeeProfilePath } from '@/shared/lib/paths';
 
@@ -15,7 +17,7 @@ export interface EventPersonProps {
 }
 
 /** Avatar, name (to the profile) and position. */
-export function EventPerson({ employee }: EventPersonProps) {
+export function EventPerson({ employee }: EventPersonProps): ReactElement {
     return (
         <span className="flex min-w-0 items-center gap-3">
             <InitialsAvatar id={employee.userId} firstName={employee.firstName} lastName={employee.lastName} />

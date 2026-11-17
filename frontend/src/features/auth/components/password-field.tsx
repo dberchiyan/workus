@@ -4,12 +4,13 @@ import VisibilityOutlined from '@mui/icons-material/VisibilityOutlined';
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField, { type TextFieldProps } from '@mui/material/TextField';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type PasswordFieldProps = Omit<TextFieldProps, 'type' | 'slotProps'>;
 
-export function PasswordField(props: PasswordFieldProps) {
+export function PasswordField(props: PasswordFieldProps): ReactElement {
     const { t } = useTranslation('auth');
     const [isVisible, setIsVisible] = useState(false);
 

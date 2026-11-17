@@ -1,4 +1,5 @@
 import { Pool } from 'pg';
+
 import type { AppConfigService } from '../config/app-config.service';
 import { databaseUrl } from '../config/database-url';
 

@@ -10,10 +10,13 @@ import IconButton from '@mui/material/IconButton';
 import TextField from '@mui/material/TextField';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
+
 import { formatDateTime, fullName } from '../format';
 import { useDeleteComment, useEditComment } from '../hooks/use-managed-requests';
 import { TIME_OFF_LIMITS } from '../schemas';
@@ -27,7 +30,7 @@ export interface CommentItemProps {
 }
 
 /** One comment; its author edits it in place or deletes it (after a confirmation). */
-export function CommentItem({ requestId, comment, viewerId }: CommentItemProps) {
+export function CommentItem({ requestId, comment, viewerId }: CommentItemProps): ReactElement {
     const { t, i18n } = useTranslation(['timeOff', 'errors', 'validation']);
     const own = comment.author.id === viewerId;
     const edit = useEditComment(requestId);

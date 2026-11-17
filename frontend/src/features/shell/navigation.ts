@@ -7,6 +7,7 @@ import PeopleAltOutlined from '@mui/icons-material/PeopleAltOutlined';
 import SettingsOutlined from '@mui/icons-material/SettingsOutlined';
 import type { SvgIconProps } from '@mui/material/SvgIcon';
 import type { ComponentType } from 'react';
+
 import type { AccessPart } from '@/features/auth';
 import { DashboardPage } from '@/features/dashboard';
 import { EmployeesPage } from '@/features/employee/core';

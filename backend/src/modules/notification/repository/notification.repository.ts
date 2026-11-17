@@ -1,6 +1,7 @@
+import { Injectable } from '@nestjs/common';
 import { TransactionHost } from '@nestjs-cls/transactional';
 import type { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapter-prisma';
-import { Injectable } from '@nestjs/common';
+
 import type { Pageable } from '../../../common/dto/pageable';
 import { toPrismaPage } from '../../../common/persistence/pageable';
 import type { PrismaService } from '../../../common/persistence/prisma.service';
@@ -22,6 +23,8 @@ const orderByFor = (
     _field: NotificationSortField,
     direction: Prisma.SortOrder,
 ): Prisma.NotificationOrderByWithRelationInput[] => [{ createdAt: direction }];
+
+const MAX_NOTICES_PER_SUBJECT = 10;
 
 @Injectable()
 export class NotificationRepository {
@@ -93,7 +96,7 @@ export class NotificationRepository {
             where: { type, subjectId: { in: subjectIds }, createdAt: { gte: since } },
             select: { recipientUserId: true, subjectId: true },
             // At most 10 responsible people a request.
-            take: subjectIds.length * 10,
+            take: subjectIds.length * MAX_NOTICES_PER_SUBJECT,
         });
     }
 

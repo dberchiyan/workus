@@ -1,5 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
 import { TIME_OFF_TYPES } from '../../service/time-off-type';
 
 export const NOTE_MAX_LENGTH = 500;

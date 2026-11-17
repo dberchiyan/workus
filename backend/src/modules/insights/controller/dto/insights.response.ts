@@ -1,5 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
 import { MoneySchema } from '../../../../common/dto/money';
 
 const GroupSchema = z.object({ id: z.uuid(), name: z.string() }).meta({ id: 'InsightGroup' });

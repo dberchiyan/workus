@@ -1,6 +1,7 @@
 import { type CanActivate, type ExecutionContext, Injectable, SetMetadata } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { ClsService } from 'nestjs-cls';
+
 import type { RequestContext } from '../context/request-context';
 import { PlanUpgradeRequiredException } from '../exception/api.exception';
 import { type Feature, lowestPlanWith, planIncludes } from '../plan/plan';

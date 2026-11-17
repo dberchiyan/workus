@@ -1,13 +1,22 @@
+import type { UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { useMutation, useQueries, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import type { ApiError } from '@/shared/api/api-error';
+import { MINUTE_MS } from '@/shared/lib/units';
+
 import { holidaysApi } from '../api/holidays-api';
 import type { CreateHolidayRequest, Holiday, UpdateHolidayRequest } from '../types';
 import { timeOffKeys } from './query-keys';
 
 /** Holidays change rarely. */
-const HOLIDAYS_STALE_MS = 5 * 60_000;
+const HOLIDAYS_STALE_MINUTES = 5;
+const HOLIDAYS_STALE_MS = HOLIDAYS_STALE_MINUTES * MINUTE_MS;
 
-export const useHolidays = (year: number) =>
+export const useHolidays = (
+    year: number,
+): UseQueryResult<
+    { id: string; heldAt: string; name: string; isRecurring: boolean; isCarriedOver: boolean; version: number }[]
+> =>
     useQuery({
         queryKey: timeOffKeys.holidayYear(year),
         queryFn: () => holidaysApi.year(year),
@@ -40,14 +49,23 @@ const useHolidayMutation = <TResult, TVariables>(mutationFn: (variables: TVariab
     });
 };
 
-export const useCreateHoliday = () =>
+export const useCreateHoliday = (): UseMutationResult<
+    { id: string; heldAt: string; name: string; isRecurring: boolean; isCarriedOver: boolean; version: number },
+    ApiError,
+    { request: CreateHolidayRequest; idempotencyKey: string }
+> =>
     useHolidayMutation<Holiday, { request: CreateHolidayRequest; idempotencyKey: string }>(
         ({ request, idempotencyKey }) => holidaysApi.create(request, idempotencyKey),
     );
 
-export const useUpdateHoliday = () =>
+export const useUpdateHoliday = (): UseMutationResult<
+    { id: string; heldAt: string; name: string; isRecurring: boolean; isCarriedOver: boolean; version: number },
+    ApiError,
+    { holidayId: string; request: UpdateHolidayRequest }
+> =>
     useHolidayMutation<Holiday, { holidayId: string; request: UpdateHolidayRequest }>(({ holidayId, request }) =>
         holidaysApi.update(holidayId, request),
     );
 
-export const useDeleteHoliday = () => useHolidayMutation((holidayId: string) => holidaysApi.remove(holidayId));
+export const useDeleteHoliday = (): UseMutationResult<void, ApiError, string> =>
+    useHolidayMutation((holidayId: string) => holidaysApi.remove(holidayId));

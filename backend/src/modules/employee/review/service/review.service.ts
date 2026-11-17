@@ -1,22 +1,21 @@
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { Transactional } from '@nestjs-cls/transactional';
+
 import {
     BusinessRuleException,
     ConcurrentModificationException,
     ResourceNotFoundException,
 } from '../../../../common/exception/api.exception';
 import { Currency, type Decimal, percentChange, toDecimal } from '../../../../common/persistence/money';
+import { isoDay } from '../../../../common/time/iso-day';
+import { DAY_MS } from '../../../../common/time/units';
+import { AuditService } from '../../../audit/service/audit.service';
 import { AuditAction, AuditTargetType } from '../../../audit/service/audit-action';
 import { AuditField, auditValue, changeOf } from '../../../audit/service/audit-change';
-import { AuditService } from '../../../audit/service/audit.service';
 import { EmployeeService } from '../../core/service/employee.service';
 import type { ReviewRecord } from '../repository/record/review.record';
-import type { DashboardReviews } from './review.types';
 import { ReviewRepository } from '../repository/review.repository';
-import { reviewCreatedChanges, reviewDeletedChanges, reviewUpdatedChanges } from './review-audit';
-import { ReviewKind, STARTING_REVIEW_TITLE } from './review-kind';
-import { ReviewStatus } from './review-status';
-import { isEmptyRichText, type RichTextDoc } from './rich-text';
+import type { DashboardReviews } from './review.types';
 import type {
     CreateReviewCommand,
     EmployeeReviews,
@@ -25,6 +24,10 @@ import type {
     StartingReviewCommand,
     UpdateReviewCommand,
 } from './review.types';
+import { reviewCreatedChanges, reviewDeletedChanges, reviewUpdatedChanges } from './review-audit';
+import { ReviewKind, STARTING_REVIEW_TITLE } from './review-kind';
+import { ReviewStatus } from './review-status';
+import { isEmptyRichText, type RichTextDoc } from './rich-text';
 
 /** Salary history = completed reviews with a salary, oldest first. */
 const salaryOverview = (reviews: ReviewRecord[]): SalaryOverview => {
@@ -43,7 +46,7 @@ const salaryOverview = (reviews: ReviewRecord[]): SalaryOverview => {
         )
         .reverse();
     const current = history.at(-1) ?? null;
-    const previous = history.at(-2) ?? null;
+    const previous = history.at(PREVIOUS) ?? null;
     const isComparable = current && previous && current.currency === previous.currency && !previous.amount.isZero();
     return {
         current,
@@ -72,7 +75,7 @@ const toColumns = (command: CreateReviewCommand) => ({
 
 /** A starting review keeps the start reviewedAt and stays completed; salary and the rest are editable. */
 const lockStarting = (review: ReviewRecord, command: UpdateReviewCommand): void => {
-    if (command.reviewedAt !== review.reviewedAt.toISOString().slice(0, 10)) {
+    if (command.reviewedAt !== isoDay(review.reviewedAt)) {
         throw new BusinessRuleException('errors.review.startingDateLocked', {}, 'reviewedAt');
     }
     if (command.status !== ReviewStatus.COMPLETED) {
@@ -82,6 +85,8 @@ const lockStarting = (review: ReviewRecord, command: UpdateReviewCommand): void 
 
 /** One salary per employee; a company of this size never comes close. */
 const MAX_SALARIES = 5000;
+
+const PREVIOUS = -2;
 
 @Injectable()
 export class ReviewService {
@@ -103,7 +108,7 @@ export class ReviewService {
         today: Date,
         days: number,
     ): Promise<{ upcoming: number; overdue: number }> {
-        const until = new Date(today.getTime() + days * 86_400_000);
+        const until = new Date(today.getTime() + days * DAY_MS);
         const [upcoming, overdue] = await Promise.all([
             this.reviewRepository.countScheduledBetween(organisationId, today, until),
             this.reviewRepository.countScheduledBefore(organisationId, today),

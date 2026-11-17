@@ -1,25 +1,23 @@
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { Transactional } from '@nestjs-cls/transactional';
+
 import type { Pageable } from '../../../common/dto/pageable';
 import {
     BusinessRuleException,
     ConcurrentModificationException,
     ResourceNotFoundException,
 } from '../../../common/exception/api.exception';
+import { DAYS_PER_WEEK } from '../../../common/time/units';
+import { AuditService } from '../../audit/service/audit.service';
 import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
 import { AuditField, auditValue, changeOf } from '../../audit/service/audit-change';
-import { AuditService } from '../../audit/service/audit.service';
-import type { EmployeeForTimeOff } from '../../employee/core/service/employee.types';
 import { EmployeeService } from '../../employee/core/service/employee.service';
+import type { EmployeeForTimeOff } from '../../employee/core/service/employee.types';
 import { NotificationType } from '../../notification/service/notification-type';
 import type { TimeOffRequestRecord } from '../repository/record/time-off-request.record';
 import { TimeOffRequestRepository } from '../repository/time-off-request.repository';
 import { HolidayService } from './holiday.service';
 import { cycleOf, LEAVE_POLICY, plusDays, todayUtc, workingDaysBetween } from './leave-policy';
-import type { CalendarSortField, TimeOffRequestSortField } from './time-off-sort';
-import { timeOffLabel } from './time-off-label';
-import { TimeOffNotifier } from './time-off-notifier';
-import { isTimeOffStatus, isTimeOffType, TIME_OFF_TYPES, TimeOffStatus, TimeOffType } from './time-off-type';
 import type {
     AbsentPerson,
     CreateTimeOffCommand,
@@ -30,6 +28,10 @@ import type {
     TimeOffRequestPage,
     TimeOffRequestView,
 } from './time-off.types';
+import { timeOffLabel } from './time-off-label';
+import { TimeOffNotifier } from './time-off-notifier';
+import type { CalendarSortField, TimeOffRequestSortField } from './time-off-sort';
+import { isTimeOffStatus, isTimeOffType, TIME_OFF_TYPES, TimeOffStatus, TimeOffType } from './time-off-type';
 
 const asDate = (iso: string): Date => new Date(`${iso}T00:00:00Z`);
 
@@ -163,7 +165,7 @@ export class TimeOffService {
 
     /** For other modules (dashboard): pending requests and who is off today / this week. */
     async overview(organisationId: string, today: Date): Promise<TimeOffOverview> {
-        const weekEnd = plusDays(today, (7 - today.getUTCDay()) % 7);
+        const weekEnd = plusDays(today, (DAYS_PER_WEEK - today.getUTCDay()) % DAYS_PER_WEEK);
         const [pending, absences] = await Promise.all([
             this.requestRepository.pendingSummary(organisationId),
             this.requestRepository.findApprovedOverlapping(organisationId, today, weekEnd),

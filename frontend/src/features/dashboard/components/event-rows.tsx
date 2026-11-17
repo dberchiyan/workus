@@ -1,10 +1,13 @@
 import ChevronRightOutlined from '@mui/icons-material/ChevronRightOutlined';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router';
+
 import { ReviewStatusChip } from '@/features/employee/review';
 import { TimeOffStatusChip, TimeOffTypeChip } from '@/features/time-off';
+
 import type { DashboardBirthday, DashboardRequest, DashboardReview } from '../types';
 import { EventPerson } from './event-person';
 
@@ -17,7 +20,7 @@ const dayMonth = (iso: string, locale: string): string =>
     );
 
 /** A request made today: who, what, its state, and a link that opens it over the dashboard. */
-export function RequestEventRow({ request, href }: { request: DashboardRequest; href: string }) {
+export function RequestEventRow({ request, href }: { request: DashboardRequest; href: string }): ReactElement {
     const { t, i18n } = useTranslation('dashboard');
     const period =
         request.startsAt === request.endsAt
@@ -62,7 +65,7 @@ export function RequestEventRow({ request, href }: { request: DashboardRequest; 
 }
 
 /** A review: whose, which and when. */
-export function ReviewEventRow({ review }: { review: DashboardReview }) {
+export function ReviewEventRow({ review }: { review: DashboardReview }): ReactElement {
     const { i18n } = useTranslation('dashboard');
     return (
         <li className={ROW}>
@@ -85,7 +88,7 @@ export function ReviewEventRow({ review }: { review: DashboardReview }) {
 }
 
 /** A birthday: day and month only. */
-export function BirthdayEventRow({ birthday }: { birthday: DashboardBirthday }) {
+export function BirthdayEventRow({ birthday }: { birthday: DashboardBirthday }): ReactElement {
     const { i18n } = useTranslation('dashboard');
     // 2000 is a leap year, so 29 February formats too.
     const date = `2000-${String(birthday.month).padStart(2, '0')}-${String(birthday.day).padStart(2, '0')}`;

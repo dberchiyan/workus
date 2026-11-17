@@ -23,7 +23,13 @@ const readPage = (raw: string | null): number => {
 };
 
 /** The events tab, each card's month and page, and the open request live in the URL (shareable, back works). */
-export const useEventsParams = (currentMonth: string) => {
+export const useEventsParams = (
+    currentMonth: string,
+): {
+    params: EventsParams;
+    update: (changes: Partial<EventsParams>) => void;
+    requestHref: (requestId: string) => string;
+} => {
     const [searchParams, setSearchParams] = useSearchParams();
     const params = useMemo<EventsParams>(() => {
         const month = (key: string) => {

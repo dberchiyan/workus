@@ -1,7 +1,8 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
-import { personName } from '../../../../common/dto/person-name';
+
 import { NewPasswordSchema } from '../../../../common/dto/password';
+import { personName } from '../../../../common/dto/person-name';
 
 export const ORGANISATION_NAME_MAX_LENGTH = 100;
 const EMAIL_MAX_LENGTH = 254;

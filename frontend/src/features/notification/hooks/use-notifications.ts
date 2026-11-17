@@ -1,5 +1,9 @@
+import type { UseInfiniteQueryResult, UseMutationResult, UseQueryResult } from '@tanstack/react-query';
 import { type InfiniteData, useInfiniteQuery, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+
 import type { ApiError } from '@/shared/api/api-error';
+import type { components } from '@/shared/types/api';
+
 import { notificationsApi } from '../api/notifications-api';
 import type { AppNotification, NotificationPage } from '../types';
 import { notificationKeys } from './query-keys';
@@ -9,7 +13,7 @@ export const NOTIFICATIONS_PAGE_SIZE = 10;
 const POLL_MS = 60_000;
 
 /** The badge: polled while the tab is visible and on focus. */
-export const useUnreadCount = () =>
+export const useUnreadCount = (): UseQueryResult<number> =>
     useQuery({
         queryKey: notificationKeys.unreadCount(),
         queryFn: notificationsApi.unreadCount,
@@ -18,7 +22,11 @@ export const useUnreadCount = () =>
     });
 
 /** The list behind the bell — loaded when it opens, fresh on every opening. */
-export const useNotificationList = (enabled: boolean) =>
+export const useNotificationList = (
+    enabled: boolean,
+): UseInfiniteQueryResult<
+    InfiniteData<{ content: components['schemas']['Notification_Output'][]; totalElements: number }>
+> =>
     useInfiniteQuery({
         queryKey: notificationKeys.list(),
         queryFn: ({ pageParam }) => notificationsApi.page(pageParam, NOTIFICATIONS_PAGE_SIZE),
@@ -48,7 +56,33 @@ const withRead = (
         })),
     };
 
-export const useMarkRead = () => {
+export const useMarkRead = (): UseMutationResult<
+    {
+        id: string;
+        type:
+            | 'TIME_OFF_REQUESTED'
+            | 'TIME_OFF_APPROVED'
+            | 'TIME_OFF_REJECTED'
+            | 'TIME_OFF_CANCELED'
+            | 'TIME_OFF_WITHDRAWN'
+            | 'TIME_OFF_ASSIGNED'
+            | 'TIME_OFF_COMMENTED'
+            | 'TIME_OFF_REMINDER';
+        createdAt: string;
+        readAt: string | null;
+        actor: { id: string; firstName: string; lastName: string } | null;
+        subject: { type: 'time_off_request'; id: string };
+        request: {
+            type: string;
+            startsAt: string;
+            endsAt: string;
+            employee: { userId: string; firstName: string; lastName: string };
+            waitingDays: number | null;
+        };
+    },
+    ApiError,
+    string
+> => {
     const queryClient = useQueryClient();
     return useMutation<AppNotification, ApiError, string>({
         mutationFn: notificationsApi.markRead,
@@ -61,7 +95,7 @@ export const useMarkRead = () => {
     });
 };
 
-export const useMarkAllRead = () => {
+export const useMarkAllRead = (): UseMutationResult<number, ApiError, void> => {
     const queryClient = useQueryClient();
     return useMutation<number, ApiError>({
         mutationFn: notificationsApi.markAllRead,

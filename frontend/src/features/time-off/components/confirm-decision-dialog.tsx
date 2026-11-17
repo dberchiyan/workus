@@ -7,14 +7,19 @@ import DialogTitle from '@mui/material/DialogTitle';
 import FormHelperText from '@mui/material/FormHelperText';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
 import type { ErrorCode } from '@/shared/types';
+
 import { formatPeriod, fullName } from '../format';
 import { RESERVED_LINE } from '../hooks/use-field-message';
 import type { ManagedRequest } from '../types';
 import { TYPE_VISUALS } from './time-off-visuals';
+
+const OVERFLOW_ALLOWANCE = 50;
 
 /** Mirrors the backend (decision_comment VARCHAR(500)). */
 const REASON_MAX = 500;
@@ -44,7 +49,7 @@ export function ConfirmDecisionDialog({
     onConfirm,
     onClose,
     onExited,
-}: ConfirmDecisionDialogProps) {
+}: ConfirmDecisionDialogProps): ReactElement {
     const { t, i18n } = useTranslation(['timeOff', 'errors', 'validation']);
     const titleId = useId();
     const descriptionId = useId();
@@ -135,7 +140,7 @@ export function ConfirmDecisionDialog({
                                           max: REASON_MAX,
                                       })
                             }
-                            slotProps={{ htmlInput: { maxLength: REASON_MAX + 50 } }}
+                            slotProps={{ htmlInput: { maxLength: REASON_MAX + OVERFLOW_ALLOWANCE } }}
                         />
                     </>
                 )}

@@ -1,6 +1,7 @@
 import type { INestApplication } from '@nestjs/common';
 import { DocumentBuilder, type OpenAPIObject, SwaggerModule } from '@nestjs/swagger';
 import { cleanupOpenApiDoc } from 'nestjs-zod';
+
 import { SESSION_COOKIE_SECURITY } from './common/security/security.decorators';
 
 /** Builds the OpenAPI document; Zod DTOs are the schemas. */

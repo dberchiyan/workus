@@ -1,3 +1,4 @@
+import { isoDay as isoDate } from '../../../../common/time/iso-day';
 import type { EmployeeBirthday, EmployeeBirthdays } from '../../../employee/core/service/employee.types';
 import type { DashboardReview, DashboardReviews } from '../../../employee/review/service/review.types';
 import type { DashboardRequest, DashboardRequests } from '../../../time-off/service/time-off.types';
@@ -8,8 +9,6 @@ import type {
     DashboardRequestsResponse,
     DashboardReviewsResponse,
 } from '../dto/admin-dashboard.response';
-
-const isoDate = (date: Date): string => date.toISOString().slice(0, 10);
 
 export const toAdminDashboardResponse = ({
     today,

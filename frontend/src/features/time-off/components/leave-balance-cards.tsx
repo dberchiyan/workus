@@ -1,8 +1,11 @@
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Skeleton from '@mui/material/Skeleton';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import type { LeaveBalances } from '../types';
 import { TIME_OFF_TYPES } from '../types';
 import { LeaveBalanceCard } from './leave-balance-card';
@@ -18,7 +21,14 @@ export interface LeaveBalanceCardsProps {
 }
 
 /** Vacation, sick days, days off — with loading and error states. */
-export function LeaveBalanceCards({ data, isPending, isError, onRetry, headingLevel, layout }: LeaveBalanceCardsProps) {
+export function LeaveBalanceCards({
+    data,
+    isPending,
+    isError,
+    onRetry,
+    headingLevel,
+    layout,
+}: LeaveBalanceCardsProps): ReactElement {
     const { t } = useTranslation('timeOff');
     const grid = cn('grid gap-4', layout === 'row' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3' : 'grid-cols-1');
     if (isPending) {

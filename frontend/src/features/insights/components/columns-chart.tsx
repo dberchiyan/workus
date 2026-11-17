@@ -1,7 +1,12 @@
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 import { m, useReducedMotion } from 'motion/react';
+import type { ReactElement } from 'react';
+
 import { cn } from '@/shared/lib/cn';
+import { DURATION_BASE, STAGGER_TIGHT } from '@/shared/lib/motion';
+import { PERCENT } from '@/shared/lib/units';
+
 import { niceScale } from '../chart';
 
 export interface ChartColumn {
@@ -30,7 +35,7 @@ export interface ColumnsChartProps {
 const PLOT = 'relative h-64';
 
 /** Month columns over a light grid; a column is a button that selects its month. */
-export function ColumnsChart(props: ColumnsChartProps) {
+export function ColumnsChart(props: ColumnsChartProps): ReactElement {
     const reduceMotion = useReducedMotion();
     const visible = (values: number[]) => values.filter((_, index) => !props.series[index]?.hidden);
     const maximum = Math.max(
@@ -50,7 +55,7 @@ export function ColumnsChart(props: ColumnsChartProps) {
             : {
                   initial: { scaleY: 0 },
                   animate: { scaleY: 1 },
-                  transition: { duration: 0.45, delay: index * 0.03, ease: 'easeOut' as const },
+                  transition: { duration: DURATION_BASE, delay: index * STAGGER_TIGHT, ease: 'easeOut' as const },
               };
 
     return (
@@ -63,7 +68,7 @@ export function ColumnsChart(props: ColumnsChartProps) {
                             variant="caption"
                             color="textSecondary"
                             className="app-tabular absolute right-0 translate-y-1/2"
-                            style={{ bottom: `${String((tick / max) * 100)}%` }}
+                            style={{ bottom: `${String((tick / max) * PERCENT)}%` }}
                         >
                             {tick}
                         </Typography>
@@ -78,7 +83,7 @@ export function ColumnsChart(props: ColumnsChartProps) {
                                 'absolute inset-x-0 border-t',
                                 tick === 0 ? 'border-text-disabled' : 'border-dashed border-divider',
                             )}
-                            style={{ bottom: `${String((tick / max) * 100)}%` }}
+                            style={{ bottom: `${String((tick / max) * PERCENT)}%` }}
                         />
                     ))}
                     <div className="absolute inset-0 flex">
@@ -104,7 +109,7 @@ export function ColumnsChart(props: ColumnsChartProps) {
                                                 key={`${props.animationKey}-${column.key}`}
                                                 className="flex w-full max-w-10 origin-bottom flex-col-reverse overflow-hidden rounded-t-md"
                                                 style={{
-                                                    height: `${String((visible(column.values).reduce((a, b) => a + b, 0) / max) * 100)}%`,
+                                                    height: `${String((visible(column.values).reduce((a, b) => a + b, 0) / max) * PERCENT)}%`,
                                                 }}
                                                 {...grow(index)}
                                             >
@@ -132,7 +137,7 @@ export function ColumnsChart(props: ColumnsChartProps) {
                                                             'block w-1/2 origin-bottom rounded-t-md',
                                                             props.series[part]?.className,
                                                         )}
-                                                        style={{ height: `${String((value / max) * 100)}%` }}
+                                                        style={{ height: `${String((value / max) * PERCENT)}%` }}
                                                         {...grow(index)}
                                                     />
                                                 ))}

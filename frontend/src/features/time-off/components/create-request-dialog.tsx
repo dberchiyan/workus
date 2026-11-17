@@ -10,17 +10,21 @@ import { useTheme } from '@mui/material/styles';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useEffect, useId } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
+import { ISO_YEAR_LENGTH } from '@/shared/lib/units';
 import { todayUtcIso } from '@/shared/lib/utc-day';
+
 import { formatCount, formatDay, formatPeriod, workingDaysBetween } from '../format';
 import { useCreateRequestForm } from '../hooks/use-create-request-form';
 import { RESERVED_LINE, useFieldMessage } from '../hooks/use-field-message';
+import { useHolidayNames } from '../hooks/use-holidays';
 import { TIME_OFF_LIMITS } from '../schemas';
 import type { LeaveBalance } from '../types';
 import { RangeCalendar } from './range-calendar';
-import { useHolidayNames } from '../hooks/use-holidays';
 import { TypeOptions } from './type-options';
 
 export interface CreateRequestDialogProps {
@@ -36,7 +40,13 @@ export interface CreateRequestDialogProps {
  * Type (cards), date range (calendar) with the cycle and the days available, optional comment.
  * Says what the request takes before it is sent.
  */
-export function CreateRequestDialog({ open, balances, onClose, onCreated, onExited }: CreateRequestDialogProps) {
+export function CreateRequestDialog({
+    open,
+    balances,
+    onClose,
+    onCreated,
+    onExited,
+}: CreateRequestDialogProps): ReactElement {
     const { t, i18n } = useTranslation(['timeOff', 'errors']);
     const locale = i18n.language;
     const theme = useTheme();
@@ -49,12 +59,12 @@ export function CreateRequestDialog({ open, balances, onClose, onCreated, onExit
     const { errors } = formState;
     const [type, startsAt, endsAt] = watch(['type', 'startsAt', 'endsAt']);
     // The years the range and the calendar can show: this one and the next.
-    const thisYear = Number(todayUtcIso().slice(0, 4));
+    const thisYear = Number(todayUtcIso().slice(0, ISO_YEAR_LENGTH));
     const holidays = useHolidayNames([
         thisYear,
         thisYear + 1,
-        Number(startsAt.slice(0, 4)) || thisYear,
-        Number(endsAt.slice(0, 4)) || thisYear,
+        Number(startsAt.slice(0, ISO_YEAR_LENGTH)) || thisYear,
+        Number(endsAt.slice(0, ISO_YEAR_LENGTH)) || thisYear,
     ]);
     const days = workingDaysBetween(startsAt, endsAt, holidays);
     const balance = balances.find((item) => item.type === type);

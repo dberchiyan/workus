@@ -1,12 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import type { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
+
 import { isApiError } from '@/shared/api/api-error';
+import { todayUtcIso as todayIso } from '@/shared/lib/utc-day';
 import type { ErrorCode } from '@/shared/types';
+
 import { type CreateTimeOffFormOutput, type CreateTimeOffFormValues, createTimeOffSchema } from '../schemas';
 import { useCreateTimeOffRequest } from './use-time-off-queries';
-
-const todayIso = (): string => new Date().toISOString().slice(0, 10);
 
 const FORM_FIELDS: ReadonlySet<string> = new Set(['type', 'startsAt', 'endsAt', 'note']);
 const isFormField = (field: string): field is keyof CreateTimeOffFormValues => FORM_FIELDS.has(field);
@@ -15,7 +18,42 @@ const isFormField = (field: string): field is keyof CreateTimeOffFormValues => F
  * Create request. One Idempotency-Key per opening of the dialog (it remounts per opening),
  * reused on every retry of that submission.
  */
-export const useCreateRequestForm = (onCreated: () => void) => {
+export const useCreateRequestForm = (
+    onCreated: () => void,
+): {
+    form: UseFormReturn<
+        { type: 'VACATION' | 'SICK_DAY' | 'DAY_OFF'; startsAt: string; endsAt: string; note: string },
+        unknown,
+        { type: 'VACATION' | 'SICK_DAY' | 'DAY_OFF'; startsAt: string; endsAt: string; note: string }
+    >;
+    submit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+    errorCode:
+        | 'VALIDATION_FAILED'
+        | 'MALFORMED_REQUEST'
+        | 'INVALID_PARAMETER'
+        | 'UNAUTHORIZED'
+        | 'INVALID_CREDENTIALS'
+        | 'SESSION_EXPIRED'
+        | 'FORBIDDEN'
+        | 'ACCESS_ENDED'
+        | 'ORGANISATION_NOT_ACTIVE'
+        | 'DEMO_RESTRICTED'
+        | 'PLAN_UPGRADE_REQUIRED'
+        | 'PLAN_LIMIT_REACHED'
+        | 'RESOURCE_NOT_FOUND'
+        | 'CONFLICT'
+        | 'CONCURRENT_MODIFICATION'
+        | 'IDEMPOTENCY_KEY_REUSED'
+        | 'BUSINESS_RULE_VIOLATION'
+        | 'PAYLOAD_TOO_LARGE'
+        | 'UNSUPPORTED_MEDIA_TYPE'
+        | 'RATE_LIMIT_EXCEEDED'
+        | 'UPSTREAM_UNAVAILABLE'
+        | 'INTERNAL_ERROR'
+        | null;
+    errorRef: RefObject<HTMLDivElement | null>;
+    isSubmitting: boolean;
+} => {
     const create = useCreateTimeOffRequest();
     const [idempotencyKey] = useState(() => crypto.randomUUID());
     const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);

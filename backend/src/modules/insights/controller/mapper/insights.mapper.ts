@@ -1,8 +1,7 @@
 import { toMoney } from '../../../../common/persistence/money';
+import { isoDay as isoDate } from '../../../../common/time/iso-day';
 import type { Insights, Salary, Turnover } from '../../service/insights.types';
 import type { InsightsResponse } from '../dto/insights.response';
-
-const isoDate = (movedAt: Date): string => movedAt.toISOString().slice(0, 10);
 
 const toTurnover = (turnover: Turnover): InsightsResponse['turnover'] => ({
     ...turnover,

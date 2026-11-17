@@ -8,9 +8,13 @@ import DialogTitle from '@mui/material/DialogTitle';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormHelperText from '@mui/material/FormHelperText';
 import TextField from '@mui/material/TextField';
+import type { ReactElement } from 'react';
 import { useEffect, useId } from 'react';
 import { Controller } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
+import { ISO_YEAR_LENGTH } from '@/shared/lib/units';
+
 import { RESERVED_LINE, useFieldMessage } from '../hooks/use-field-message';
 import { useHolidayForm } from '../hooks/use-holiday-form';
 import { TIME_OFF_LIMITS } from '../schemas';
@@ -27,7 +31,7 @@ export interface HolidayDialogProps {
 }
 
 /** Add or change a holiday: heldAt, name and whether it repeats every year. */
-export function HolidayDialog({ holiday, defaultDate, open, onClose, onExited }: HolidayDialogProps) {
+export function HolidayDialog({ holiday, defaultDate, open, onClose, onExited }: HolidayDialogProps): ReactElement {
     const { t } = useTranslation(['timeOff', 'errors']);
     const titleId = useId();
     const recurringHintId = useId();
@@ -106,7 +110,9 @@ export function HolidayDialog({ holiday, defaultDate, open, onClose, onExited }:
                     </FormHelperText>
                     {holiday?.isCarriedOver && (
                         <Alert severity="info" variant="outlined">
-                            {t('holidays.dialog.copyMade', { year: Number(holiday.heldAt.slice(0, 4)) + 1 })}
+                            {t('holidays.dialog.copyMade', {
+                                year: Number(holiday.heldAt.slice(0, ISO_YEAR_LENGTH)) + 1,
+                            })}
                         </Alert>
                     )}
                 </DialogContent>

@@ -6,16 +6,19 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormHelperText from '@mui/material/FormHelperText';
-import TextField from '@mui/material/TextField';
 import { useTheme } from '@mui/material/styles';
+import TextField from '@mui/material/TextField';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { type FieldError, useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
 import { type CurrentUser, useUpdateOwnName } from '@/features/auth';
 import { isApiError } from '@/shared/api/api-error';
 import type { ErrorCode } from '@/shared/types';
-import { type EditNameValues, editNameSchema, NAME_LIMITS } from '../schemas';
+
+import { editNameSchema, type EditNameValues, NAME_LIMITS } from '../schemas';
 
 /** Keeps every helper line's height while it is empty, so the form never shifts. */
 const RESERVED_LINE = ' ';
@@ -34,7 +37,7 @@ export interface EditNameDialogProps {
  * profile card, the account menu and every list then show the new name. Remounted on each
  * opening, so the fields start from the current name.
  */
-export function EditNameDialog({ open, user, onClose, onExited }: EditNameDialogProps) {
+export function EditNameDialog({ open, user, onClose, onExited }: EditNameDialogProps): ReactElement {
     const { t } = useTranslation(['settings', 'validation', 'errors']);
     const titleId = useId();
     const textId = useId();

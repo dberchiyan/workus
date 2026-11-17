@@ -1,7 +1,10 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { type SecurityCategory, SecurityLogView } from '@/features/auth';
+
 import { useEmployeeSecurityLog } from '../hooks/use-employee-security-log';
 import { ExportButton } from './export-button';
 
@@ -9,7 +12,7 @@ import { ExportButton } from './export-button';
  * The employee's sign-ins, failed attempts, password changes and signed-out sessions. Laid out
  * like the Activity tab: a header row over the card's padded body.
  */
-export function ProfileSecurityTab({ employeeId }: { employeeId: string }) {
+export function ProfileSecurityTab({ employeeId }: { employeeId: string }): ReactElement {
     const { t } = useTranslation('employee');
     const headingId = useId();
     const [category, setCategory] = useState<SecurityCategory | undefined>(undefined);

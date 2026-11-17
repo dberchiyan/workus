@@ -1,4 +1,6 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
+
 import { cn } from '@/shared/lib/cn';
 
 /** Success = done / active, warning = waiting, info = planned, danger = refused, neutral = ended. */
@@ -33,7 +35,7 @@ export interface StatusBadgeProps {
 }
 
 /** One look for every status in the app: a soft pill, a dot in the tone, the word. */
-export function StatusBadge({ tone, label, className }: StatusBadgeProps) {
+export function StatusBadge({ tone, label, className }: StatusBadgeProps): ReactElement {
     const { badge, dot } = TONES[tone];
     return (
         <Typography

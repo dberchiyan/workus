@@ -1,11 +1,12 @@
 import { Controller, Get, HttpStatus, Query } from '@nestjs/common';
-import type { Principal } from '../../../common/security/principal';
-import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
+
 import { ApiPageable, type Pageable, PageableQuery } from '../../../common/dto/pageable';
 import { ApiErrors } from '../../../common/exception/api-errors.decorator';
+import { CurrentPrincipal } from '../../../common/security/current-principal.decorator';
 import { can } from '../../../common/security/policies';
+import type { Principal } from '../../../common/security/principal';
 import { Authorize } from '../../../common/security/security.decorators';
 import { DashboardService } from '../service/dashboard.service';
 import {

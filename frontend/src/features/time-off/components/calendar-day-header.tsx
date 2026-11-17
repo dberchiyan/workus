@@ -1,8 +1,12 @@
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
-import { useTranslation } from 'react-i18next';
+import type { ReactElement } from 'react';
 import type { Ref } from 'react';
+import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+import { ISO_DAY_OF_MONTH_START } from '@/shared/lib/units';
+
 import { isWeekendIso } from '../calendar';
 
 export interface CalendarDayHeaderProps {
@@ -15,7 +19,7 @@ export interface CalendarDayHeaderProps {
 }
 
 /** Day number over its short weekday; today in the primary colour with a dot. */
-export function CalendarDayHeader({ date, today, holiday, weekday, ref }: CalendarDayHeaderProps) {
+export function CalendarDayHeader({ date, today, holiday, weekday, ref }: CalendarDayHeaderProps): ReactElement {
     const { t } = useTranslation('timeOff');
     const header = (
         <th
@@ -33,7 +37,7 @@ export function CalendarDayHeader({ date, today, holiday, weekday, ref }: Calend
                 <span aria-hidden className="absolute top-1 left-1/2 size-1 -translate-x-1/2 rounded-full bg-primary" />
             )}
             <Typography variant="subtitle2" component="span" color="inherit" className="app-tabular block">
-                {Number(date.slice(8))}
+                {Number(date.slice(ISO_DAY_OF_MONTH_START))}
             </Typography>
             <Typography
                 variant="caption"

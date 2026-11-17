@@ -11,9 +11,13 @@ import Card from '@mui/material/Card';
 import IconButton from '@mui/material/IconButton';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { ISO_YEAR_LENGTH } from '@/shared/lib/units';
 import { todayUtcIso } from '@/shared/lib/utc-day';
+
 import { isWeekendIso } from '../calendar';
 import { useHolidays } from '../hooks/use-holidays';
 import type { Holiday } from '../types';
@@ -58,11 +62,11 @@ function DateTile({ heldAt, locale }: { heldAt: string; locale: string }) {
  * Settings → Holidays (admin): the company's non-working days, a year at a time. A isRecurring
  * holiday is copied to the next year; each year's copy is changed on its own.
  */
-export function HolidaysSection() {
+export function HolidaysSection(): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const titleId = useId();
     const today = todayUtcIso();
-    const currentYear = Number(today.slice(0, 4));
+    const currentYear = Number(today.slice(0, ISO_YEAR_LENGTH));
     const [year, setYear] = useState(currentYear);
     const [editing, setEditing] = useState<Editing | null>(null);
     const [open, setOpen] = useState(false);

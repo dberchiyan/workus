@@ -1,5 +1,7 @@
 import Paper from '@mui/material/Paper';
 import { m, useReducedMotion } from 'motion/react';
+import type { ReactElement } from 'react';
+
 import { BrandMark } from '@/shared/components/brand-mark';
 import { cn } from '@/shared/lib/cn';
 
@@ -40,7 +42,7 @@ const Line = ({ className }: { className: string }) => <div className={cn('h-2 r
  * colours — light sidebar, stat tiles, people with status badges and responsible avatars — and
  * a notice floating in. Motion comes from the page's LazyMotion.
  */
-export function AppPreview() {
+export function AppPreview(): ReactElement {
     const reduce = useReducedMotion();
     return (
         <m.div

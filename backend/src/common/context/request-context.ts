@@ -1,4 +1,5 @@
 import type { ClsStore } from 'nestjs-cls';
+
 import type { Principal } from '../security/principal';
 
 export const SessionState = {

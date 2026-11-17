@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
-import { NotificationType } from '../../notification/service/notification-type';
+
 import { NotificationService } from '../../notification/service/notification.service';
+import { NotificationType } from '../../notification/service/notification-type';
 import { TimeOffRequestRepository } from '../repository/time-off-request.repository';
 import { employeeUserIdOf, requestNotice, responsibleUserIdsOf } from './time-off-notices';
 

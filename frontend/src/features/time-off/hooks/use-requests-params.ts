@@ -1,8 +1,13 @@
 import { useCallback, useMemo } from 'react';
 import { useSearchParams } from 'react-router';
+
 import { CLOSED_STATUSES, type ClosedStatus, isTimeOffType, type TimeOffType } from '../types';
 
-export const CLOSED_PAGE_SIZES = [10, 20, 50] as const;
+const SMALL_PAGE = 10;
+const MEDIUM_PAGE = 20;
+const LARGE_PAGE = 50;
+
+export const CLOSED_PAGE_SIZES = [SMALL_PAGE, MEDIUM_PAGE, LARGE_PAGE] as const;
 const DEFAULT_CLOSED_SIZE = 10;
 
 export interface RequestsParams {
@@ -30,7 +35,7 @@ const readSize = (raw: string | null): number => {
 };
 
 /** Filters, the closed list's page and the open request live in the URL (shareable, back works). */
-export const useRequestsParams = () => {
+export const useRequestsParams = (): { params: RequestsParams; update: (changes: Partial<RequestsParams>) => void } => {
     const [searchParams, setSearchParams] = useSearchParams();
     const params = useMemo<RequestsParams>(() => {
         const type = searchParams.get('type') ?? '';

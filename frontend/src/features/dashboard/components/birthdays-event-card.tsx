@@ -1,13 +1,15 @@
 import CakeOutlined from '@mui/icons-material/CakeOutlined';
 import type { UseQueryResult } from '@tanstack/react-query';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { type DashboardBirthdays, EVENTS_PAGE_SIZE } from '../types';
-import { EVENT_TONES } from './event-tones';
 import { EventCard } from './event-card';
 import { EventList } from './event-list';
 import { EventPagination } from './event-pagination';
 import { BirthdayEventRow } from './event-rows';
+import { EVENT_TONES } from './event-tones';
 
 export interface BirthdaysEventCardProps {
     id: string;
@@ -20,7 +22,15 @@ export interface BirthdaysEventCardProps {
 }
 
 /** Birthdays of a day or a month, five a page. */
-export function BirthdaysEventCard({ id, query, page, onPage, subtitle, emptyText, action }: BirthdaysEventCardProps) {
+export function BirthdaysEventCard({
+    id,
+    query,
+    page,
+    onPage,
+    subtitle,
+    emptyText,
+    action,
+}: BirthdaysEventCardProps): ReactElement {
     const { t, i18n } = useTranslation('dashboard');
     const total = query.data?.totalElements;
     return (

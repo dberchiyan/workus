@@ -1,13 +1,14 @@
-import { Suspense, type ReactNode } from 'react';
+import { type ReactNode, Suspense } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router';
+
 import { LoginPage, RequireAccess, RequireAuth } from '@/features/auth';
 import { DashboardPage } from '@/features/dashboard';
 import { EmployeeProfilePage, EmployeesPage } from '@/features/employee/core';
-import { AppLayout } from '@/features/shell';
-import { SettingsPage } from '@/features/settings';
 import { InsightsPage } from '@/features/insights';
 import { OrganisationGate, SignupPage } from '@/features/organisation';
 import { CompaniesPage, CompanyPage } from '@/features/platform';
+import { SettingsPage } from '@/features/settings';
+import { AppLayout } from '@/features/shell';
 import { CalendarPage, RequestsPage } from '@/features/time-off';
 import { PageLoader } from '@/shared/components/page-loader';
 import { RouteErrorBoundary } from '@/shared/components/route-error-boundary';

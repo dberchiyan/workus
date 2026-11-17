@@ -2,8 +2,10 @@ import LockOutlined from '@mui/icons-material/LockOutlined';
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router';
+
 import { cn } from '@/shared/lib/cn';
 import { settingsPath } from '@/shared/lib/paths';
 import type { Schemas } from '@/shared/types';
@@ -35,7 +37,7 @@ export function UpgradePrompt({
     hasBillingAccount,
     compact = false,
     className,
-}: UpgradePromptProps) {
+}: UpgradePromptProps): ReactElement {
     const { t, i18n } = useTranslation();
     const planName = t(`plans.${requiredPlan}`);
     const number = new Intl.NumberFormat(i18n.language);

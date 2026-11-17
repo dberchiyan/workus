@@ -1,9 +1,12 @@
 import Link from '@mui/material/Link';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { cn } from '@/shared/lib/cn';
-import { LANDING_PATH } from '../landing';
+
 import { ThemeModeToggle } from '@/shared/components/theme-mode-toggle';
+import { cn } from '@/shared/lib/cn';
+
+import { LANDING_PATH } from '../landing';
 
 export interface PageShellProps {
     children: ReactNode;
@@ -18,7 +21,7 @@ export interface PageShellProps {
  * Skip link, top bar and the page's single <main> landmark, over the brand backdrop (soft
  * glows and a dot grid fading out from the centre — decorative).
  */
-export function PageShell({ children, actions, homeLink = false, className }: PageShellProps) {
+export function PageShell({ children, actions, homeLink = false, className }: PageShellProps): ReactElement {
     const { t } = useTranslation();
     return (
         <div className="relative isolate flex min-h-dvh flex-col bg-background">

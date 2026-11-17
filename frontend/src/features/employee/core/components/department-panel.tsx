@@ -6,9 +6,12 @@ import WorkOutlineOutlined from '@mui/icons-material/WorkOutlineOutlined';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { useCreatePosition, useRenameDepartment, useRenamePosition } from '../hooks/use-company-structure';
 import type { Department, StructurePosition } from '../types';
 import { PositionHoldersDialog } from './position-holders-dialog';
@@ -64,7 +67,7 @@ export function DepartmentPanel({
     readOnly = false,
     onRemoveDepartment,
     onRemovePosition,
-}: DepartmentPanelProps) {
+}: DepartmentPanelProps): ReactElement {
     const { t, i18n } = useTranslation('employee');
     const renameDepartment = useRenameDepartment();
     const renamePosition = useRenamePosition();

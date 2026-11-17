@@ -1,9 +1,12 @@
 import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import i18n from 'i18next';
+
 import { env } from '@/shared/config/env';
 import type { ErrorCode, ErrorResponse } from '@/shared/types';
-import { ApiError } from './api-error';
+
 import { markApiActivity } from './activity';
+import { ApiError } from './api-error';
+import { HttpStatus } from './http-status';
 import { checkResponseContract } from './response-contract';
 
 const TIMEOUT_MS = 15_000;
@@ -71,7 +74,7 @@ apiClient.interceptors.response.use(
             return Promise.reject(new ApiError(status, code, i18n.t(`errors:${code}`), [], undefined));
         }
         const apiError = ApiError.fromResponse(data);
-        if (apiError.status === 401 && SESSION_ERRORS.has(apiError.code)) {
+        if (apiError.status === HttpStatus.UNAUTHORIZED && SESSION_ERRORS.has(apiError.code)) {
             onSessionLost?.(apiError.code, error.config);
         }
         return Promise.reject(apiError);

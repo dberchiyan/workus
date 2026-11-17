@@ -1,4 +1,5 @@
 import { defineConfig, env } from 'prisma/config';
+
 import { databaseUrl } from './src/common/config/database-url';
 
 try {

@@ -1,8 +1,11 @@
 import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link as RouterLink } from 'react-router';
+
 import { cn } from '@/shared/lib/cn';
+
 import { formatPeriod } from '../format';
 import type { CalendarRequest } from '../types';
 import { TYPE_VISUALS } from './time-off-visuals';
@@ -22,7 +25,7 @@ export interface CalendarBarProps {
  * One request across its days. Approved: the type's tint and coloured icon; pending: grey with a
  * dashed outline — never colour alone, the text says the status.
  */
-export function CalendarBar({ request, span, href }: CalendarBarProps) {
+export function CalendarBar({ request, span, href }: CalendarBarProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const { icon: Icon, text, tint } = TYPE_VISUALS[request.type];
     const pending = request.status === 'PENDING';

@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/client';
+
 import type { Company, CompanyCounts, CompanyPage, CompanyPeople, CompanyStatus, CompanyUserPage } from '../types';
 
 export const COMPANIES_PAGE_SIZE = 20;

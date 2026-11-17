@@ -2,7 +2,9 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
+
 import { RevealValue } from './reveal-value';
 
 export interface StatCardProps {
@@ -13,7 +15,7 @@ export interface StatCardProps {
 }
 
 /** A titled number with a hint line under it (stat rows on Employees and the dashboard). */
-export function StatCard({ title, value, hint }: StatCardProps) {
+export function StatCard({ title, value, hint }: StatCardProps): ReactElement {
     return (
         // Full height: cards in one grid row line up whatever their hints wrap to.
         <Card variant="outlined" className="h-full">

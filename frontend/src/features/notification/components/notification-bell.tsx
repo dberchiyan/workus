@@ -2,14 +2,17 @@ import NotificationsOutlined from '@mui/icons-material/NotificationsOutlined';
 import Badge from '@mui/material/Badge';
 import IconButton from '@mui/material/IconButton';
 import Popover from '@mui/material/Popover';
+import type { ReactElement } from 'react';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useCurrentUser } from '@/features/auth';
+
 import { useUnreadCount } from '../hooks/use-notifications';
 import { NotificationPanel } from './notification-panel';
 
 /** The bell in the top bar: the unread count (polled), and the list in a popover. */
-export function NotificationBell() {
+export function NotificationBell(): ReactElement | null {
     const { t } = useTranslation('notification');
     const { data: user } = useCurrentUser();
     const unread = useUnreadCount();

@@ -1,4 +1,5 @@
 import { join } from 'node:path';
+
 import { Module } from '@nestjs/common';
 import { AcceptLanguageResolver, I18nModule } from 'nestjs-i18n';
 

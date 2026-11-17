@@ -1,29 +1,30 @@
-import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { Transactional } from '@nestjs-cls/transactional';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
+
+import type { Pageable } from '../../../common/dto/pageable';
 import {
     AccessEndedException,
     BusinessRuleException,
     InvalidCredentialsException,
     NotAuthenticatedException,
 } from '../../../common/exception/api.exception';
-import type { Pageable } from '../../../common/dto/pageable';
 import { MetricsService } from '../../../common/observability/metrics.service';
 import type { Principal } from '../../../common/security/principal';
 import { loginRateLimitKey, RateLimitName } from '../../../common/security/rate-limit';
 import { RateLimitService } from '../../../common/security/rate-limit.service';
-import { EmployeeService } from '../../employee/core/service/employee.service';
+import { AuditService } from '../../audit/service/audit.service';
+import type { SecurityEventPage } from '../../audit/service/audit.types';
 import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
 import { AuditField, auditValue, changeOf } from '../../audit/service/audit-change';
 import type { AuditEventSortField } from '../../audit/service/audit-sort';
-import { AuditService } from '../../audit/service/audit.service';
-import type { SecurityEventPage } from '../../audit/service/audit.types';
 import type { SecurityCategory } from '../../audit/service/security-category';
-import { authoritiesFor, type UserRole } from '../../user/service/user-role';
+import { EmployeeService } from '../../employee/core/service/employee.service';
 import { UserService } from '../../user/service/user.service';
 import type { UserProfile } from '../../user/service/user.types';
+import { authoritiesFor, type UserRole } from '../../user/service/user-role';
 import { PasswordHasher } from './password-hasher.service';
-import { type StartedSession, SessionService } from './session.service';
+import { SessionService, type StartedSession } from './session.service';
 
 export interface LoginCommand {
     email: string;

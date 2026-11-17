@@ -1,8 +1,11 @@
 import Avatar from '@mui/material/Avatar';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
+
 import { cn } from '@/shared/lib/cn';
 
 /** Muted theme tones (theme/tokens.ts → avatar); literal class names so Tailwind sees them. */
+const HASH_PRIME = 31;
 const AVATAR_TONES = [
     'bg-avatar-c1',
     'bg-avatar-c2',
@@ -20,7 +23,7 @@ const SIZE_CLASS = { sm: 'size-7', md: 'size-8', lg: 'size-16' } as const;
 const toneFor = (id: string): string => {
     let hash = 0;
     for (const char of id) {
-        hash = (hash * 31 + char.charCodeAt(0)) >>> 0;
+        hash = (hash * HASH_PRIME + char.charCodeAt(0)) >>> 0;
     }
     return AVATAR_TONES[hash % AVATAR_TONES.length] ?? AVATAR_TONES[0];
 };
@@ -36,7 +39,7 @@ export interface InitialsAvatarProps {
 }
 
 /** Initials on a per-person tone; decorative — the name is always shown or labelled nearby. */
-export function InitialsAvatar({ id, firstName, lastName, size = 'md', className }: InitialsAvatarProps) {
+export function InitialsAvatar({ id, firstName, lastName, size = 'md', className }: InitialsAvatarProps): ReactElement {
     return (
         <Avatar aria-hidden className={cn(toneFor(id), 'text-avatar-text', SIZE_CLASS[size], className)}>
             <Typography variant={size === 'lg' ? 'h5' : 'caption'} component="span" className="app-tabular">

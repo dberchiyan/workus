@@ -6,10 +6,13 @@ import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormHelperText from '@mui/material/FormHelperText';
 import TextField from '@mui/material/TextField';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
 import type { ErrorCode } from '@/shared/types';
+
 import { useDecideCompany } from '../hooks/use-platform';
 import type { Company } from '../types';
 
@@ -28,7 +31,13 @@ export interface DecideCompanyDialogProps {
  * Approve (its people can start at once) or reject with a reason its owner will read. Cancel has
  * the first focus; the reason is required and checked on submit.
  */
-export function DecideCompanyDialog({ company, decision, open, onClose, onExited }: DecideCompanyDialogProps) {
+export function DecideCompanyDialog({
+    company,
+    decision,
+    open,
+    onClose,
+    onExited,
+}: DecideCompanyDialogProps): ReactElement {
     const { t } = useTranslation(['platform', 'errors']);
     const titleId = useId();
     const textId = useId();

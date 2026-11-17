@@ -11,9 +11,11 @@ import type { Request, Response } from 'express';
 import { ClsService } from 'nestjs-cls';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import { catchError, finalize, type Observable, throwError } from 'rxjs';
+
 import { AppConfigService } from '../config/app-config.service';
 import type { RequestContext } from '../context/request-context';
 import { ApiException } from '../exception/api.exception';
+import { MS_PER_SECOND, NS_PER_MS } from '../time/units';
 import { MetricsService } from './metrics.service';
 import { DEFAULT_SLOW_THRESHOLD_MS, SLOW_THRESHOLD_KEY } from './slow-threshold.decorator';
 
@@ -44,13 +46,13 @@ export class TimingInterceptor implements NestInterceptor {
                 return throwError(() => error);
             }),
             finalize(() => {
-                const durationMs = Number(process.hrtime.bigint() - started) / 1_000_000;
+                const durationMs = Number(process.hrtime.bigint() - started) / NS_PER_MS;
                 const pattern = this.routePattern(request);
                 const route = `${request.method} ${pattern}`;
                 const status = failedStatus ?? response.statusCode;
                 this.metrics.httpRequestDuration.observe(
                     { method: request.method, route: pattern, status: String(status) },
-                    durationMs / 1000,
+                    durationMs / MS_PER_SECOND,
                 );
                 const queryCount = this.config.get('DB_QUERY_LOG') ? (this.cls.get('queryCount') ?? 0) : undefined;
                 const entry = {

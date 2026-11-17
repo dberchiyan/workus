@@ -1,7 +1,9 @@
 import type { AxiosResponse } from 'axios';
 import i18n from 'i18next';
 import type { z } from 'zod';
+
 import { ApiContractError } from './api-error';
+import { HttpStatus } from './http-status';
 import { RESPONSE_SCHEMAS } from './schemas.generated';
 
 /** How many mismatches an error lists (keeps it readable). */
@@ -25,7 +27,7 @@ const schemaFor = (method: string | undefined, url: string | undefined): z.ZodTy
  */
 export const checkResponseContract = (response: AxiosResponse): AxiosResponse => {
     const schema = schemaFor(response.config.method, response.config.url);
-    if (!schema || response.status === 204) {
+    if (!schema || response.status === HttpStatus.NO_CONTENT) {
         return response;
     }
     const result = schema.safeParse(response.data);

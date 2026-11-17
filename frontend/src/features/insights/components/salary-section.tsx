@@ -1,8 +1,13 @@
 import Typography from '@mui/material/Typography';
 import { m, useReducedMotion } from 'motion/react';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatMoney, type Money, toUnits } from '@/shared/lib/money';
+import { STAGGER_LOOSE } from '@/shared/lib/motion';
+import { PERCENT, TENTHS } from '@/shared/lib/units';
+
 import { signed } from '../chart';
 import { useSalary } from '../hooks/use-insights';
 import type { InsightsFilter } from '../types';
@@ -11,20 +16,24 @@ import { DeltaLine } from './delta-line';
 import { Figure } from './figure';
 import { InsightSection } from './insight-section';
 
+const MIN_BAR_PERCENT = 2;
+const SHARE_PRECISION = 10_000n;
+const PER_MILLE_UNITS = 1000n;
+
 /** Share of `value` in `max` for drawing (exact integers; a ratio, not an amount). */
 const share = (value: Money, max: Money): number => {
     const top = toUnits(max.amount);
-    return top <= 0n ? 0 : Number((toUnits(value.amount) * 10_000n) / top) / 10_000;
+    return top <= 0n ? 0 : Number((toUnits(value.amount) * SHARE_PRECISION) / top) / Number(SHARE_PRECISION);
 };
 
 /** (current − previous) / previous in tenths of a percent, exact; null without a base. */
 const changeTenths = (current: Money, previous: Money): number | null => {
     const base = toUnits(previous.amount);
-    return base === 0n ? null : Number(((toUnits(current.amount) - base) * 1000n) / base);
+    return base === 0n ? null : Number(((toUnits(current.amount) - base) * PER_MILLE_UNITS) / base);
 };
 
 /** Average monthly salary per group as horizontal bars, highest first, labelled directly. */
-export function SalarySection({ filter }: { filter: InsightsFilter }) {
+export function SalarySection({ filter }: { filter: InsightsFilter }): ReactElement {
     const { t, i18n } = useTranslation('insights');
     const reduceMotion = useReducedMotion();
     const query = useSalary(filter);
@@ -59,7 +68,9 @@ export function SalarySection({ filter }: { filter: InsightsFilter }) {
                             tenths !== null && (
                                 <DeltaLine
                                     direction={tenths}
-                                    change={t('common.changePercent', { value: signed(tenths / 10, i18n.language) })}
+                                    change={t('common.changePercent', {
+                                        value: signed(tenths / TENTHS, i18n.language),
+                                    })}
                                     previousYear={filter.year - 1}
                                     better="up"
                                 />
@@ -104,7 +115,7 @@ export function SalarySection({ filter }: { filter: InsightsFilter }) {
                                         key={`${animationKey}-${group.id}`}
                                         className="block h-full origin-left rounded-e-md bg-chart-c1"
                                         style={{
-                                            width: `${String(top ? Math.max(2, share(group.average, top) * 100) : 0)}%`,
+                                            width: `${String(top ? Math.max(MIN_BAR_PERCENT, share(group.average, top) * PERCENT) : 0)}%`,
                                         }}
                                         {...(reduceMotion
                                             ? {}
@@ -113,7 +124,7 @@ export function SalarySection({ filter }: { filter: InsightsFilter }) {
                                                   animate: { scaleX: 1 },
                                                   transition: {
                                                       duration: 0.5,
-                                                      delay: index * 0.05,
+                                                      delay: index * STAGGER_LOOSE,
                                                       ease: 'easeOut' as const,
                                                   },
                                               })}

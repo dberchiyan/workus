@@ -1,6 +1,9 @@
 import type { UseQueryResult } from '@tanstack/react-query';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { MonthSwitcher } from '@/shared/components/month-switcher';
+
 import type { DashboardBirthdays, DashboardReviews } from '../types';
 import { BirthdaysEventCard } from './birthdays-event-card';
 import { ReviewsEventCard } from './reviews-event-card';
@@ -19,7 +22,7 @@ export interface MonthEventsPanelProps {
 }
 
 /** Reviews and birthdays of a month, each card with its own month and pages. */
-export function MonthEventsPanel(props: MonthEventsPanelProps) {
+export function MonthEventsPanel(props: MonthEventsPanelProps): ReactElement {
     const { t, i18n } = useTranslation('dashboard');
     const switcher = (month: string, onChange: (month: string) => void) => (
         <MonthSwitcher

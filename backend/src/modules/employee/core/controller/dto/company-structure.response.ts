@@ -1,6 +1,8 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
 
+import { MAX_DEPARTMENTS, MAX_POSITIONS } from '../../../../../common/dto/limits';
+
 export const StructurePositionSchema = z
     .object({
         id: z.uuid(),
@@ -18,14 +20,14 @@ export const DepartmentSchema = z
         id: z.uuid(),
         name: z.string(),
         /** Positions by title. */
-        positions: z.array(StructurePositionSchema).max(200),
+        positions: z.array(StructurePositionSchema).max(MAX_POSITIONS),
         version: z.number().int(),
     })
     .meta({ id: 'Department' });
 
 /** The whole structure: departments in their order. */
 export class CompanyStructureResponse extends createZodDto(
-    z.object({ departments: z.array(DepartmentSchema).max(50) }),
+    z.object({ departments: z.array(DepartmentSchema).max(MAX_DEPARTMENTS) }),
 ) {}
 
 export class DepartmentResponse extends createZodDto(z.object(DepartmentSchema.shape)) {}

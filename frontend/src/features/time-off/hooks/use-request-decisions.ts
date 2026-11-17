@@ -1,6 +1,8 @@
 import { useState } from 'react';
+
 import { isApiError } from '@/shared/api/api-error';
 import type { ErrorCode } from '@/shared/types';
+
 import type { ManagedRequest, TimeOffDecision } from '../types';
 import { useDecideRequest } from './use-managed-requests';
 
@@ -15,7 +17,65 @@ type Confirmable = { request: ManagedRequest; decision: 'reject' | 'cancel' };
  * Approve runs at once (it is what the request asks for); reject (with an optional reason) and
  * cancel are confirmed first. A failed approve is announced; a failed confirmation shows in its dialog.
  */
-export const useRequestDecisions = () => {
+export const useRequestDecisions = (): {
+    start: (request: ManagedRequest, decision: TimeOffDecision) => void;
+    busyId: string | null;
+    isPending: boolean;
+    confirming: (Confirmable & { open: boolean }) | null;
+    confirmError:
+        | 'VALIDATION_FAILED'
+        | 'MALFORMED_REQUEST'
+        | 'INVALID_PARAMETER'
+        | 'UNAUTHORIZED'
+        | 'INVALID_CREDENTIALS'
+        | 'SESSION_EXPIRED'
+        | 'FORBIDDEN'
+        | 'ACCESS_ENDED'
+        | 'ORGANISATION_NOT_ACTIVE'
+        | 'DEMO_RESTRICTED'
+        | 'PLAN_UPGRADE_REQUIRED'
+        | 'PLAN_LIMIT_REACHED'
+        | 'RESOURCE_NOT_FOUND'
+        | 'CONFLICT'
+        | 'CONCURRENT_MODIFICATION'
+        | 'IDEMPOTENCY_KEY_REUSED'
+        | 'BUSINESS_RULE_VIOLATION'
+        | 'PAYLOAD_TOO_LARGE'
+        | 'UNSUPPORTED_MEDIA_TYPE'
+        | 'RATE_LIMIT_EXCEEDED'
+        | 'UPSTREAM_UNAVAILABLE'
+        | 'INTERNAL_ERROR'
+        | null;
+    confirm: (comment?: string) => undefined;
+    closeConfirm: () => void;
+    clearConfirm: () => void;
+    notice: DecisionNotice | null;
+    failure:
+        | 'VALIDATION_FAILED'
+        | 'MALFORMED_REQUEST'
+        | 'INVALID_PARAMETER'
+        | 'UNAUTHORIZED'
+        | 'INVALID_CREDENTIALS'
+        | 'SESSION_EXPIRED'
+        | 'FORBIDDEN'
+        | 'ACCESS_ENDED'
+        | 'ORGANISATION_NOT_ACTIVE'
+        | 'DEMO_RESTRICTED'
+        | 'PLAN_UPGRADE_REQUIRED'
+        | 'PLAN_LIMIT_REACHED'
+        | 'RESOURCE_NOT_FOUND'
+        | 'CONFLICT'
+        | 'CONCURRENT_MODIFICATION'
+        | 'IDEMPOTENCY_KEY_REUSED'
+        | 'BUSINESS_RULE_VIOLATION'
+        | 'PAYLOAD_TOO_LARGE'
+        | 'UNSUPPORTED_MEDIA_TYPE'
+        | 'RATE_LIMIT_EXCEEDED'
+        | 'UPSTREAM_UNAVAILABLE'
+        | 'INTERNAL_ERROR'
+        | null;
+    dismiss: () => void;
+} => {
     const decide = useDecideRequest();
     const [confirming, setConfirming] = useState<(Confirmable & { open: boolean }) | null>(null);
     const [confirmError, setConfirmError] = useState<ErrorCode | null>(null);

@@ -9,6 +9,11 @@ export const FEEDBACK_MAX_TEXT = 2000;
 const MAX_DEPTH = 6;
 const MAX_NODES = 1000;
 
+const MAX_LIST_ITEMS = 200;
+const MAX_LIST_START = 10_000;
+const MAX_LIST_TYPE_LENGTH = 8;
+const MAX_BLOCKS_PER_ITEM = 50;
+
 const MarkSchema = z.strictObject({ type: z.enum(['bold', 'italic']) });
 
 const TextSchema = z.strictObject({
@@ -35,23 +40,23 @@ const BlockSchema: z.ZodType<RichBlock> = z.lazy(() =>
         ParagraphSchema,
         z.strictObject({
             type: z.literal('bulletList'),
-            content: z.array(ListItemSchema).min(1).max(200),
+            content: z.array(ListItemSchema).min(1).max(MAX_LIST_ITEMS),
         }),
         z.strictObject({
             type: z.literal('orderedList'),
             attrs: z
                 .strictObject({
-                    start: z.number().int().min(1).max(10_000).optional(),
-                    type: z.string().max(8).nullable().optional(),
+                    start: z.number().int().min(1).max(MAX_LIST_START).optional(),
+                    type: z.string().max(MAX_LIST_TYPE_LENGTH).nullable().optional(),
                 })
                 .optional(),
-            content: z.array(ListItemSchema).min(1).max(200),
+            content: z.array(ListItemSchema).min(1).max(MAX_LIST_ITEMS),
         }),
     ]),
 );
 
 const ListItemSchema: z.ZodType<RichBlock> = z.lazy(() =>
-    z.strictObject({ type: z.literal('listItem'), content: z.array(BlockSchema).min(1).max(50) }),
+    z.strictObject({ type: z.literal('listItem'), content: z.array(BlockSchema).min(1).max(MAX_BLOCKS_PER_ITEM) }),
 );
 
 export interface RichTextDoc {

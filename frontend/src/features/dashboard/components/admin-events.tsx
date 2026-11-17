@@ -2,22 +2,28 @@ import { styled } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { ManagedRequestDialog } from '@/features/time-off';
 import { cn } from '@/shared/lib/cn';
 import { currentMonthUtc, todayUtcRange } from '@/shared/lib/utc-day';
+
 import { useEventBirthdays, useEventReviews, useTodayRequests } from '../hooks/use-admin-dashboard';
 import { type EventsTab, useEventsParams } from '../hooks/use-events-params';
 import type { DateRange, LocalDay } from '../types';
 import { MonthEventsPanel } from './month-events-panel';
 import { TodayEventsPanel } from './today-events-panel';
 
+const TAB_HEIGHT_UNITS = 5.5;
+const TAB_PADDING_UNITS = 1.5;
+
 /** Compact tab: content-wide, still a 44 px touch target. */
 const EventsTabButton = styled(Tab)(({ theme }) => ({
     minWidth: 0,
-    minHeight: theme.spacing(5.5),
-    paddingInline: theme.spacing(1.5),
+    minHeight: theme.spacing(TAB_HEIGHT_UNITS),
+    paddingInline: theme.spacing(TAB_PADDING_UNITS),
 }));
 
 /** First and last day of `YYYY-MM`. */
@@ -28,7 +34,7 @@ const monthRange = (month: string): DateRange => {
 };
 
 /** Today's events and events by month (admin dashboard, under the figures); a request opens in place. */
-export function AdminEvents() {
+export function AdminEvents(): ReactElement {
     const { t, i18n } = useTranslation('dashboard');
     // Today (UTC, as everywhere), fixed for the visit (no clock in render).
     const [day] = useState<LocalDay>(todayUtcRange);

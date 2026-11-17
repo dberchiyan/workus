@@ -3,21 +3,25 @@ import CardContent from '@mui/material/CardContent';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
 import { domAnimation, LazyMotion, m, useReducedMotion } from 'motion/react';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, Link as RouterLink } from 'react-router';
+import { Link as RouterLink, Navigate } from 'react-router';
+
 import { BillingTestModeNote } from '@/features/billing';
-import { PATHS } from '@/shared/lib/paths';
 import { PageLoader } from '@/shared/components/page-loader';
-import { PageShell } from '../components/page-shell';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
+import { DURATION_QUICK, EASE_OUT_QUINT } from '@/shared/lib/motion';
+import { PATHS } from '@/shared/lib/paths';
+
 import { AppPreview } from '../components/app-preview';
 import { BrandLogo } from '../components/brand-logo';
 import { LoginForm } from '../components/login-form';
+import { PageShell } from '../components/page-shell';
 import { useCurrentUser } from '../hooks/use-current-user';
 import { useLoginRedirect } from '../hooks/use-login-redirect';
 
-export default function LoginPage() {
+export function LoginPage(): ReactElement {
     const { t } = useTranslation('auth');
     useDocumentTitle(t('login.pageTitle'));
     const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
@@ -39,7 +43,7 @@ export default function LoginPage() {
                     <m.div
                         initial={reduce ? false : { opacity: 0, y: 12 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.4, ease: [0.2, 0, 0, 1] }}
+                        transition={{ duration: DURATION_QUICK, ease: EASE_OUT_QUINT }}
                         className="flex w-full max-w-md shrink-0 flex-col gap-8"
                     >
                         <BrandLogo linkHome />

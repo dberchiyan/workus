@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { FEEDBACK_MAX_TEXT, isRichTextDoc, richTextLength } from './rich-text';
 import type { RichTextDoc } from './types';
 

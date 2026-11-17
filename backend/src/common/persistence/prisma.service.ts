@@ -3,6 +3,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { ClsService } from 'nestjs-cls';
 import { InjectPinoLogger, PinoLogger } from 'nestjs-pino';
 import type { Pool } from 'pg';
+
 import { PrismaClient } from '../../generated/prisma/client';
 import { AppConfigService } from '../config/app-config.service';
 import type { RequestContext } from '../context/request-context';

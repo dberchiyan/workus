@@ -1,8 +1,12 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { RefObject } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import type { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
+
 import { isApiError } from '@/shared/api/api-error';
 import type { ErrorCode } from '@/shared/types';
+
 import { type UpdateEmployeeFormOutput, type UpdateEmployeeFormValues, updateEmployeeSchema } from '../schemas';
 import type { EmployeeProfile, UpdateEmployeeRequest } from '../types';
 import { useUpdateEmployee } from './use-employee-queries';
@@ -59,7 +63,67 @@ const toRequest = (values: UpdateEmployeeFormOutput, version: number): UpdateEmp
  * Edit profile. The dialog remounts on every opening (parent `key`), so it starts from the
  * profile as read and sends that version (a stale one is refused with "reload").
  */
-export const useEditProfileForm = (employee: EmployeeProfile, onSaved: () => void) => {
+export const useEditProfileForm = (
+    employee: EmployeeProfile,
+    onSaved: () => void,
+): {
+    form: UseFormReturn<
+        {
+            email: string;
+            startsAt: string;
+            positionId: string;
+            firstName: string;
+            lastName: string;
+            mobile: string;
+            personalEmail: string;
+            linkedinUrl: string;
+            telegram: string;
+            address: string;
+            bornAt: string;
+        },
+        unknown,
+        {
+            email: string;
+            startsAt: string;
+            positionId: string;
+            firstName: string;
+            lastName: string;
+            mobile: string;
+            personalEmail: string;
+            linkedinUrl: string;
+            telegram: string;
+            address: string;
+            bornAt: string;
+        }
+    >;
+    submit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+    errorCode:
+        | 'VALIDATION_FAILED'
+        | 'MALFORMED_REQUEST'
+        | 'INVALID_PARAMETER'
+        | 'UNAUTHORIZED'
+        | 'INVALID_CREDENTIALS'
+        | 'SESSION_EXPIRED'
+        | 'FORBIDDEN'
+        | 'ACCESS_ENDED'
+        | 'ORGANISATION_NOT_ACTIVE'
+        | 'DEMO_RESTRICTED'
+        | 'PLAN_UPGRADE_REQUIRED'
+        | 'PLAN_LIMIT_REACHED'
+        | 'RESOURCE_NOT_FOUND'
+        | 'CONFLICT'
+        | 'CONCURRENT_MODIFICATION'
+        | 'IDEMPOTENCY_KEY_REUSED'
+        | 'BUSINESS_RULE_VIOLATION'
+        | 'PAYLOAD_TOO_LARGE'
+        | 'UNSUPPORTED_MEDIA_TYPE'
+        | 'RATE_LIMIT_EXCEEDED'
+        | 'UPSTREAM_UNAVAILABLE'
+        | 'INTERNAL_ERROR'
+        | null;
+    errorRef: RefObject<HTMLDivElement | null>;
+    isSubmitting: boolean;
+} => {
     const update = useUpdateEmployee(employee.id);
     const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);
     const [errorCount, setErrorCount] = useState(0);

@@ -6,12 +6,16 @@ import { useColorScheme } from '@mui/material/styles';
 import { type ReactNode, useDeferredValue } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
+
 import { useAccess, useLogout } from '@/features/auth';
 import { useEmployeeQuickSearch } from '@/features/employee/core';
-import { SETTINGS_SECTIONS, sectionAccessPart } from '@/features/settings';
+import { sectionAccessPart, SETTINGS_SECTIONS } from '@/features/settings';
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { employeeProfilePath, settingsPath } from '@/shared/lib/paths';
+
 import { useNavigationItems } from './use-navigation-items';
+
+const PREFIX_MATCH_SCORE = 3;
 
 export const COMMAND_GROUPS = ['people', 'pages', 'settings', 'preferences', 'account'] as const;
 export type CommandGroup = (typeof COMMAND_GROUPS)[number];
@@ -40,7 +44,7 @@ const THEMES = [
 const score = (command: Command, query: string): number => {
     const label = command.label.toLowerCase();
     if (label.startsWith(query)) {
-        return 3;
+        return PREFIX_MATCH_SCORE;
     }
     if (label.split(/\s+/).some((word) => word.startsWith(query))) {
         return 2;
@@ -53,7 +57,13 @@ const score = (command: Command, query: string): number => {
  * (by ACCESS), the theme, signing out and, for admins, people by name or email — filtered by
  * the query and grouped in a fixed order.
  */
-export const useCommands = (query: string) => {
+export const useCommands = (
+    query: string,
+): {
+    groups: { group: 'people' | 'pages' | 'settings' | 'preferences' | 'account'; commands: Command[] }[];
+    ordered: Command[];
+    isSearchingPeople: boolean;
+} => {
     const { t } = useTranslation(['shell', 'settings', 'common']);
     const navigate = useNavigate();
     const can = useAccess();

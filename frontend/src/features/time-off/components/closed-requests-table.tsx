@@ -5,7 +5,9 @@ import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatDateTime, formatPeriod, fullName } from '../format';
 import type { ManagedRequest } from '../types';
 import { RequestPerson } from './request-person';
@@ -22,7 +24,7 @@ const COLUMNS = [
 ] as const;
 
 /** Tablet and desktop: closed requests, the latest change first. */
-export function ClosedRequestsTable({ requests }: { requests: readonly ManagedRequest[] }) {
+export function ClosedRequestsTable({ requests }: { requests: readonly ManagedRequest[] }): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     return (
         <Table size="small" className="table-fixed">

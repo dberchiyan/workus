@@ -2,20 +2,23 @@ import PersonAddAltOutlined from '@mui/icons-material/PersonAddAltOutlined';
 import Button from '@mui/material/Button';
 import Snackbar from '@mui/material/Snackbar';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useCallback, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { useAccess, usePlan } from '@/features/auth';
+import { UpgradePrompt } from '@/shared/components/upgrade-prompt';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
+
 import { AddEmployeeDialog } from '../components/add-employee-dialog';
 import { CategoryTabs } from '../components/category-tabs';
 import { EmployeeList } from '../components/employee-list';
 import { EmployeeStatsCards } from '../components/employee-stats-cards';
 import { useEmployeeListParams } from '../hooks/use-employee-list-params';
 import { useEmployeeSummary, usePositionCategories } from '../hooks/use-employee-queries';
-import { useAccess, usePlan } from '@/features/auth';
-import { UpgradePrompt } from '@/shared/components/upgrade-prompt';
 
-export default function EmployeesPage() {
+export function EmployeesPage(): ReactElement {
     const { t } = useTranslation('employee');
     useDocumentTitle(t('pageTitle'));
     const headingRef = usePageHeadingFocus<HTMLHeadingElement>();

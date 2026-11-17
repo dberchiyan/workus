@@ -2,18 +2,24 @@ import { styled } from '@mui/material/styles';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { formatCount } from '../format';
 import type { CategoryCounts } from '../types';
+
+const TAB_HEIGHT_UNITS = 5.5;
+const TAB_PADDING_UNITS = 1.5;
 
 const ALL = 'all';
 
 /** Compact tab: content-wide, small side padding, still a 44 px touch target. */
 const CategoryTab = styled(Tab)(({ theme }) => ({
     minWidth: 0,
-    minHeight: theme.spacing(5.5),
-    paddingInline: theme.spacing(1.5),
+    minHeight: theme.spacing(TAB_HEIGHT_UNITS),
+    paddingInline: theme.spacing(TAB_PADDING_UNITS),
     paddingBlock: theme.spacing(1),
 }));
 
@@ -25,7 +31,7 @@ export interface CategoryTabsProps {
 }
 
 /** Tabs come from the categories in the database; each shows how many employees match. */
-export function CategoryTabs({ counts, categoryId, onChange, controlsId }: CategoryTabsProps) {
+export function CategoryTabs({ counts, categoryId, onChange, controlsId }: CategoryTabsProps): ReactElement {
     const { t, i18n } = useTranslation('employee');
     const tabs = [
         { value: ALL, label: t('tabs.all'), count: counts?.total },

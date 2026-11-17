@@ -10,9 +10,12 @@ import ListItemText from '@mui/material/ListItemText';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import Tooltip from '@mui/material/Tooltip';
+import type { ReactElement } from 'react';
 import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useAccess } from '@/features/auth';
+
 import type { EmployeeProfile } from '../types';
 import { CancelTerminationDialog } from './cancel-termination-dialog';
 import { EditProfileDialog } from './edit-profile-dialog';
@@ -25,7 +28,7 @@ type DialogKind = 'edit' | 'resetPassword' | 'terminate' | 'cancelTermination';
  * One ⋮ menu: Edit profile, Reset password, then Terminate (or Change / Cancel termination). Dialogs remount on
  * each opening; on close, focus returns to the menu button.
  */
-export function ProfileActions({ employee }: { employee: EmployeeProfile }) {
+export function ProfileActions({ employee }: { employee: EmployeeProfile }): ReactElement {
     const { t } = useTranslation('employee');
     const menuId = useId();
     const menuButtonId = useId();

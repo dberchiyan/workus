@@ -2,9 +2,12 @@ import ArrowForwardOutlined from '@mui/icons-material/ArrowForwardOutlined';
 import TrendingDownOutlined from '@mui/icons-material/TrendingDownOutlined';
 import TrendingUpOutlined from '@mui/icons-material/TrendingUpOutlined';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { formatSalaryChange, fullName } from '../activity-format';
 import type { ActivityChange, ActivityValue } from '../types';
 import { ActivityValueView, PeopleList } from './activity-value-view';
@@ -111,7 +114,7 @@ function PeopleDiff({ from, to }: { from: ActivityValue; to: ActivityValue }) {
 }
 
 /** One field: "Before → After", only "After" for a new value, only "Before" for a removed one. */
-export function ActivityChangeRow({ change }: { change: ActivityChange }) {
+export function ActivityChangeRow({ change }: { change: ActivityChange }): ReactElement {
     const { t } = useTranslation('employee');
     const { field, from, to } = change;
 

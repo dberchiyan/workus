@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/client';
+
 import type { Billing, BillingInfo, BillingRedirect, ChangePlanRequest, CheckoutSessionRequest } from '../types';
 
 const BASE = '/api/v1/billing';

@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/client';
+
 import type { AppNotification, NotificationPage, UnreadNotifications } from '../types';
 
 const BASE = '/api/v1/notifications';

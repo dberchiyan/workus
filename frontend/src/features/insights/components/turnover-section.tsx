@@ -1,6 +1,10 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { MONTHS_PER_YEAR, TENTHS } from '@/shared/lib/units';
+
 import { monthLabels, signed } from '../chart';
 import { useTurnover } from '../hooks/use-insights';
 import type { InsightsFilter, TurnoverMovement } from '../types';
@@ -22,7 +26,7 @@ export interface TurnoverSectionProps {
     now: { year: number; month: number };
 }
 
-export function TurnoverSection({ filter, now }: TurnoverSectionProps) {
+export function TurnoverSection({ filter, now }: TurnoverSectionProps): ReactElement {
     const { t, i18n } = useTranslation('insights');
     const query = useTurnover(filter);
     const [picked, setPicked] = useState<number | undefined>();
@@ -41,7 +45,7 @@ export function TurnoverSection({ filter, now }: TurnoverSectionProps) {
     const percent = (value: number) => new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 1 }).format(value);
 
     // Months of the current year that have not started stay empty.
-    const lastMonth = filter.year === now.year ? now.month : 12;
+    const lastMonth = filter.year === now.year ? now.month : MONTHS_PER_YEAR;
     const active = data?.months.filter((month) => month.hired.length + month.left.length > 0) ?? [];
     const selected = picked !== undefined && picked <= lastMonth ? picked : (active.at(-1)?.month ?? lastMonth);
     const month = data?.months.find((item) => item.month === selected);
@@ -96,7 +100,7 @@ export function TurnoverSection({ filter, now }: TurnoverSectionProps) {
                             data.rate !== null &&
                             data.previousRate !== null && (
                                 <DeltaLine
-                                    direction={Math.round((data.rate - data.previousRate) * 10)}
+                                    direction={Math.round((data.rate - data.previousRate) * TENTHS)}
                                     change={t('common.changePoints', {
                                         value: signed(data.rate - data.previousRate, i18n.language),
                                     })}

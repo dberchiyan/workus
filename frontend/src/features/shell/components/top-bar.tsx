@@ -1,8 +1,11 @@
 import MenuOutlined from '@mui/icons-material/MenuOutlined';
 import IconButton from '@mui/material/IconButton';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useAccess } from '@/features/auth';
 import { NotificationBell } from '@/features/notification';
+
 import { CommandPaletteButton } from './command-palette-button';
 import { UserMenu } from './user-menu';
 
@@ -13,7 +16,7 @@ export interface TopBarProps {
     isMenuOpen: boolean;
 }
 
-export function TopBar({ onOpenMenu, menuButtonId, isMenuOpen }: TopBarProps) {
+export function TopBar({ onOpenMenu, menuButtonId, isMenuOpen }: TopBarProps): ReactElement {
     const { t } = useTranslation('shell');
     const can = useAccess();
     return (

@@ -4,16 +4,18 @@ import Button from '@mui/material/Button';
 import FormHelperText from '@mui/material/FormHelperText';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
+import type { ReactElement } from 'react';
 import type { FieldError } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
-import { isLoginValidationMessage, LOGIN_FIELD_LIMITS, type LoginFormValues } from '../schemas';
+
 import { useLoginForm } from '../hooks/use-login-form';
+import { isLoginValidationMessage, LOGIN_FIELD_LIMITS, type LoginFormValues } from '../schemas';
 import { PasswordField } from './password-field';
 
 /** Keeps one line of error space under every field and above the button, so nothing shifts. */
 const RESERVED_LINE = '\u00A0';
 
-export function LoginForm() {
+export function LoginForm(): ReactElement {
     const { t } = useTranslation(['auth', 'validation', 'errors']);
     const { form, onSubmit, errorCode, errorSummaryRef, isSessionExpired } = useLoginForm();
     const { register, formState } = form;

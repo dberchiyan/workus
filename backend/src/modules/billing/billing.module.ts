@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { PinoLogger } from 'nestjs-pino';
+
 import { AppConfigService } from '../../common/config/app-config.service';
 import { MetricsService } from '../../common/observability/metrics.service';
 import { ObservabilityModule } from '../../common/observability/observability.module';
@@ -7,11 +8,11 @@ import { AuditModule } from '../audit/audit.module';
 import { UserModule } from '../user/user.module';
 import { FakeBillingGateway } from './adapter/fake/fake-billing.gateway';
 import { StripeBillingGateway } from './adapter/stripe/stripe-billing.gateway';
-import { BillingWebhookController } from './controller/billing-webhook.controller';
 import { BillingController } from './controller/billing.controller';
+import { BillingWebhookController } from './controller/billing-webhook.controller';
 import { BillingRepository } from './repository/billing.repository';
-import { BillingGateway } from './service/billing-gateway';
 import { BillingService } from './service/billing.service';
+import { BillingGateway } from './service/billing-gateway';
 
 /**
  * Subscriptions and plans (integrations module, Stripe). The gateway port gets the adapter the

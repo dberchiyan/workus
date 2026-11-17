@@ -1,8 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { Dispatch, RefObject, SetStateAction } from 'react';
 import { useEffect, useRef, useState } from 'react';
+import type { UseFormReturn } from 'react-hook-form';
 import { useForm } from 'react-hook-form';
+
 import { isApiError } from '@/shared/api/api-error';
+import { todayUtcIso as todayIso } from '@/shared/lib/utc-day';
 import type { ErrorCode } from '@/shared/types';
+
 import {
     type CreateEmployeeFormOutput,
     type CreateEmployeeFormValues,
@@ -14,8 +19,6 @@ import { useCreateEmployee } from './use-employee-queries';
 
 export const AddEmployeeStep = { DETAILS: 0, RESPONSIBLE: 1, ACCESS: 2 } as const;
 export type AddEmployeeStep = (typeof AddEmployeeStep)[keyof typeof AddEmployeeStep];
-
-const todayIso = (): string => new Date().toISOString().slice(0, 10);
 
 const emptyValues = (): CreateEmployeeFormValues => ({
     firstName: '',
@@ -68,7 +71,80 @@ export interface AddedEmployee {
  * generated password (shown this once). One Idempotency-Key per opening of the dialog, reused on
  * every retry of that submission (api.md → Idempotency).
  */
-export const useAddEmployeeForm = (onCreated: (employee: CreatedEmployee) => void) => {
+export const useAddEmployeeForm = (
+    onCreated: (employee: CreatedEmployee) => void,
+): {
+    form: UseFormReturn<
+        {
+            firstName: string;
+            lastName: string;
+            email: string;
+            positionId: string;
+            startsAt: string;
+            startingSalary: string;
+            mobile: string;
+            personalEmail: string;
+            linkedinUrl: string;
+            telegram: string;
+            address: string;
+            bornAt: string;
+            responsibleUserIds: string[];
+        },
+        unknown,
+        {
+            firstName: string;
+            lastName: string;
+            email: string;
+            positionId: string;
+            startsAt: string;
+            startingSalary: string;
+            mobile: string;
+            personalEmail: string;
+            linkedinUrl: string;
+            telegram: string;
+            address: string;
+            bornAt: string;
+            responsibleUserIds: string[];
+        }
+    >;
+    step: AddEmployeeStep;
+    goNext: () => Promise<void>;
+    goBack: () => void;
+    submit: (e?: React.BaseSyntheticEvent) => Promise<void>;
+    reset: () => void;
+    finish: () => void;
+    added: AddedEmployee | null;
+    isSaved: boolean;
+    setIsSaved: Dispatch<SetStateAction<boolean>>;
+    errorCode:
+        | 'VALIDATION_FAILED'
+        | 'MALFORMED_REQUEST'
+        | 'INVALID_PARAMETER'
+        | 'UNAUTHORIZED'
+        | 'INVALID_CREDENTIALS'
+        | 'SESSION_EXPIRED'
+        | 'FORBIDDEN'
+        | 'ACCESS_ENDED'
+        | 'ORGANISATION_NOT_ACTIVE'
+        | 'DEMO_RESTRICTED'
+        | 'PLAN_UPGRADE_REQUIRED'
+        | 'PLAN_LIMIT_REACHED'
+        | 'RESOURCE_NOT_FOUND'
+        | 'CONFLICT'
+        | 'CONCURRENT_MODIFICATION'
+        | 'IDEMPOTENCY_KEY_REUSED'
+        | 'BUSINESS_RULE_VIOLATION'
+        | 'PAYLOAD_TOO_LARGE'
+        | 'UNSUPPORTED_MEDIA_TYPE'
+        | 'RATE_LIMIT_EXCEEDED'
+        | 'UPSTREAM_UNAVAILABLE'
+        | 'INTERNAL_ERROR'
+        | null;
+    errorRef: RefObject<HTMLDivElement | null>;
+    responsibles: ResponsibleOption[];
+    selectResponsibles: (people: ResponsibleOption[]) => void;
+    isSubmitting: boolean;
+} => {
     const create = useCreateEmployee();
     const [step, setStep] = useState<AddEmployeeStep>(AddEmployeeStep.DETAILS);
     const [idempotencyKey, setIdempotencyKey] = useState(() => crypto.randomUUID());

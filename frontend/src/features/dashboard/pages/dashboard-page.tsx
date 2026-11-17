@@ -1,18 +1,21 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useAccess, useCurrentUser } from '@/features/auth';
 import { MyTimeOff } from '@/features/time-off';
-import { AdminEvents } from '../components/admin-events';
-import { AdminOverview } from '../components/admin-overview';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
+
+import { AdminEvents } from '../components/admin-events';
+import { AdminOverview } from '../components/admin-overview';
 
 /**
  * Admins: what needs attention (requests, absences, reviews, people starting / leaving), then
  * today's events and events by month (requests made, reviews, birthdays).
  * Employees and managers: their time off (balances and requests).
  */
-export default function DashboardPage() {
+export function DashboardPage(): ReactElement | null {
     const { t } = useTranslation('dashboard');
     useDocumentTitle(t('pageTitle'));
     const headingRef = usePageHeadingFocus<HTMLHeadingElement>();

@@ -1,7 +1,10 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
-import { personName } from '../../../../common/dto/person-name';
+
+import { MAX_TEMPORARY_PASSWORD_LENGTH } from '../../../../common/dto/limits';
+import { MAX_SEARCH_LENGTH } from '../../../../common/dto/limits';
 import { pageableOptions } from '../../../../common/dto/pageable';
+import { personName } from '../../../../common/dto/person-name';
 import { ADMINISTRATOR_SORT_FIELDS } from '../../../user/service/administrator-sort';
 
 export const ADMINISTRATOR_PAGEABLE = pageableOptions({
@@ -34,7 +37,7 @@ export class AdministratorPageResponse extends createZodDto(
 ) {}
 
 export const AdministratorFilterQuerySchema = z.object({
-    search: z.string().trim().max(100, 'validation.search.tooLong').optional(),
+    search: z.string().trim().max(MAX_SEARCH_LENGTH, 'validation.search.tooLong').optional(),
 });
 
 export class AdministratorFilterQuery extends createZodDto(AdministratorFilterQuerySchema) {}
@@ -70,6 +73,6 @@ export class AddedAdministratorResponse extends createZodDto(
          * The generated sign-in password, shown to the owner this once. Null when the answer is a
          * replay of a retried request — it is never stored, so it cannot be shown again.
          */
-        temporaryPassword: z.string().min(1).max(64).nullable(),
+        temporaryPassword: z.string().min(1).max(MAX_TEMPORARY_PASSWORD_LENGTH).nullable(),
     }),
 ) {}

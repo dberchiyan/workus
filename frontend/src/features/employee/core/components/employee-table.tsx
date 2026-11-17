@@ -5,7 +5,9 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import TableSortLabel from '@mui/material/TableSortLabel';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { formatCalendarDate } from '../format';
 import type { EmployeeListItem, EmployeeListParams } from '../types';
 import { EmployeeIdentity } from './employee-identity';
@@ -33,7 +35,7 @@ export interface EmployeeTableProps {
     onSort: (field: SortField) => void;
 }
 
-export function EmployeeTable({ employees, params, onSort }: EmployeeTableProps) {
+export function EmployeeTable({ employees, params, onSort }: EmployeeTableProps): ReactElement {
     const { t, i18n } = useTranslation('employee');
 
     const sortableHeader = (field: SortField, label: string) => {

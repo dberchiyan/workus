@@ -80,6 +80,7 @@
         "@types/node": "26.6.6",
         "@types/pg": "8.23.1",
         "eslint": "9.39.5",
+        "eslint-plugin-simple-import-sort": "14.0.0",
         "globals": "17.14.0",
         "prettier": "3.9.10",
         "prisma": "7.10.1",

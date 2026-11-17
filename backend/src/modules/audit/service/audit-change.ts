@@ -1,5 +1,15 @@
 import { z } from 'zod';
+
+import {
+    MAX_CHANGES_PER_EVENT,
+    MAX_LABEL_LENGTH,
+    MAX_PEOPLE_IN_CHANGE,
+    MAX_PERSON_NAME_LENGTH,
+    MAX_STATUS_LENGTH,
+    MAX_TYPE_LENGTH,
+} from '../../../common/dto/limits';
 import { MoneySchema } from '../../../common/dto/money';
+import { isoDay } from '../../../common/time/iso-day';
 
 /**
  * One value in a change summary. Typed, so the client formats it (dates, money, people) and
@@ -8,21 +18,21 @@ import { MoneySchema } from '../../../common/dto/money';
  */
 const PersonSchema = z.object({
     id: z.uuid(),
-    firstName: z.string().max(100),
-    lastName: z.string().max(100),
+    firstName: z.string().max(MAX_PERSON_NAME_LENGTH),
+    lastName: z.string().max(MAX_PERSON_NAME_LENGTH),
 });
 
 export const AuditValueSchema = z.discriminatedUnion('kind', [
-    z.object({ kind: z.literal('text'), text: z.string().max(255) }),
+    z.object({ kind: z.literal('text'), text: z.string().max(MAX_LABEL_LENGTH) }),
     z.object({ kind: z.literal('date'), at: z.iso.date() }),
     z.object({ kind: z.literal('money'), money: MoneySchema }),
-    z.object({ kind: z.literal('reviewStatus'), status: z.string().max(32) }),
-    z.object({ kind: z.literal('people'), people: z.array(PersonSchema).max(20) }),
+    z.object({ kind: z.literal('reviewStatus'), status: z.string().max(MAX_STATUS_LENGTH) }),
+    z.object({ kind: z.literal('people'), people: z.array(PersonSchema).max(MAX_PEOPLE_IN_CHANGE) }),
     z.object({ kind: z.literal('feedback') }),
-    z.object({ kind: z.literal('terminationReason'), reason: z.string().max(32) }),
+    z.object({ kind: z.literal('terminationReason'), reason: z.string().max(MAX_STATUS_LENGTH) }),
     z.object({ kind: z.literal('redacted') }),
-    z.object({ kind: z.literal('timeOffType'), type: z.string().max(16) }),
-    z.object({ kind: z.literal('timeOffStatus'), status: z.string().max(16) }),
+    z.object({ kind: z.literal('timeOffType'), type: z.string().max(MAX_TYPE_LENGTH) }),
+    z.object({ kind: z.literal('timeOffStatus'), status: z.string().max(MAX_TYPE_LENGTH) }),
     z.object({ kind: z.literal('number'), number: z.number().int() }),
     z.object({ kind: z.literal('flag'), flag: z.boolean() }),
 ]);
@@ -75,12 +85,12 @@ export const AuditChangeSchema = z.object({
 });
 export type AuditChange = z.infer<typeof AuditChangeSchema>;
 
-export const AuditChangesSchema = z.array(AuditChangeSchema).max(32);
+export const AuditChangesSchema = z.array(AuditChangeSchema).max(MAX_CHANGES_PER_EVENT);
 
 /** Value builders, so callers never hand-write the tagged shapes. */
 export const auditValue = {
-    text: (text: string): AuditValue => ({ kind: 'text', text: text.slice(0, 255) }),
-    date: (date: Date): AuditValue => ({ kind: 'date', at: date.toISOString().slice(0, 10) }),
+    text: (text: string): AuditValue => ({ kind: 'text', text: text.slice(0, MAX_LABEL_LENGTH) }),
+    date: (date: Date): AuditValue => ({ kind: 'date', at: isoDay(date) }),
     money: (money: z.infer<typeof MoneySchema>): AuditValue => ({ kind: 'money', money }),
     reviewStatus: (status: string): AuditValue => ({ kind: 'reviewStatus', status }),
     people: (people: z.infer<typeof PersonSchema>[]): AuditValue => ({ kind: 'people', people }),

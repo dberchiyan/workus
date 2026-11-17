@@ -1,19 +1,22 @@
-import { IdleSessionWarning } from '@/features/auth';
 import Drawer from '@mui/material/Drawer';
 import Link from '@mui/material/Link';
 import { useTheme } from '@mui/material/styles';
 import useMediaQuery from '@mui/material/useMediaQuery';
+import type { ReactElement } from 'react';
 import { useId, useState, ViewTransition } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Outlet, useLocation } from 'react-router';
+
+import { IdleSessionWarning } from '@/features/auth';
 import { TopProgressBar } from '@/shared/components/top-progress-bar';
 import { cn } from '@/shared/lib/cn';
 import { PATHS } from '@/shared/lib/paths';
+
 import { useIsPageLoading } from '../hooks/use-is-page-loading';
 import { useSidebarCollapsed } from '../hooks/use-sidebar-collapsed';
+import { BillingBanner } from './billing-banner';
 import { SidebarContent } from './sidebar-content';
 import { TopBar } from './top-bar';
-import { BillingBanner } from './billing-banner';
 
 /** One key per page: Settings' sections (`/settings/<section>`) are one page with its own menu. */
 const pageTransitionKey = (pathname: string): string =>
@@ -23,7 +26,7 @@ const pageTransitionKey = (pathname: string): string =>
  * Signed-in layout (ux.md patterns): desktop — persistent sidebar the person can fold to the
  * icon rail; tablet — icon rail; mobile — temporary drawer opened from the top bar.
  */
-export function AppLayout() {
+export function AppLayout(): ReactElement {
     const { t } = useTranslation();
     const theme = useTheme();
     // Behaviour CSS cannot express: which drawer variant is mounted.

@@ -2,17 +2,20 @@ import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Navigate, Link as RouterLink } from 'react-router';
+import { Link as RouterLink, Navigate } from 'react-router';
+
 import { BrandLogo, PageShell, useCurrentUser } from '@/features/auth';
 import { PageLoader } from '@/shared/components/page-loader';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
 import { PATHS } from '@/shared/lib/paths';
+
 import { SignupForm } from '../components/signup-form';
 
 /** Register a company: its first account becomes the owner. Signed-in people go to the app. */
-export default function SignupPage() {
+export function SignupPage(): ReactElement {
     const { t } = useTranslation('organisation');
     useDocumentTitle(t('signup.pageTitle'));
     const headingRef = usePageHeadingFocus<HTMLHeadingElement>();

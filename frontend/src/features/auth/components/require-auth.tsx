@@ -1,15 +1,18 @@
 import Alert from '@mui/material/Alert';
 import Button from '@mui/material/Button';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Outlet, useLocation } from 'react-router';
+
 import { isApiError } from '@/shared/api/api-error';
 import { PageLoader } from '@/shared/components/page-loader';
 import { PATHS } from '@/shared/lib/paths';
+
 import { useCurrentUser } from '../hooks/use-current-user';
 import type { LoginLocationState } from '../hooks/use-login-redirect';
 
 /** App start → me: 200 → app · 401 → sign-in, remembering the intended path. */
-export function RequireAuth() {
+export function RequireAuth(): ReactElement {
     const { t } = useTranslation(['common', 'errors']);
     const location = useLocation();
     const { data: user, isPending, isError, error, refetch, isRefetching } = useCurrentUser();

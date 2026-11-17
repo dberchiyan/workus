@@ -1,7 +1,9 @@
 import CheckCircleOutlined from '@mui/icons-material/CheckCircleOutlined';
 import RadioButtonUncheckedOutlined from '@mui/icons-material/RadioButtonUncheckedOutlined';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
 import { PASSWORD_LIMITS, PASSWORD_RULES } from '@/shared/lib/password-rules';
 
@@ -19,7 +21,7 @@ export interface PasswordRulesProps {
 }
 
 /** What a new password needs, ticked off while typing; the icon and the words say the state. */
-export function PasswordRules({ id, password, extraRules = [] }: PasswordRulesProps) {
+export function PasswordRules({ id, password, extraRules = [] }: PasswordRulesProps): ReactElement {
     const { t } = useTranslation('common');
     const rules = [
         ...PASSWORD_RULES.map((rule) => ({

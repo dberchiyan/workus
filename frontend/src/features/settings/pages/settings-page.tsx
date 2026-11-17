@@ -1,28 +1,31 @@
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, NavLink, useParams } from 'react-router';
+
 import { useAccess } from '@/features/auth';
-import { AdministratorsSection, OrganisationSection } from '@/features/organisation';
 import { BillingSection } from '@/features/billing';
 import { CompanyStructureSection } from '@/features/employee/core';
+import { AdministratorsSection, OrganisationSection } from '@/features/organisation';
 import { HolidaysSection } from '@/features/time-off';
-import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
+import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
 import { cn } from '@/shared/lib/cn';
 import { settingsPath } from '@/shared/lib/paths';
+import { trackScrollEdges } from '@/shared/lib/scroll-edges';
+
 import { AccountSection } from '../components/account-section';
 import { SecuritySection } from '../components/security-section';
 import { SessionsSection } from '../components/sessions-section';
 import { isSettingsSection, sectionAccessPart, SETTINGS_GROUPS, SETTINGS_SECTIONS } from '../sections';
-import { trackScrollEdges } from '@/shared/lib/scroll-edges';
 
 /**
  * Your account, sessions and security log, and (by role) the company's details, structure,
  * holidays and administrators — one section at a time, each with its own URL. The menu is
  * grouped (You, Company); with one group only, it needs no heading.
  */
-export default function SettingsPage() {
+export function SettingsPage(): ReactElement {
     const { t } = useTranslation('settings');
     const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
     const { section } = useParams();

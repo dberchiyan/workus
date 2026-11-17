@@ -1,6 +1,7 @@
 import { type CanActivate, type ExecutionContext, Injectable } from '@nestjs/common';
 import type { Request, Response } from 'express';
 import { ClsService } from 'nestjs-cls';
+
 import { AppConfigService } from '../config/app-config.service';
 import { type RequestContext, SessionState } from '../context/request-context';
 import { readCookie } from './request-client';

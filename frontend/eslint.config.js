@@ -4,6 +4,7 @@ import boundaries from 'eslint-plugin-boundaries';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
@@ -50,7 +51,7 @@ export default tseslint.config(
             globals: { ...globals.browser },
             parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
         },
-        plugins: { 'react-refresh': reactRefresh, boundaries },
+        plugins: { 'react-refresh': reactRefresh, boundaries, 'simple-import-sort': simpleImportSort },
         settings: {
             'import/resolver': { typescript: { project: './tsconfig.app.json' } },
             'boundaries/include': ['src/**/*'],
@@ -71,6 +72,22 @@ export default tseslint.config(
             '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
             '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
             'no-restricted-syntax': ['error', ...RESTRICTED_SYNTAX, IMPORT_META_ENV],
+            '@typescript-eslint/no-magic-numbers': [
+                'error',
+                {
+                    ignore: [-1, 0, 1, 2, '0n', '1n', '-1n'],
+                    ignoreArrayIndexes: true,
+                    ignoreDefaultValues: true,
+                    ignoreClassFieldInitialValues: true,
+                    ignoreEnums: true,
+                    ignoreNumericLiteralTypes: true,
+                    ignoreReadonlyClassProperties: true,
+                    ignoreTypeIndexes: true,
+                },
+            ],
+            '@typescript-eslint/explicit-module-boundary-types': 'error',
+            'simple-import-sort/imports': 'error',
+            'simple-import-sort/exports': 'error',
             'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
             'boundaries/dependencies': [
                 'error',
@@ -166,5 +183,18 @@ export default tseslint.config(
         // The one place that reads the raw values.
         files: ['src/shared/config/env.ts'],
         rules: { 'no-restricted-syntax': ['error', ...RESTRICTED_SYNTAX] },
+    },
+    {
+        files: ['*.config.ts'],
+        rules: { 'no-restricted-syntax': 'off' },
+    },
+    {
+        files: [
+            'src/theme/**/*.ts',
+            'scripts/**/*.ts',
+            'src/**/mocks/**/*.ts',
+            'src/features/auth/components/app-preview.tsx',
+        ],
+        rules: { '@typescript-eslint/no-magic-numbers': 'off' },
     },
 );

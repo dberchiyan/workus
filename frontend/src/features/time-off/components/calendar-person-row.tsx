@@ -1,9 +1,13 @@
 import Link from '@mui/material/Link';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { Link as RouterLink } from 'react-router';
+
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
 import { cn } from '@/shared/lib/cn';
 import { employeeProfilePath } from '@/shared/lib/paths';
+import { PERCENT } from '@/shared/lib/units';
+
 import { calendarCells, isWeekendIso } from '../calendar';
 import { fullName } from '../format';
 import type { CalendarRow } from '../types';
@@ -22,7 +26,14 @@ export interface CalendarPersonRowProps {
 }
 
 /** The person (sticky on the left) and their month: free days, requests, days outside employment. */
-export function CalendarPersonRow({ row, days, today, holidays, requestHref, canOpenProfile }: CalendarPersonRowProps) {
+export function CalendarPersonRow({
+    row,
+    days,
+    today,
+    holidays,
+    requestHref,
+    canOpenProfile,
+}: CalendarPersonRowProps): ReactElement {
     const { employee } = row;
     const name = fullName(employee);
     const cells = calendarCells(days, row.requests, employee);
@@ -115,7 +126,7 @@ function TodayBand({ offset, span }: { offset: number | undefined; span: number 
         <span
             aria-hidden
             className="pointer-events-none absolute inset-y-0 z-1 bg-primary/10"
-            style={{ left: `${(offset / span) * 100}%`, width: `${100 / span}%` }}
+            style={{ left: `${(offset / span) * PERCENT}%`, width: `${PERCENT / span}%` }}
         />
     );
 }

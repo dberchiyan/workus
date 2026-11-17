@@ -3,6 +3,8 @@ import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import type { ReactElement } from 'react';
+
 import { trackScrollEdges } from '@/shared/lib/scroll-edges';
 
 export interface ChartTableProps {
@@ -12,7 +14,7 @@ export interface ChartTableProps {
 }
 
 /** The chart's numbers as a table — readable without colour (and in forced colours). */
-export function ChartTable({ caption, columns, rows }: ChartTableProps) {
+export function ChartTable({ caption, columns, rows }: ChartTableProps): ReactElement {
     return (
         <div ref={trackScrollEdges} className="app-scroll-fade overflow-x-auto">
             <Table size="small">

@@ -4,12 +4,15 @@ import Button from '@mui/material/Button';
 import Pagination from '@mui/material/Pagination';
 import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useId, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { previousDay, todayUtcIso } from '@/shared/lib/utc-day';
+
 import { isApiError } from '@/shared/api/api-error';
 import { cn } from '@/shared/lib/cn';
-import { formatDayHeading, dayKey } from '../activity-format';
+import { previousDay, todayUtcIso } from '@/shared/lib/utc-day';
+
+import { dayKey, formatDayHeading } from '../activity-format';
 import { ACTIVITY_PAGE_SIZE, useEmployeeActivity } from '../hooks/use-employee-activity';
 import type { ActivityEvent } from '../types';
 import { ActivityEventItem } from './activity-event-item';
@@ -51,7 +54,7 @@ const useDayHeading = () => {
 };
 
 /** Who changed what and when — the employee's audit trail as a timeline of cards, ten a page. */
-export function ProfileActivityTab({ employeeId }: { employeeId: string }) {
+export function ProfileActivityTab({ employeeId }: { employeeId: string }): ReactElement {
     const { t, i18n } = useTranslation(['employee', 'errors']);
     const headingId = useId();
     const dayHeading = useDayHeading();

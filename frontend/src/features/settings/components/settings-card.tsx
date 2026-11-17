@@ -1,5 +1,6 @@
 import Card from '@mui/material/Card';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import type { ReactNode } from 'react';
 
 export interface SettingsCardProps {
@@ -11,7 +12,7 @@ export interface SettingsCardProps {
 }
 
 /** One titled block of a settings section. */
-export function SettingsCard({ id, title, description, action, children }: SettingsCardProps) {
+export function SettingsCard({ id, title, description, action, children }: SettingsCardProps): ReactElement {
     return (
         <Card component="section" aria-labelledby={id} className="flex flex-col">
             <div className="flex flex-wrap items-start justify-between gap-3 border-b border-divider px-4 py-4 sm:px-6">

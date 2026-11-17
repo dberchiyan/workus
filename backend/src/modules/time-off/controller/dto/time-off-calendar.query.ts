@@ -1,5 +1,7 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+
+import { MAX_SEARCH_LENGTH } from '../../../../common/dto/limits';
 import { isTimeOffType, TIME_OFF_TYPES, type TimeOffType } from '../../service/time-off-type';
 
 export const TimeOffCalendarQuerySchema = z.object({
@@ -21,7 +23,7 @@ export const TimeOffCalendarQuerySchema = z.object({
             return [...new Set(types)];
         }),
     /** Words matched against the person's first name, last name or email. */
-    search: z.string().trim().max(100, 'validation.search.tooLong').optional(),
+    search: z.string().trim().max(MAX_SEARCH_LENGTH, 'validation.search.tooLong').optional(),
 });
 
 export class TimeOffCalendarQuery extends createZodDto(TimeOffCalendarQuerySchema) {}

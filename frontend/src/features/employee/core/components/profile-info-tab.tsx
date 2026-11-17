@@ -1,7 +1,9 @@
 import BadgeOutlined from '@mui/icons-material/BadgeOutlined';
 import ContactPhoneOutlined from '@mui/icons-material/ContactPhoneOutlined';
 import Link from '@mui/material/Link';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { addMonthsIso, formatCalendarDate, todayIso, yearsAndMonthsBetween } from '../format';
 import type { EmployeeProfileMock } from '../mocks/employee-profile-mock';
 import type { EmployeeProfile } from '../types';
@@ -15,7 +17,7 @@ export interface ProfileInfoTabProps {
     mock: EmployeeProfileMock;
 }
 
-export function ProfileInfoTab({ employee, mock }: ProfileInfoTabProps) {
+export function ProfileInfoTab({ employee, mock }: ProfileInfoTabProps): ReactElement {
     const { t, i18n } = useTranslation('employee');
     const date = (iso: string) => formatCalendarDate(iso, i18n.language);
     const external = (href: string, text: string) => (

@@ -1,5 +1,6 @@
 import type { I18nPath } from '../i18n/i18n-path';
 import { type Feature, type Plan, PLAN_CATALOGUE } from '../plan/plan';
+import { SECONDS_PER_MINUTE } from '../time/units';
 import { ErrorCode } from './error-code';
 
 export type MessageArgs = Readonly<Record<string, string | number>>;
@@ -100,7 +101,7 @@ export class UnsupportedMediaTypeException extends ApiException {
 export class RateLimitExceededException extends ApiException {
     constructor(readonly retryAfterSeconds: number) {
         super('RATE_LIMIT_EXCEEDED', 'errors.RATE_LIMIT_EXCEEDED', {
-            minutes: Math.max(1, Math.ceil(retryAfterSeconds / 60)),
+            minutes: Math.max(1, Math.ceil(retryAfterSeconds / SECONDS_PER_MINUTE)),
         });
     }
 }

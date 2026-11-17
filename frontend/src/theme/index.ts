@@ -1,5 +1,6 @@
 import { createTheme, type Shadows } from '@mui/material/styles';
 import type { CSSProperties } from 'react';
+
 import { TOKENS } from './tokens';
 import { muiTypography } from './typography';
 
@@ -256,8 +257,8 @@ export const theme = createTheme({
     },
 });
 
-export { typographyGlobalStyles } from './typography';
 export { TOKENS } from './tokens';
+export { typographyGlobalStyles } from './typography';
 
 declare module '@mui/material/Typography' {
     interface TypographyPropsVariantOverrides {

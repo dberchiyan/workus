@@ -1,8 +1,7 @@
+import { isoDay } from '../../../common/time/iso-day';
 import type { Notice } from '../../notification/service/notification.service';
 import { NotificationSubjectType, type NotificationType } from '../../notification/service/notification-type';
 import type { RequestNoticeRecord } from '../repository/record/time-off-request.record';
-
-const isoDay = (date: Date): string => date.toISOString().slice(0, 10);
 
 export const employeeUserIdOf = (request: RequestNoticeRecord): string => request.employee.user.id;
 

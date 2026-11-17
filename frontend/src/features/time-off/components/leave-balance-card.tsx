@@ -1,8 +1,11 @@
 import Card from '@mui/material/Card';
 import CardContent from '@mui/material/CardContent';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+
 import { formatCount, formatDay } from '../format';
 import type { LeaveBalance } from '../types';
 import { TYPE_VISUALS } from './time-off-visuals';
@@ -14,7 +17,7 @@ export interface LeaveBalanceCardProps {
 }
 
 /** Days available and used in the current cycle; "available" is omitted when unlimited. */
-export function LeaveBalanceCard({ balance, headingLevel }: LeaveBalanceCardProps) {
+export function LeaveBalanceCard({ balance, headingLevel }: LeaveBalanceCardProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     const { icon: Icon, tone } = TYPE_VISUALS[balance.type];
     const stats = [

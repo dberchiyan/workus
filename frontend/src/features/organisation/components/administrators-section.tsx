@@ -7,18 +7,21 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Pagination from '@mui/material/Pagination';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useDeferredValue, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { useAccess, useCurrentUser } from '@/features/auth';
 import { InitialsAvatar } from '@/shared/components/initials-avatar';
+import { RowSkeleton } from '@/shared/components/row-skeleton';
 import { cn } from '@/shared/lib/cn';
+
 import { ADMINISTRATORS_PAGE_SIZE } from '../api/organisation-api';
 import { useAdministrators } from '../hooks/use-organisation';
-import type { Administrator } from '../types';
 import { NEXT_ROLE, ROLE_BADGE } from '../roles';
+import type { Administrator } from '../types';
 import { AddAdministratorDialog } from './add-administrator-dialog';
 import { ChangeRoleDialog } from './change-role-dialog';
-import { RowSkeleton } from '@/shared/components/row-skeleton';
 
 const SKELETON_ROWS = ['s1', 's2', 's3'];
 const SEARCH_MAX_LENGTH = 100;
@@ -27,7 +30,7 @@ const SEARCH_MAX_LENGTH = 100;
  * Settings → Administrators: the owners and admins of the organisation. Admins see the list;
  * owners add admins and make an admin an owner or an owner an admin (the last owner stays one).
  */
-export function AdministratorsSection() {
+export function AdministratorsSection(): ReactElement {
     const { t, i18n } = useTranslation('organisation');
     const titleId = useId();
     const can = useAccess();

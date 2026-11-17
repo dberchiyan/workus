@@ -2,18 +2,23 @@ import TrendingDownOutlined from '@mui/icons-material/TrendingDownOutlined';
 import TrendingFlatOutlined from '@mui/icons-material/TrendingFlatOutlined';
 import TrendingUpOutlined from '@mui/icons-material/TrendingUpOutlined';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
+
+import { RevealValue } from '@/shared/components/reveal-value';
 import { formatMoney } from '@/shared/lib/money';
+
 import { formatPercentChange, formatReviewDate } from '../format';
 import type { EmployeeReviews } from '../types';
 import { SalaryHistoryChart } from './salary-history-chart';
-import { RevealValue } from '@/shared/components/reveal-value';
 
 /** Current salary, change vs the previous completed review, and the history chart. */
-export function SalaryOverview({ salary }: { salary: EmployeeReviews['salary'] }) {
+const PREVIOUS = -2;
+
+export function SalaryOverview({ salary }: { salary: EmployeeReviews['salary'] }): ReactElement {
     const { t, i18n } = useTranslation('review');
     const locale = i18n.language;
-    const previous = salary.history.at(-2);
+    const previous = salary.history.at(PREVIOUS);
 
     if (!salary.current) {
         return (

@@ -8,13 +8,13 @@ import {
     todayUtc,
     workingDaysBetween,
 } from '../src/modules/time-off/service/leave-policy';
+import { timeOffLabel } from '../src/modules/time-off/service/time-off-label';
 import {
     isTimeOffType,
     TIME_OFF_TYPES,
     type TimeOffStatus,
     TimeOffType,
 } from '../src/modules/time-off/service/time-off-type';
-import { timeOffLabel } from '../src/modules/time-off/service/time-off-label';
 
 const HOUR_MS = 3_600_000;
 

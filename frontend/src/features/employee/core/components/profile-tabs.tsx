@@ -1,14 +1,17 @@
 import Card from '@mui/material/Card';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
+import type { ReactElement } from 'react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
-import { PROFILE_TABS, type ProfileTab, useProfileTab } from '../hooks/use-profile-tab';
-import type { EmployeeProfileMock } from '../mocks/employee-profile-mock';
-import type { EmployeeProfile } from '../types';
+
 import { useUpgrade } from '@/features/auth';
 import { ReviewTab } from '@/features/employee/review';
 import { UpgradePrompt } from '@/shared/components/upgrade-prompt';
+
+import { PROFILE_TABS, type ProfileTab, useProfileTab } from '../hooks/use-profile-tab';
+import type { EmployeeProfileMock } from '../mocks/employee-profile-mock';
+import type { EmployeeProfile } from '../types';
 import { ProfileActivityTab } from './profile-activity-tab';
 import { ProfileFilesTab } from './profile-files-tab';
 import { ProfileInfoTab } from './profile-info-tab';
@@ -20,7 +23,7 @@ export interface ProfileTabsProps {
 }
 
 /** Info, Files, Review, Activity, Security — the open tab is kept in the URL. */
-export function ProfileTabs({ employee, mock }: ProfileTabsProps) {
+export function ProfileTabs({ employee, mock }: ProfileTabsProps): ReactElement {
     const { t } = useTranslation('employee');
     const { tab, setTab } = useProfileTab();
     const baseId = useId();

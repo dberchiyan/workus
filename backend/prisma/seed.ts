@@ -1,11 +1,14 @@
 import 'reflect-metadata';
+
 import { PrismaPg } from '@prisma/adapter-pg';
 import { z } from 'zod';
+
+import { databaseUrl } from '../src/common/config/database-url';
 import { PrismaClient } from '../src/generated/prisma/client';
 import { PasswordHasher } from '../src/modules/auth/service/password-hasher.service';
-import { UserRole } from '../src/modules/user/service/user-role';
-import { databaseUrl } from '../src/common/config/database-url';
 import { DEFAULT_STRUCTURE } from '../src/modules/employee/core/service/default-structure';
+import { UserRole } from '../src/modules/user/service/user-role';
+import { seedActivity } from './seed-activity';
 import {
     contactsFor,
     ORGANISATIONS,
@@ -14,7 +17,6 @@ import {
     SEED_PASSWORD,
     type SeedOrganisation,
 } from './seed-data';
-import { seedActivity } from './seed-activity';
 import { seedHolidays } from './seed-holidays';
 import { seedNotifications } from './seed-notifications';
 import { seedReviews } from './seed-reviews';

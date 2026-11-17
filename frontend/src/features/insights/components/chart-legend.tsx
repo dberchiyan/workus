@@ -1,4 +1,6 @@
 import ToggleButton from '@mui/material/ToggleButton';
+import type { ReactElement } from 'react';
+
 import { cn } from '@/shared/lib/cn';
 
 export interface ChartLegendProps {
@@ -9,7 +11,7 @@ export interface ChartLegendProps {
 }
 
 /** Swatch + name per series; the names carry identity, colour only supports them. */
-export function ChartLegend({ label, items, onToggle }: ChartLegendProps) {
+export function ChartLegend({ label, items, onToggle }: ChartLegendProps): ReactElement {
     return (
         <div role="group" aria-label={label} className="flex flex-wrap gap-2">
             {items.map((item) => {

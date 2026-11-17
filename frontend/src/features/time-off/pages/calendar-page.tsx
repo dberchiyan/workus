@@ -3,12 +3,16 @@ import Button from '@mui/material/Button';
 import Card from '@mui/material/Card';
 import TablePagination from '@mui/material/TablePagination';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { todayUtcIso } from '@/shared/lib/utc-day';
+
 import { useAccess } from '@/features/auth';
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
+import { ISO_MONTH_LENGTH } from '@/shared/lib/units';
+import { todayUtcIso } from '@/shared/lib/utc-day';
+
 import { CalendarGrid } from '../components/calendar-grid';
 import { CalendarToolbar } from '../components/calendar-toolbar';
 import { ManagedRequestDialog } from '../components/managed-request-dialog';
@@ -20,11 +24,11 @@ import { CALENDAR_PAGE_SIZES, useCalendarParams } from '../hooks/use-calendar-pa
  * Who is away and when: everyone's approved time off and requests still waiting (grey). Admins
  * open a request in a dialog over the calendar and decide there.
  */
-export default function CalendarPage() {
+export function CalendarPage(): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
     // Today (UTC, as everywhere), fixed for the visit (no clock in render).
     const [today] = useState(todayUtcIso);
-    const currentMonth = today.slice(0, 7);
+    const currentMonth = today.slice(0, ISO_MONTH_LENGTH);
     const { params, update, requestHref } = useCalendarParams(currentMonth);
     const calendar = useCalendar(params);
     const can = useAccess();
@@ -41,7 +45,10 @@ export default function CalendarPage() {
 
     const data = calendar.data;
     // A month or filter change keeps the old grid until the new one arrives.
-    const rows = calendar.isPlaceholderData && data?.from.slice(0, 7) !== params.month ? undefined : data?.content;
+    const rows =
+        calendar.isPlaceholderData && data?.from.slice(0, ISO_MONTH_LENGTH) !== params.month
+            ? undefined
+            : data?.content;
     const holidays = new Map((rows ? (data?.holidays ?? []) : []).map((day) => [day.heldAt, day.name]));
 
     return (

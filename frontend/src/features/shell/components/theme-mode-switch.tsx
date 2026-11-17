@@ -4,6 +4,7 @@ import SettingsBrightnessOutlined from '@mui/icons-material/SettingsBrightnessOu
 import { useColorScheme } from '@mui/material/styles';
 import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
+import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
 const MODES = [
@@ -20,7 +21,7 @@ export interface ThemeModeSwitchProps {
 }
 
 /** System / Light / Dark in the account menu; MUI keeps the choice in this browser. */
-export function ThemeModeSwitch({ label }: ThemeModeSwitchProps) {
+export function ThemeModeSwitch({ label }: ThemeModeSwitchProps): ReactElement {
     const { t } = useTranslation();
     const { mode, setMode } = useColorScheme();
     return (

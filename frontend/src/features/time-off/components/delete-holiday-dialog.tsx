@@ -5,10 +5,13 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import FormHelperText from '@mui/material/FormHelperText';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
 import type { ErrorCode } from '@/shared/types';
+
 import { formatDay } from '../format';
 import { RESERVED_LINE } from '../hooks/use-field-message';
 import { useDeleteHoliday } from '../hooks/use-holidays';
@@ -22,7 +25,7 @@ export interface DeleteHolidayDialogProps {
 }
 
 /** Says what changes (requests on that day take it again); Cancel has the first focus. */
-export function DeleteHolidayDialog({ holiday, open, onClose, onExited }: DeleteHolidayDialogProps) {
+export function DeleteHolidayDialog({ holiday, open, onClose, onExited }: DeleteHolidayDialogProps): ReactElement {
     const { t, i18n } = useTranslation(['timeOff', 'errors']);
     const titleId = useId();
     const descriptionId = useId();

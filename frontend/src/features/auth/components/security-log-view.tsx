@@ -7,15 +7,19 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import Typography from '@mui/material/Typography';
 import type { UseQueryResult } from '@tanstack/react-query';
+import type { ReactElement } from 'react';
 import { useMemo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+
 import { cn } from '@/shared/lib/cn';
+import { trackScrollEdges } from '@/shared/lib/scroll-edges';
+import { ISO_YEAR_LENGTH } from '@/shared/lib/units';
 import { previousDay, todayUtcIso } from '@/shared/lib/utc-day';
+
 import { SECURITY_LOG_PAGE_SIZE } from '../api/account-api';
 import { groupSecurityEvents, isSecurityCategory, SECURITY_CATEGORIES } from '../security-log';
 import type { SecurityCategory, SecurityLog } from '../types';
 import { SecurityEventRow } from './security-event-row';
-import { trackScrollEdges } from '@/shared/lib/scroll-edges';
 
 const ALL = 'ALL';
 
@@ -32,7 +36,7 @@ export interface SecurityLogViewProps {
  * A security log: a filter by kind, then the events by day (UTC), alike ones from one device
  * folded into one row, four events a page. Own log in Settings, an employee's for admins.
  */
-export function SecurityLogView({ log, category, onCategory, page, onPage }: SecurityLogViewProps) {
+export function SecurityLogView({ log, category, onCategory, page, onPage }: SecurityLogViewProps): ReactElement {
     const { t, i18n } = useTranslation('auth');
     const [now] = useState(() => Date.now());
     const today = todayUtcIso();
@@ -54,7 +58,7 @@ export function SecurityLogView({ log, category, onCategory, page, onPage }: Sec
             weekday: 'short',
             month: 'short',
             day: 'numeric',
-            ...(day.slice(0, 4) === today.slice(0, 4) ? {} : { year: 'numeric' }),
+            ...(day.slice(0, ISO_YEAR_LENGTH) === today.slice(0, ISO_YEAR_LENGTH) ? {} : { year: 'numeric' }),
             timeZone: 'UTC',
         }).format(new Date(`${day}T00:00:00Z`));
     };

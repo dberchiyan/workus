@@ -1,3 +1,5 @@
+import { ISO_DAY_LENGTH, MINUTE_MS } from '@/shared/lib/units';
+
 import type { SecurityCategory, SecurityEvent } from './types';
 
 type Action = SecurityEvent['action'];
@@ -34,7 +36,8 @@ export const SECURITY_TONES: Record<Action, SecurityTone> = {
 };
 
 /** Events this close (and alike, from one device) fold into one row. */
-const GROUP_GAP_MS = 30 * 60_000;
+const GROUP_GAP_MINUTES = 30;
+const GROUP_GAP_MS = GROUP_GAP_MINUTES * MINUTE_MS;
 
 /** Which events may share a row: sign-ins and sign-outs together, otherwise the same action. */
 const kindOf = (action: Action): string =>
@@ -56,7 +59,7 @@ export interface SecurityDay {
     groups: SecurityEventGroup[];
 }
 
-const dayOf = (iso: string): string => iso.slice(0, 10);
+const dayOf = (iso: string): string => iso.slice(0, ISO_DAY_LENGTH);
 
 const sameRow = (group: SecurityEventGroup, event: SecurityEvent): boolean => {
     const last = group.events[group.events.length - 1];

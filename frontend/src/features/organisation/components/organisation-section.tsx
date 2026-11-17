@@ -6,11 +6,14 @@ import FormHelperText from '@mui/material/FormHelperText';
 import Skeleton from '@mui/material/Skeleton';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
+import type { ReactElement } from 'react';
 import { useEffect, useId, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { useTranslation } from 'react-i18next';
+
 import { isApiError } from '@/shared/api/api-error';
 import type { ErrorCode } from '@/shared/types';
+
 import { useOrganisation, useRenameOrganisation } from '../hooks/use-organisation';
 import { ORGANISATION_LIMITS, renameSchema, type RenameValues } from '../schemas';
 import type { Organisation } from '../types';
@@ -107,7 +110,7 @@ function RenameForm({ organisation }: { organisation: Organisation }) {
 }
 
 /** Settings → Organisation (owners): the company's name, shown to everyone in it. */
-export function OrganisationSection() {
+export function OrganisationSection(): ReactElement {
     const { t } = useTranslation('organisation');
     const titleId = useId();
     const organisation = useOrganisation();
