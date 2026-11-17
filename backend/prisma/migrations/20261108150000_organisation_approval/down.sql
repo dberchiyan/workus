@@ -1,5 +1,3 @@
--- Reverts 20261108150000_organisation_approval. Fails while platform admins or approval events
--- exist — remove them first (incidents only).
 ALTER TABLE "audit_events" DROP CONSTRAINT "ck_audit_events_action";
 ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_action"
     CHECK ("action" IN ('employee.created', 'employee.updated', 'employee.terminated',

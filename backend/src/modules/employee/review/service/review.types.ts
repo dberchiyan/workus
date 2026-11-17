@@ -12,9 +12,7 @@ export interface SalaryPoint {
 export interface SalaryOverview {
     current: SalaryPoint | null;
     previous: SalaryPoint | null;
-    /** Percent vs the previous completed review, e.g. "12.5"; null without a previous one. */
     changePercent: string | null;
-    /** Oldest first, completed reviews only. */
     history: SalaryPoint[];
 }
 
@@ -27,7 +25,6 @@ export interface CreateReviewCommand {
     title: string;
     reviewedAt: string;
     status: ReviewStatus;
-    /** Validated decimal string, USD per month. */
     salary: string | undefined;
     responsibleUserIds: string[];
     feedback: {
@@ -40,16 +37,12 @@ export interface CreateReviewCommand {
 
 export type UpdateReviewCommand = CreateReviewCommand & { version: number };
 
-/** The salary agreed at hire, recorded as the employee's starting review. */
 export interface StartingReviewCommand {
-    /** The employee's start reviewedAt (YYYY-MM-DD). */
     startsAt: string;
-    /** Validated decimal string, USD per month. */
     salary: string;
     responsibleUserIds: string[];
 }
 
-/** A review on the admin dashboard (status as stored — guarded by its CHECK). */
 export interface DashboardReview {
     id: string;
     title: string;

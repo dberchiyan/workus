@@ -19,10 +19,8 @@ import { PersonLine } from './person-line';
 const HIRED = 'bg-chart-c1';
 const LEFT = 'bg-chart-c2';
 
-/** Hires and leavers per month side by side; a month lists who joined and who left. */
 export interface TurnoverSectionProps {
     filter: InsightsFilter;
-    /** This year and month (UTC), read once per visit. */
     now: { year: number; month: number };
 }
 
@@ -44,7 +42,6 @@ export function TurnoverSection({ filter, now }: TurnoverSectionProps): ReactEle
         }).format(new Date(`${iso}T00:00:00Z`));
     const percent = (value: number) => new Intl.NumberFormat(i18n.language, { maximumFractionDigits: 1 }).format(value);
 
-    // Months of the current year that have not started stay empty.
     const lastMonth = filter.year === now.year ? now.month : MONTHS_PER_YEAR;
     const active = data?.months.filter((month) => month.hired.length + month.left.length > 0) ?? [];
     const selected = picked !== undefined && picked <= lastMonth ? picked : (active.at(-1)?.month ?? lastMonth);

@@ -36,7 +36,6 @@ export function ReviewDeleteButton({
     onAction: OnReviewAction;
 }): ReactElement | null {
     const { t } = useTranslation('review');
-    // The starting salary opens the salary history: it can be edited, never deleted.
     if (review.kind === 'STARTING') {
         return null;
     }

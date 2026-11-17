@@ -31,7 +31,6 @@ export class TimeOffCommentService {
         }
         const comment = await this.requestRepository.addComment(organisationId, requestId, authorId, body);
         await this.requestRepository.touch(organisationId, requestId, authorId);
-        // The employee and the responsible people hear of it; edits and deletions are quiet.
         await this.notifier.notify(
             organisationId,
             requestId,

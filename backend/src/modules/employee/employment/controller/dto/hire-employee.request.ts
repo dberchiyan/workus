@@ -13,7 +13,6 @@ import { isoDay } from '../../../../../common/time/iso-day';
 
 export const EMAIL_MAX_LENGTH = 254;
 export const MAX_RESPONSIBLES = 10;
-/** Mirrored by ck_employees_born_at. */
 const MIN_DATE_OF_BIRTH = '1900-01-01';
 
 /** Optional text: blank → absent; otherwise trimmed and checked by `schema`. */
@@ -25,7 +24,6 @@ const text = (max: number, key: string) => z.string().trim().max(max, key);
 export const CreateEmployeeRequestSchema = z.object({
     firstName: personName('firstName'),
     lastName: personName('lastName'),
-    /** Work email — also the sign-in email. */
     email: z
         .string({ error: 'validation.workEmail.required' })
         .trim()
@@ -34,7 +32,6 @@ export const CreateEmployeeRequestSchema = z.object({
         .pipe(z.email('validation.email.invalid')),
     positionId: z.uuid('validation.position.required'),
     startsAt: z.iso.date('validation.startDate.invalid'),
-    /** Starting monthly salary in USD — recorded as the employee's first (starting) review. */
     startingSalary: z
         .string({ error: 'validation.startingSalary.required' })
         .trim()
@@ -55,7 +52,6 @@ export const CreateEmployeeRequestSchema = z.object({
             'validation.linkedin.invalid',
         ),
     ),
-    /** Stored as "@handle". */
     telegram: optional(
         text(MAX_TELEGRAM_LENGTH, 'validation.telegram.invalid').regex(
             /^@?[A-Za-z0-9_]{5,32}$/,
@@ -63,7 +59,6 @@ export const CreateEmployeeRequestSchema = z.object({
         ),
     ),
     address: optional(text(MAX_ADDRESS_LENGTH, 'validation.address.tooLong')),
-    /** Optional; from 1900-01-01 up to today (the server's UTC date). */
     bornAt: optional(
         z.iso
             .date('validation.dateOfBirth.invalid')
@@ -84,7 +79,6 @@ export class CreateEmployeeRequest extends createZodDto(CreateEmployeeRequestSch
  */
 export class UpdateEmployeeRequest extends createZodDto(
     CreateEmployeeRequestSchema.omit({ responsibleUserIds: true, startingSalary: true }).extend({
-        /** The version the client read; a stale one is 409 CONCURRENT_MODIFICATION. */
         version: z.number().int().min(0),
     }),
 ) {}

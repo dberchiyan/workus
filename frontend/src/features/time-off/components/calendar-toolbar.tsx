@@ -25,7 +25,6 @@ export function CalendarToolbar({ month, currentMonth, types, onMonth, onTypes }
     const { t, i18n } = useTranslation('timeOff');
     const toggle = (type: TimeOffType) => {
         const next = types.includes(type) ? types.filter((item) => item !== type) : [...types, type];
-        // At least one type stays on — an empty calendar would look like nobody is away.
         if (next.length > 0) {
             onTypes(TIME_OFF_TYPES.filter((item) => next.includes(item)));
         }
@@ -54,7 +53,6 @@ export function CalendarToolbar({ month, currentMonth, types, onMonth, onTypes }
                 )}
             </div>
             <div className="flex flex-wrap items-center gap-2">
-                {/* On a phone the types stay on one line and scroll sideways, edge to edge. */}
                 <div
                     role="group"
                     aria-label={t('calendar.page.types')}

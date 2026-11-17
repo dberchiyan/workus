@@ -21,7 +21,6 @@ export type SessionAuthenticationRecord = Prisma.SessionGetPayload<{
     select: typeof sessionAuthenticationSelect;
 }>;
 
-/** A session as its owner sees it in Settings. */
 export const sessionListSelect = {
     id: true,
     clientType: true,

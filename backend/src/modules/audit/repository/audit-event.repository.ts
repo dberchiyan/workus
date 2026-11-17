@@ -58,7 +58,6 @@ export class AuditEventRepository {
     ): Promise<{ content: AuditEventRecord[]; totalElements: number }> {
         const where = { organisationId, employeeId } satisfies Prisma.AuditEventWhereInput;
         const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
-        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [totalElements, content] = await Promise.all([
             this.txHost.tx.auditEvent.count({ where }),
             this.txHost.tx.auditEvent.findMany({ where, select: auditEventSelect, ...page }),
@@ -110,7 +109,6 @@ export class AuditEventRepository {
             action: { in: [...actions] },
         } satisfies Prisma.AuditEventWhereInput;
         const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
-        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [totalElements, content] = await Promise.all([
             this.txHost.tx.auditEvent.count({ where }),
             this.txHost.tx.auditEvent.findMany({ where, select: securityEventSelect, ...page }),

@@ -21,9 +21,7 @@ import { TIME_OFF_LIMITS } from '../schemas';
 import type { Holiday } from '../types';
 
 export interface HolidayDialogProps {
-    /** Undefined: a new holiday. */
     holiday: Holiday | undefined;
-    /** The heldAt a new holiday starts with (in the year shown). */
     defaultDate: string;
     open: boolean;
     onClose: () => void;

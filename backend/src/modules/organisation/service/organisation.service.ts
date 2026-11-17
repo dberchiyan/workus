@@ -63,7 +63,6 @@ export class OrganisationService {
         if (await this.userService.existsByEmail(email)) {
             throw new BusinessConflictException('errors.registration.emailTaken', {}, 'email');
         }
-        // Hashing is CPU work, done before the transaction opens.
         const passwordHash = await this.passwordHasher.hash(command.password);
         const result = await this.createWithOwner({ ...command, email }, passwordHash);
         this.logger.info({ organisationId: result.organisation.id, email, ip: command.ip }, 'Organisation registered');
@@ -83,7 +82,6 @@ export class OrganisationService {
             lastName: command.lastName,
             passwordHash,
         });
-        // Starts with the default departments and positions, shaped later in Settings.
         await this.structureService.createDefault(organisation.id, userId);
         await this.auditService.record({
             action: AuditAction.ORGANISATION_CREATED,
@@ -207,7 +205,6 @@ export class OrganisationService {
             throw new ResourceNotFoundException();
         }
         if (this.config.isDemoProtected(before.email)) {
-            // The demo's showcase accounts keep their roles (another visitor may be signed in as one).
             throw new DemoRestrictedException();
         }
         if (!isAdministrator(before.role)) {

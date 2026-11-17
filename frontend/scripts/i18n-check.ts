@@ -1,6 +1,5 @@
 import { readdir, readFile } from 'node:fs/promises';
 
-/** Fails on locale key mismatch or an ErrorCode without a message (ux.md → i18n). */
 const LOCALES_DIR = new URL('../src/locales/', import.meta.url);
 const REFERENCE_LOCALE = 'en';
 

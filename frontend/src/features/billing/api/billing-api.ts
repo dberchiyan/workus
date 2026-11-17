@@ -4,7 +4,6 @@ import type { Billing, BillingInfo, BillingRedirect, ChangePlanRequest, Checkout
 
 const BASE = '/api/v1/billing';
 
-/** The caller's company's subscription (owners) and the public billing mode. */
 export const billingApi = {
     info: async (): Promise<BillingInfo> => (await apiClient.get<BillingInfo>(`${BASE}/info`)).data,
     summary: async (): Promise<Billing> => (await apiClient.get<Billing>(BASE)).data,

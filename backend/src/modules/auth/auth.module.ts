@@ -20,8 +20,6 @@ import { SessionService } from './service/session.service';
         SessionRepository,
         { provide: SessionAuthenticator, useExisting: SessionService },
     ],
-    // SessionService: other modules sign people out (a termination that takes effect today, a role
-    // change). AuthService and PasswordHasher: registration starts the new owner's first session.
     exports: [SessionAuthenticator, SessionService, AuthService, PasswordHasher],
 })
 export class AuthModule {}

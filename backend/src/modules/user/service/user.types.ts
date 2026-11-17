@@ -6,7 +6,6 @@ export interface UserCredentials {
     id: string;
     organisationId: string;
     email: string;
-    /** null → no password (added by an admin before passwords were generated); cannot sign in. */
     passwordHash: string | null;
     role: UserRole;
 }
@@ -22,7 +21,6 @@ export interface UserProfile {
         name: string;
         status: OrganisationStatus;
         rejectionReason: string | null;
-        /** The plan in effect (common/plan) and, after a failed payment, since when. */
         plan: Plan;
         pastDueAt: Date | null;
     };
@@ -34,7 +32,6 @@ export interface NewUser {
     firstName: string;
     lastName: string;
     role: UserRole;
-    /** Argon2 hash of the generated password. */
     passwordHash: string;
     createdBy: string;
 }

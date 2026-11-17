@@ -7,9 +7,7 @@ import { useCurrentUser } from './use-current-user';
 export interface CompanyPlan {
     plan: Plan;
     features: readonly PlanFeature[];
-    /** Active employees the plan allows; null = unlimited. */
     maxEmployees: number | null;
-    /** A payment failed: the plan stays until then (owners see a banner). */
     graceEndsAt: string | null;
     has: (feature: PlanFeature) => boolean;
 }
@@ -30,10 +28,8 @@ export const usePlan = (): CompanyPlan => {
 };
 
 export interface UpgradeState {
-    /** The plan lacks the feature: show the prompt instead of the feature. */
     locked: boolean;
     requiredPlan: Plan;
-    /** The person can open Settings → Billing (owners); others are told to ask an owner. */
     hasBillingAccount: boolean;
 }
 

@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "notifications" (
     "id" UUID NOT NULL DEFAULT uuidv7(),
     "recipient_user_id" UUID NOT NULL,
@@ -13,25 +12,18 @@ CREATE TABLE "notifications" (
     CONSTRAINT "pk_notifications" PRIMARY KEY ("id")
 );
 
--- CreateIndex
 CREATE INDEX "idx_notifications_recipient_user_id_created_at" ON "notifications"("recipient_user_id", "created_at");
 
--- CreateIndex
 CREATE INDEX "idx_notifications_actor_user_id" ON "notifications"("actor_user_id");
 
--- CreateIndex
 CREATE INDEX "idx_notifications_subject_id_type" ON "notifications"("subject_id", "type");
 
--- CreateIndex
 CREATE INDEX "idx_notifications_created_at" ON "notifications"("created_at");
 
--- AddForeignKey
 ALTER TABLE "notifications" ADD CONSTRAINT "fk_notifications_recipient_user_id" FOREIGN KEY ("recipient_user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "notifications" ADD CONSTRAINT "fk_notifications_actor_user_id" FOREIGN KEY ("actor_user_id") REFERENCES "users"("id") ON DELETE SET NULL ON UPDATE CASCADE;
 
--- Unread count of one person (the bell polls it).
 CREATE INDEX "idx_notifications_recipient_user_id_unread" ON "notifications"("recipient_user_id") WHERE "read_at" IS NULL;
 
 ALTER TABLE "notifications" ADD CONSTRAINT "ck_notifications_type"

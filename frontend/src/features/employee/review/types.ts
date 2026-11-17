@@ -9,7 +9,6 @@ export type ReviewCandidate = Schemas['ResponsibleCandidatesResponse_Output']['c
 export type ReviewCandidateOption = ReviewCandidate & { subtitle: string };
 export type UpdateReviewRequest = Schemas['UpdateReviewRequest'];
 
-/** Rich-text feedback document (TipTap JSON), as generated from the API. */
 export type RichTextDoc = NonNullable<Review['feedback']['hr']>;
 export const FEEDBACK_SOURCES = ['hr', 'teamLead', 'team', 'client'] as const;
 export type FeedbackSource = (typeof FEEDBACK_SOURCES)[number];

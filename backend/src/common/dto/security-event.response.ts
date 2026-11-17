@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { SECURITY_CATEGORIES } from '../../modules/audit/service/security-category';
 import { pageResponseSchema } from './page.response';
 
-/** Security-log actions (auth.*) as the API names them. */
 export const SECURITY_ACTIONS = [
     'auth.signed_in',
     'auth.sign_in_failed',
@@ -28,14 +27,11 @@ export const SecurityEventSchema = z
         action: z.enum(SECURITY_ACTIONS),
         occurredAt: z.iso.datetime(),
         ip: z.string().nullable(),
-        /** As the browser sent it; the client turns it into "Chrome on macOS". */
         userAgent: z.string().nullable(),
-        /** A sign-in from a device the user had not signed in from before. */
         isNewDevice: z.boolean(),
     })
     .meta({ id: 'SecurityEvent' });
 
-/** A user's security log, newest first (own in Settings; an employee's for admins). */
 export const SecurityEventPageSchema = pageResponseSchema(SecurityEventSchema);
 export type SecurityEventPageBody = z.infer<typeof SecurityEventPageSchema>;
 
@@ -68,7 +64,6 @@ export const toSecurityEventPage = (page: {
     totalElements: page.totalElements,
 });
 
-/** `?category=` of both security-log endpoints; absent = every event. */
 export const SecurityLogQuerySchema = z.object({
     category: z.enum(SECURITY_CATEGORIES, { error: 'validation.invalid' }).optional(),
 });

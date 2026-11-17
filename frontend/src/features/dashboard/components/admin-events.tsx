@@ -19,7 +19,6 @@ import { TodayEventsPanel } from './today-events-panel';
 const TAB_HEIGHT_UNITS = 5.5;
 const TAB_PADDING_UNITS = 1.5;
 
-/** Compact tab: content-wide, still a 44 px touch target. */
 const EventsTabButton = styled(Tab)(({ theme }) => ({
     minWidth: 0,
     minHeight: theme.spacing(TAB_HEIGHT_UNITS),
@@ -36,12 +35,10 @@ const monthRange = (month: string): DateRange => {
 /** Today's events and events by month (admin dashboard, under the figures); a request opens in place. */
 export function AdminEvents(): ReactElement {
     const { t, i18n } = useTranslation('dashboard');
-    // Today (UTC, as everywhere), fixed for the visit (no clock in render).
     const [day] = useState<LocalDay>(todayUtcRange);
     const [currentMonth] = useState(currentMonthUtc);
     const { params, update, requestHref } = useEventsParams(currentMonth);
     const onToday = params.tab === 'today';
-    // The open tab's cards use the pages in the URL; the other tab's first pages give its count.
     const todayRange = { from: day.date, to: day.date };
     const requests = useTodayRequests(day, onToday ? params.requestsPage : 0);
     const todayReviews = useEventReviews(todayRange, onToday ? params.reviewsPage : 0);

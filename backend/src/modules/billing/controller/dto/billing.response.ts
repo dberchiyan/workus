@@ -9,13 +9,11 @@ import { SUBSCRIPTION_STATUSES } from '../../service/subscription-status';
 
 export const SubscriptionStatusSchema = z.enum(SUBSCRIPTION_STATUSES).meta({ id: 'SubscriptionStatus' });
 
-/** One plan as the pricing table shows it. */
 export const PlanOfferSchema = z
     .object({
         plan: PlanSchema,
         name: z.string().max(MAX_PLAN_NAME_LENGTH),
         monthlyPrice: MoneySchema,
-        /** Active employees the plan allows; null = unlimited. */
         maxEmployees: z.number().int().min(1).nullable(),
         features: z.array(FeatureSchema).max(MAX_PLAN_FEATURES),
     })
@@ -24,18 +22,12 @@ export const PlanOfferSchema = z
 export const BillingResponseSchema = z.object({
     plan: PlanSchema,
     status: SubscriptionStatusSchema,
-    /** The plan the subscription switches to when the paid period ends; null = it stays. */
     scheduledPlan: PlanSchema.nullable(),
-    /** End of the paid period: the next charge, or when the scheduled change applies. */
     periodEndsAt: z.iso.datetime().nullable(),
     pastDueAt: z.iso.datetime().nullable(),
-    /** When the grace period ends and the company returns to Starter. */
     graceEndsAt: z.iso.datetime().nullable(),
-    /** The company has a billing account: Manage billing (card, invoices, plan) can open. */
     hasBillingAccount: z.boolean(),
-    /** A paid plan held without a subscription (set by Workus). */
     isGrantedPlan: z.boolean(),
-    /** Test keys: payments are not real (the demo). */
     isTestMode: z.boolean(),
     plans: z.array(PlanOfferSchema).max(MAX_PLAN_OFFERS),
 });
@@ -46,23 +38,19 @@ export const CheckoutSessionRequestSchema = z.object({
 });
 export class CheckoutSessionRequest extends createZodDto(CheckoutSessionRequestSchema) {}
 
-/** The plan to move to: Starter = cancel (or give a isGrantedPlan plan up); the current one = keep it. */
 export const ChangePlanRequestSchema = z.object({ plan: PlanSchema });
 export class ChangePlanRequest extends createZodDto(ChangePlanRequestSchema) {}
 
-/** Where the browser goes next (the provider's hosted page). */
 export const BillingRedirectResponseSchema = z.object({ url: z.url() });
 export class BillingRedirectResponse extends createZodDto(BillingRedirectResponseSchema) {}
 
 export const BillingInfoResponseSchema = z.object({
-    /** Payments run against test keys: the sign-in page shows the test card. */
     isTestMode: z.boolean(),
 });
 export class BillingInfoResponse extends createZodDto(BillingInfoResponseSchema) {}
 
 export const WebhookReceiptResponseSchema = z.object({
     received: z.literal(true),
-    /** The event was delivered before and changed nothing this time. */
     isDuplicate: z.boolean(),
 });
 export class WebhookReceiptResponse extends createZodDto(WebhookReceiptResponseSchema) {}

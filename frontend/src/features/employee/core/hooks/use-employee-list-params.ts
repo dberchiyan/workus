@@ -14,7 +14,6 @@ export const PAGE_SIZES = [SMALL_PAGE, MEDIUM_PAGE, LARGE_PAGE] as const;
 const DEFAULT_SIZE = 20;
 const DEFAULT_SORT = 'name,asc';
 
-/** URL is the source of truth; anything malformed falls back to the default. */
 const urlSchema = z.object({
     category: z.uuid().optional().catch(undefined),
     status: z.enum(['active', 'terminated']).catch('active'),
@@ -77,12 +76,9 @@ export const useEmployeeListParams = (): {
 
     const update = useCallback(
         (change: ListChange): void => {
-            setSearchParams(
-                // Any change other than the page itself starts again from page 1.
-                (current) => toSearchParams({ ...parseParams(current), page: 1, ...change }),
-                // Typing a search replaces the history entry instead of adding one per pause.
-                { replace: change.search !== undefined },
-            );
+            setSearchParams((current) => toSearchParams({ ...parseParams(current), page: 1, ...change }), {
+                replace: change.search !== undefined,
+            });
         },
         [setSearchParams],
     );

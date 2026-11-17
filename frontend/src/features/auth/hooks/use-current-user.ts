@@ -11,11 +11,6 @@ import { authApi } from '../api/auth-api';
 import type { CurrentUser } from '../types';
 import { authKeys } from './query-keys';
 
-/**
- * "Who am I" — `null` means signed out. Never a stored boolean. A dead session at `/` reloads
- * the page: the server has just cleared its cookie, so `/` now opens the landing page (where there
- * is no landing — local Vite — the reload finds no cookie and goes to sign-in as usual).
- */
 const ME_STALE_MINUTES = 5;
 const ME_STALE_MS = ME_STALE_MINUTES * MINUTE_MS;
 
@@ -49,7 +44,6 @@ export const useCurrentUser = (): UseQueryResult<{
                 if (isApiError(error) && error.status === HttpStatus.UNAUTHORIZED) {
                     if (error.code === 'SESSION_EXPIRED' && window.location.pathname === PATHS.dashboard) {
                         window.location.replace(PATHS.dashboard);
-                        // The page is being replaced; stay pending so sign-in does not flash first.
                         return new Promise<never>(() => undefined);
                     }
                     return null;

@@ -12,7 +12,6 @@ import { useLoginForm } from '../hooks/use-login-form';
 import { isLoginValidationMessage, LOGIN_FIELD_LIMITS, type LoginFormValues } from '../schemas';
 import { PasswordField } from './password-field';
 
-/** Keeps one line of error space under every field and above the button, so nothing shifts. */
 const RESERVED_LINE = '\u00A0';
 
 export function LoginForm(): ReactElement {

@@ -27,7 +27,6 @@ export function MyTimeOff(): ReactElement {
     const balances = useOwnBalances();
     const requests = useOwnRequests();
     const [expandedId, setExpandedId] = useState<string | null>(null);
-    // `?request=<id>` (a notification's link) opens that request and brings the list into view.
     const [searchParams] = useSearchParams();
     const linkedId = searchParams.get('request');
     const [openedLink, setOpenedLink] = useState<string | null>(null);
@@ -149,7 +148,6 @@ export function MyTimeOff(): ReactElement {
                         </Typography>
                     </div>
                 ) : (
-                    // The card's own width decides (container query): table when it fits, else stacked.
                     <div className="@container border-t border-divider">
                         <div className="hidden @[48rem]:block">
                             <RequestsTable
@@ -221,7 +219,6 @@ export function MyTimeOff(): ReactElement {
                     requestsHeadingRef.current?.focus();
                 }}
             />
-            {/* Polite status; stays until dismissed or replaced. */}
             <Snackbar
                 open={notice !== null}
                 onClose={(_event, reason) => {

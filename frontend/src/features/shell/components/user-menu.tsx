@@ -58,7 +58,6 @@ export function UserMenu(): ReactElement | null {
                 onClick={(event) => {
                     setAnchor(event.currentTarget);
                 }}
-                // -mr-2: the avatar (not the padded hit area) aligns with the content edge.
                 className="-mr-2 min-h-11 gap-3 rounded-sm px-2"
             >
                 <span className="hidden flex-col items-end sm:flex">
@@ -79,7 +78,6 @@ export function UserMenu(): ReactElement | null {
                 anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
                 slotProps={{
-                    // The popover focuses its paper; move on to the first item so arrows work at once.
                     transition: {
                         onEntered: () => {
                             menuRef.current?.querySelector<HTMLElement>('[role="menuitem"]')?.focus();

@@ -65,7 +65,6 @@ export class EmploymentService {
             {
                 startsAt: command.startsAt,
                 salary: startingSalary,
-                // A review needs someone responsible: the employee's people, otherwise whoever hired.
                 responsibleUserIds: responsibleUserIds.length > 0 ? responsibleUserIds : [actorId],
             },
             actorId,
@@ -115,7 +114,6 @@ export class EmploymentService {
         await this.refuseDemoAccount(organisationId, employeeId);
         const { after } = await this.employeeService.terminate(organisationId, employeeId, command, actorId);
         await this.reviewService.cancelScheduledAfter(organisationId, employeeId, command.terminatedAt, actorId);
-        // Effective today or earlier: signed out now (a later terminatedAt is handled on its day).
         if (after.terminatedAt && after.terminatedAt <= todayUtc()) {
             await this.sessionService.endForTermination([{ userId: after.user.id, organisationId }]);
         }

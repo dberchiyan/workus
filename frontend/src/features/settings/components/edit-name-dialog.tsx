@@ -20,7 +20,6 @@ import type { ErrorCode } from '@/shared/types';
 
 import { editNameSchema, type EditNameValues, NAME_LIMITS } from '../schemas';
 
-/** Keeps every helper line's height while it is empty, so the form never shifts. */
 const RESERVED_LINE = ' ';
 const FIELDS = new Set<string>(['firstName', 'lastName']);
 const isField = (field: string): field is keyof EditNameValues => FIELDS.has(field);
@@ -42,7 +41,6 @@ export function EditNameDialog({ open, user, onClose, onExited }: EditNameDialog
     const titleId = useId();
     const textId = useId();
     const theme = useTheme();
-    // Behaviour CSS cannot express: a full-screen sheet on phones (ux.md → Patterns).
     const isPhone = useMediaQuery(theme.breakpoints.down('sm'));
     const update = useUpdateOwnName();
     const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);
@@ -55,7 +53,6 @@ export function EditNameDialog({ open, user, onClose, onExited }: EditNameDialog
     });
     const { errors, isSubmitting } = form.formState;
 
-    // Opening focuses the first field (the dialog mounts with each opening).
     useEffect(() => {
         requestAnimationFrame(() => {
             form.setFocus('firstName');

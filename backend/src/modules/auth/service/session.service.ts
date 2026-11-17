@@ -20,7 +20,6 @@ import type { SessionListRecord } from '../repository/record/session.record';
 import { SessionRepository } from '../repository/session.repository';
 
 const MINUTE_MS = 60_000;
-/** security.md: last_seen_at is written at most once a minute. */
 const TOUCH_INTERVAL_MS = MINUTE_MS;
 
 export interface StartSessionCommand {
@@ -28,7 +27,6 @@ export interface StartSessionCommand {
     authorities: string[];
     ip: string;
     userAgent: string | null;
-    /** Token of a session presented at login — deleted, never reused (no fixation). */
     presentedToken: string | undefined;
 }
 
@@ -36,14 +34,11 @@ export interface StartedSession {
     token: string;
     csrfToken: string;
     absoluteExpiresAt: Date;
-    /** Sessions this sign-in ended (the per-user limit) — for the security log. */
     evicted: number;
 }
 
-/** Devices a person can be signed in on at once (product decision). */
 const MAX_SESSIONS_PER_USER = 10;
 
-/** Days back the hourly job looks for terminations that took effect. */
 const LEAVER_WINDOW_DAYS = 7;
 
 @Injectable()
@@ -78,7 +73,6 @@ export class SessionService extends SessionAuthenticator {
             idleExpiresAt: this.idleExpiry(now, absoluteExpiresAt),
             absoluteExpiresAt,
         });
-        // At most MAX_SESSIONS_PER_USER devices: a new sign-in ends the least recently used one.
         const trimmed = await this.sessionRepository.deleteBeyondMostRecent(command.userId, MAX_SESSIONS_PER_USER);
         if (trimmed > 0) {
             this.logger.info({ userId: command.userId, trimmed }, 'Oldest sessions ended (limit)');
@@ -110,7 +104,6 @@ export class SessionService extends SessionAuthenticator {
                 session.user.email,
                 session.user.organisationId,
                 session.user.organisation.status === OrganisationStatus.ACTIVE,
-                // Guarded by ck_organisations_plan.
                 isPlan(session.user.organisation.plan) ? session.user.organisation.plan : Plan.STARTER,
                 session.id,
                 session.authorities,

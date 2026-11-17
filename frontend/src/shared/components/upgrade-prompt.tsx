@@ -13,16 +13,12 @@ import type { Schemas } from '@/shared/types';
 type Plan = Schemas['Plan_Output'];
 type PlanFeature = Schemas['PlanFeature_Output'];
 
-/** What is locked: a feature of a higher plan, or the plan's employee limit. */
 export type UpgradeReason = { kind: 'feature'; feature: PlanFeature } | { kind: 'limit'; limit: number; count: number };
 
 export interface UpgradePromptProps {
     reason: UpgradeReason;
-    /** The cheapest plan that lifts the lock (named in the text). */
     requiredPlan: Plan;
-    /** Owners get the button to Settings → Billing; everyone else is told to ask an owner. */
     hasBillingAccount: boolean;
-    /** One line with the action beside it (page notices) instead of the centred block. */
     compact?: boolean;
     className?: string;
 }

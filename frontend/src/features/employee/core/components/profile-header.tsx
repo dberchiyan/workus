@@ -32,7 +32,6 @@ export function ProfileHeader({ employee, headingRef }: ProfileHeaderProps): Rea
             : null;
     return (
         <Card variant="outlined" className="flex-1">
-            {/* Phone: avatar and actions on top, the text full width below; side by side from sm. */}
             <CardContent className="flex flex-wrap items-start gap-4 p-5 sm:flex-nowrap sm:items-center sm:p-6">
                 <ViewTransition name={personAvatarTransition(employee.id)}>
                     <InitialsAvatar

@@ -5,7 +5,6 @@ import type { CompanyStructure, Department, EmployeePage, StructurePosition } fr
 const BASE = '/api/v1/structure';
 const enc = encodeURIComponent;
 
-/** Settings → Company structure: the organisation's departments and positions (admins). */
 export const structureApi = {
     find: async (): Promise<CompanyStructure> => (await apiClient.get<CompanyStructure>(BASE)).data,
     /** The key identifies one logical "add" — reused on retry so it never adds twice. */

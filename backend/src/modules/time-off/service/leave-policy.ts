@@ -2,11 +2,6 @@ import { isoDay } from '../../../common/time/iso-day';
 import { MONTHS_PER_YEAR, SATURDAY, SUNDAY } from '../../../common/time/units';
 import { TimeOffType } from './time-off-type';
 
-/**
- * Leave rules (product decision): cycles are counted from the employee's start date. Vacation —
- * 10 working days per 6-month cycle; sick days — 5 per 12-month cycle; days off — no limit, only
- * counted. Unused days do not carry over. A request belongs to the cycle of its first day.
- */
 export const LEAVE_POLICY: Readonly<Record<TimeOffType, { cycleMonths: number; allowance: number | null }>> = {
     [TimeOffType.VACATION]: { cycleMonths: 6, allowance: 10 },
     [TimeOffType.SICK_DAY]: { cycleMonths: 12, allowance: 5 },
@@ -44,7 +39,6 @@ export const cycleOf = (origin: Date, months: number, date: Date): { start: Date
     return { start, end: plusDays(plusMonths(origin, (index + 1) * months), -1) };
 };
 
-/** `YYYY-MM-DD` of a `@db.Date` value. */
 export { isoDay };
 
 export const isWeekday = (date: Date): boolean => {

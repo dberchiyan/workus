@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "company_holidays" (
     "id" UUID NOT NULL DEFAULT uuidv7(),
     "held_at" DATE NOT NULL,
@@ -14,23 +13,17 @@ CREATE TABLE "company_holidays" (
     CONSTRAINT "pk_company_holidays" PRIMARY KEY ("id")
 );
 
--- CreateIndex
 CREATE INDEX "idx_company_holidays_is_recurring_is_carried_over" ON "company_holidays"("is_recurring", "is_carried_over");
 
--- CreateIndex
 CREATE UNIQUE INDEX "uq_company_holidays_held_at" ON "company_holidays"("held_at");
 
--- A name is not blank.
 ALTER TABLE "company_holidays"
     ADD CONSTRAINT "ck_company_holidays_name_not_blank" CHECK (btrim("name") <> '');
 
--- A holiday added after a request was made may take its last working day: days >= 0 (a new
--- request still needs at least one — checked by the service).
 ALTER TABLE "time_off_requests" DROP CONSTRAINT "ck_time_off_requests_days_positive";
 ALTER TABLE "time_off_requests"
     ADD CONSTRAINT "ck_time_off_requests_days_non_negative" CHECK ("days" >= 0);
 
--- Holiday changes go to the audit log (target type holiday, no employee).
 ALTER TABLE "audit_events" DROP CONSTRAINT "ck_audit_events_action";
 ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_action"
     CHECK ("action" IN ('employee.created', 'employee.updated', 'employee.terminated',

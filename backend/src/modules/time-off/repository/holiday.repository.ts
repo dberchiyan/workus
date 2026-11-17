@@ -5,7 +5,6 @@ import type { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapt
 import type { PrismaService } from '../../../common/persistence/prisma.service';
 import { type HolidayDayRecord, holidayDaySelect, type HolidayRecord, holidaySelect } from './record/holiday.record';
 
-/** A year has at most 366 days, so one holiday per heldAt bounds every range read here. */
 const MAX_HOLIDAYS = 400;
 
 export interface NewHoliday {

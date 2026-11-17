@@ -18,7 +18,6 @@ import type { Administrator } from '../types';
 export interface ChangeRoleDialogProps {
     open: boolean;
     administrator: Administrator;
-    /** The signed-in owner changes their own role. */
     isSelf: boolean;
     onClose: () => void;
     onExited: () => void;

@@ -62,7 +62,6 @@ import { UserModule } from './modules/user/user.module';
         InsightsModule,
     ],
     providers: [
-        // Guards run in registration order (security.md → Guards).
         { provide: APP_GUARD, useClass: SessionGuard },
         { provide: APP_GUARD, useClass: CsrfGuard },
         { provide: APP_GUARD, useClass: RateLimitGuard },
@@ -70,7 +69,6 @@ import { UserModule } from './modules/user/user.module';
         { provide: APP_GUARD, useClass: DemoGuard },
         { provide: APP_GUARD, useClass: PlanGuard },
         { provide: APP_PIPE, useClass: ZodValidationPipe },
-        // Outermost first: timing measures everything; idempotency stores the serialized response.
         { provide: APP_INTERCEPTOR, useClass: TimingInterceptor },
         { provide: APP_INTERCEPTOR, useClass: IdempotencyInterceptor },
         { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },

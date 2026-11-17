@@ -23,12 +23,6 @@ import { seedReviews } from './seed-reviews';
 import { seedSecurityLog } from './seed-security';
 import { alignPendingResponsibles, seedPendingRequests, seedTimeOff, seedTimeOffComments } from './seed-time-off';
 
-/**
- * Development seed (APP_ENV=dev only): organisations (OSDB, Vortex, …), each with its structure
- * (the default departments and positions), an owner, admins and employees sharing SEED_PASSWORD,
- * responsibles, reviews, time off, holidays, notifications and a security log for every
- * employee. Idempotent — existing rows are kept.
- */
 const seedEnv = z.object({
     APP_ENV: z.literal('dev'),
     DATABASE_HOST: z.string().min(1),
@@ -64,8 +58,6 @@ const seedOrganisation = async (
         update: {},
         select: { id: true },
     });
-    // The plan is seed data while nobody pays: OSDB exists before the seed (the tenancy
-    // migration creates it), so a re-run realigns a isGrantedPlan plan but never a live subscription.
     await prisma.organisation.updateMany({
         where: { id: organisationId, subscriptionStatus: 'NONE' },
         data: { plan: organisation.plan },
@@ -94,7 +86,6 @@ const seedOrganisation = async (
             })
         ).map((user) => [user.email, user.id]),
     );
-    // The company's structure: the default departments and positions (kept if already there).
     for (const [index, department] of DEFAULT_STRUCTURE.entries()) {
         const { id: categoryId } = await prisma.positionCategory.upsert({
             where: { organisationId_name: { organisationId, name: department.name } },
@@ -136,9 +127,6 @@ const seedOrganisation = async (
         skipDuplicates: true,
     });
 
-    // Only admins are responsible: one each (rotating), every third person both. Responsibles who
-    // are not administrators (left from earlier seeds) are removed; past reviews and requests keep
-    // theirs.
     const admins = adminPeople.map((admin) => idOf(userIdByEmail, admin.email));
     const employeeIdByUserId = new Map(
         (
@@ -176,7 +164,6 @@ const seedOrganisation = async (
         skipDuplicates: true,
     });
 
-    // Contacts only where none are set yet, so edits made in the app survive a re-seed.
     let contacts = 0;
     for (const [index, employee] of people.entries()) {
         const { count } = await prisma.employee.updateMany({
@@ -194,8 +181,6 @@ const seedOrganisation = async (
         contacts += count;
     }
 
-    // Dates of birth where none is set (edits made in the app survive a re-seed): every ninth
-    // person has a birthday on the seed day, every ninth from the fifth later this month.
     const today = daysAgo(0);
     let birthDates = 0;
     for (const [index, employee] of people.entries()) {
@@ -246,7 +231,6 @@ const seedOrganisation = async (
     const pending = await seedPendingRequests(prisma, organisationId, admins[0] ?? '');
     const realigned = await alignPendingResponsibles(prisma, organisationId);
     const comments = await seedTimeOffComments(prisma, organisationId, admins);
-    // After the requests, so the ones covering a new holiday give its working day back.
     const holidays = await seedHolidays(prisma, organisationId);
     const notifications = await seedNotifications(prisma, organisationId);
     const security = await seedSecurityLog(prisma, organisationId);
@@ -257,9 +241,7 @@ const seedOrganisation = async (
 const seed = async (): Promise<void> => {
     try {
         process.loadEnvFile('.env');
-    } catch {
-        // Variables come from the environment.
-    }
+    } catch {}
     const env = seedEnv.parse(process.env);
     const prisma = new PrismaClient({
         adapter: new PrismaPg({
@@ -274,7 +256,6 @@ const seed = async (): Promise<void> => {
     });
     try {
         const passwordHash = await new PasswordHasher().hash(SEED_PASSWORD);
-        // Platform admins: the internal organisation, no tenant data.
         const platform = await prisma.user.createMany({
             data: PLATFORM_ADMINS.map((admin) => ({
                 ...admin,

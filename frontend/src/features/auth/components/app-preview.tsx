@@ -6,11 +6,8 @@ import { BrandMark } from '@/shared/components/brand-mark';
 import { cn } from '@/shared/lib/cn';
 
 const MENU = ['menu-1', 'menu-2', 'menu-3', 'menu-4', 'menu-5'] as const;
-/** Bar widths of the stat tiles' figures and the mini chart's columns (percent). */
 const TILES = ['w-2/5', 'w-1/4'] as const;
-/** Distinct heights — they double as keys. */
 const COLUMNS = [40, 65, 50, 80, 60, 95, 75] as const;
-/** People rows: an avatar tone, a status tone, how many responsible avatars. */
 const ROWS = [
     { id: 'row-1', avatar: 'bg-avatar-c1', name: 'w-2/5', status: 'success', stack: 2 },
     { id: 'row-2', avatar: 'bg-avatar-c4', name: 'w-1/3', status: 'warning', stack: 1 },
@@ -53,7 +50,6 @@ export function AppPreview(): ReactElement {
             className="relative hidden w-full max-w-2xl self-center lg:block"
         >
             <Paper elevation={12} className="overflow-hidden">
-                {/* Window bar */}
                 <div className="flex items-center gap-1.5 border-b border-divider px-4 py-3">
                     <span className="size-2.5 rounded-full bg-divider" />
                     <span className="size-2.5 rounded-full bg-divider" />
@@ -128,7 +124,6 @@ export function AppPreview(): ReactElement {
                     </div>
                 </div>
             </Paper>
-            {/* A notice floats in over the corner. */}
             <m.div
                 initial={reduce ? false : { opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}

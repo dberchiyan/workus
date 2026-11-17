@@ -57,7 +57,6 @@ apiClient.interceptors.request.use((config) => {
     return config;
 });
 
-// Every JSON answer is checked against the contract the types come from (runtime safety net).
 apiClient.interceptors.response.use(
     (response) => {
         markApiActivity();

@@ -1,7 +1,6 @@
 import { Prisma, type PrismaClient } from '../src/generated/prisma/client';
 import { ReviewKind, STARTING_REVIEW_TITLE } from '../src/modules/employee/review/service/review-kind';
 
-/** Monthly USD base salary by position category (fictional). */
 const BASE_SALARY: Readonly<Record<string, number>> = {
     Developers: 3500,
     'AI Engineers': 4200,
@@ -56,7 +55,6 @@ interface SeedReviewEmployee {
 const roundToHundreds = (amount: Prisma.Decimal): Prisma.Decimal =>
     amount.dividedBy(100).toDecimalPlaces(0, Prisma.Decimal.ROUND_HALF_UP).times(100);
 
-/** Every six months; the yearly one is the "Annual review". */
 const REVIEW_INTERVAL_MONTHS = 6;
 
 /**
@@ -87,7 +85,6 @@ export const seedReviews = async (
         }
         const responsibleUserIds =
             employee.responsibleUserIds.length > 0 ? employee.responsibleUserIds : [fallbackResponsibleId];
-        // Completed reviews happen up to today, or up to the last day if that came first.
         const end = employee.terminatedAt && employee.terminatedAt < today ? employee.terminatedAt : today;
         let salary = new Prisma.Decimal(BASE_SALARY[employee.categoryName] ?? 3000).plus((index % 5) * 100);
         const reviews: Omit<Prisma.EmployeeReviewCreateManyInput, 'organisationId'>[] = [
@@ -122,7 +119,6 @@ export const seedReviews = async (
             round += 1;
             date = addMonths(employee.startsAt, REVIEW_INTERVAL_MONTHS * round);
         }
-        // Every eleventh: the last review (within a month) was never held — it is overdue.
         const last = reviews.at(-1);
         if (
             index % 11 === 5 &&

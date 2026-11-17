@@ -20,7 +20,6 @@ export interface CalendarPersonRowProps {
     days: string[];
     today: string;
     holidays: ReadonlyMap<string, string>;
-    /** Where a request opens (admins), or nothing. */
     requestHref: ((requestId: string) => string) | undefined;
     canOpenProfile: boolean;
 }

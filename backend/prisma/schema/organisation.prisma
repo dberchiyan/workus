@@ -4,27 +4,17 @@
 model Organisation {
   id                         String                      @id(map: "pk_organisations") @default(dbgenerated("uuidv7()")) @db.Uuid
   name                       String                      @db.VarChar(100)
-  /// PENDING (registered, waiting for a platform admin) | ACTIVE | REJECTED — CHECK in migration.
   status                     String                      @db.VarChar(16)
-  /// The internal organisation of Workus platform admins: never listed as a company.
   isPlatform                 Boolean                     @default(false) @map("is_platform")
-  /// When and by whom (a platform admin) it was last approved or rejected.
   decidedAt                  DateTime?                   @map("decided_at") @db.Timestamptz(3)
   decidedBy                  String?                     @map("decided_by") @db.Uuid
   decider                    User?                       @relation("OrganisationDecider", fields: [decidedBy], references: [id], onDelete: Restrict, map: "fk_organisations_decided_by")
-  /// Why it was rejected (shown to its owner); cleared on approval.
   rejectionReason            String?                     @map("rejection_reason") @db.VarChar(500)
-  /// The plan in effect — STARTER | TEAM | BUSINESS (CHECK); features and the employee limit follow it (common/plan).
   plan                       String                      @default("STARTER") @db.VarChar(16)
-  /// NONE (no paid subscription: Starter, or a plan isGrantedPlan by Workus) | ACTIVE | PAST_DUE — CHECK in migration.
   subscriptionStatus         String                      @default("NONE") @map("subscription_status") @db.VarChar(16)
-  /// The plan the subscription switches to when the paid period ends (a downgrade, or STARTER after a cancellation); null = it stays.
   scheduledPlan              String?                     @map("scheduled_plan") @db.VarChar(16)
-  /// End of the paid period: the next charge, or when the scheduled change applies.
   periodEndsAt           DateTime?                   @map("period_ends_at") @db.Timestamptz(3)
-  /// Since when the payment fails; the grace period counts from it (CHECK: set ⇔ PAST_DUE).
   pastDueAt               DateTime?                   @map("past_due_at") @db.Timestamptz(3)
-  /// The company's account and subscription at the payment provider (Stripe ids) — references only; our rows hold the workflow state.
   billingCustomerId          String?                     @unique(map: "uq_organisations_billing_customer_id") @map("billing_customer_id") @db.VarChar(64)
   billingSubscriptionId      String?                     @unique(map: "uq_organisations_billing_subscription_id") @map("billing_subscription_id") @db.VarChar(64)
   createdAt                  DateTime                    @default(now()) @map("created_at") @db.Timestamptz(3)

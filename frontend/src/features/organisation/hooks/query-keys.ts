@@ -1,4 +1,3 @@
-/** No tenant id: the organisation comes from the session (see auth queryKeys). */
 export const organisationKeys = {
     all: ['organisation'] as const,
     current: (): readonly ['organisation', 'current'] => [...organisationKeys.all, 'current'] as const,

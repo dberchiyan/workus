@@ -10,7 +10,6 @@ import { CommandPaletteButton } from './command-palette-button';
 import { UserMenu } from './user-menu';
 
 export interface TopBarProps {
-    /** Present on mobile only, where the menu is a temporary drawer. */
     onOpenMenu?: () => void;
     menuButtonId: string;
     isMenuOpen: boolean;
@@ -20,8 +19,6 @@ export function TopBar({ onOpenMenu, menuButtonId, isMenuOpen }: TopBarProps): R
     const { t } = useTranslation('shell');
     const can = useAccess();
     return (
-        // Background and border span the full width; the controls sit in the page's content column
-        // (same padding and max width as <main>), so they line up with the content's edges.
         <header className="sticky top-0 z-10 flex h-top-bar-height shrink-0 border-b border-divider bg-background-paper px-4 md:px-8">
             <div className="mx-auto flex w-full max-w-page items-center gap-2">
                 {onOpenMenu && (

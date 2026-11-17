@@ -25,7 +25,6 @@ export function ResponsibleStep({ form, responsibles, onChange }: ResponsibleSte
     const candidates = useResponsibleCandidates(search, true);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    // Step shown → focus the search field.
     useEffect(() => {
         inputRef.current?.focus();
     }, []);

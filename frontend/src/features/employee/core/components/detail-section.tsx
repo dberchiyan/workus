@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 export interface DetailRow {
     key: string;
     label: string;
-    /** null/empty → "Not provided". */
     value: ReactNode;
 }
 
@@ -39,7 +38,6 @@ export function DetailSection({ title, icon, rows }: DetailSectionProps): ReactE
                         key={row.key}
                         className="grid grid-cols-1 gap-1 px-4 py-3 sm:grid-cols-[minmax(0,14rem)_1fr] sm:gap-4 sm:px-6"
                     >
-                        {/* 14rem: one-off label column width for this list. */}
                         <Typography variant="body2" component="dt" color="textSecondary">
                             {row.label}
                         </Typography>

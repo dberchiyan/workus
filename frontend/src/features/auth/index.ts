@@ -1,6 +1,5 @@
 import { lazyWithPreload } from '@/shared/lib/lazy-with-preload';
 
-/** Public surface of the auth feature. Pages are lazy so the router stays in the shell chunk. */
 export const LoginPage = lazyWithPreload(async () => ({ default: (await import('./pages/login-page')).LoginPage }));
 export { ACCESS, type AccessPart, type UserRole } from './access';
 export { SECURITY_LOG_PAGE_SIZE, SESSIONS_PAGE_SIZE } from './api/account-api';

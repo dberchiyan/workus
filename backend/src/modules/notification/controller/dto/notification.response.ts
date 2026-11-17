@@ -10,9 +10,7 @@ export const NotificationSchema = z
         id: z.uuid(),
         type: z.enum(NOTIFICATION_TYPES),
         createdAt: z.iso.datetime(),
-        /** Null = not read yet. */
         readAt: z.iso.datetime().nullable(),
-        /** Who caused it; null = the system (reminders). */
         actor: z
             .object({
                 id: z.uuid(),
@@ -20,9 +18,7 @@ export const NotificationSchema = z
                 lastName: z.string().max(MAX_PERSON_NAME_LENGTH),
             })
             .nullable(),
-        /** What it is about — the client links to it. */
         subject: z.object({ type: z.enum(['time_off_request']), id: z.uuid() }),
-        /** The time-off request as it was when the notice was sent. */
         request: z.object({
             type: z.string().max(MAX_TYPE_LENGTH),
             startsAt: z.iso.date(),
@@ -32,7 +28,6 @@ export const NotificationSchema = z
                 firstName: z.string().max(MAX_PERSON_NAME_LENGTH),
                 lastName: z.string().max(MAX_PERSON_NAME_LENGTH),
             }),
-            /** Reminders only: whole days it has waited. */
             waitingDays: z.number().int().min(0).nullable(),
         }),
     })

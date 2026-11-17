@@ -36,7 +36,6 @@ export interface CreateEmployeeCommand {
     linkedinUrl: string | undefined;
     telegram: string | undefined;
     address: string | undefined;
-    /** `YYYY-MM-DD`. */
     bornAt: string | undefined;
     responsibleUserIds: string[];
 }
@@ -46,7 +45,6 @@ export type UpdateEmployeeCommand = Omit<CreateEmployeeCommand, 'responsibleUser
 };
 
 export interface TerminateEmployeeCommand {
-    /** Last-day semantics as stored: terminated from this terminatedAt (inclusive). */
     terminatedAt: string;
     reason: string;
     comment: string | undefined;
@@ -58,7 +56,6 @@ export interface EmployeeProfile {
     today: Date;
 }
 
-/** For time off: the employee's dates and responsible people (who decide requests). */
 export interface EmployeeForTimeOff {
     id: string;
     startsAt: Date;
@@ -66,16 +63,13 @@ export interface EmployeeForTimeOff {
     responsibleUserIds: string[];
 }
 
-/** One row of the time-off calendar (for other modules). */
 export interface EmployeeCalendarRow {
     id: string;
-    /** For the avatar colour. */
     userId: string;
     firstName: string;
     lastName: string;
     positionTitle: string;
     startsAt: Date;
-    /** First day without work; null while employed. */
     terminatedAt: Date | null;
 }
 
@@ -88,24 +82,19 @@ export interface EmployeeMovement {
     kind: 'JOINING' | 'LEAVING';
     movedAt: Date;
     employeeId: string;
-    /** For the avatar colour. */
     userId: string;
     firstName: string;
     lastName: string;
 }
 
-/** People starting and leaving within the window (dashboard). */
 export interface EmployeeMovements {
     joining: number;
     leaving: number;
-    /** The soonest start or leave, if any. */
     next: EmployeeMovement | null;
 }
 
-/** A birthday (no year — age is personal data) of someone employed then. */
 export interface EmployeeBirthday {
     employeeId: string;
-    /** For the avatar colour. */
     userId: string;
     firstName: string;
     lastName: string;
@@ -119,14 +108,12 @@ export interface EmployeeBirthdays {
     totalElements: number;
 }
 
-/** One person in the company figures (insights). */
 export interface RosterEmployee {
     id: string;
     userId: string;
     firstName: string;
     lastName: string;
     startsAt: Date;
-    /** First day without work; null while employed. */
     terminatedAt: Date | null;
     position: { id: string; title: string };
     category: { id: string; name: string; sortOrder: number };

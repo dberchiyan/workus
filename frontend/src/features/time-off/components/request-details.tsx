@@ -37,7 +37,6 @@ export interface RequestDetailsProps {
 /** Responsible people, status, history and comments of one request. */
 export function RequestDetails({ request, onCancel }: RequestDetailsProps): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
-    // The employee's note and the reason for a decision first; then the comments, oldest first.
     const comments = [
         ...(request.note ? [{ key: 'note', author: t('details.note'), text: request.note }] : []),
         ...(request.decisionComment && request.decidedBy
@@ -52,8 +51,6 @@ export function RequestDetails({ request, onCancel }: RequestDetailsProps): Reac
     ];
     const viewerId = useCurrentUser().data?.id;
     return (
-        // One grid, row by row: Responsible | Status, then History | Comments — each row as tall
-        // as its taller panel.
         <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
             <Panel title={t('details.responsible', { count: request.responsibles.length })}>
                 <ul className="m-0 flex list-none flex-col gap-3 p-0">
@@ -96,7 +93,6 @@ export function RequestDetails({ request, onCancel }: RequestDetailsProps): Reac
                 <ol className="m-0 flex list-none flex-col p-0">
                     {request.history.map((item, index) => (
                         <li key={item.id} className="relative flex gap-3 pb-4 pl-5 last:pb-0">
-                            {/* Timeline: a dot and, between items, the rail. */}
                             <span aria-hidden className="absolute top-3 left-0 size-2 rounded-full bg-primary" />
                             {index < request.history.length - 1 && (
                                 <span aria-hidden className="absolute top-5 bottom-0 left-[3px] w-px bg-divider" />

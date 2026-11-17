@@ -54,7 +54,6 @@ export function NotificationBell(): ReactElement | null {
                     paper: {
                         role: 'dialog',
                         'aria-labelledby': titleId,
-                        // A phone gets the width less a 16 px edge on each side.
                         className: 'w-[calc(100vw-2rem)] max-w-[26rem]',
                     },
                 }}

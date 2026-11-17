@@ -21,7 +21,6 @@ export interface TodayEventsPanelProps {
     requests: UseQueryResult<DashboardRequests>;
     requestsPage: number;
     onRequestsPage: (page: number) => void;
-    /** Where a request opens: a dialog over the dashboard. */
     requestHref: (requestId: string) => string;
     reviews: UseQueryResult<DashboardReviews>;
     birthdays: UseQueryResult<DashboardBirthdays>;

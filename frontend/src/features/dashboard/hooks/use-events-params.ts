@@ -6,14 +6,11 @@ const MONTH = /^(19|20)\d{2}-(0[1-9]|1[0-2])$/;
 
 export interface EventsParams {
     tab: EventsTab;
-    /** `YYYY-MM` of each month card; absent → the current month (UTC). */
     reviewsMonth: string;
     birthdaysMonth: string;
-    /** Zero-based page of each card in the open tab. */
     requestsPage: number;
     reviewsPage: number;
     birthdaysPage: number;
-    /** The request open in the dialog over the dashboard. */
     request: string | undefined;
 }
 
@@ -68,7 +65,6 @@ export const useEventsParams = (
                     set('requestsPage', changes.requestsPage?.toString(), '0');
                     set('reviewsPage', changes.reviewsPage?.toString(), '0');
                     set('birthdaysPage', changes.birthdaysPage?.toString(), '0');
-                    // Another tab starts both cards from their first page; another month, its card.
                     if (changes.tab !== undefined) {
                         next.delete('requestsPage');
                         next.delete('reviewsPage');
@@ -85,14 +81,12 @@ export const useEventsParams = (
                     }
                     return next;
                 },
-                // Closing a request is a step back should undo; the rest replaces.
                 { replace: !('request' in changes) },
             );
         },
         [setSearchParams, currentMonth],
     );
 
-    /** The link that opens a request over the dashboard as it is now (opening is a history step). */
     const requestHref = useCallback(
         (requestId: string): string => {
             const next = new URLSearchParams(searchParams);

@@ -19,7 +19,6 @@ export function EmployeeSearchField({ value, onSearch }: EmployeeSearchFieldProp
     const [text, setText] = useState(value);
     const [urlValue, setUrlValue] = useState(value);
 
-    // The URL changed from outside (back/forward, "clear filters"): show what it says.
     if (value !== urlValue) {
         setUrlValue(value);
         setText(value);

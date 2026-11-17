@@ -23,7 +23,6 @@ export interface NewSession {
     absoluteExpiresAt: Date;
 }
 
-/** Sessions trimmed per sign-in at most (normally one). */
 const MAX_TRIMMED = 100;
 
 @Injectable()
@@ -54,7 +53,6 @@ export class SessionRepository {
             idleExpiresAt: { gt: now },
             absoluteExpiresAt: { gt: now },
         };
-        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [totalElements, content] = await Promise.all([
             this.txHost.tx.session.count({ where }),
             this.txHost.tx.session.findMany({

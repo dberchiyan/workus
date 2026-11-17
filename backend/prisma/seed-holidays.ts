@@ -1,10 +1,5 @@
 import type { PrismaClient } from '../src/generated/prisma/client';
 
-/**
- * Company holidays (dev only): a common international set — editable in Settings → Holidays.
- * Recurring ones are copied to the next year by the app (on start and daily); Easter Monday
- * moves every year, so each year has its own one-off entry.
- */
 const HOLIDAYS: readonly { heldAt: string; name: string; isRecurring: boolean }[] = [
     { heldAt: '2026-01-01', name: 'New Year’s Day', isRecurring: true },
     { heldAt: '2026-04-06', name: 'Easter Monday', isRecurring: false },

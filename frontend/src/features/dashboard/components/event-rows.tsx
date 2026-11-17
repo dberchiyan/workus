@@ -90,10 +90,8 @@ export function ReviewEventRow({ review }: { review: DashboardReview }): ReactEl
 /** A birthday: day and month only. */
 export function BirthdayEventRow({ birthday }: { birthday: DashboardBirthday }): ReactElement {
     const { i18n } = useTranslation('dashboard');
-    // 2000 is a leap year, so 29 February formats too.
     const date = `2000-${String(birthday.month).padStart(2, '0')}-${String(birthday.day).padStart(2, '0')}`;
     return (
-        // Short enough to stay on one line at any width.
         <li className="flex items-center gap-4 border-b border-divider px-4 py-3 last:border-b-0 sm:px-5">
             <span className="min-w-0 flex-1">
                 <EventPerson employee={birthday.employee} />

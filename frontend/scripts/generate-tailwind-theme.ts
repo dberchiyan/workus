@@ -2,10 +2,6 @@ import { writeFile } from 'node:fs/promises';
 
 import { TOKENS } from '../src/theme/tokens.ts';
 
-/**
- * Generates the Tailwind @theme block from theme/tokens.ts. Colours point at MUI's CSS
- * variables so both systems switch light/dark together; typography utilities are disabled.
- */
 const lines: string[] = [];
 const push = (name: string, value: string): void => {
     lines.push(`  --${name}: ${value};`);

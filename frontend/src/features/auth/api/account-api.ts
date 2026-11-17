@@ -8,14 +8,11 @@ import type {
     UserSessions,
 } from '../types';
 
-/** Other sessions per page in Settings. */
 export const SESSIONS_PAGE_SIZE = 5;
-/** Security-log entries per "Show more" (grouped on screen, so a page shows fewer rows). */
 export const SECURITY_LOG_PAGE_SIZE = 4;
 
 const BASE = '/api/v1/auth';
 
-/** The signed-in user's own account: name, password and sessions (Settings). */
 export const accountApi = {
     /** Admins and owners only (the server refuses everyone else). */
     updateName: async (request: UpdateOwnNameRequest): Promise<void> => {

@@ -9,7 +9,6 @@ const ROLES = ['OWNER', 'ADMIN', 'MANAGER', 'EMPLOYEE'] as const;
 export const toCompanyResponse = (company: CompanyRecord): CompanyResponse => ({
     id: company.id,
     name: company.name,
-    // Guarded by ck_organisations_status.
     status: STATUSES.find((status) => status === company.status) ?? 'PENDING',
     createdAt: company.createdAt.toISOString(),
     decidedAt: company.decidedAt?.toISOString() ?? null,
@@ -31,7 +30,6 @@ export const toCompanyUser = (user: CompanyUserRecord, today: Date): CompanyUser
     firstName: user.firstName,
     lastName: user.lastName,
     email: user.email,
-    // Guarded by ck_users_role (a company never holds platform admins).
     role: ROLES.find((role) => role === user.role) ?? 'EMPLOYEE',
     status: user.employee?.terminatedAt && user.employee.terminatedAt <= today ? 'TERMINATED' : 'ACTIVE',
     createdAt: user.createdAt.toISOString(),

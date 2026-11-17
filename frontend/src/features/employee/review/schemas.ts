@@ -3,7 +3,6 @@ import { z } from 'zod';
 import { FEEDBACK_MAX_TEXT, isRichTextDoc, richTextLength } from './rich-text';
 import type { RichTextDoc } from './types';
 
-/** Mirrors backend CreateReviewRequestSchema (review/controller/dto/create-review.request.ts). */
 export const REVIEW_LIMITS = { title: 150, feedback: 2000, responsibles: 10 } as const;
 
 const MESSAGES = {
@@ -23,10 +22,8 @@ const MESSAGE_SET: ReadonlySet<string> = new Set(Object.values(MESSAGES));
 export const isReviewValidationMessage = (message: string): message is ReviewValidationMessage =>
     MESSAGE_SET.has(message);
 
-/** Monthly USD: a decimal string with up to two places — never a number (data.md → Money). */
 const SALARY_PATTERN = /^\d{1,13}(\.\d{1,2})?$/;
 
-/** Rich text (TipTap JSON) or null; ≤ 2000 characters of text, like the server. */
 const feedback = z
     .custom<RichTextDoc | null>((value) => value === null || isRichTextDoc(value))
     .refine((value) => value === null || richTextLength(value) <= FEEDBACK_MAX_TEXT, MESSAGES.feedbackTooLong);

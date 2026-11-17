@@ -5,14 +5,12 @@ model EmployeeReview {
   organisation   Organisation                @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_employee_reviews_organisation_id")
   employeeId     String                      @map("employee_id") @db.Uuid
   employee       Employee                    @relation(fields: [organisationId, employeeId], references: [organisationId, id], onDelete: Restrict, map: "fk_employee_reviews_employee_id")
-  /// STARTING = the salary agreed at hire (one per employee, dated the start date, always COMPLETED); REGULAR otherwise.
-  kind           String                      @default("REGULAR") @db.VarChar(16) // STARTING | REGULAR — CHECK in migration
+  kind           String                      @default("REGULAR") @db.VarChar(16)
   title          String                      @db.VarChar(150)
   reviewedAt     DateTime                    @map("reviewed_at") @db.Date
-  status         String                      @db.VarChar(32) // COMPLETED | SCHEDULED | CANCELED — CHECK in migration
-  salaryAmount   Decimal?                    @map("salary_amount") @db.Decimal(19, 4) // required when COMPLETED — CHECK
-  salaryCurrency String?                     @map("salary_currency") @db.Char(3) // set together with the amount — CHECK
-  /// Rich-text feedback (TipTap document JSON, whitelisted nodes/marks; ≤ 2000 characters of text).
+  status         String                      @db.VarChar(32)
+  salaryAmount   Decimal?                    @map("salary_amount") @db.Decimal(19, 4)
+  salaryCurrency String?                     @map("salary_currency") @db.Char(3)
   feedbackHr     Json?                       @map("feedback_hr") @db.JsonB
   feedbackLead   Json?                       @map("feedback_lead") @db.JsonB
   feedbackTeam   Json?                       @map("feedback_team") @db.JsonB
@@ -33,7 +31,6 @@ model EmployeeReviewResponsible {
   organisationId    String         @map("organisation_id") @db.Uuid
   organisation      Organisation   @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_employee_review_responsibles_organisation_id")
   reviewId          String         @map("review_id") @db.Uuid
-  // The assignment means nothing without the review.
   review            EmployeeReview @relation(fields: [organisationId, reviewId], references: [organisationId, id], onDelete: Cascade, map: "fk_employee_review_responsibles_review_id")
   responsibleUserId String         @map("responsible_user_id") @db.Uuid
   responsible       User           @relation("ReviewResponsibleUser", fields: [organisationId, responsibleUserId], references: [organisationId, id], onDelete: Restrict, map: "fk_employee_review_responsibles_responsible_user_id")

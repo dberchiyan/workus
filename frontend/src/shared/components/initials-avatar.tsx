@@ -4,7 +4,6 @@ import type { ReactElement } from 'react';
 
 import { cn } from '@/shared/lib/cn';
 
-/** Muted theme tones (theme/tokens.ts → avatar); literal class names so Tailwind sees them. */
 const HASH_PRIME = 31;
 const AVATAR_TONES = [
     'bg-avatar-c1',
@@ -29,11 +28,9 @@ const toneFor = (id: string): string => {
 };
 
 export interface InitialsAvatarProps {
-    /** Stable person id — picks the colour. */
     id: string;
     firstName: string;
     lastName: string;
-    /** `sm` responsibles in tables, `md` a person's own row, `lg` a profile header. */
     size?: 'sm' | 'md' | 'lg';
     className?: string;
 }

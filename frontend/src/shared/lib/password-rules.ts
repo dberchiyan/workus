@@ -1,9 +1,7 @@
 import { z } from 'zod';
 
-/** Mirrors backend NewPasswordSchema (common/dto/password.ts). */
 export const PASSWORD_LIMITS = { min: 12, max: 128 } as const;
 
-/** The rules a new password meets — checked live in the rules box and on submit. */
 export const PASSWORD_RULES = [
     {
         key: 'length',
@@ -15,7 +13,6 @@ export const PASSWORD_RULES = [
     { key: 'symbol', test: (value: string) => /[^\p{L}\p{Nd}\s]/u.test(value) },
 ] as const;
 
-/** A new password field (registration, password change); messages are i18n keys. */
 export const newPasswordSchema = z
     .string()
     .min(1, 'validation:newPassword.required')

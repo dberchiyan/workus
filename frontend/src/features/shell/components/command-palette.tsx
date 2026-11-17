@@ -32,9 +32,6 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps): ReactEle
     const { groups, ordered, isSearchingPeople } = useCommands(query);
     const active = ordered[Math.min(activeIndex, ordered.length - 1)];
 
-    // Typing can start the moment ⌘K is pressed: the input takes focus as soon as it exists (the
-    // portal mounts it a render after opening), not after the dialog's fade — so the dialog's own
-    // first focus is off.
     const focusOnAttach = useCallback((node: HTMLInputElement | null) => {
         node?.focus();
     }, []);
@@ -65,7 +62,6 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps): ReactEle
             maxWidth="sm"
             aria-labelledby={titleId}
             disableAutoFocus
-            // Opens near the top (like a search box), not centred: one-off geometry.
             slotProps={{
                 paper: { className: 'self-start mt-[12vh] overflow-hidden' },
             }}
@@ -134,8 +130,6 @@ export function CommandPalette({ open, onClose }: CommandPaletteProps): ReactEle
                             {commands.map((command) => {
                                 const isActive = command === active;
                                 return (
-                                    // Keyboard lives in the combobox input (aria-activedescendant), so options are
-                                    // never focused themselves; a pointer picks one directly.
                                     // eslint-disable-next-line jsx-a11y/click-events-have-key-events, jsx-a11y/interactive-supports-focus
                                     <div
                                         key={command.id}

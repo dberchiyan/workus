@@ -135,7 +135,6 @@ export const useEditProfileForm = (
         defaultValues: valuesFor(employee),
     });
 
-    // An actionable async error takes focus (ux.md → Focus moves with the UI).
     useEffect(() => {
         if (errorCount > 0) {
             errorRef.current?.focus();

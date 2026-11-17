@@ -1,5 +1,3 @@
--- Company structure changes are audited: department.* and position.* (target types department,
--- position; no employee).
 ALTER TABLE "audit_events" DROP CONSTRAINT "ck_audit_events_action";
 ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_action"
     CHECK ("action" IN ('employee.created', 'employee.updated', 'employee.terminated',

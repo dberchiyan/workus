@@ -9,8 +9,6 @@ import { SettingsCard } from './settings-card';
 /** Your security log: sign-ins (and failed ones), password changes, signed-out sessions. */
 export function SecuritySection(): ReactElement {
     const { t } = useTranslation('settings');
-    // The filter and the page live in the URL (`?category=&logPage=`; "All" and the first page
-    // leave them out — `page` is the sessions list's, on the same screen).
     const [searchParams, setSearchParams] = useSearchParams();
     const raw = searchParams.get('category');
     const category = isSecurityCategory(raw) ? raw : undefined;

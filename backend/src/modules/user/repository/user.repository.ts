@@ -149,7 +149,6 @@ export class UserRepository {
     ): Promise<{ content: AdministratorRecord[]; totalElements: number }> {
         const where = administratorsWhere(organisationId, searchTerms);
         const page = toPrismaPage(pageable, administratorOrderBy, (direction) => ({ id: direction }));
-        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [totalElements, content] = await Promise.all([
             this.txHost.tx.user.count({ where }),
             this.txHost.tx.user.findMany({ where, select: administratorSelect, ...page }),

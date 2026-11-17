@@ -25,7 +25,6 @@ export function EditProfileFields({ form }: EditProfileFieldsProps): ReactElemen
     const { register, control, formState } = form;
     const { errors } = formState;
 
-    // Dialog open → first control (ux.md → Focus moves with the UI).
     useEffect(() => {
         requestAnimationFrame(() => {
             form.setFocus('firstName');

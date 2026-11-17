@@ -139,7 +139,6 @@ export class HolidayService implements OnApplicationBootstrap {
                 changes,
             });
         }
-        // Made isRecurring in a year that has come: its copy for the next year is due now.
         await this.carryOver(organisationId, actorId);
         return (await this.holidayRepository.findById(organisationId, id)) ?? after;
     }
@@ -217,7 +216,6 @@ export class HolidayService implements OnApplicationBootstrap {
     ): NewAuditEvent {
         return {
             action,
-            // The holiday's own organisation: the daily job has no principal.
             organisationId: target.organisationId,
             employeeId: null,
             target: { type: AuditTargetType.HOLIDAY, id: target.id, label: target.name },

@@ -11,7 +11,6 @@ import { CommandPalette } from './command-palette';
 
 const GAP_UNITS = 1.5;
 
-/** A search-box look: hairline, the page's background, muted text. */
 const SearchBox = styled(ButtonBase)(({ theme }) => {
     const { palette } = theme.vars ?? theme;
     return {

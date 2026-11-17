@@ -8,11 +8,9 @@ import { useTranslation } from 'react-i18next';
 
 export type PasswordFieldProps = Omit<TextFieldProps, 'type' | 'slotProps'> & {
     autoComplete: 'current-password' | 'new-password';
-    /** Id of more help (e.g. the password rules), read with the field. */
     describedBy?: string;
 };
 
-/** A password input with a show / hide button. */
 export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(function PasswordField(
     { autoComplete, describedBy, ...props },
     ref,

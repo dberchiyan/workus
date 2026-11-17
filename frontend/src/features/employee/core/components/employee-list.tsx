@@ -36,7 +36,6 @@ export function EmployeeList({
 }: EmployeeListProps): ReactElement {
     const { t } = useTranslation('employee');
     const theme = useTheme();
-    // Behaviour CSS cannot express: which markup (table or cards) is rendered.
     const isTable = useMediaQuery(theme.breakpoints.up('md'));
     const { data, isPending, isError, error, refetch, isPlaceholderData, isFetching } = useEmployees(params);
 
@@ -64,7 +63,6 @@ export function EmployeeList({
     };
 
     return (
-        // overflow-visible: the table header sticks to the page, which `overflow: hidden` would stop.
         <Card variant="outlined" id={id} aria-busy={isFetching} className="relative overflow-visible">
             <EmployeeToolbar
                 params={params}

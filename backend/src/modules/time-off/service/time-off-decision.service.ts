@@ -21,7 +21,6 @@ import type { TimeOffRequestCriteria } from './time-off-request.criteria';
 import type { ManagedRequestSortField } from './time-off-sort';
 import { TimeOffStatus } from './time-off-type';
 
-/** Status changes a responsible person can make, with what they lead to. */
 const DECISIONS = {
     approve: {
         from: [TimeOffStatus.PENDING],
@@ -39,7 +38,6 @@ const DECISIONS = {
         decided: true,
         refusal: 'errors.timeOff.notPending',
     },
-    // A responsible person may cancel an approved request at any time, even once it has started.
     cancel: {
         from: [TimeOffStatus.PENDING, TimeOffStatus.APPROVED],
         to: TimeOffStatus.CANCELED,
@@ -103,7 +101,6 @@ export class TimeOffDecisionService {
         requestId: string,
         decision: TimeOffDecision,
         actorId: string,
-        /** Why — rejections only; shown to the employee. */
         comment?: string,
     ): Promise<ManagedTimeOffRequestView> {
         const rule = DECISIONS[decision];
@@ -186,7 +183,6 @@ export class TimeOffDecisionService {
             target: { type: AuditTargetType.TIME_OFF_REQUEST, id: requestId, label: timeOffLabel(after) },
             changes: changeOf(AuditField.RESPONSIBLES, peopleOf(before), peopleOf(after)),
         });
-        // Only the people newly made responsible hear of it.
         await this.notifier.notify(
             organisationId,
             requestId,

@@ -2,7 +2,6 @@ import { useTranslation } from 'react-i18next';
 
 import { isEmployeeValidationMessage } from '../schemas';
 
-/** Keeps one helper line under every field, so the form never shifts (data.md → Forms). */
 export const RESERVED_LINE = ' ';
 
 /** Client errors carry i18n keys; server field errors arrive already localised. */

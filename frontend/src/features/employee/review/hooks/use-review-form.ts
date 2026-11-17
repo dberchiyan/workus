@@ -31,7 +31,6 @@ const valuesFor = (review: Review | null): CreateReviewFormValues => ({
 
 const FORM_FIELDS: ReadonlySet<string> = new Set(Object.keys(valuesFor(null)));
 const isFormField = (field: string): field is keyof CreateReviewFormValues => FORM_FIELDS.has(field);
-/** Server field names → form field names. */
 const SERVER_FIELDS: Readonly<Record<string, keyof CreateReviewFormValues>> = {
     'feedback.hr': 'feedbackHr',
     'feedback.teamLead': 'feedbackTeamLead',
@@ -46,7 +45,6 @@ const toRequest = (values: CreateReviewFormOutput): CreateReviewRequest => {
         status: values.status,
         ...(values.salary === '' ? {} : { salary: values.salary }),
         responsibleUserIds: values.responsibleUserIds,
-        // null clears a source's feedback when editing.
         feedback: {
             hr: values.feedbackHr,
             teamLead: values.feedbackTeamLead,
@@ -146,7 +144,6 @@ export const useReviewForm = (
 } => {
     const create = useCreateReview(employeeId);
     const update = useUpdateReview(employeeId);
-    // The dialog remounts on every opening (parent `key`), so initial state is per opening.
     const [idempotencyKey] = useState(() => crypto.randomUUID());
     const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);
     const [errorCount, setErrorCount] = useState(0);

@@ -16,6 +16,5 @@ export const useEmployeeSecurityLog = (
     useQuery({
         queryKey: employeeKeys.securityLog(employeeId, category, page),
         queryFn: () => employeeApi.securityLog(employeeId, category, page, SECURITY_LOG_PAGE_SIZE),
-        // Another page or filter keeps the current rows on screen until its own arrive.
         placeholderData: keepPreviousData,
     });

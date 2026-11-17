@@ -3,10 +3,8 @@ import type { ReactElement } from 'react';
 
 import { cn } from '@/shared/lib/cn';
 
-/** Success = done / active, warning = waiting, info = planned, danger = refused, neutral = ended. */
 export type StatusTone = 'success' | 'warning' | 'info' | 'danger' | 'neutral';
 
-/** Literal class names so Tailwind sees them (theme/tokens.ts → status). */
 const TONES: Record<StatusTone, { badge: string; dot: string }> = {
     success: {
         badge: 'bg-status-success-background text-status-success-text',
@@ -29,7 +27,6 @@ const TONES: Record<StatusTone, { badge: string; dot: string }> = {
 
 export interface StatusBadgeProps {
     tone: StatusTone;
-    /** The status in words — it carries the meaning; tone and dot only support it. */
     label: string;
     className?: string;
 }

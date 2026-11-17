@@ -100,18 +100,14 @@ export const useDecideRequest = (): UseMutationResult<
     const queryClient = useQueryClient();
     return useMutation<ManagedRequest, ApiError, { requestId: string; decision: TimeOffDecision; comment?: string }>({
         mutationFn: ({ requestId, decision, comment }) => managedRequestsApi.decide(requestId, decision, comment),
-        // Refetches run in the background: the answer already shows the new state.
         onSuccess: (request) => {
             queryClient.setQueryData(timeOffKeys.managedRequest(request.id), request);
             void queryClient.invalidateQueries({ queryKey: timeOffKeys.all });
-            // The dashboard's cards count pending requests (its key, not imported: no feature cycle).
             void queryClient.invalidateQueries({ queryKey: ['dashboard'] });
         },
     });
 };
 
-/** Adds the new comment to the open request; the lists refetch in the background. */
-/** Where a comment is written: the admin's Requests dialog, or the employee's own request. */
 export type CommentScope = 'managed' | 'own';
 
 /** Comment caches to refresh: the open request (admin) and the employee's own lists. */
@@ -256,7 +252,6 @@ export const useUpdateRequestResponsibles = (
         mutationFn: (responsibleUserIds) => managedRequestsApi.updateResponsibles(requestId, responsibleUserIds),
         onSuccess: (request) => {
             queryClient.setQueryData(timeOffKeys.managedRequest(request.id), request);
-            // "Only requests I decide" and the cards' responsible lists change.
             void queryClient.invalidateQueries({ queryKey: timeOffKeys.managedLists() });
         },
     });

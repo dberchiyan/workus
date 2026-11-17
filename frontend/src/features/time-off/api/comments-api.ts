@@ -5,7 +5,6 @@ import type { TimeOffComment } from '../types';
 const commentUrl = (requestId: string, commentId: string): string =>
     `/api/v1/time-off-requests/${encodeURIComponent(requestId)}/comments/${encodeURIComponent(commentId)}`;
 
-/** Comments: the employee writes on their own request; only the author edits or deletes one. */
 export const commentsApi = {
     /** The key identifies one logical "send" — reused on retry so it never posts twice. */
     addOwn: async (requestId: string, body: string, idempotencyKey: string): Promise<TimeOffComment> =>

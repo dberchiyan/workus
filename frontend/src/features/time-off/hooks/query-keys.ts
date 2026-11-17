@@ -1,7 +1,6 @@
 import type { CalendarQuery } from '../api/calendar-api';
 import type { ManagedRequestsQuery } from '../api/managed-requests-api';
 
-/** No tenant id: the organisation comes from the session. "own" = the signed-in employee. */
 export const timeOffKeys = {
     all: ['time-off'] as const,
     ownBalances: (): readonly ['time-off', 'own', 'balances'] => [...timeOffKeys.all, 'own', 'balances'] as const,

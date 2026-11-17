@@ -1,4 +1,3 @@
--- The starting salary of an employee is a review of kind STARTING: one per employee, always completed.
 ALTER TABLE "employee_reviews" ADD COLUMN "kind" VARCHAR(16) NOT NULL DEFAULT 'REGULAR';
 
 ALTER TABLE "employee_reviews"

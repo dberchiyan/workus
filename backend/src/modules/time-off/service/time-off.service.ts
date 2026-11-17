@@ -35,7 +35,6 @@ import { isTimeOffStatus, isTimeOffType, TIME_OFF_TYPES, TimeOffStatus, TimeOffT
 
 const asDate = (iso: string): Date => new Date(`${iso}T00:00:00Z`);
 
-/** Avatars shown on the "Out today" card; the rest is "+N". */
 const OUT_TODAY_SHOWN = 5;
 
 /** A pending request, or an approved one that has not started, can still be canceled. */
@@ -106,7 +105,6 @@ export class TimeOffService {
         ]);
         return requests.map((request) => ({
             employeeId: request.employeeId,
-            // Guarded by ck_time_off_requests_type.
             type: isTimeOffType(request.type) ? request.type : TimeOffType.DAY_OFF,
             days: workingDaysBetween(
                 request.startsAt > from ? request.startsAt : from,
@@ -130,7 +128,6 @@ export class TimeOffService {
         return {
             content: page.content.map((request) => ({
                 id: request.id,
-                // Guarded by ck_time_off_requests_type / _status.
                 type: isTimeOffType(request.type) ? request.type : TimeOffType.DAY_OFF,
                 status: isTimeOffStatus(request.status) ? request.status : TimeOffStatus.PENDING,
                 startsAt: request.startsAt,
@@ -300,7 +297,6 @@ export class TimeOffService {
             throw new ResourceNotFoundException();
         }
         if (request.status === TimeOffStatus.CANCELED) {
-            // Canceling again changes nothing.
             return this.viewOf(organisationId, request);
         }
         if (!isCancelable(request, todayUtc())) {

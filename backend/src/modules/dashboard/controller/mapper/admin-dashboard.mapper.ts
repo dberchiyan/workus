@@ -64,7 +64,6 @@ const toReview = (review: DashboardReview): DashboardReviewsResponse['content'][
     id: review.id,
     title: review.title,
     reviewedAt: isoDate(review.reviewedAt),
-    // Only scheduled and completed reviews are listed.
     status: review.status === 'COMPLETED' ? 'COMPLETED' : 'SCHEDULED',
     employee: review.employee,
 });

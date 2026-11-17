@@ -1,6 +1,5 @@
 import { lazyWithPreload } from '@/shared/lib/lazy-with-preload';
 
-/** Public surface of the organisation feature: registering a company and its settings. */
 export const SignupPage = lazyWithPreload(async () => ({ default: (await import('./pages/signup-page')).SignupPage }));
 export { AdministratorsSection } from './components/administrators-section';
 export { OrganisationGate } from './components/organisation-gate';

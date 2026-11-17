@@ -10,7 +10,6 @@ import {
     structurePositionSelect,
 } from './record/company-structure.record';
 
-/** Per organisation: enough for any real company, and every list here stays bounded. */
 export const MAX_DEPARTMENTS = 50;
 export const MAX_POSITIONS = 200;
 

@@ -22,7 +22,6 @@ const FIELD: Readonly<Record<FeedbackSource, 'feedbackHr' | 'feedbackTeamLead' |
 export interface FeedbackTabsFieldProps {
     control: Control<CreateReviewFormValues>;
     values: Pick<CreateReviewFormValues, 'feedbackHr' | 'feedbackTeamLead' | 'feedbackTeam' | 'feedbackClient'>;
-    /** Error message per source: an i18n key from the schema or a localised server message. */
     errors: Partial<Record<FeedbackSource, string | undefined>>;
 }
 

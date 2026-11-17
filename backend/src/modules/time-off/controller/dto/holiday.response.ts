@@ -8,9 +8,7 @@ export const HolidaySchema = z
         id: z.uuid(),
         heldAt: z.iso.date(),
         name: z.string(),
-        /** Copied to the same day of the next year. */
         isRecurring: z.boolean(),
-        /** Its copy for the next year has been made (later edits do not reach it). */
         isCarriedOver: z.boolean(),
         version: z.number().int(),
     })

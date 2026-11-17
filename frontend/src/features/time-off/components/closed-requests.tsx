@@ -100,7 +100,6 @@ export function ClosedRequests({ params, onStatus, onPage }: ClosedRequestsProps
                         </Typography>
                     </div>
                 ) : (
-                    // The card's own width decides (container query): table when it fits, else stacked.
                     <div className="@container">
                         <div className="hidden @[48rem]:block">
                             <ClosedRequestsTable requests={items} />

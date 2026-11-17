@@ -12,15 +12,12 @@ import type { NavItem } from '../navigation';
 
 export interface NavItemLinkProps {
     item: NavItem;
-    /** Rail mode: icon only, label in a tooltip and the accessible name. */
     isCollapsed: boolean;
     onNavigate?: () => void;
 }
 
 export function NavItemLink({ item, isCollapsed, onNavigate }: NavItemLinkProps): ReactElement {
     const { t } = useTranslation('shell');
-    // A section stays active on its sub-pages (/settings/sessions, /employees/:id); the Dashboard
-    // ('/') only on itself.
     const exact = item.path === '/';
     const isActive = useMatch({ path: item.path, end: exact }) !== null;
     const label = t(`nav.${item.section}`);

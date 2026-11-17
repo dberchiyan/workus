@@ -32,7 +32,6 @@ model Position {
   version        Int              @default(0)
   employees      Employee[]
 
-  /// Unique across the organisation, so the position picker is never ambiguous.
   @@unique([organisationId, title], map: "uq_positions_organisation_id_title")
   @@unique([organisationId, id], map: "uq_positions_organisation_id_id")
   @@index([organisationId, categoryId], map: "idx_positions_organisation_id_category_id")
@@ -49,17 +48,14 @@ model Employee {
   positionId         String                @map("position_id") @db.Uuid
   position           Position              @relation(fields: [organisationId, positionId], references: [organisationId, id], onDelete: Restrict, map: "fk_employees_position_id")
   startsAt          DateTime              @map("starts_at") @db.Date
-  terminatedAt       DateTime?             @map("terminated_at") @db.Date // set → terminated from that day
-  /// Set together with terminated_at: RESIGNATION | DISMISSAL | END_OF_CONTRACT | LAYOFF | OTHER — CHECK in migration.
+  terminatedAt       DateTime?             @map("terminated_at") @db.Date
   terminationReason  String?               @map("termination_reason") @db.VarChar(32)
-  /// Optional note; required for OTHER — CHECK.
   terminationComment String?               @map("termination_comment") @db.VarChar(500)
   mobile             String?               @db.VarChar(32)
   personalEmail      String?               @map("personal_email") @db.VarChar(254)
   linkedinUrl        String?               @map("linkedin_url") @db.VarChar(255)
-  telegram           String?               @db.VarChar(33) // "@handle"
+  telegram           String?               @db.VarChar(33)
   address            String?               @db.VarChar(500)
-  /// Optional; on or after 1900-01-01 — CHECK in migration. Personal data: the audit log records only that it changed.
   bornAt        DateTime?             @map("born_at") @db.Date
   createdAt          DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt          DateTime              @updatedAt @map("updated_at") @db.Timestamptz(3)
@@ -71,7 +67,6 @@ model Employee {
   auditEvents        AuditEvent[]
   timeOffRequests    TimeOffRequest[]
 
-  /// One HR record per user (a user belongs to one organisation, so this is also unique by user).
   @@unique([organisationId, userId], map: "uq_employees_organisation_id_user_id")
   @@unique([organisationId, id], map: "uq_employees_organisation_id_id")
   @@index([organisationId, positionId], map: "idx_employees_organisation_id_position_id")
@@ -85,7 +80,6 @@ model EmployeeResponsible {
   organisationId    String       @map("organisation_id") @db.Uuid
   organisation      Organisation @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_employee_responsibles_organisation_id")
   employeeId        String       @map("employee_id") @db.Uuid
-  // The assignment means nothing without the employee.
   employee          Employee     @relation(fields: [organisationId, employeeId], references: [organisationId, id], onDelete: Cascade, map: "fk_employee_responsibles_employee_id")
   responsibleUserId String       @map("responsible_user_id") @db.Uuid
   responsible       User         @relation("EmployeeResponsibleUser", fields: [organisationId, responsibleUserId], references: [organisationId, id], onDelete: Restrict, map: "fk_employee_responsibles_responsible_user_id")

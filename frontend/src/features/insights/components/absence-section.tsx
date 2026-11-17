@@ -19,7 +19,6 @@ import { PersonLine } from './person-line';
 const TOP_RANKS = 3;
 
 type AbsenceType = keyof Absence['top'][number]['byType'];
-/** The time-off types in their usual order, coloured as on the Calendar and the Requests page. */
 const TYPES: { type: AbsenceType; className: string }[] = (['VACATION', 'SICK_DAY', 'DAY_OFF'] as const).map(
     (type) => ({ type, className: TIME_OFF_TYPE_VISUALS[type].tone }),
 );

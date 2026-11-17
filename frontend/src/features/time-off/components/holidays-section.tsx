@@ -84,7 +84,6 @@ export function HolidaysSection(): ReactElement {
     const exited = (): void => {
         setEditing(null);
     };
-    // A new holiday starts on today in the current year, on 1 January in another one.
     const defaultDate = year === currentYear ? today : `${String(year)}-01-01`;
 
     return (
@@ -225,7 +224,6 @@ export function HolidaysSection(): ReactElement {
                 </ul>
             )}
 
-            {/* Remounted on each opening, so every dialog starts fresh. */}
             {editing?.kind === 'add' && (
                 <HolidayDialog
                     key={editing.key}

@@ -4,19 +4,15 @@
 /// processing outcome (no updated_* / version); rows older than 90 days are deleted by a daily job.
 model BillingEvent {
   id              String        @id(map: "pk_billing_events") @default(dbgenerated("uuidv7()")) @db.Uuid
-  /// The provider's event id (evt_…).
   providerEventId String        @unique(map: "uq_billing_events_provider_event_id") @map("provider_event_id") @db.VarChar(255)
   type            String        @db.VarChar(64)
-  /// The event's own time at the provider.
   occurredAt      DateTime      @map("occurred_at") @db.Timestamptz(3)
-  /// The company it concerns, once resolved from the subscription or customer; null when unknown.
   organisationId  String?       @map("organisation_id") @db.Uuid
   organisation    Organisation? @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_billing_events_organisation_id")
   subscriptionId  String?       @map("subscription_id") @db.VarChar(64)
   customerId      String?       @map("customer_id") @db.VarChar(64)
   receivedAt      DateTime      @default(now()) @map("received_at") @db.Timestamptz(3)
   processedAt     DateTime?     @map("processed_at") @db.Timestamptz(3)
-  /// Why processing failed, in our own words (never the provider's text); null = pending or done.
   error           String?       @db.VarChar(255)
 
   @@index([organisationId, receivedAt], map: "idx_billing_events_organisation_id_received_at")

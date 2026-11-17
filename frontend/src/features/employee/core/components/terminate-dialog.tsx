@@ -117,7 +117,6 @@ export function TerminateDialog({ employee, open, onClose, onExited }: Terminate
                             slotProps={{ htmlInput: { maxLength: TERMINATION_COMMENT_MAX } }}
                         />
                     </div>
-                    {/* What will happen, before the confirm button. */}
                     <Alert severity="warning" variant="outlined">
                         {isFuture
                             ? t('terminate.consequence.future', {

@@ -1,4 +1,3 @@
--- Date of birth on the employee record (employee module): optional, for birthdays on the admin dashboard.
 ALTER TABLE "employees" ADD COLUMN "born_at" DATE;
 
 ALTER TABLE "employees"

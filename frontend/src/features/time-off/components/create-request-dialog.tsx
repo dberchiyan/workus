@@ -29,7 +29,6 @@ import { TypeOptions } from './type-options';
 
 export interface CreateRequestDialogProps {
     open: boolean;
-    /** Current balances: the cycle and the days available for the chosen type. */
     balances: readonly LeaveBalance[];
     onClose: () => void;
     onCreated: () => void;
@@ -58,7 +57,6 @@ export function CreateRequestDialog({
     const { register, control, formState, watch, setValue } = form;
     const { errors } = formState;
     const [type, startsAt, endsAt] = watch(['type', 'startsAt', 'endsAt']);
-    // The years the range and the calendar can show: this one and the next.
     const thisYear = Number(todayUtcIso().slice(0, ISO_YEAR_LENGTH));
     const holidays = useHolidayNames([
         thisYear,
@@ -102,7 +100,6 @@ export function CreateRequestDialog({
                 </DialogTitle>
                 <DialogContent dividers className="flex flex-col gap-6 bg-background">
                     <div className="grid grid-cols-1 gap-6 md:grid-cols-[minmax(0,16rem)_minmax(0,1fr)]">
-                        {/* 16rem: one-off width of the type column, fits "Vacation days" with its icon. */}
                         <Controller
                             control={control}
                             name="type"
@@ -153,7 +150,6 @@ export function CreateRequestDialog({
                                     holidays={holidays}
                                 />
                             </div>
-                            {/* What the request takes, before sending; a date error takes its place. */}
                             <Typography
                                 variant="body2"
                                 role="status"

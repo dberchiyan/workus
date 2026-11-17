@@ -22,11 +22,9 @@ type Copied = 'email' | 'password' | 'both' | null;
 export interface CredentialsCardProps {
     name: string;
     email: string;
-    /** Null when the answer was a replay: the password was shown before and is gone. */
     password: string | null;
     saved: boolean;
     onSavedChange: (saved: boolean) => void;
-    /** What happened, e.g. "Nora Hale can now sign in", and the line under it. */
     title: string;
     description: string;
 }
@@ -114,7 +112,6 @@ export function CredentialsCard({
                                 <Typography component="dt" variant="caption" color="textSecondary">
                                     {t('credentials.password')}
                                 </Typography>
-                                {/* The type scale comes from the theme: one size smaller on a phone keeps it on one line. */}
                                 <Typography
                                     component="dd"
                                     variant={isPhone ? 'body1' : 'h6'}

@@ -20,15 +20,11 @@ import {
     type WebhookEvent,
 } from '../../service/billing-gateway';
 
-/** Every provider call has a timeout (architecture.md); Stripe answers in well under this. */
 const TIMEOUT_MS = 10_000;
-/** Retries only idempotent calls (reads, and writes that carry an idempotency key). */
 const MAX_NETWORK_RETRIES = 2;
-/** Signed timestamps older than this are refused (integrations.md → Webhooks: ≤ 5 min). */
 const SIGNATURE_TOLERANCE_SECONDS = 300;
 const PROVIDER = 'stripe';
 
-/** Stripe's subscription statuses in our words; unknown ones count as ended (never isGrantedPlan). */
 const STATE_OF: Record<Stripe.Subscription.Status, SubscriptionState> = {
     active: SubscriptionState.ACTIVE,
     trialing: SubscriptionState.ACTIVE,
@@ -68,7 +64,6 @@ export class StripeBillingGateway extends BillingGateway {
         @InjectPinoLogger(StripeBillingGateway.name) private readonly logger: PinoLogger,
     ) {
         super();
-        // The env schema has checked that the keys exist when BILLING_PROVIDER=stripe.
         const secretKey = config.get('STRIPE_SECRET_KEY') ?? '';
         this.stripe = new Stripe(secretKey, {
             timeout: TIMEOUT_MS,
@@ -92,7 +87,6 @@ export class StripeBillingGateway extends BillingGateway {
                     email: customer.email,
                     metadata: { organisationId: customer.organisationId },
                 },
-                // One customer per company: a retry after a timeout returns the same one.
                 { idempotencyKey: `customer-${customer.organisationId}` },
             ),
         );
@@ -119,7 +113,6 @@ export class StripeBillingGateway extends BillingGateway {
             ),
         );
         if (!session.url) {
-            // A subscription session always has a hosted page; none means Stripe is misbehaving.
             throw new UpstreamUnavailableException();
         }
         return { url: session.url };
@@ -144,7 +137,6 @@ export class StripeBillingGateway extends BillingGateway {
             return this.toSubscription(subscription);
         } catch (error) {
             if (error instanceof BusinessRuleException) {
-                // Stripe answers "no such subscription" as an invalid request.
                 return null;
             }
             throw error;
@@ -160,7 +152,6 @@ export class StripeBillingGateway extends BillingGateway {
                 expand: ['data.schedule'],
             }),
         );
-        // Newest first; a running one wins over an older ended one.
         const subscriptions = [...list.data].sort((left, right) => right.created - left.created);
         const RUNNING: readonly SubscriptionState[] = [SubscriptionState.ACTIVE, SubscriptionState.PAST_DUE];
         const running = subscriptions.find((subscription) => RUNNING.includes(stateOf(subscription.status)));
@@ -180,7 +171,6 @@ export class StripeBillingGateway extends BillingGateway {
         if (!price) {
             throw new BusinessRuleException('errors.billing.notPurchasable');
         }
-        // A pending change or cancellation is dropped first: the new intent replaces it.
         const subscription = await this.resetPending(subscriptionId);
         const item = subscription.items.data[0];
         if (!item) {
@@ -190,13 +180,11 @@ export class StripeBillingGateway extends BillingGateway {
             await this.call('subscriptions.update', () =>
                 this.stripe.subscriptions.update(subscriptionId, {
                     items: [{ id: item.id, price }],
-                    // The difference for the rest of the period is invoiced and charged at once.
                     proration_behavior: 'always_invoice',
                     payment_behavior: 'error_if_incomplete',
                 }),
             );
         } else {
-            // A schedule: the current phase runs to the period end, then the new price starts.
             const schedule = await this.call('subscriptionSchedules.create', () =>
                 this.stripe.subscriptionSchedules.create({ from_subscription: subscriptionId }),
             );

@@ -1,10 +1,5 @@
 import { z } from 'zod';
 
-/**
- * Rich-text feedback is a TipTap/ProseMirror document, never HTML: only these nodes and marks
- * are accepted, anything else (links, images, attributes, unknown types) is rejected. The client
- * renders it with the editor in read-only mode — no innerHTML anywhere.
- */
 export const FEEDBACK_MAX_TEXT = 2000;
 const MAX_DEPTH = 6;
 const MAX_NODES = 1000;

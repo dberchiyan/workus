@@ -12,7 +12,6 @@ export const ADMINISTRATOR_PAGEABLE = pageableOptions({
     defaultSort: 'name,asc',
 });
 
-/** The roles of the people who run an organisation. */
 export const AdministratorRoleSchema = z.enum(['OWNER', 'ADMIN']).meta({ id: 'AdministratorRole' });
 
 export const AdministratorResponseSchema = z
@@ -51,11 +50,9 @@ export class ChangeRoleRequest extends createZodDto(ChangeRoleRequestSchema) {}
 
 const EMAIL_MAX_LENGTH = 254;
 
-/** The role is not a field: an owner always adds an admin (and may make them an owner after). */
 export const AddAdministratorRequestSchema = z.object({
     firstName: personName('firstName'),
     lastName: personName('lastName'),
-    /** Work email — the sign-in email; unique across organisations. */
     email: z
         .string({ error: 'validation.workEmail.required' })
         .trim()
@@ -69,10 +66,6 @@ export class AddAdministratorRequest extends createZodDto(AddAdministratorReques
 export class AddedAdministratorResponse extends createZodDto(
     z.object({
         ...AdministratorResponseSchema.shape,
-        /**
-         * The generated sign-in password, shown to the owner this once. Null when the answer is a
-         * replay of a retried request — it is never stored, so it cannot be shown again.
-         */
         temporaryPassword: z.string().min(1).max(MAX_TEMPORARY_PASSWORD_LENGTH).nullable(),
     }),
 ) {}

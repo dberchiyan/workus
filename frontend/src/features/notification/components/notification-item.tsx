@@ -16,7 +16,6 @@ export interface NotificationItemProps {
     notification: AppNotification;
     view: NotificationView;
     now: number;
-    /** Follows the link: marks it read and closes the panel. */
     onOpen: (notification: AppNotification) => void;
 }
 

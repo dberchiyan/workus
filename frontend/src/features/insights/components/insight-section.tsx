@@ -16,16 +16,12 @@ export interface InsightSectionProps {
     subtitle: string;
     isLoading: boolean;
     isError: boolean;
-    /** An older answer is on screen while the new one loads. */
     isStale: boolean;
     onRetry: () => void;
-    /** Charts offer a table view (values readable without colour). */
     table?: { shown: boolean; onToggle: () => void };
     children: ReactNode;
-    /** The headline: number, label, change. */
     figure: ReactNode;
     about: { title: string; text: string };
-    /** More side content (a breakdown, the selected month's people). */
     aside?: ReactNode;
 }
 
@@ -33,11 +29,7 @@ export interface InsightSectionProps {
 export function InsightSection(props: InsightSectionProps): ReactElement {
     const { t } = useTranslation('insights');
     return (
-        <section
-            aria-labelledby={props.id}
-            // One-off geometry: the side card keeps a readable fixed width next to the chart.
-            className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]"
-        >
+        <section aria-labelledby={props.id} className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_20rem]">
             <Card className="flex min-w-0 flex-col">
                 <div className="flex flex-wrap items-start justify-between gap-3 border-b border-divider px-4 py-4 sm:px-6">
                     <div className="flex min-w-0 flex-col gap-0.5">

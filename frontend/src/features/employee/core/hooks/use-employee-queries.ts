@@ -111,7 +111,6 @@ export const useCreateEmployee = (): UseMutationResult<
     const queryClient = useQueryClient();
     return useMutation<CreatedEmployee, ApiError, { request: CreateEmployeeRequest; idempotencyKey: string }>({
         mutationFn: ({ request, idempotencyKey }) => employeeApi.create(request, idempotencyKey),
-        // The answer holds the generated password: never kept in the mutation cache.
         gcTime: 0,
         onSuccess: async () => {
             await Promise.all([
@@ -279,7 +278,6 @@ export const useEmployeeProfile = (
     version: number;
 }> => useQuery(profileQuery(employeeId));
 
-/** How long a hover's prefetch counts as fresh: opening the profile soon after shows it at once. */
 const PREFETCH_FRESH_MS = 30_000;
 
 /**
@@ -290,7 +288,6 @@ export const usePrefetchEmployeeProfile = (): ((employeeId: string) => void) => 
     const queryClient = useQueryClient();
     return (employeeId) => {
         void EmployeeProfilePage.preload();
-        // A failed prefetch is silent: opening the profile asks again and shows the error there.
         queryClient.query({ ...profileQuery(employeeId), staleTime: PREFETCH_FRESH_MS }).catch(() => undefined);
     };
 };

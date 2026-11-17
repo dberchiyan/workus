@@ -1,9 +1,3 @@
--- New companies wait for a Workus platform admin's approval: organisations get a status (existing
--- ones are ACTIVE), the decision (who, when, why rejected), and the internal "Workus Platform"
--- organisation that holds platform admins (role PLATFORM_ADMIN) — never listed as a company.
-
--- Existing rows are ACTIVE (added with that default), then the default is dropped so every new
--- organisation names its status (registration: PENDING).
 ALTER TABLE "organisations"
     ADD COLUMN "status" VARCHAR(16) NOT NULL DEFAULT 'ACTIVE',
     ADD COLUMN "is_platform" BOOLEAN NOT NULL DEFAULT false,
@@ -14,7 +8,6 @@ ALTER TABLE "organisations" ALTER COLUMN "status" DROP DEFAULT;
 
 ALTER TABLE "organisations"
     ADD CONSTRAINT "ck_organisations_status" CHECK ("status" IN ('PENDING', 'ACTIVE', 'REJECTED'));
--- A rejection always says why; only a rejected organisation has a reason.
 ALTER TABLE "organisations"
     ADD CONSTRAINT "ck_organisations_rejection_reason"
     CHECK (("status" = 'REJECTED') = ("rejection_reason" IS NOT NULL));
@@ -23,7 +16,6 @@ CREATE INDEX "idx_organisations_status_created_at" ON "organisations"("status", 
 CREATE INDEX "idx_organisations_decided_by" ON "organisations"("decided_by");
 ALTER TABLE "organisations" ADD CONSTRAINT "fk_organisations_decided_by" FOREIGN KEY ("decided_by") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- The platform organisation (fixed id, also used by the seed).
 INSERT INTO "organisations" ("id", "name", "status", "is_platform", "updated_at")
 VALUES ('01960000-0000-7000-8000-000000000000', 'Workus Platform', 'ACTIVE', true, CURRENT_TIMESTAMP);
 

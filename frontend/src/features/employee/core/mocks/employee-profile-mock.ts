@@ -1,10 +1,3 @@
-/**
- * TEMPORARY front-end mock for profile data the API does not have yet (level, equipment,
- * files). Leave balances come from the time-off API. Deterministic per employee,
- * so a person looks the same on every visit. Replace each part with an API field as it lands;
- * delete this file when nothing uses it.
- */
-
 export interface EmployeeProfileMock {
     level: string;
     laptopId: string;

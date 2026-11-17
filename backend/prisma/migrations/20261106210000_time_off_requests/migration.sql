@@ -1,4 +1,3 @@
--- Time-off requests and who may decide them (time-off module).
 CREATE TABLE "time_off_requests" (
     "id" UUID NOT NULL DEFAULT uuidv7(),
     "employee_id" UUID NOT NULL,
@@ -52,7 +51,6 @@ ALTER TABLE "time_off_requests"
     ADD CONSTRAINT "ck_time_off_requests_days_positive" CHECK ("days" > 0),
     ADD CONSTRAINT "ck_time_off_requests_decision" CHECK (("decided_by" IS NULL) = ("decided_at" IS NULL));
 
--- Request events in the history.
 ALTER TABLE "audit_events" DROP CONSTRAINT "ck_audit_events_action";
 ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_action"
     CHECK ("action" IN ('employee.created', 'employee.updated', 'employee.terminated',

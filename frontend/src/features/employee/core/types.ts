@@ -9,7 +9,6 @@ export type EmployeeStatus = Schemas['EmployeeStatus'];
 export type EmployeeSortField = 'name' | 'startsAt';
 export type SortDirection = 'asc' | 'desc';
 
-/** List state as it lives in the URL (page is 1-based there, 0-based in the API). */
 export interface EmployeeListParams {
     categoryId: string | undefined;
     status: EmployeeStatus;
@@ -30,7 +29,6 @@ export type ResponsibleCandidate = Schemas['ResponsibleCandidatesResponse_Output
 
 export type EmployeeProfile = Schemas['EmployeeProfileResponse_Output'];
 
-/** A candidate as shown in the people picker. */
 export type ResponsibleOption = ResponsibleCandidate & { subtitle: string };
 export type UpdateResponsiblesRequest = Schemas['UpdateResponsiblesRequest'];
 export type UpdateEmployeeRequest = Schemas['UpdateEmployeeRequest'];
@@ -43,7 +41,6 @@ export type ActivityAction = ActivityEvent['action'];
 export type ActivityChange = ActivityEvent['changes'][number];
 export type ActivityValue = NonNullable<ActivityChange['from']>;
 
-/** Settings → Company structure. */
 export type CompanyStructure = Schemas['CompanyStructureResponse_Output'];
 export type Department = Schemas['Department_Output'];
 export type StructurePosition = Schemas['StructurePosition_Output'];

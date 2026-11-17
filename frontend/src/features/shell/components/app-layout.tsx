@@ -29,7 +29,6 @@ const pageTransitionKey = (pathname: string): string =>
 export function AppLayout(): ReactElement {
     const { t } = useTranslation();
     const theme = useTheme();
-    // Behaviour CSS cannot express: which drawer variant is mounted.
     const isTabletUp = useMediaQuery(theme.breakpoints.up('md'));
     const isDesktop = useMediaQuery(theme.breakpoints.up('lg'));
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -64,7 +63,6 @@ export function AppLayout(): ReactElement {
                     onClose={closeDrawer}
                     slotProps={{ paper: { className: 'w-sidebar-width max-w-[85vw] border-0' } }}
                 >
-                    {/* max-w in vw above: the drawer never covers the whole screen on 320 px. */}
                     <SidebarContent isCollapsed={false} onNavigate={closeDrawer} />
                 </Drawer>
             )}
@@ -81,12 +79,8 @@ export function AppLayout(): ReactElement {
                     isMenuOpen={isDrawerOpen}
                 />
                 <main id="main" tabIndex={-1} className="flex flex-1 flex-col px-4 py-6 outline-none md:px-8 md:py-8">
-                    {/* One content width for every signed-in page (theme token `container-page`). */}
                     <div className="mx-auto flex w-full max-w-page flex-1 flex-col gap-6">
                         <BillingBanner />
-                        {/* Navigations run in a transition: the old page slides out, the new one in (CSS in
-                theme/tailwind.css); keyed by page, so filters and tabs (search params) and
-                Settings' sections (its own menu stays put) don't. */}
                         <ViewTransition
                             key={pageTransitionKey(pathname)}
                             enter="page-enter"

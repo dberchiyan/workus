@@ -2,7 +2,6 @@ import { apiClient } from '@/shared/api/client';
 
 import type { CategoryCounts, Insights, InsightsFilter } from '../types';
 
-/** Company figures for one year (admin). */
 export const insightsApi = {
     /** Every figure in one request (the server reads the roster once). */
     get: async (filter: InsightsFilter): Promise<Insights> =>

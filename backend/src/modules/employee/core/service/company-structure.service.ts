@@ -200,7 +200,6 @@ export class CompanyStructureService {
     @Transactional()
     async removePosition(organisationId: string, id: string): Promise<void> {
         const position = await this.requirePosition(organisationId, id);
-        // The employees' foreign key would refuse too; this says why, in the person's language.
         if ((await this.structureRepository.countHolders(organisationId, id)) > 0) {
             throw new BusinessRuleException('errors.structure.positionInUse');
         }

@@ -24,15 +24,12 @@ export interface Command {
     id: string;
     group: CommandGroup;
     label: string;
-    /** A second, muted line: a position, "Settings", "Current". */
     hint?: string;
-    /** Extra words the search matches (not shown). */
     keywords?: string;
     leading: ReactNode;
     run: () => void;
 }
 
-/** People search starts at two characters (one matches almost everyone). */
 const MIN_PEOPLE_QUERY = 2;
 const THEMES = [
     { mode: 'light', icon: LightModeOutlined },
@@ -150,7 +147,6 @@ export const useCommands = (
                   .filter(({ rank }) => rank > 0)
                   .sort((a, b) => b.rank - a.rank)
                   .map(({ command }) => command);
-    // The server already matched people (name or email); keep its order.
     const commands = [...found, ...matching];
     const groups = COMMAND_GROUPS.map((group) => ({
         group,
@@ -159,7 +155,6 @@ export const useCommands = (
 
     return {
         groups,
-        /** In display order — what ↑ / ↓ walk through. */
         ordered: groups.flatMap(({ commands: inGroup }) => inGroup),
         isSearchingPeople: searchesPeople && people.isFetching,
     };

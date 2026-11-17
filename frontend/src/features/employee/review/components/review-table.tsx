@@ -16,10 +16,6 @@ import { ReviewPeople } from './review-people';
 import { type OnReviewAction, ReviewDeleteButton, ReviewEditButton } from './review-row-actions';
 import { ReviewStatusChip } from './review-status-chip';
 
-/**
- * Columns with known content get fixed widths (rem); Title and Responsible share the rest, so
- * nothing in Date/Status/Salary is ever cut (one-off geometry for this table).
- */
 const COLUMNS = [
     { key: 'title', width: undefined },
     { key: 'reviewedAt', width: 'w-32' },

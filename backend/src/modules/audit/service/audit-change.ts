@@ -11,11 +11,6 @@ import {
 import { MoneySchema } from '../../../common/dto/money';
 import { isoDay } from '../../../common/time/iso-day';
 
-/**
- * One value in a change summary. Typed, so the client formats it (dates, money, people) and
- * never parses free text. Feedback is logged as present/absent only — its text stays out of the log;
- * personal contacts are logged as "changed" (`redacted`) without their values.
- */
 const PersonSchema = z.object({
     id: z.uuid(),
     firstName: z.string().max(MAX_PERSON_NAME_LENGTH),
@@ -79,7 +74,6 @@ export const AUDIT_FIELDS = Object.values(AuditField) as [AuditField, ...AuditFi
 
 export const AuditChangeSchema = z.object({
     field: z.enum(AUDIT_FIELDS),
-    /** null = the field had no value (created), or has none now (deleted / cleared). */
     from: AuditValueSchema.nullable(),
     to: AuditValueSchema.nullable(),
 });
@@ -87,7 +81,6 @@ export type AuditChange = z.infer<typeof AuditChangeSchema>;
 
 export const AuditChangesSchema = z.array(AuditChangeSchema).max(MAX_CHANGES_PER_EVENT);
 
-/** Value builders, so callers never hand-write the tagged shapes. */
 export const auditValue = {
     text: (text: string): AuditValue => ({ kind: 'text', text: text.slice(0, MAX_LABEL_LENGTH) }),
     date: (date: Date): AuditValue => ({ kind: 'date', at: isoDay(date) }),

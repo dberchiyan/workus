@@ -10,7 +10,6 @@ export interface PickerPerson {
     id: string;
     firstName: string;
     lastName: string;
-    /** Position or role shown under the name. */
     subtitle: string;
 }
 
@@ -18,10 +17,8 @@ export interface PeoplePickerProps<P extends PickerPerson> {
     label: string;
     value: P[];
     onChange: (people: P[]) => void;
-    /** Server-side search results for the current text. */
     options: P[];
     isLoading: boolean;
-    /** Called with the debounced, trimmed search text. */
     onSearch: (text: string) => void;
     max: number;
     helperText: string;
@@ -76,7 +73,6 @@ export function PeoplePicker<P extends PickerPerson>({
             onInputChange={(_event, text) => {
                 setInput(text);
             }}
-            // Server-side search: show what the API returned.
             filterOptions={(items) => items}
             getOptionLabel={fullName}
             isOptionEqualToValue={(option, selected) => option.id === selected.id}

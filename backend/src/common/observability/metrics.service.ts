@@ -38,7 +38,6 @@ export class MetricsService {
         registers: [this.registry],
     });
 
-    /** Calls to the payment provider by operation and outcome (integrations.md). */
     readonly billingProviderCalls = new Counter({
         name: 'billing_provider_calls_total',
         help: 'Payment provider calls by operation and outcome',

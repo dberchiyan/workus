@@ -9,7 +9,6 @@ const PersonSchema = z.object({ id: z.uuid(), firstName: z.string(), lastName: z
 export const EmployeeListItemSchema = z
     .object({
         id: z.uuid(),
-        /** The person's user id — stable across screens (e.g. avatar colour, responsibles). */
         userId: z.uuid(),
         firstName: z.string(),
         lastName: z.string(),
@@ -19,7 +18,6 @@ export const EmployeeListItemSchema = z
             title: z.string(),
             category: z.object({ id: z.uuid(), name: z.string() }),
         }),
-        /** Up to three; `responsibleCount` is the total. */
         responsibles: z.array(PersonSchema),
         responsibleCount: z.number().int().min(0),
         startsAt: z.iso.date(),
@@ -35,7 +33,6 @@ export class EmployeeSummaryResponse extends createZodDto(
         totalActive: z.number().int().min(0),
         newLast30Days: z.number().int().min(0),
         terminatedLast90Days: z.number().int().min(0),
-        /** Mean whole days since start over active employees. */
         averageTenureDays: z.number().int().min(0),
         withoutResponsible: z.number().int().min(0),
     }),

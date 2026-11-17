@@ -11,7 +11,6 @@ import { isUserRole, UserRole } from './user-role';
 
 const toRole = (role: string): UserRole => {
     if (!isUserRole(role)) {
-        // Guarded by ck_users_role; reaching this means the schema and code disagree.
         throw new Error('Unknown user role in database');
     }
     return role;
@@ -39,11 +38,9 @@ export class UserService {
                   role: toRole(user.role),
                   organisation: {
                       ...user.organisation,
-                      // Guarded by ck_organisations_status.
                       status: isOrganisationStatus(user.organisation.status)
                           ? user.organisation.status
                           : OrganisationStatus.PENDING,
-                      // Guarded by ck_organisations_plan.
                       plan: isPlan(user.organisation.plan) ? user.organisation.plan : Plan.STARTER,
                   },
               }

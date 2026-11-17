@@ -7,10 +7,6 @@ export const IDEMPOTENCY_EXEMPT_KEY = 'idempotency:exempt';
 export const IDEMPOTENCY_HEADER = 'Idempotency-Key';
 
 export interface IdempotentOptions {
-    /**
-     * Top-level response fields never stored for replay (secrets shown once, e.g. a generated
-     * password): a replay answers them as null.
-     */
     redact?: readonly string[];
 }
 

@@ -16,7 +16,6 @@ export interface LeaveBalanceCardsProps {
     isError: boolean;
     onRetry: () => void;
     headingLevel: 'h2' | 'h3';
-    /** Layout of the cards: a row (dashboard) or a column (profile side). */
     layout: 'row' | 'column';
 }
 

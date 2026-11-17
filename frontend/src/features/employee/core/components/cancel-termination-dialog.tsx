@@ -41,7 +41,6 @@ export function CancelTerminationDialog({
     const isPending = cancel.isPending;
     const keepRef = useRef<HTMLButtonElement>(null);
 
-    // Confirmation: the safe choice gets the initial focus.
     useEffect(() => {
         if (open) {
             requestAnimationFrame(() => {

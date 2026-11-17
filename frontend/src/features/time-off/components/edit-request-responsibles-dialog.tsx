@@ -18,9 +18,7 @@ import { fullName } from '../format';
 import { useRequestResponsibleCandidates, useUpdateRequestResponsibles } from '../hooks/use-managed-requests';
 import type { ManagedRequest } from '../types';
 
-/** As on an employee: at most ten. */
 const MAX_RESPONSIBLES = 10;
-/** Keeps the form line's height while it is empty, so the dialog never shifts. */
 const RESERVED_LINE = ' ';
 
 interface Option {
@@ -75,7 +73,6 @@ export function EditRequestResponsiblesDialog({
             });
         }
     }, [open]);
-    // A failed save takes focus to what explains it (the field or the form line).
     useEffect(() => {
         if (errorCount > 0) {
             (fieldError ? inputRef.current : errorRef.current)?.focus();

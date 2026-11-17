@@ -53,10 +53,8 @@ export interface EmployeeListQuery {
 }
 
 const NEW_HIRE_WINDOW_DAYS = 30;
-/** Insights read the whole roster in memory; a company of this size never comes close. */
 const MAX_ROSTER = 5000;
 const TERMINATION_WINDOW_DAYS = 90;
-/** Rows per export: one person's history stays far below this; a file, not pages (api.md). */
 const MAX_EXPORT_EVENTS = 5000;
 
 @Injectable()
@@ -135,7 +133,6 @@ export class EmployeeService {
         actorId: string,
     ): Promise<EmployeeListItemRecord> {
         const email = command.email.toLowerCase();
-        // Emails are unique across organisations: one sign-in, one account, one tenant.
         if (await this.userService.existsByEmail(email)) {
             throw new BusinessConflictException('errors.employee.emailTaken', { email }, 'email');
         }
@@ -188,7 +185,6 @@ export class EmployeeService {
                 id: employeeId,
                 label: `${command.firstName} ${command.lastName}`,
             },
-            // Contacts are personal data — the log names only the work facts.
             changes: [
                 ...changeOf(AuditField.POSITION, null, auditValue.text(profile.position.title)),
                 ...changeOf(AuditField.STARTS_AT, null, auditValue.date(profile.startsAt)),
@@ -238,7 +234,6 @@ export class EmployeeService {
         const current = before.responsibles.map(({ responsible }) => responsible.id).sort();
         const next = [...responsibleUserIds].sort();
         if (current.length === next.length && current.every((id, index) => id === next[index])) {
-            // Nothing changed: no write, no history entry.
             return { employee: before, today: todayUtc() };
         }
         if (
@@ -314,7 +309,6 @@ export class EmployeeService {
                       },
                   ],
         );
-        // Personal data like the contacts: the log says that it changed, never the terminatedAt.
         const dateOfBirthChanged = (before.bornAt?.getTime() ?? null) !== (details.bornAt?.getTime() ?? null);
         if (dateOfBirthChanged) {
             contactChanges.push({
@@ -712,7 +706,6 @@ export class EmployeeService {
 
 const nameOf = (employee: EmployeeProfileRecord): string => `${employee.user.firstName} ${employee.user.lastName}`;
 
-/** Personal contacts: the log says that they changed, never their values. */
 const CONTACT_FIELDS = [
     ['mobile', AuditField.MOBILE],
     ['personalEmail', AuditField.PERSONAL_EMAIL],

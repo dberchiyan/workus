@@ -21,7 +21,6 @@ export interface RichTextEditorProps {
     value: RichTextDoc | null;
     onChange: (value: RichTextDoc | null) => void;
     placeholder: string;
-    /** Error text (localised); shown under the editor instead of the counter. */
     error?: string | undefined;
 }
 
@@ -104,7 +103,6 @@ export function RichTextEditor({ label, value, onChange, placeholder, error }: R
                                 size="small"
                                 aria-label={tool.label}
                                 aria-pressed={state[tool.key]}
-                                // Keeps the caret and selection in the editor; keyboard activation refocuses it in run().
                                 onMouseDown={(event) => {
                                     event.preventDefault();
                                 }}

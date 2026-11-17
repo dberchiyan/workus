@@ -8,7 +8,6 @@ import { holidaysApi } from '../api/holidays-api';
 import type { CreateHolidayRequest, Holiday, UpdateHolidayRequest } from '../types';
 import { timeOffKeys } from './query-keys';
 
-/** Holidays change rarely. */
 const HOLIDAYS_STALE_MINUTES = 5;
 const HOLIDAYS_STALE_MS = HOLIDAYS_STALE_MINUTES * MINUTE_MS;
 

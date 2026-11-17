@@ -24,7 +24,6 @@ import type { Billing, Plan } from '../types';
 import { PlanCard } from './plan-card';
 import { type PlanChange, PlanChangeDialog } from './plan-change-dialog';
 
-/** `?checkout=` after the provider sends the owner back. */
 const CHECKOUT_PARAM = 'checkout';
 const PLAN_RANK: Record<Plan, number> = { STARTER: 0, TEAM: 1, BUSINESS: 2 };
 
@@ -54,7 +53,6 @@ function CurrentPlan({ billing, onKeep }: { billing: Billing; onKeep: () => void
         }
         return billing.periodEndsAt ? t('billing:current.nextCharge', { date: date(billing.periodEndsAt) }) : null;
     })();
-    // A isGrantedPlan paid plan is in force like a paid one: it reads "Included", never "no plan".
     const statusKey = billing.isGrantedPlan ? 'GRANTED' : billing.status;
     const tone = statusKey === 'PAST_DUE' ? 'danger' : statusKey === 'NONE' ? 'neutral' : 'success';
     return (
@@ -116,13 +114,11 @@ export function BillingSection(): ReactElement {
     const checkout = useStartCheckout();
     const sync = useSyncBilling();
     const changePlan = useChangePlan();
-    // The change under review; kept through the dialog's closing transition.
     const [change, setChange] = useState<PlanChange | null>(null);
     const [changeOpen, setChangeOpen] = useState(false);
     const [changeNotice, setChangeNotice] = useState<string | null>(null);
     const [searchParams, setSearchParams] = useSearchParams();
     const checkoutResult = searchParams.get(CHECKOUT_PARAM);
-    // One key per logical checkout: a retry of the same click reuses it.
     const checkoutKey = useRef(crypto.randomUUID());
     const synced = useRef(false);
     const clearCheckoutParam = (): void => {
@@ -135,8 +131,6 @@ export function BillingSection(): ReactElement {
         );
     };
 
-    // Back from a paid checkout: the subscription is re-read once (a mutation, not a fetch of
-    // page data), then the URL is cleaned so a reload does not ask again.
     const { mutate: runSync } = sync;
     useEffect(() => {
         if (checkoutResult !== 'success' || synced.current) {
@@ -144,12 +138,9 @@ export function BillingSection(): ReactElement {
         }
         synced.current = true;
         runSync(undefined, { onSuccess: clearCheckoutParam });
-        // clearCheckoutParam only writes the URL; the effect runs once per checkout result.
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [checkoutResult, runSync]);
 
-    // The canceled checkout's notice comes from the URL; the upgrade's from the sync result; a
-    // plan change's from its confirmation.
     const notice =
         checkoutResult === 'canceled'
             ? t('billing:notice.canceled')
@@ -206,7 +197,6 @@ export function BillingSection(): ReactElement {
         }
         if (!hasSubscription) {
             if (offer.plan === 'STARTER') {
-                // A isGrantedPlan paid plan can be given up for Starter at once.
                 return {
                     label: t('billing:plans.switchToStarter'),
                     onClick: open('giveUp'),
@@ -341,7 +331,6 @@ export function BillingSection(): ReactElement {
                     setChange(null);
                 }}
             />
-            {/* Polite status; stays until dismissed (no auto-dismiss of unread messages). */}
             <Snackbar
                 open={notice !== null}
                 onClose={(_event, reason) => {

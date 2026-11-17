@@ -2,7 +2,6 @@ import { z } from 'zod';
 
 import { newPasswordSchema, PASSWORD_LIMITS } from '@/shared/lib/password-rules';
 
-/** Mirrors backend ChangePasswordRequest (auth/controller/dto/change-password.request.ts). */
 export const changePasswordSchema = z
     .object({
         currentPassword: z
@@ -19,10 +18,8 @@ export const changePasswordSchema = z
 
 export type ChangePasswordValues = z.infer<typeof changePasswordSchema>;
 
-/** Mirrors backend common/dto/person-name.ts (users.first_name / last_name). */
 export const NAME_LIMITS = { firstName: 100, lastName: 100 } as const;
 
-/** Mirrors backend UpdateOwnNameRequest (auth/controller/dto/update-own-name.request.ts). */
 export const editNameSchema = z.object({
     firstName: z
         .string()

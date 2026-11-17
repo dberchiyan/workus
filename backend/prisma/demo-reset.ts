@@ -5,13 +5,6 @@ import { z } from 'zod';
 import { databaseUrl } from '../src/common/config/database-url';
 import { PrismaClient } from '../src/generated/prisma/client';
 
-/**
- * Empties the demo database (DEMO_MODE=true only): drops the `public` schema with every table,
- * row and trigger, then creates it empty. `npm run db:demo-reset` follows with the migrations and
- * the seed. A schema drop, not TRUNCATE — `audit_events` refuses TRUNCATE by design. With a
- * Stripe key, the companies' test subscriptions are canceled first, so none keeps renewing for
- * a company that no longer exists.
- */
 const resetEnv = z.object({
     DEMO_MODE: z.literal('true'),
     DATABASE_HOST: z.string().min(1),
@@ -25,7 +18,6 @@ const resetEnv = z.object({
         .transform((value) => (value ? value : undefined)),
 });
 
-/** Subscriptions canceled per reset — the demo holds a handful; a backlog never builds. */
 const MAX_CANCELED = 100;
 
 const cancelSubscriptions = async (prisma: PrismaClient, secretKey: string): Promise<void> => {
@@ -41,9 +33,7 @@ const cancelSubscriptions = async (prisma: PrismaClient, secretKey: string): Pro
         }
         try {
             await stripe.subscriptions.cancel(billingSubscriptionId);
-        } catch {
-            // Already canceled or gone: nothing to keep from renewing.
-        }
+        } catch {}
     }
     process.stdout.write(`Canceled ${organisations.length} test subscriptions\n`);
 };
@@ -51,9 +41,7 @@ const cancelSubscriptions = async (prisma: PrismaClient, secretKey: string): Pro
 const reset = async (): Promise<void> => {
     try {
         process.loadEnvFile('.env');
-    } catch {
-        // Variables come from the environment.
-    }
+    } catch {}
     const env = resetEnv.parse(process.env);
     const prisma = new PrismaClient({
         adapter: new PrismaPg({

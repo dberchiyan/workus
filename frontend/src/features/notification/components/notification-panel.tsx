@@ -29,7 +29,6 @@ export function NotificationPanel({ titleId, viewerId, unreadCount, onClose }: N
     const markAllRead = useMarkAllRead();
     const viewOf = useNotificationView();
     const items = list.data?.pages.flatMap((page) => page.content) ?? [];
-    // The panel mounts on each opening, so "ago" is counted from then.
     const [now] = useState(() => Date.now());
 
     const open = (notification: AppNotification): void => {

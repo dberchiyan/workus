@@ -27,7 +27,6 @@ import {
 } from '../schemas';
 import type { AddedAdministrator } from '../types';
 
-/** Keeps every helper line's height while it is empty, so the form never shifts. */
 const RESERVED_LINE = ' ';
 const FIELDS = new Set<string>(['firstName', 'lastName', 'email']);
 const isField = (field: string): field is keyof AddAdministratorValues => FIELDS.has(field);
@@ -48,7 +47,6 @@ export function AddAdministratorDialog({ open, onClose, onExited }: AddAdministr
     const titleId = useId();
     const doneHintId = useId();
     const theme = useTheme();
-    // Behaviour CSS cannot express: a full-screen sheet on phones (ux.md → Patterns).
     const isPhone = useMediaQuery(theme.breakpoints.down('sm'));
     const add = useAddAdministrator();
     const [idempotencyKey] = useState(() => crypto.randomUUID());
@@ -99,7 +97,6 @@ export function AddAdministratorDialog({ open, onClose, onExited }: AddAdministr
     });
 
     const finish = (): void => {
-        // The password leaves memory with the dialog.
         setAdded(null);
         add.reset();
         onClose();
@@ -108,7 +105,6 @@ export function AddAdministratorDialog({ open, onClose, onExited }: AddAdministr
     return (
         <Dialog
             open={open}
-            // The sign-in details close only through Done, so the password is not lost by accident.
             onClose={added || isSubmitting ? undefined : onClose}
             maxWidth="sm"
             fullWidth

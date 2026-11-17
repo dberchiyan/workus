@@ -7,7 +7,6 @@ import { DecisionFeedback } from './decision-feedback';
 import { RequestDialog } from './request-dialog';
 
 export interface ManagedRequestDialogProps {
-    /** The request open over the page (from the URL); undefined → closed. */
     requestId: string | undefined;
     onClose: () => void;
 }

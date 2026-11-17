@@ -41,7 +41,6 @@ export class AuditService {
     private toRow(event: NewAuditEvent): NewAuditEventRow {
         const organisationId = event.organisationId ?? this.cls.get('principal')?.organisationId;
         if (!organisationId) {
-            // A programming error: an event outside a request must name its organisation.
             throw new Error('Audit event without an organisation');
         }
         return {

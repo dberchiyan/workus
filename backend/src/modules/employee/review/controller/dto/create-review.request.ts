@@ -8,7 +8,6 @@ import { RichTextDocSchema } from '../../service/rich-text';
 export const TITLE_MAX_LENGTH = 150;
 export const MAX_RESPONSIBLES = 10;
 
-/** Rich text (TipTap document); null or absent → no feedback from that source. */
 const feedback = RichTextDocSchema.nullable().optional();
 
 export const ReviewStatusSchema = z.enum(REVIEW_STATUSES).meta({ id: 'ReviewStatus' });
@@ -21,7 +20,6 @@ const ReviewFieldsSchema = z.object({
         .max(TITLE_MAX_LENGTH, 'validation.title.tooLong'),
     reviewedAt: z.iso.date('validation.reviewDate.invalid'),
     status: z.enum(REVIEW_STATUSES, { error: 'validation.reviewStatus.required' }),
-    /** New monthly salary in USD. */
     salary: AmountInputSchema.optional(),
     responsibleUserIds: z
         .array(z.uuid('validation.invalid'))
@@ -49,7 +47,6 @@ export const CreateReviewRequestSchema = ReviewFieldsSchema.superRefine(salaryFo
 export class CreateReviewRequest extends createZodDto(CreateReviewRequestSchema) {}
 
 export const UpdateReviewRequestSchema = ReviewFieldsSchema.extend({
-    /** The version the client read; a stale one is 409 CONCURRENT_MODIFICATION. */
     version: z.number().int().min(0),
 }).superRefine(salaryForCompleted);
 

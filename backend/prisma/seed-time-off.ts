@@ -18,17 +18,12 @@ import {
 
 const HOUR_MS = 3_600_000;
 
-/**
- * Pending requests in the seed, by type (4 in all): sick days and vacations made this morning and
- * starting today — the demo resets daily, so "today" always has fresh requests to decide.
- */
 const PENDING_MIX: Readonly<Record<TimeOffType, number>> = {
     [TimeOffType.VACATION]: 2,
     [TimeOffType.DAY_OFF]: 0,
     [TimeOffType.SICK_DAY]: 2,
 };
 
-/** People with a rejected vacation in their history (the rest is approved). */
 const REJECTED_AT = new Set([3, 10]);
 
 /** The Monday on or after `date`. */
@@ -48,7 +43,6 @@ const plusWorkingDays = (start: Date, count: number): Date => {
 
 interface Plan {
     type: TimeOffType;
-    /** Days from the cycle start (or from today with `fromToday`). */
     offset: number;
     length: number;
     status: TimeOffStatus;
@@ -64,7 +58,6 @@ interface Plan {
  * Vacation days stay within the allowance.
  */
 const plansFor = (index: number): Plan[] => [
-    // Every fifth person is off around today (the admin dashboard's "Out today").
     ...(index % 5 === 2
         ? [
               {
@@ -148,13 +141,10 @@ export const seedTimeOff = async (
             const days = workingDaysBetween(start, end);
             const outsideEmployment = start < employee.startsAt || (lastDay !== null && end > lastDay);
             const overlaps = taken.some((t) => start <= t.end && end >= t.start);
-            // Terminated people have nothing pending.
             if (outsideEmployment || overlaps) {
                 continue;
             }
             taken.push({ start, end });
-            // Made two weeks ahead (sick days on the day), never in the future — and never all on the
-            // seed day: a request planned ahead was made 1–20 days ago, so "made today" stays short.
             const daysAgo = 1 + ((index * 7 + taken.length * 3) % 20);
             const createdAt = new Date(
                 Math.min(
@@ -186,7 +176,6 @@ export const seedTimeOff = async (
                     createdAt,
                     createdBy: employee.userId,
                     updatedBy: decidedAt ? decider : employee.userId,
-                    // The last change, not the seed run (the dashboard shows what changed today).
                     updatedAt: canceledAt ?? decidedAt ?? createdAt,
                     responsibles: {
                         create: responsibleUserIds.map((responsibleUserId) => ({ responsibleUserId })),
@@ -543,7 +532,6 @@ export const seedTimeOffComments = async (
                 requestId: request.id,
                 authorId: admins[(index + offset) % admins.length] ?? '',
                 body: COMMENTS[(index + offset) % COMMENTS.length] ?? body,
-                // Hours after the request, but never before it or in the future (requests made minutes ago).
                 createdAt: new Date(
                     Math.max(
                         request.createdAt.getTime() + (offset + 1) * MINUTE_MS,

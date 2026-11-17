@@ -23,7 +23,6 @@ export const toEmployeeProfileResponse = (employee: EmployeeProfileRecord, today
     startsAt: toIsoDate(employee.startsAt),
     bornAt: employee.bornAt ? toIsoDate(employee.bornAt) : null,
     terminatedAt: employee.terminatedAt ? toIsoDate(employee.terminatedAt) : null,
-    // Guarded by ck_employees_termination_reason and ck_employees_termination_reason_with_date.
     termination:
         employee.terminatedAt && employee.terminationReason
             ? {

@@ -20,10 +20,8 @@ export interface CalendarGridProps {
     month: string;
     today: string;
     rows: CalendarRow[] | undefined;
-    /** Company holidays of the month: `YYYY-MM-DD` → name. */
     holidays: ReadonlyMap<string, string>;
     search: string;
-    /** Requests open in a dialog over the calendar; names open the profile. */
     requestHref: ((requestId: string) => string) | undefined;
     canOpenProfile: boolean;
     onSearch: (search: string) => void;
@@ -60,20 +58,13 @@ export function CalendarGrid({
         if (!loaded || !box || !cell || box.scrollWidth <= box.clientWidth) {
             return;
         }
-        // Today a few days in from the sticky name column.
         const nameWidth = box.querySelector('thead td')?.getBoundingClientRect().width ?? 0;
         box.scrollLeft = Math.max(0, cell.offsetLeft - nameWidth - cell.offsetWidth * LEAD_COLUMNS);
     }, [month, loaded]);
 
     return (
-        // `isolate`: the sticky name column's z-index stays inside the grid, under the top bar.
-        // `relative`: absolutely positioned bits (the sr-only caption) are placed and clipped in
-        // here — otherwise they sit in the page, where the scrolled days are, and widen it.
-        // The days fade out at the end; scrolled, the name column casts a shadow over them.
         <div ref={setScrollBox} className="app-scroll-fade-end relative isolate overflow-x-auto">
             <table
-                // One-off geometry: the name column plus a width per day before the days start
-                // scrolling — 2.5rem on a phone (a one-day request stays a finger-sized target), 2rem up.
                 className="w-full min-w-[calc(10rem+var(--days)*2.5rem)] table-fixed border-separate border-spacing-0 sm:min-w-[calc(11rem+var(--days)*2rem)]"
                 style={{ '--days': days.length } as CSSProperties}
             >
@@ -115,7 +106,6 @@ export function CalendarGrid({
                     {rows?.length === 0 && (
                         <tr>
                             <td colSpan={days.length + 1} className="px-4 py-10">
-                                {/* Pinned to the visible width so it stays in view when the days scroll. */}
                                 <Typography variant="body2" color="textSecondary" className="sticky left-4">
                                     {search ? t('calendar.page.noMatches') : t('calendar.page.empty')}
                                 </Typography>

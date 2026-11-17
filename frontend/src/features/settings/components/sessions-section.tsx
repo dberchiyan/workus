@@ -34,7 +34,6 @@ export function SessionsSection(): ReactElement {
     const pages = Math.max(1, Math.ceil(total / SESSIONS_PAGE_SIZE));
     const number = (value: number) => new Intl.NumberFormat(i18n.language).format(value);
 
-    // Signing out the last session of a page leaves it empty: show the last page that has some.
     useEffect(() => {
         if (others && others.content.length === 0 && page > 0) {
             goTo(Math.max(0, pages - 1));

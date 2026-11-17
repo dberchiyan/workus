@@ -9,13 +9,11 @@ import { cn } from '@/shared/lib/cn';
 import { shiftMonth } from '@/shared/lib/month';
 
 export interface MonthSwitcherProps {
-    /** `YYYY-MM`. */
     month: string;
     onChange: (month: string) => void;
     locale: string;
     previousLabel: string;
     nextLabel: string;
-    /** Heading level of the month name where it titles a section. */
     headingComponent?: 'h2' | 'h3' | 'span';
     className?: string;
 }

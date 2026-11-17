@@ -35,7 +35,6 @@ const orderByFor = (field: EmployeeSortField, direction: SortDirection): Prisma.
         ? [{ user: { firstName: direction } }, { user: { lastName: direction } }]
         : [{ startsAt: direction }];
 
-/** Bounded lists for pickers. */
 const MAX_POSITIONS = 200;
 const MAX_CANDIDATES = 20;
 
@@ -87,7 +86,6 @@ export class EmployeeRepository {
     ): Promise<{ content: EmployeeListItemRecord[]; totalElements: number }> {
         const where = employeeWhere(organisationId, criteria);
         const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
-        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [totalElements, content] = await Promise.all([
             this.txHost.tx.employee.count({ where }),
             this.txHost.tx.employee.findMany({ where, select: employeeListItemSelect, ...page }),
@@ -106,7 +104,6 @@ export class EmployeeRepository {
             AND: [employedBetween(criteria.from, criteria.to), ...searchWhere(criteria.searchTerms)],
         };
         const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
-        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [totalElements, content] = await Promise.all([
             this.txHost.tx.employee.count({ where }),
             this.txHost.tx.employee.findMany({ where, select: employeeCalendarSelect, ...page }),
@@ -130,7 +127,6 @@ export class EmployeeRepository {
         AND (e.terminated_at IS NULL OR e.terminated_at > ${criteria.from}::date)
         AND EXTRACT(MONTH FROM e.born_at) = ${criteria.month}
         AND EXTRACT(DAY FROM e.born_at) = ANY(${criteria.days}::int[])`;
-        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [countRows, rows] = await Promise.all([
             this.txHost.tx.$queryRaw<unknown[]>`
         SELECT COUNT(*)::int AS total FROM employees e ${where}`,
@@ -433,5 +429,4 @@ export class EmployeeRepository {
     }
 }
 
-/** People starting or leaving within a month are few; bounded defensively. */
 const MAX_MOVEMENTS = 200;

@@ -4,7 +4,6 @@ import { ISO_DAY_LENGTH, PER_MILLE } from '@/shared/lib/units';
 export const fullName = (person: { firstName: string; lastName: string }): string =>
     `${person.firstName} ${person.lastName}`;
 
-/** UTC calendar day of an instant, `YYYY-MM-DD` — groups events by day (UTC, as everywhere). */
 const HUNDREDTHS_OF_PERCENT = 10_000n;
 const HALF = 5n;
 const TENTH = 10n;
@@ -37,7 +36,6 @@ export const formatSalaryChange = (from: Money, to: Money, locale: string): stri
     }
     const scaled = ((toUnits(to.amount) - before) * HUNDREDTHS_OF_PERCENT) / before;
     const tenths = (scaled + (scaled >= 0n ? HALF : -HALF)) / TENTH;
-    // A display ratio, not an amount: a float is fine here.
     return new Intl.NumberFormat(locale, {
         style: 'percent',
         minimumFractionDigits: 1,

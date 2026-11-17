@@ -1,5 +1,3 @@
--- More security-log events (auth module): a session ended by the per-user limit, sessions ended
--- by a termination, sign-in locked after too many failed attempts.
 ALTER TABLE "audit_events" DROP CONSTRAINT "ck_audit_events_action";
 ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_action"
     CHECK ("action" IN ('employee.created', 'employee.updated', 'employee.terminated',

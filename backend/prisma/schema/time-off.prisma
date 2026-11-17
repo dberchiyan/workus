@@ -7,16 +7,12 @@ model TimeOffRequest {
   organisation    Organisation                @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_time_off_requests_organisation_id")
   employeeId      String                      @map("employee_id") @db.Uuid
   employee        Employee                    @relation(fields: [organisationId, employeeId], references: [organisationId, id], onDelete: Restrict, map: "fk_time_off_requests_employee_id")
-  type            String                      @db.VarChar(16) // VACATION | SICK_DAY | DAY_OFF — CHECK in migration
+  type            String                      @db.VarChar(16)
   startsAt       DateTime                    @map("starts_at") @db.Date
-  endsAt         DateTime                    @map("ends_at") @db.Date // inclusive; >= starts_at — CHECK
-  /// Working days (Mon–Fri, not company holidays) in the range: > 0 when made — CHECK >= 0, a
-  /// holiday added later may take the last one; kept in step with holidays.
+  endsAt         DateTime                    @map("ends_at") @db.Date
   days            Int
-  status          String                      @db.VarChar(16) // PENDING | APPROVED | REJECTED | CANCELED — CHECK
-  /// The employee's note.
+  status          String                      @db.VarChar(16)
   note            String?                     @db.VarChar(500)
-  /// Why it was rejected (or a note with the approval).
   decisionComment String?                     @map("decision_comment") @db.VarChar(500)
   decidedBy       String?                     @map("decided_by") @db.Uuid
   decider         User?                       @relation("TimeOffRequestDecider", fields: [organisationId, decidedBy], references: [organisationId, id], onDelete: Restrict, map: "fk_time_off_requests_decided_by")
@@ -42,7 +38,6 @@ model TimeOffRequestResponsible {
   organisationId    String         @map("organisation_id") @db.Uuid
   organisation      Organisation   @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_time_off_request_responsibles_organisation_id")
   requestId         String         @map("request_id") @db.Uuid
-  // The assignment means nothing without the request.
   request           TimeOffRequest @relation(fields: [organisationId, requestId], references: [organisationId, id], onDelete: Cascade, map: "fk_time_off_request_responsibles_request_id")
   responsibleUserId String         @map("responsible_user_id") @db.Uuid
   responsible       User           @relation("TimeOffRequestResponsibleUser", fields: [organisationId, responsibleUserId], references: [organisationId, id], onDelete: Restrict, map: "fk_time_off_request_responsibles_responsible_user_id")
@@ -66,7 +61,6 @@ model TimeOffRequestComment {
   author         User           @relation("TimeOffRequestCommentAuthor", fields: [organisationId, authorId], references: [organisationId, id], onDelete: Restrict, map: "fk_time_off_request_comments_author_id")
   body           String         @db.VarChar(1000)
   createdAt      DateTime       @default(now()) @map("created_at") @db.Timestamptz(3)
-  /// Set when its author edits it (only the author edits or deletes a comment).
   editedAt       DateTime?      @map("edited_at") @db.Timestamptz(3)
 
   @@index([requestId, createdAt], map: "idx_time_off_request_comments_request_id_created_at")
@@ -84,9 +78,7 @@ model CompanyHoliday {
   organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_company_holidays_organisation_id")
   heldAt           DateTime     @map("held_at") @db.Date
   name           String       @db.VarChar(100)
-  /// Repeats every year: copied to the same day of the next year.
   isRecurring    Boolean      @default(false) @map("is_recurring")
-  /// Set when its copy for the next year was made (never copied twice, even if that copy is deleted).
   isCarriedOver    Boolean      @default(false) @map("is_carried_over")
   createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)

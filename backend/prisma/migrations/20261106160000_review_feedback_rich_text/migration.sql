@@ -1,4 +1,3 @@
--- Feedback becomes rich text: a TipTap document (JSON). Existing plain text turns into one paragraph.
 ALTER TABLE "employee_reviews"
     ALTER COLUMN "feedback_hr" TYPE JSONB USING CASE WHEN "feedback_hr" IS NULL THEN NULL ELSE jsonb_build_object('type', 'doc', 'content', jsonb_build_array(jsonb_build_object('type', 'paragraph', 'content', jsonb_build_array(jsonb_build_object('type', 'text', 'text', "feedback_hr"))))) END,
     ALTER COLUMN "feedback_lead" TYPE JSONB USING CASE WHEN "feedback_lead" IS NULL THEN NULL ELSE jsonb_build_object('type', 'doc', 'content', jsonb_build_array(jsonb_build_object('type', 'paragraph', 'content', jsonb_build_array(jsonb_build_object('type', 'text', 'text', "feedback_lead"))))) END,

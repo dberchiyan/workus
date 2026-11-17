@@ -1,26 +1,17 @@
-/* Cascade order declared once: MUI (Emotion) emits into `mui`, utilities always win. */
 @layer theme, base, mui, components, utilities;
 
-/* Granular import — no Preflight; CssBaseline is the only reset. */
 @import 'tailwindcss/theme.css' layer(theme);
 @import 'tailwindcss/utilities.css' layer(utilities);
 @import './tailwind.theme.css';
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/* Reserve the scrollbar's space, so pages don't shift sideways when content gets shorter. */
 @layer base {
     html {
         scrollbar-gutter: stable;
     }
 }
 
-/*
- * Page transitions (React <ViewTransition> in AppLayout): the content leaves quickly and the new
- * page rises in — transform and opacity only; the shell (sidebar, top bar) stays put. Shared
- * elements (an avatar into the profile) morph with the browser's default. Off when motion is
- * reduced.
- */
 @keyframes page-out {
     to {
         opacity: 0;
@@ -52,8 +43,6 @@
     }
 }
 
-/* TopProgressBar: fades in after 150 ms (quick loads show nothing), then sweeps; still when
-   motion is reduced. */
 @keyframes progress-appear {
     from {
         opacity: 0;
@@ -82,12 +71,6 @@
     }
 }
 
-/*
- * Sideways scrollers (`trackScrollEdges`): an edge with more content past it fades out, so the row
- * reads as "keeps going". Only while something is hidden — a box that fits has no mask, which
- * would otherwise clip focus rings outside it. `-end` fades the end only (the calendar: its sticky
- * name column takes the start and gets a shadow instead).
- */
 @property --scroll-fade-start {
     syntax: '<length>';
     inherits: false;
@@ -131,10 +114,6 @@
     }
 }
 
-/*
- * A figure that arrives after loading, or changes (`RevealValue`), rises in — the real value only,
- * never counting through made-up ones (ux.md). Still when motion is reduced.
- */
 @keyframes value-in {
     from {
         opacity: 0;
@@ -147,10 +126,6 @@
     }
 }
 
-/*
- * Brand backdrop behind sign-in and sign-up (PageShell): two soft glows in the brand tones and a
- * dot grid that fades out towards the edges. Decorative; the page reads the same without it.
- */
 .app-brand-backdrop {
     overflow: hidden;
     background:

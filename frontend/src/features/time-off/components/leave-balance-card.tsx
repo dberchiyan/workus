@@ -12,7 +12,6 @@ import { TYPE_VISUALS } from './time-off-visuals';
 
 export interface LeaveBalanceCardProps {
     balance: LeaveBalance;
-    /** The card title's heading level within the page. */
     headingLevel: 'h2' | 'h3';
 }
 
@@ -69,8 +68,6 @@ export function LeaveBalanceCard({ balance, headingLevel }: LeaveBalanceCardProp
                         </div>
                     ))}
                 </dl>
-                {/* Reserved line, so cards in a row keep one height; stacked on a phone, an empty one
-            would only leave a gap. */}
                 <Typography
                     variant="caption"
                     color="textSecondary"

@@ -6,7 +6,6 @@ const HALF_STEP = 2.5;
 const MID_STEP = 5;
 const NICE_FACTORS = [1, 2, HALF_STEP, MID_STEP, DECIMAL_BASE];
 const ANY_YEAR = 2026;
-/** Series colours in fixed order (theme `chart` palette); literal names so Tailwind sees them. */
 export const SERIES = [
     'bg-chart-c1',
     'bg-chart-c2',
@@ -30,7 +29,6 @@ export const niceScale = (maximum: number): { max: number; ticks: number[] } => 
     const power = DECIMAL_BASE ** Math.floor(Math.log10(rough));
     const step =
         NICE_FACTORS.map((factor) => factor * power).find((candidate) => candidate >= rough) ?? DECIMAL_BASE * power;
-    // Whole people / days: never a fractional step.
     const whole = Math.max(1, Math.ceil(step));
     const max = Math.ceil(maximum / whole) * whole;
     return { max, ticks: Array.from({ length: max / whole + 1 }, (_, index) => index * whole) };

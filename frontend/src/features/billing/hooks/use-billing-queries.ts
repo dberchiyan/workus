@@ -9,7 +9,6 @@ import { billingApi } from '../api/billing-api';
 import type { Billing, BillingRedirect, ChangePlanRequest, CheckoutSessionRequest } from '../types';
 import { billingKeys } from './query-keys';
 
-/** The billing mode never changes while the app runs. */
 const INFO_STALE_MS = Number.POSITIVE_INFINITY;
 
 export const useBillingInfo = (): UseQueryResult<{ isTestMode: boolean }> =>

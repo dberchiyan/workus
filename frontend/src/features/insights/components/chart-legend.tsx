@@ -6,7 +6,6 @@ import { cn } from '@/shared/lib/cn';
 export interface ChartLegendProps {
     label: string;
     items: { key: string; label: string; className: string; hidden: boolean }[];
-    /** Absent → a plain legend; present → each item shows or hides its series. */
     onToggle?: (key: string) => void;
 }
 

@@ -1,4 +1,3 @@
--- Refuses while department.* / position.* events exist (audit rows are append-only).
 ALTER TABLE "audit_events" DROP CONSTRAINT "ck_audit_events_target_type";
 ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_target_type"
     CHECK ("target_type" IN ('employee', 'review', 'time_off_request', 'holiday', 'user',

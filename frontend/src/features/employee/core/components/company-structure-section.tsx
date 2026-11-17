@@ -38,14 +38,12 @@ export function CompanyStructureSection(): ReactElement {
     const { t, i18n } = useTranslation('employee');
     const titleId = useId();
     const structure = useCompanyStructure();
-    // Managing the structure is a Team feature: a lower plan reads it and sees the prompt.
     const upgrade = useUpgrade('structure');
     const createDepartment = useCreateDepartment();
     const removeDepartment = useRemoveDepartment();
     const removePosition = useRemovePosition();
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const [addingDepartment, setAddingDepartment] = useState(false);
-    // One key per logical add, reused on a retry of that add; a new one after each success.
     const departmentKey = useRef(crypto.randomUUID());
     const [removing, setRemoving] = useState<RemoveStructureItem | null>(null);
     const [removeOpen, setRemoveOpen] = useState(false);
@@ -198,7 +196,6 @@ export function CompanyStructureSection(): ReactElement {
                     )}
                     {selected && (
                         <DepartmentPanel
-                            // A fresh panel (and its open forms) per department; it fades in.
                             key={selected.id}
                             department={selected}
                             readOnly={upgrade.locked}

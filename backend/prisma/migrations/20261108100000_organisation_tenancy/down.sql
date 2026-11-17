@@ -1,6 +1,3 @@
--- Reverts 20261108100000_organisation_tenancy. Only possible while a single organisation exists
--- (rows of others would collide on the restored global uniques), no user is an OWNER and no
--- organisation / role events were logged — incidents only.
 ALTER TABLE "audit_events" DROP CONSTRAINT "ck_audit_events_target_type";
 ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_target_type"
     CHECK ("target_type" IN ('employee', 'review', 'time_off_request', 'holiday', 'user'));
@@ -17,7 +14,6 @@ ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_action"
                         'auth.session_evicted', 'auth.sessions_ended_on_termination',
                         'auth.sign_in_locked'));
 
--- Composite foreign keys go; the single-column ones come back.
 ALTER TABLE "audit_events" DROP CONSTRAINT "fk_audit_events_employee_id";
 ALTER TABLE "employees" DROP CONSTRAINT "fk_employees_user_id";
 ALTER TABLE "employee_responsibles" DROP CONSTRAINT "fk_employee_responsibles_employee_id";

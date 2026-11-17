@@ -10,9 +10,7 @@ import { LANDING_PATH } from '../landing';
 
 export interface PageShellProps {
     children: ReactNode;
-    /** Extra controls placed before the theme toggle in the top bar. */
     actions?: ReactNode;
-    /** A quiet "About Workus" link to the landing page at the start of the top bar (signed out). */
     homeLink?: boolean;
     className?: string;
 }
@@ -32,7 +30,6 @@ export function PageShell({ children, actions, homeLink = false, className }: Pa
             >
                 {t('a11y.skipToContent')}
             </Link>
-            {/* Arbitrary value: safe-area inset for notched devices (one-off geometry). */}
             <header className="flex items-center justify-end gap-2 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] md:px-8">
                 {homeLink && (
                     <Link

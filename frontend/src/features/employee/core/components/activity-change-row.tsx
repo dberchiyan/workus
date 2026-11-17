@@ -119,7 +119,6 @@ export function ActivityChangeRow({ change }: { change: ActivityChange }): React
     const { field, from, to } = change;
 
     let value: ReactNode;
-    // Feedback and personal contacts are logged without their values: only that they changed.
     if (FEEDBACK_FIELDS.has(field) || from?.kind === 'redacted' || to?.kind === 'redacted') {
         const state = from && to ? 'edited' : to ? 'added' : 'removed';
         value = (
@@ -158,7 +157,6 @@ export function ActivityChangeRow({ change }: { change: ActivityChange }): React
 
     return (
         <div className="grid grid-cols-1 gap-x-4 gap-y-0.5 py-1.5 sm:grid-cols-[11rem_1fr]">
-            {/* 11rem: one-off label column, fits the longest field name ("Responsible people"). */}
             <dt className="min-w-0">
                 <Typography variant="body2" component="span" color="textSecondary">
                     {t(`profile.activity.fields.${field}`)}

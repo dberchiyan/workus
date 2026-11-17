@@ -17,7 +17,6 @@ export const RegistrationRequestSchema = z.object({
     organisationName: OrganisationNameSchema,
     firstName: personName('firstName'),
     lastName: personName('lastName'),
-    /** Work email — the sign-in email; unique across organisations. */
     email: z
         .string({ error: 'validation.email.required' })
         .trim()

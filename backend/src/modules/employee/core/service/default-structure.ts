@@ -1,7 +1,3 @@
-/**
- * The structure a new company starts with (registration, and the dev seed): departments in this
- * order, each with its positions. The company then shapes it in Settings → Company structure.
- */
 export const DEFAULT_STRUCTURE: readonly { name: string; positions: readonly string[] }[] = [
     {
         name: 'Developers',

@@ -11,11 +11,9 @@ const money = (point: SalaryPoint | null) => (point ? toMoney(point.amount, poin
 
 export const toReviewResponse = (review: ReviewRecord): ReviewResponse => ({
     id: review.id,
-    // Guarded by ck_employee_reviews_kind.
     kind: isReviewKind(review.kind) ? review.kind : ReviewKind.REGULAR,
     title: review.title,
     reviewedAt: isoDate(review.reviewedAt),
-    // Guarded by ck_employee_reviews_status.
     status: isReviewStatus(review.status) ? review.status : ReviewStatus.SCHEDULED,
     salary: review.salaryAmount && review.salaryCurrency ? toMoney(review.salaryAmount, review.salaryCurrency) : null,
     responsibles: review.responsibles.map(({ responsible }) => ({

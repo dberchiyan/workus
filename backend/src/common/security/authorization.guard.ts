@@ -16,7 +16,6 @@ import { PermissionService } from './permission.service';
 import type { Policy, PolicyArgs } from './policy';
 import { POLICY_KEY, PUBLIC_KEY } from './security.decorators';
 
-/** The authority of Workus platform admins (role PLATFORM_ADMIN). */
 export const PLATFORM_ADMIN_AUTHORITY = 'PLATFORM_ADMIN';
 
 /**
@@ -47,17 +46,14 @@ export class AuthorizationGuard implements CanActivate {
                 : new NotAuthenticatedException();
         }
         if (requiredPolicy.scope === 'tenant') {
-            // Platform authorities never reach tenant data (security.md → Authorisation).
             if (principal.hasAuthority(PLATFORM_ADMIN_AUTHORITY)) {
                 throw new AccessDeniedException();
             }
-            // A company waiting for approval (or rejected) has only its own accounts open.
             if (!principal.isOrganisationActive) {
                 throw new OrganisationNotActiveException();
             }
         }
         const request = context.switchToHttp().getRequest<Request>();
-        // Policy params are path ids: anything but a UUID is 400 before a policy queries with it.
         const args: PolicyArgs = Object.fromEntries(
             requiredPolicy.params.map((name) => {
                 const value: unknown = Reflect.get(request.params, name);

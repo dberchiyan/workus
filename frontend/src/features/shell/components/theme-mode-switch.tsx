@@ -16,7 +16,6 @@ type Mode = (typeof MODES)[number]['mode'];
 const isMode = (value: unknown): value is Mode => MODES.some((item) => item.mode === value);
 
 export interface ThemeModeSwitchProps {
-    /** Names the group for assistive tech. */
     label: string;
 }
 
@@ -32,19 +31,13 @@ export function ThemeModeSwitch({ label }: ThemeModeSwitchProps): ReactElement {
             value={mode ?? 'system'}
             aria-label={label}
             onChange={(_event, value: unknown) => {
-                // Clicking the chosen option again keeps it.
                 if (isMode(value)) {
                     setMode(value);
                 }
             }}
         >
             {MODES.map(({ mode: option, icon: Icon }) => (
-                <ToggleButton
-                    key={option}
-                    value={option}
-                    // Compact, so three fit in one row of the 288 px panel.
-                    className="min-w-0 gap-1.5 px-1 py-1"
-                >
+                <ToggleButton key={option} value={option} className="min-w-0 gap-1.5 px-1 py-1">
                     <Icon aria-hidden fontSize="small" />
                     {t(`theme.${option}`)}
                 </ToggleButton>

@@ -6,15 +6,10 @@ export const ErrorCode = {
     INVALID_CREDENTIALS: 401,
     SESSION_EXPIRED: 401,
     FORBIDDEN: 403,
-    /** Correct credentials of someone no longer employed. */
     ACCESS_ENDED: 403,
-    /** The caller's organisation is not approved (waiting, or rejected): its data is closed. */
     ORGANISATION_NOT_ACTIVE: 403,
-    /** Turned off in the public demo (DEMO_MODE): it would lock other visitors out. */
     DEMO_RESTRICTED: 403,
-    /** The action belongs to a higher plan (the message names it); upgrade in Settings → Billing. */
     PLAN_UPGRADE_REQUIRED: 403,
-    /** The plan's employee limit is reached; upgrade in Settings → Billing to add more. */
     PLAN_LIMIT_REACHED: 403,
     RESOURCE_NOT_FOUND: 404,
     CONFLICT: 409,

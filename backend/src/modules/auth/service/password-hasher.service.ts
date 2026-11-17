@@ -3,7 +3,6 @@ import { randomBytes, randomInt } from 'node:crypto';
 import { Injectable } from '@nestjs/common';
 import * as argon2 from 'argon2';
 
-/** Unambiguous characters only (no 0/O, 1/l/I), so a password read off a screen is typed right. */
 const UPPER = 'ABCDEFGHJKLMNPQRSTUVWXYZ';
 const LOWER = 'abcdefghijkmnopqrstuvwxyz';
 const DIGITS = '23456789';
@@ -20,12 +19,10 @@ const HASH_OPTIONS = {
     parallelism: 1,
 } as const;
 
-/** The one place passwords are hashed and verified (security.md → Passwords). */
 const DUMMY_SECRET_BYTES = 32;
 
 @Injectable()
 export class PasswordHasher {
-    /** Verified against when the email is unknown, so timing does not reveal accounts. */
     private readonly dummyHash: Promise<string> = argon2.hash(
         randomBytes(DUMMY_SECRET_BYTES).toString('hex'),
         HASH_OPTIONS,
@@ -56,7 +53,6 @@ export class PasswordHasher {
         while (chars.length < TEMPORARY_LENGTH) {
             chars.push(pick(ALL));
         }
-        // Fisher–Yates with a CSPRNG: the guaranteed classes are not always first.
         for (let index = chars.length - 1; index > 0; index -= 1) {
             const other = randomInt(index + 1);
             [chars[index], chars[other]] = [chars[other] ?? '', chars[index] ?? ''];

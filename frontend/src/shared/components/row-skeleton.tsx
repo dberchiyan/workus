@@ -4,9 +4,7 @@ import type { ReactElement } from 'react';
 import { cn } from '@/shared/lib/cn';
 
 export interface RowSkeletonProps {
-    /** What leads the row: a person's avatar (circle), an icon tile, or nothing. */
     leading?: 'avatar' | 'icon' | 'none';
-    /** A chip or a date at the end of the row. */
     trailing?: boolean;
     className?: string;
 }

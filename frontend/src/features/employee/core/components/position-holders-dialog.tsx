@@ -56,7 +56,6 @@ function Tenure({ startsAt }: { startsAt: string }) {
 
 function HolderRow({ employee }: { employee: EmployeeListItem }) {
     return (
-        // `relative`: the name's link stretches over the whole row.
         <li className="relative flex min-h-16 items-center gap-4 rounded-lg px-3 py-2 transition-colors hover:bg-badge-neutral-background/60">
             <span className="min-w-0 flex-1">
                 <EmployeeIdentity employee={employee} isCompact />
@@ -145,7 +144,6 @@ export function PositionHoldersDialog({
                         aria-busy={query.isPlaceholderData}
                         className={cn(
                             'app-value-in m-0 flex list-none flex-col p-0 transition-opacity',
-                            // Five rows' height on every page, so the last one does not shrink the dialog.
                             pages > 1 && 'min-h-80',
                             query.isPlaceholderData && 'opacity-60',
                         )}

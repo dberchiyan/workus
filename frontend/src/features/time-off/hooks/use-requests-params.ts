@@ -12,13 +12,11 @@ const DEFAULT_CLOSED_SIZE = 10;
 
 export interface RequestsParams {
     type: TimeOffType | undefined;
-    /** Only requests the viewer may decide. */
     mine: boolean;
     search: string;
     status: ClosedStatus | undefined;
     page: number;
     size: number;
-    /** The request open in the dialog. */
     request: string | undefined;
 }
 
@@ -51,7 +49,6 @@ export const useRequestsParams = (): { params: RequestsParams; update: (changes:
         };
     }, [searchParams]);
 
-    /** Any filter change goes back to the first page of the closed list. */
     const update = useCallback(
         (changes: Partial<RequestsParams>) => {
             setSearchParams(
@@ -75,7 +72,6 @@ export const useRequestsParams = (): { params: RequestsParams; update: (changes:
                     }
                     return next;
                 },
-                // Opening / closing a request is a step back-navigation should undo; filters replace.
                 { replace: !('request' in changes) },
             );
         },

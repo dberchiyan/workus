@@ -1,16 +1,10 @@
 import type { TypographyVariantsOptions } from '@mui/material/styles';
 import type { CSSProperties } from 'react';
 
-/** The only file with typographic values (styling.md → Typography). */
 export const TYPE = {
     fontFamily: "'Inter Variable', system-ui, -apple-system, 'Segoe UI', sans-serif",
     fontMono: "'JetBrains Mono', ui-monospace, monospace",
     measure: '65ch',
-    /**
-     * Inter's alternates: `cv05` (l with a tail) and `cv08` (I with serifs) tell I, l and 1 apart in
-     * emails and ids; `ss03` rounds quotes and commas. Optical sizing (the opsz axis) gives large
-     * headings Inter Display's tighter cut on its own.
-     */
     features: "'cv05', 'cv08', 'ss03'",
     variants: {
         h1: {
@@ -54,12 +48,7 @@ export const TYPE = {
             tracking: '-0.02em',
         },
     },
-    /** Variants whose figures are always tabular. */
     tabularVariants: ['metric'],
-    /**
-     * How lines break: headings even out their lines (no lone word on the last one); running text
-     * avoids a single-word last line. Only the style is set — `noWrap` / `truncate` still win.
-     */
     wrap: {
         balance: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'subtitle1'],
         pretty: ['body1', 'body2', 'caption'],
@@ -89,14 +78,12 @@ const variantStyle = (variant: TypeVariant): CSSProperties => ({
     ...(wrapStyle(variant) ? { textWrapStyle: wrapStyle(variant) } : {}),
 });
 
-/** MUI typography options — every variant reads the generated custom properties. */
 export const muiTypography: TypographyVariantsOptions = {
     fontFamily: TYPE.fontFamily,
     ...Object.fromEntries(VARIANT_NAMES.map((variant) => [variant, variantStyle(variant)])),
     button: { ...variantStyle('button'), textTransform: 'none' },
 };
 
-/** Custom properties, `.app-*` utility classes and `.app-prose`, injected once with GlobalStyles. */
 export const typographyGlobalStyles = {
     html: { fontFeatureSettings: TYPE.features, fontOpticalSizing: 'auto' },
     ':root': {
@@ -121,7 +108,6 @@ export const typographyGlobalStyles = {
             { fontFamily: 'var(--app-font-family)', ...variantStyle(variant) },
         ]),
     ),
-    /** Tabular figures for numbers in columns (dates, counts). */
     '.app-tabular': { fontVariantNumeric: 'tabular-nums' },
     '.app-prose': {
         maxWidth: 'var(--app-measure)',

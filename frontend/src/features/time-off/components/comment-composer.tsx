@@ -12,7 +12,6 @@ import { TIME_OFF_LIMITS } from '../schemas';
 
 export interface CommentComposerProps {
     requestId: string;
-    /** The admin's Requests dialog, or the employee's own request. */
     scope: CommentScope;
 }
 

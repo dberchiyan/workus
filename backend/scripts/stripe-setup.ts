@@ -3,15 +3,6 @@ import { z } from 'zod';
 
 import { PLAN_CATALOGUE } from '../src/common/plan/plan';
 
-/**
- * One-off setup of a Stripe account (test or live) for Workus: the Team and Business products
- * with their monthly prices (found again by lookup key, so a re-run creates nothing twice), a
- * Customer Portal configuration where upgrades charge at once and downgrades or cancellations
- * take effect at the period end, and — with --webhook-url — the webhook endpoint. Prints the
- * variables to put in .env.
- *
- *   STRIPE_SECRET_KEY=sk_test_… npx tsx scripts/stripe-setup.ts [--webhook-url https://host/api/v1/webhooks/stripe]
- */
 const env = z.object({ STRIPE_SECRET_KEY: z.string().min(1) }).parse(process.env);
 const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
     timeout: 15_000,
@@ -68,7 +59,6 @@ const ensurePortal = async (teamPrice: string, businessPrice: string): Promise<s
         features: {
             invoice_history: { enabled: true },
             payment_method_update: { enabled: true },
-            // Cancel and downgrade take effect at the end of the paid period (product decision).
             subscription_cancel: { enabled: true, mode: 'at_period_end', proration_behavior: 'none' },
             subscription_update: {
                 enabled: true,
@@ -77,7 +67,6 @@ const ensurePortal = async (teamPrice: string, businessPrice: string): Promise<s
                     { product: productId(team), prices: [team.id] },
                     { product: productId(business), prices: [business.id] },
                 ],
-                // An upgrade is charged at once; a downgrade waits for the period end.
                 proration_behavior: 'always_invoice',
                 schedule_at_period_end: { conditions: [{ type: 'decreasing_item_amount' }] },
             },

@@ -1,4 +1,3 @@
-/** Mirrored by ck_organisations_subscription_status. */
 export const SubscriptionStatus = {
     NONE: 'NONE',
     ACTIVE: 'ACTIVE',

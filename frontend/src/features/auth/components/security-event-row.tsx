@@ -39,12 +39,10 @@ const ICONS: Record<Action, ComponentType<SvgIconProps>> = {
     'auth.sign_in_locked': LockClockOutlined,
 };
 
-/** Failed sign-ins in a row from this many on are called out. */
 const REPEATED_FAILURES = 2;
 
 export interface SecurityEventRowProps {
     group: SecurityEventGroup;
-    /** `YYYY-MM-DD` of today (UTC) and the time the list was opened. */
     today: string;
     now: number;
 }
@@ -58,7 +56,6 @@ export function SecurityEventRow({ group, today, now }: SecurityEventRowProps): 
     const [open, setOpen] = useState(false);
     const listId = useId();
     const { events } = group;
-    // A group always has its first event; the type cannot tell.
     const newest = events[0] as SecurityEvent;
     const oldest = events[events.length - 1] as SecurityEvent;
     const count = events.length;
@@ -132,7 +129,6 @@ export function SecurityEventRow({ group, today, now }: SecurityEventRowProps): 
                         />
                     </Typography>
                     {repeatedFailures && (
-                        // The theme has no warning colour with text contrast; error red carries it.
                         <Typography variant="caption" color="error" className="mt-0.5 flex items-center gap-1">
                             <WarningAmberOutlined aria-hidden fontSize="inherit" />
                             {t('securityLog.repeatedFailures', { count })}
@@ -156,11 +152,7 @@ export function SecurityEventRow({ group, today, now }: SecurityEventRowProps): 
                 )}
             </div>
             {count > 1 && (
-                <ul
-                    id={listId}
-                    // A class, not the hidden attribute: `flex` would override the attribute.
-                    className={cn('m-0 ml-12 list-none flex-col gap-1 p-0', open ? 'flex' : 'hidden')}
-                >
+                <ul id={listId} className={cn('m-0 ml-12 list-none flex-col gap-1 p-0', open ? 'flex' : 'hidden')}>
                     {events.map((event) => (
                         <li key={event.id} className="flex flex-wrap gap-x-2">
                             <Typography variant="caption">{t(`securityLog.short.${event.action}`)}</Typography>

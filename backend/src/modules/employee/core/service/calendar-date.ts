@@ -9,5 +9,4 @@ export const todayUtc = (): Date => {
 
 export const minusDays = (date: Date, days: number): Date => new Date(date.getTime() - days * DAY_MS);
 
-/** `YYYY-MM-DD` for a `@db.Date` value. */
 export const toIsoDate = isoDay;

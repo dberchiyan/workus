@@ -25,7 +25,6 @@ export class PlanGuard implements CanActivate {
     canActivate(context: ExecutionContext): boolean {
         const feature = this.reflector.get<Feature | undefined>(REQUIRED_FEATURE_KEY, context.getHandler());
         const principal = this.cls.get('principal');
-        // No principal: the authorisation guard has already refused (or the route is public).
         if (feature === undefined || !principal) {
             return true;
         }

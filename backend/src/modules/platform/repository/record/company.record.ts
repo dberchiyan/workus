@@ -1,6 +1,5 @@
 import type { Prisma } from '../../../../generated/prisma/client';
 
-/** Owners shown with a company (a handful at most). */
 export const MAX_OWNERS_SHOWN = 3;
 
 const ownersSelect = {
@@ -56,7 +55,6 @@ export type CompanyRecord = Prisma.OrganisationGetPayload<{
     select: ReturnType<typeof companySelect>;
 }>;
 
-/** A person of a company, directory facts only (never salaries, reviews, time off, contacts). */
 export const companyUserSelect = {
     id: true,
     firstName: true,

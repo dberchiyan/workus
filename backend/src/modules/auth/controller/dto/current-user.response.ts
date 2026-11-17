@@ -18,30 +18,19 @@ export const CurrentUserResponseSchema = z.object({
     firstName: z.string(),
     lastName: z.string(),
     role: UserRoleSchema,
-    /** The caller's organisation (a user belongs to one). */
     organisation: z.object({
         id: z.uuid(),
         name: z.string().max(MAX_ORGANISATION_NAME_LENGTH),
-        /** PENDING / REJECTED: only the waiting screen (and the own account) is open. */
         status: z.enum(ORGANISATION_STATUSES).meta({ id: 'OrganisationStatus' }),
-        /** Why a platform admin rejected it; null otherwise. */
         rejectionReason: z.string().max(MAX_REJECTION_REASON_LENGTH).nullable(),
-        /** What the company's plan allows — the UI shows upgrade prompts from it; the API enforces. */
         billing: z.object({
             plan: PlanSchema,
             features: z.array(FeatureSchema).max(MAX_PLAN_FEATURES),
-            /** Active employees the plan allows; null = unlimited. */
             maxEmployees: z.number().int().min(1).nullable(),
-            /** A payment failed: the plan stays until this instant, then Starter (owners see a banner). */
             graceEndsAt: z.iso.datetime().nullable(),
         }),
     }),
-    /** Minutes without activity after which the session ends (the client warns before). */
     idleTimeoutMinutes: z.number().int().min(1),
-    /**
-     * One of the public demo's shared showcase accounts: actions that would lock other visitors
-     * out are turned off for it. False for everyone else (a company a visitor created included).
-     */
     isDemoRestricted: z.boolean(),
 });
 

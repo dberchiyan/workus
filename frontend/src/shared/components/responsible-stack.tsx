@@ -14,20 +14,15 @@ export interface StackPerson {
 }
 
 export interface ResponsibleStackProps {
-    /** In order; may be the first few of `total`. */
     people: readonly StackPerson[];
-    /** Everyone, when the data names only the first few. */
     total?: number;
-    /** A single person: avatar and full name (tables); otherwise the avatar alone. */
     showSoleName?: boolean;
 }
 
-/** At most this many circles, the last one "+N" when there are more people. */
 const MAX_CIRCLES = 3;
 
 const fullName = (person: StackPerson): string => `${person.firstName} ${person.lastName}`;
 
-/** Paper-coloured ring: overlapping circles stay apart. */
 const RING = 'ring-2 ring-background-paper';
 
 /**
@@ -63,8 +58,6 @@ export function ResponsibleStack({ people, total, showSoleName = false }: Respon
     return (
         <Tooltip title={names}>
             <span
-                // WAI-ARIA tooltip pattern: the trigger takes focus so keyboard users get the names too.
-                // `relative z-10`: above a row's stretched link.
                 // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                 tabIndex={0}
                 aria-label={t('people.responsible', { names })}

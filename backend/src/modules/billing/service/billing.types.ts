@@ -1,7 +1,6 @@
 import type { Plan, PlanOffer } from '../../../common/plan/plan';
 import type { SubscriptionStatus } from './subscription-status';
 
-/** The company's billing state as the owner sees it (Settings → Billing). */
 export interface BillingSummary {
     plan: Plan;
     status: SubscriptionStatus;

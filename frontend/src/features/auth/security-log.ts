@@ -4,7 +4,6 @@ import type { SecurityCategory, SecurityEvent } from './types';
 
 type Action = SecurityEvent['action'];
 
-/** The filter row, in order; `undefined` is "All". */
 export const SECURITY_CATEGORIES = [
     'SIGN_INS',
     'FAILED',
@@ -15,10 +14,6 @@ export const SECURITY_CATEGORIES = [
 export const isSecurityCategory = (value: unknown): value is SecurityCategory =>
     SECURITY_CATEGORIES.some((category) => category === value);
 
-/**
- * How an entry looks: `danger` — someone could not get in (red); `critical` — the account itself
- * changed or every device was signed out (highlighted); `normal` — everything else.
- */
 export type SecurityTone = 'normal' | 'danger' | 'critical';
 
 export const SECURITY_TONES: Record<Action, SecurityTone> = {
@@ -35,7 +30,6 @@ export const SECURITY_TONES: Record<Action, SecurityTone> = {
     'auth.sign_in_locked': 'danger',
 };
 
-/** Events this close (and alike, from one device) fold into one row. */
 const GROUP_GAP_MINUTES = 30;
 const GROUP_GAP_MS = GROUP_GAP_MINUTES * MINUTE_MS;
 
@@ -47,14 +41,11 @@ const kindOf = (action: Action): string =>
 const groupable = (action: Action): boolean => SECURITY_TONES[action] !== 'critical';
 
 export interface SecurityEventGroup {
-    /** The newest event's id. */
     id: string;
-    /** Newest first; one or more. */
     events: SecurityEvent[];
 }
 
 export interface SecurityDay {
-    /** `YYYY-MM-DD`, UTC (days are UTC everywhere). */
     day: string;
     groups: SecurityEventGroup[];
 }

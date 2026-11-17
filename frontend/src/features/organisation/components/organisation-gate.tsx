@@ -15,7 +15,6 @@ import { authKeys, BrandLogo, PageShell, useAccess, useCurrentUser, useLogout } 
 import { useDocumentTitle } from '@/shared/hooks/use-document-title';
 import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
 
-/** How often a waiting company checks whether it was approved. */
 const RECHECK_MS = 60_000;
 
 /**

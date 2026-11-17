@@ -53,7 +53,6 @@ export const useLoginForm = (): {
     const [serverErrorCount, setServerErrorCount] = useState(0);
     const errorSummaryRef = useRef<HTMLDivElement>(null);
 
-    // An actionable async error takes focus (ux.md → Focus moves with the UI).
     useEffect(() => {
         if (serverErrorCount > 0) {
             errorSummaryRef.current?.focus();
@@ -62,7 +61,6 @@ export const useLoginForm = (): {
 
     const form = useForm<LoginFormValues, unknown, LoginFormOutput>({
         resolver: zodResolver(loginSchema),
-        // Errors appear only when the form is submitted; the layout reserves their space.
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
         defaultValues: { email: '', password: '' },
@@ -91,7 +89,6 @@ export const useLoginForm = (): {
             }
         },
         () => {
-            // Field messages say what is wrong; focus goes to the first invalid field.
             setErrorCode(null);
         },
     );

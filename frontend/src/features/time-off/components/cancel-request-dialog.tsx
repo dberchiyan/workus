@@ -18,7 +18,6 @@ import { useCancelTimeOffRequest } from '../hooks/use-time-off-queries';
 import type { TimeOffRequest } from '../types';
 
 export interface CancelRequestDialogProps {
-    /** Kept while the dialog closes, so its text does not vanish mid-transition. */
     request: TimeOffRequest | null;
     open: boolean;
     onClose: () => void;

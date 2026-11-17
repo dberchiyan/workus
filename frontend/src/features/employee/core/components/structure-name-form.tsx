@@ -16,21 +16,14 @@ import { STRUCTURE_LIMITS, type StructureNameOutput, structureNameSchema, type S
 
 export interface StructureNameFormProps {
     kind: 'department' | 'position';
-    /** The field's accessible name (and placeholder). */
     label: string;
     defaultValue?: string;
-    /** Throws an ApiError when the server refuses; the message lands under the field. */
     onSave: (value: string) => Promise<void>;
     onCancel: () => void;
-    /** Adding several in a row: after a save the field empties and stays open. */
     keepOpen?: boolean;
     className?: string;
 }
 
-/**
- * One name typed in place — a department's or a position's. Enter saves, Escape cancels; errors
- * appear under the field on submit only, on a reserved line, so the list never shifts.
- */
 const OVERFLOW_ALLOWANCE = 20;
 
 export function StructureNameForm({
@@ -91,7 +84,6 @@ export function StructureNameForm({
                     }}
                     inputRef={(element: HTMLInputElement | null) => {
                         ref(element);
-                        // Opened on purpose by the person (Add / Rename): take the focus and select the text.
                         if (element && document.activeElement !== element && !element.dataset.focused) {
                             element.dataset.focused = 'true';
                             element.focus();

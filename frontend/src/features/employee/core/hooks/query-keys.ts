@@ -2,7 +2,6 @@ import type { SecurityCategory } from '@/features/auth';
 
 import type { EmployeeFilters, EmployeeListParams } from '../types';
 
-/** No tenant id: the organisation comes from the session (see auth queryKeys). */
 export const employeeKeys = {
     all: ['employees'] as const,
     lists: (): readonly ['employees', 'list'] => [...employeeKeys.all, 'list'] as const,

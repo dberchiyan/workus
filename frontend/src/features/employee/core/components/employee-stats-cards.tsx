@@ -23,7 +23,6 @@ function Hint({ icon, children, isPositive = false }: { icon: ReactNode; childre
         <Typography
             variant="body2"
             color={isPositive ? undefined : 'textSecondary'}
-            // items-start: in a narrow (two-column phone) card the text wraps beside the icon.
             className={isPositive ? 'flex items-start gap-1 text-success' : 'flex items-start gap-1'}
         >
             {icon}

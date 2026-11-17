@@ -8,15 +8,12 @@ export const COMMENT_MAX_LENGTH = 500;
 export class TerminateEmployeeRequest extends createZodDto(
     z
         .object({
-            /** Terminated from this terminatedAt (inclusive); a future terminatedAt plans the leave. */
             terminatedAt: z.iso.date('validation.terminationDate.invalid'),
             reason: TerminationReasonSchema,
-            /** Blank → none. Required when the reason is OTHER. */
             comment: z.preprocess(
                 (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
                 z.string().trim().max(COMMENT_MAX_LENGTH, 'validation.terminationComment.tooLong').optional(),
             ),
-            /** The version the client read; a stale one is 409 CONCURRENT_MODIFICATION. */
             version: z.number().int().min(0),
         })
         .superRefine((request, context) => {
@@ -32,7 +29,6 @@ export class TerminateEmployeeRequest extends createZodDto(
 
 export class CancelTerminationRequest extends createZodDto(
     z.object({
-        /** The version the client read; a stale one is 409 CONCURRENT_MODIFICATION. */
         version: z.number().int().min(0),
     }),
 ) {}

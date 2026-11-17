@@ -77,10 +77,6 @@ export function EmployeeProfilePage(): ReactElement {
     return (
         <div className="flex flex-col gap-4">
             {back}
-            {/*
-        Two rows on desktop, each stretched to its taller cell: header | Responsible, then
-        tabs | leave balances. Phones stack them in this order.
-      */}
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
                 <div className="flex min-w-0 lg:col-span-2">
                     <ProfileHeader employee={employee} headingRef={headingRef} />

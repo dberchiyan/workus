@@ -1,6 +1,5 @@
 import type { Prisma } from '../../../../../generated/prisma/client';
 
-/** A person has few reviews; bounded defensively. */
 export const MAX_REVIEWS = 200;
 export const MAX_REVIEW_RESPONSIBLES = 10;
 
@@ -26,7 +25,6 @@ export const reviewSelect = {
 } satisfies Prisma.EmployeeReviewSelect;
 export type ReviewRecord = Prisma.EmployeeReviewGetPayload<{ select: typeof reviewSelect }>;
 
-/** A review on the admin dashboard: whose, what and when. */
 export const dashboardReviewSelect = {
     id: true,
     title: true,

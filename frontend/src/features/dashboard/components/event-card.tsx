@@ -15,11 +15,9 @@ const SKELETON_ROWS = ['a', 'b'];
 export interface EventCardProps {
     id: string;
     icon: ComponentType<SvgIconProps>;
-    /** Theme tone classes: solid for the header tile, light for the empty state's. */
     tone: { solid: string; light: string };
     title: string;
     subtitle?: string;
-    /** Undefined while loading. */
     count: string | undefined;
     action?: ReactNode;
     isLoading: boolean;
@@ -27,7 +25,6 @@ export interface EventCardProps {
     onRetry: () => void;
     isEmpty: boolean;
     empty: { title: string; text: string };
-    /** Pagination under the rows. */
     footer?: ReactNode;
     children: ReactNode;
 }

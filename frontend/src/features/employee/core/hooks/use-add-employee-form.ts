@@ -60,7 +60,6 @@ const toRequest = (values: CreateEmployeeFormOutput): CreateEmployeeRequest => {
     };
 };
 
-/** The created employee and their sign-in details, shown on the Access step. */
 export interface AddedEmployee {
     employee: CreatedEmployee;
     email: string;
@@ -162,7 +161,6 @@ export const useAddEmployeeForm = (
         defaultValues: emptyValues(),
     });
 
-    // An actionable async error takes focus (ux.md → Focus moves with the UI).
     useEffect(() => {
         if (errorCount > 0) {
             errorRef.current?.focus();
@@ -175,7 +173,6 @@ export const useAddEmployeeForm = (
         setStep(AddEmployeeStep.DETAILS);
         setErrorCode(null);
         setIdempotencyKey(crypto.randomUUID());
-        // The password leaves memory with the dialog.
         create.reset();
         setAdded(null);
         setIsSaved(false);
@@ -229,11 +226,9 @@ export const useAddEmployeeForm = (
                 }
             }
             if (hasDetailsError) {
-                // Step 1 remounts and focuses the first field in error.
                 setStep(AddEmployeeStep.DETAILS);
             }
             if (!hasFieldError) {
-                // Nothing to point at: the form-level line says what happened and takes focus.
                 setErrorCode(error.code);
                 setErrorCount((count) => count + 1);
             }

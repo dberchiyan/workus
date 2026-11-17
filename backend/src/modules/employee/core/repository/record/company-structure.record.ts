@@ -9,7 +9,6 @@ export type StructurePositionRecord = Prisma.PositionGetPayload<{
     select: typeof structurePositionSelect;
 }>;
 
-/** A department with its positions (bounded: a company has at most MAX_POSITIONS). */
 export const departmentSelect = {
     id: true,
     name: true,

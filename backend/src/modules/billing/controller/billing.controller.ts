@@ -65,7 +65,6 @@ export class BillingController {
         @CurrentPrincipal() principal: Principal,
         @Headers(IDEMPOTENCY_HEADER) idempotencyKey: string,
     ): Promise<BillingRedirectResponse> {
-        // The same key goes to the provider, so a retry never opens a second session.
         return this.billingService.startCheckout(principal, request.plan, idempotencyKey);
     }
 

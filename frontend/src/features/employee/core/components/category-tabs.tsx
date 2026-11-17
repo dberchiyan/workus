@@ -15,7 +15,6 @@ const TAB_PADDING_UNITS = 1.5;
 
 const ALL = 'all';
 
-/** Compact tab: content-wide, small side padding, still a 44 px touch target. */
 const CategoryTab = styled(Tab)(({ theme }) => ({
     minWidth: 0,
     minHeight: theme.spacing(TAB_HEIGHT_UNITS),
@@ -49,7 +48,6 @@ export function CategoryTabs({ counts, categoryId, onChange, controlsId }: Categ
             onChange={(_event, value: string) => {
                 onChange(value === ALL ? undefined : value);
             }}
-            // Scrolls horizontally when the tabs do not fit (phones); no arrow buttons.
             variant="scrollable"
             scrollButtons={false}
             aria-label={t('tabs.label')}

@@ -1,7 +1,6 @@
 import type { PrismaClient } from '../src/generated/prisma/client';
 
 const DAY_MS = 86_400_000;
-/** Decisions this recent tell the employee; older notices than READ_AFTER_DAYS are read. */
 const DECIDED_WITHIN_DAYS = 30;
 const READ_AFTER_DAYS = 3;
 const MAX_REQUESTS = 200;

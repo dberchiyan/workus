@@ -11,12 +11,10 @@ import type {
     UpdateOrganisationRequest,
 } from '../types';
 
-/** Administrators per page in Settings. */
 export const ADMINISTRATORS_PAGE_SIZE = 10;
 
 const BASE = '/api/v1/organisation';
 
-/** The caller's organisation (from the session) and registering a new one. */
 export const organisationApi = {
     /** A new company and its owner; the answer signs the owner in (session cookies). */
     register: async (request: RegistrationRequest): Promise<Organisation> =>

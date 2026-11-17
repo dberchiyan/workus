@@ -17,7 +17,6 @@ import { EditResponsiblesDialog } from './edit-responsibles-dialog';
 export function ResponsiblesCard({ employee }: { employee: EmployeeProfile }): ReactElement {
     const { t } = useTranslation('employee');
     const [isEditing, setIsEditing] = useState(false);
-    // Each opening starts from the profile as read (and its version).
     const [opening, setOpening] = useState(0);
     const editButtonRef = useRef<HTMLButtonElement>(null);
     return (
@@ -86,7 +85,6 @@ export function ResponsiblesCard({ employee }: { employee: EmployeeProfile }): R
                     setIsEditing(false);
                 }}
                 onExited={() => {
-                    // Dialog closed → focus returns to its trigger (ux.md → Focus moves with the UI).
                     editButtonRef.current?.focus();
                 }}
             />

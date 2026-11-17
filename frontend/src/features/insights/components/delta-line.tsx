@@ -6,12 +6,9 @@ import type { ReactElement } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export interface DeltaLineProps {
-    /** Positive = up; null = nothing to compare with. */
     direction: number | null;
-    /** "+3", "−1.5 %" — the change as text. */
     change: string;
     previousYear: number;
-    /** Which way is good; colour follows it, the arrow and sign always say the direction. */
     better: 'up' | 'down';
 }
 

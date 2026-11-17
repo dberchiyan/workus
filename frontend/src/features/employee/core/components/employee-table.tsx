@@ -16,7 +16,6 @@ import { ResponsibleAvatars } from './responsible-avatars';
 
 type SortField = EmployeeListParams['sortField'];
 
-/** Fixed widths, so columns never jump between pages and tabs. */
 const COLUMNS = [
     { key: 'name', width: 'w-[30%]' },
     { key: 'position', width: 'w-[22%]' },
@@ -25,8 +24,6 @@ const COLUMNS = [
     { key: 'status', width: 'w-[12%]' },
 ] as const;
 
-/** Header cells stick below the top bar while the page scrolls. */
-// z-20: above the row's interactive bits (`relative z-10` — responsible tooltip, stretched link).
 const HEAD_CELL = 'top-top-bar-height z-20';
 
 export interface EmployeeTableProps {
@@ -47,7 +44,6 @@ export function EmployeeTable({ employees, params, onSort }: EmployeeTableProps)
                 sortDirection={isActive ? params.sortDirection : false}
                 aria-sort={isActive ? (params.sortDirection === 'asc' ? 'ascending' : 'descending') : 'none'}
             >
-                {/* Arrow only on the active column; on the others it appears on hover (MUI default). */}
                 <TableSortLabel
                     active={isActive}
                     direction={isActive ? params.sortDirection : 'asc'}
@@ -62,10 +58,8 @@ export function EmployeeTable({ employees, params, onSort }: EmployeeTableProps)
     };
 
     return (
-        // `isolate`: the row and header z-indexes stay inside the table, under the app top bar.
         <Table stickyHeader size="small" className="isolate table-fixed">
             <caption className="sr-only">{t('table.caption')}</caption>
-            {/* Percentages are one-off geometry for this table's columns. */}
             <colgroup>
                 {COLUMNS.map((column) => (
                     <col key={column.key} className={column.width} />

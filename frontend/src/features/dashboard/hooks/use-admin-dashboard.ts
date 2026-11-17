@@ -6,7 +6,6 @@ import type { components } from '@/shared/types/api';
 import { dashboardApi } from '../api/dashboard-api';
 import type { DateRange, LocalDay } from '../types';
 
-/** No tenant id: the organisation comes from the session (see auth queryKeys). */
 export const dashboardKeys = {
     all: ['dashboard'] as const,
     admin: (): readonly ['dashboard', 'admin'] => [...dashboardKeys.all, 'admin'] as const,

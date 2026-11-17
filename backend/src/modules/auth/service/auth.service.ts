@@ -68,15 +68,12 @@ export class AuthService {
     async login(input: LoginCommand): Promise<LoginResult> {
         const command = { ...input, email: input.email.toLowerCase() };
         const credentials = await this.userService.findCredentialsByEmail(command.email);
-        // Unknown email and an account without a password look the same — no timing oracle.
         if (!credentials?.passwordHash) {
             await this.passwordHasher.verifyDummy(command.password);
             throw this.loginFailed(command);
         }
         if (!(await this.passwordHasher.verify(credentials.passwordHash, command.password))) {
-            // A wrong password for a real account goes to its owner's security log.
             await this.security(AuditAction.AUTH_SIGN_IN_FAILED, credentials.id, null, credentials.organisationId);
-            // That was the last allowed try from this IP: sign-in is now blocked there for a while.
             if (
                 await this.rateLimitService.isExhausted(
                     RateLimitName.LOGIN,
@@ -87,7 +84,6 @@ export class AuthService {
             }
             throw this.loginFailed(command);
         }
-        // Checked only after the password, so it tells nothing to someone who does not know it.
         if (await this.employeeService.hasAccessEnded(credentials.id)) {
             this.logger.warn({ userId: credentials.id, ip: command.ip }, 'Login refused: access ended');
             await this.security(
@@ -125,7 +121,6 @@ export class AuthService {
         if (command.currentPassword === command.newPassword) {
             throw new BusinessRuleException('errors.auth.samePassword', {}, 'newPassword');
         }
-        // Hashing is CPU work, done before the transaction opens.
         const passwordHash = await this.passwordHasher.hash(command.newPassword);
         const session = await this.replacePassword(credentials.id, credentials.role, passwordHash, command);
         await this.rateLimitService.reset(RateLimitName.PASSWORD_CHANGE, [credentials.id]);
@@ -278,7 +273,6 @@ export class AuthService {
     async currentUser(userId: string): Promise<UserProfile> {
         const user = await this.userService.findProfileById(userId);
         if (!user) {
-            // Sessions cascade with their user, so this only happens in a race with deletion.
             throw new NotAuthenticatedException();
         }
         return user;

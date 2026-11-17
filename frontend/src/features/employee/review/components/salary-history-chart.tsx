@@ -9,7 +9,6 @@ import { compareMoney, formatMoney, ratioBetween } from '@/shared/lib/money';
 import { formatReviewDate } from '../format';
 import type { SalaryPoint } from '../types';
 
-/** Drawn in CSS pixels: the width follows the container; the height matches `h-28` (112 px). */
 const HEIGHT = 112;
 const PAD = 8;
 
@@ -56,7 +55,6 @@ const smoothPath = (points: readonly { cx: number; cy: number }[]): string => {
         }
         const before = slopes[i - 1] ?? 0;
         const after = slopes[i] ?? 0;
-        // Flat or turning point: horizontal tangent keeps the curve monotone.
         return before * after <= 0 ? 0 : (2 * before * after) / (before + after);
     });
     return points
@@ -85,7 +83,6 @@ export interface SalaryHistoryChartProps {
 export function SalaryHistoryChart({ history }: SalaryHistoryChartProps): ReactElement | null {
     const { t, i18n } = useTranslation('review');
     const locale = i18n.language;
-    // "Now" for the right edge, fixed once per mount (render stays pure).
     const [nowMs] = useState(() => Date.now());
     const { ref, width } = useWidth();
     const WIDTH = Math.max(width, 2 * PAD + 1);
@@ -109,7 +106,6 @@ export function SalaryHistoryChart({ history }: SalaryHistoryChartProps): ReactE
     const y = (point: SalaryPoint) => HEIGHT - PAD - ratioBetween(point.salary, min, max) * (HEIGHT - 2 * PAD);
 
     const points = history.map((point) => ({ point, cx: x(point.reviewedAt), cy: y(point) }));
-    // Markers sit PAD in from the edges; the tail and the baseline run edge to edge.
     const path = `${smoothPath(points)} H ${WIDTH}`;
 
     return (
@@ -119,7 +115,6 @@ export function SalaryHistoryChart({ history }: SalaryHistoryChartProps): ReactE
                     {t('salary.chartTitle')}
                 </Typography>
             </figcaption>
-            {/* The box reserves the height before the first measurement, so nothing shifts. */}
             <div ref={ref} className="h-28 w-full">
                 {width > 0 && (
                     <svg
@@ -157,7 +152,6 @@ export function SalaryHistoryChart({ history }: SalaryHistoryChartProps): ReactE
                                 placement="top"
                             >
                                 <g className="cursor-default">
-                                    {/* Hit target larger than the mark. */}
                                     <circle cx={cx} cy={cy} r={12} fill="transparent" />
                                     <circle
                                         cx={cx}

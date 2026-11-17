@@ -10,14 +10,11 @@ import { formatPeriod } from '../format';
 import type { CalendarRequest } from '../types';
 import { TYPE_VISUALS } from './time-off-visuals';
 
-/** Wide enough for the type's name next to its icon. */
 const LABEL_MIN_DAYS = 3;
 
 export interface CalendarBarProps {
     request: CalendarRequest;
-    /** Days of this month the bar covers. */
     span: number;
-    /** Admins open the request in a dialog over the calendar; others see its details in the tooltip. */
     href: string | undefined;
 }
 
@@ -40,8 +37,7 @@ export function CalendarBar({ request, span, href }: CalendarBarProps): ReactEle
         'outline-offset-2 focus-visible:outline-2 focus-visible:outline-primary',
         pending
             ? 'border border-dashed border-text-disabled bg-badge-neutral-background text-text-secondary'
-            : // The muted tones are too dark for an icon on the dark theme's tint.
-              cn(tint, text, 'dark:text-text-primary'),
+            : cn(tint, text, 'dark:text-text-primary'),
     );
     const content = (
         <>
@@ -55,7 +51,6 @@ export function CalendarBar({ request, span, href }: CalendarBarProps): ReactEle
         </>
     );
 
-    // The same facts as the description, laid out: the type, then when and the status.
     const details = (
         <span className="flex flex-col gap-0.5 py-0.5">
             <span className="flex items-center gap-1.5">
@@ -79,12 +74,10 @@ export function CalendarBar({ request, span, href }: CalendarBarProps): ReactEle
     return (
         <Tooltip title={details} describeChild>
             {href ? (
-                // A link, not a button: open in a new tab works, and back closes the dialog.
                 <RouterLink to={href} className={className}>
                     {content}
                 </RouterLink>
             ) : (
-                // A focusable tooltip trigger (WAI-ARIA tooltip pattern) so keyboard users get the details.
                 // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                 <span tabIndex={0} className={className}>
                     {content}

@@ -22,7 +22,6 @@ export function AccountSection(): ReactElement {
     const user = useCurrentUser().data;
     const can = useAccess();
     const canEditName = can('account.editName');
-    // Each opening remounts the dialog, so its fields start from the current name.
     const [editOpening, setEditOpening] = useState(0);
     const [isEditOpen, setIsEditOpen] = useState(false);
     const editButtonRef = useRef<HTMLButtonElement>(null);
@@ -91,7 +90,6 @@ export function AccountSection(): ReactElement {
                 title={t('account.password.title')}
                 description={t('account.password.description')}
             >
-                {/* A container: the rules box sits beside the fields when the card is wide enough. */}
                 {can('account.changePassword') ? (
                     <div className="@container">
                         <ChangePasswordForm />

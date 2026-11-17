@@ -25,7 +25,6 @@ export interface AddEmployeeDialogProps {
     open: boolean;
     onClose: () => void;
     onCreated: (employee: CreatedEmployee) => void;
-    /** After the closing transition — the place to return focus. */
     onExited: () => void;
 }
 
@@ -33,7 +32,6 @@ export interface AddEmployeeDialogProps {
 export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmployeeDialogProps): ReactElement {
     const { t } = useTranslation(['employee', 'common', 'errors']);
     const theme = useTheme();
-    // Behaviour CSS cannot express: the dialog variant.
     const isPhone = useMediaQuery(theme.breakpoints.down('sm'));
     const titleId = useId();
     const {
@@ -67,7 +65,6 @@ export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmp
     return (
         <Dialog
             open={open}
-            // On the Access step only Done closes it, so the password is not lost by a stray click or Esc.
             onClose={added ? undefined : close}
             fullScreen={isPhone}
             fullWidth
@@ -75,7 +72,6 @@ export function AddEmployeeDialog({ open, onClose, onCreated, onExited }: AddEmp
             aria-labelledby={titleId}
             slotProps={{ transition: { onExited } }}
         >
-            {/* Enter submits the current step: Next on step 1, Create on step 2. */}
             <form
                 noValidate
                 className="flex min-h-0 flex-1 flex-col"

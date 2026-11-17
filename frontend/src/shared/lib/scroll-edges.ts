@@ -1,4 +1,3 @@
-/** Sub-pixel widths leave a fraction of a pixel "to scroll" at the ends. */
 const SLACK = 1;
 
 /**
@@ -17,7 +16,6 @@ export function trackScrollEdges(element: HTMLElement | null): (() => void) | un
     };
     update();
     element.addEventListener('scroll', update, { passive: true });
-    // The box resizes with the window; its content when data arrives.
     const observer = new ResizeObserver(update);
     observer.observe(element);
     for (const child of element.children) {

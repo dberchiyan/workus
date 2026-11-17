@@ -18,7 +18,6 @@ export function DecisionFeedback({ decisions }: DecisionFeedbackProps): ReactEle
     return (
         <>
             <ConfirmDecisionDialog
-                // A new request or decision starts with an empty reason.
                 key={
                     decisions.confirming
                         ? `${decisions.confirming.request.id}-${decisions.confirming.decision}`
@@ -32,7 +31,6 @@ export function DecisionFeedback({ decisions }: DecisionFeedbackProps): ReactEle
                 onClose={decisions.closeConfirm}
                 onExited={decisions.clearConfirm}
             />
-            {/* Polite status; stays until dismissed or replaced. */}
             <Snackbar
                 open={notice !== null || decisions.failure !== null}
                 onClose={(_event, reason) => {

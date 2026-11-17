@@ -8,7 +8,6 @@ export interface RegisterCommand {
     password: string;
     ip: string;
     userAgent: string | null;
-    /** A session cookie sent along — deleted, never reused (no fixation). */
     presentedToken: string | undefined;
 }
 

@@ -6,7 +6,6 @@ export interface SectionHeaderProps {
     id: string;
     title: string;
     subtitle: string;
-    /** Undefined while loading. */
     count: string | undefined;
     children?: ReactNode;
 }

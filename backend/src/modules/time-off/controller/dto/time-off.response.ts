@@ -13,7 +13,6 @@ export const PersonSchema = z.object({
     id: z.uuid(),
     firstName: z.string(),
     lastName: z.string(),
-    /** Null for admins (no employee record). */
     positionTitle: z.string().nullable(),
 });
 
@@ -23,13 +22,10 @@ export class LeaveBalancesResponse extends createZodDto(
             z.object({
                 type: TimeOffTypeSchema,
                 cycleStartsAt: z.iso.date(),
-                /** Last day of the cycle (inclusive). */
                 cycleEndsAt: z.iso.date(),
-                /** Working days per cycle; null = no limit. */
                 allowance: z.number().int().nullable(),
                 used: z.number().int(),
                 pending: z.number().int(),
-                /** allowance − used − pending; null without a limit. */
                 available: z.number().int().nullable(),
             }),
         ),
@@ -41,21 +37,16 @@ export const TimeOffCommentSchema = z
         id: z.uuid(),
         body: z.string(),
         createdAt: z.iso.datetime(),
-        /** Null until its author edits it. */
         editedAt: z.iso.datetime().nullable(),
-        /** Only the author edits or deletes it. */
         author: PersonSchema,
     })
     .meta({ id: 'TimeOffComment' });
 
-/** What every view of a request shows. */
 const requestShape = {
     id: z.uuid(),
     type: TimeOffTypeSchema,
     startsAt: z.iso.date(),
-    /** Inclusive. */
     endsAt: z.iso.date(),
-    /** Working days. */
     days: z.number().int(),
     status: TimeOffStatusSchema,
     note: z.string().max(MAX_NOTE_LENGTH).nullable(),
@@ -63,20 +54,15 @@ const requestShape = {
     createdAt: z.iso.datetime(),
     decidedAt: z.iso.datetime().nullable(),
     decidedBy: PersonSchema.nullable(),
-    /** Who may decide (the employee's responsible people when it was made). */
     responsibles: z.array(PersonSchema),
-    /** Oldest first. */
     history: z.array(
         z.object({
             id: z.uuid(),
-            /** RESPONSIBLES_CHANGED — an admin changed who decides it. */
             action: z.enum(['CREATED', 'APPROVED', 'REJECTED', 'CANCELED', 'RESPONSIBLES_CHANGED']),
             occurredAt: z.iso.datetime(),
-            /** Null = the system. */
             actor: PersonSchema.nullable(),
         }),
     ),
-    /** Comments (admins and the employee), oldest first — the latest 50 when there are more (see commentCount). */
     comments: z.array(TimeOffCommentSchema),
     commentCount: z.number().int(),
 };
@@ -85,20 +71,17 @@ export const TimeOffRequestSchema = z
     .object({ ...requestShape, canCancel: z.boolean() })
     .meta({ id: 'TimeOffRequest' });
 
-/** A request as an admin sees it: whose it is and what the viewer may do with it. */
 export const ManagedTimeOffRequestSchema = z
     .object({
         ...requestShape,
         employee: z.object({
             id: z.uuid(),
-            /** For the avatar colour. */
             userId: z.uuid(),
             firstName: z.string(),
             lastName: z.string(),
             email: z.string(),
             positionTitle: z.string(),
         }),
-        /** Only the request's responsible people decide; each action only from its statuses. */
         can: z.object({ approve: z.boolean(), reject: z.boolean(), cancel: z.boolean() }),
     })
     .meta({ id: 'ManagedTimeOffRequest' });
@@ -117,16 +100,13 @@ export const TimeOffCalendarRowSchema = z
     .object({
         employee: z.object({
             id: z.uuid(),
-            /** For the avatar colour. */
             userId: z.uuid(),
             firstName: z.string(),
             lastName: z.string(),
             positionTitle: z.string(),
             startsAt: z.iso.date(),
-            /** First day without work; null while employed. */
             terminatedAt: z.iso.date().nullable(),
         }),
-        /** Approved and pending requests touching the month, by start date. */
         requests: z.array(
             z.object({
                 id: z.uuid(),
@@ -142,10 +122,8 @@ export const TimeOffCalendarRowSchema = z
 
 export class TimeOffCalendarResponse extends createZodDto(
     pageResponseSchema(TimeOffCalendarRowSchema).extend({
-        /** First and last day of the month. */
         from: z.iso.date(),
         to: z.iso.date(),
-        /** Company holidays in the month, by date. */
         holidays: z.array(z.object({ heldAt: z.iso.date(), name: z.string() })).max(MAX_DAYS_IN_MONTH),
     }),
 ) {}

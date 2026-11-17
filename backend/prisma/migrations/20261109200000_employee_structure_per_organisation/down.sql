@@ -1,6 +1,3 @@
--- Back to one shared catalogue: the first company's departments and positions (by name / title)
--- become the shared ones; other companies' employees move to the same title there. Positions or
--- departments a company added on its own are lost unless the first company has the same title.
 ALTER TABLE "employees" DROP CONSTRAINT "fk_employees_position_id";
 ALTER TABLE "positions" DROP CONSTRAINT "fk_positions_category_id";
 ALTER TABLE "positions" DROP CONSTRAINT "fk_positions_organisation_id";

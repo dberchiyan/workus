@@ -125,7 +125,6 @@ export const seedActivity = async (
             const target = { type: AuditTargetType.REVIEW, id: review.id, label: review.title };
             const people = auditValue.people(review.responsibles.map(({ responsible }) => person(responsible)));
             if (review.kind === ReviewKind.STARTING && review.salaryAmount && review.salaryCurrency) {
-                // Added with the employee, in the same step (a millisecond later, so it sorts above).
                 event(index, new Date(hiredAt.getTime() + 1), AuditAction.REVIEW_CREATED, employee.id, target, [
                     { field: AuditField.TITLE, from: null, to: auditValue.text(review.title) },
                     { field: AuditField.REVIEWED_AT, from: null, to: auditValue.date(review.reviewedAt) },
@@ -166,7 +165,6 @@ export const seedActivity = async (
         }
 
         if (employee.terminatedAt && employee.terminationReason) {
-            // Recorded two weeks before the last day (or a few hours ago when that is in the future).
             event(
                 index + 1,
                 past(shift(employee.terminatedAt, -14), now),

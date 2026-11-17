@@ -28,7 +28,6 @@ export function RequestsFilters({ search, type, mine, onSearch, onType, onMine }
     return (
         <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
             <RequestSearchField value={search} onSearch={onSearch} />
-            {/* On a phone the options stay on one line and scroll sideways, edge to edge. */}
             <div ref={trackScrollEdges} className="app-scroll-fade -mx-4 overflow-x-auto px-4 md:mx-0 md:px-0">
                 <ToggleButtonGroup
                     exclusive
@@ -36,7 +35,6 @@ export function RequestsFilters({ search, type, mine, onSearch, onType, onMine }
                     value={type ?? ALL}
                     aria-label={t('manage.filters.type')}
                     onChange={(_event, value: string | null) => {
-                        // Clicking the selected button again keeps it (one option is always on).
                         if (value !== null) {
                             onType(isTimeOffType(value) ? value : undefined);
                         }

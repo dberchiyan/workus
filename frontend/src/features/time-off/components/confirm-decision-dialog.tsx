@@ -21,16 +21,13 @@ import { TYPE_VISUALS } from './time-off-visuals';
 
 const OVERFLOW_ALLOWANCE = 50;
 
-/** Mirrors the backend (decision_comment VARCHAR(500)). */
 const REASON_MAX = 500;
 
 export interface ConfirmDecisionDialogProps {
-    /** Kept while the dialog closes, so its text does not vanish mid-transition. */
     target: { request: ManagedRequest; decision: 'reject' | 'cancel' } | null;
     open: boolean;
     busy: boolean;
     errorCode: ErrorCode | null;
-    /** `comment`: the reason given for a rejection, if any. */
     onConfirm: (comment?: string) => void;
     onClose: () => void;
     onExited: () => void;

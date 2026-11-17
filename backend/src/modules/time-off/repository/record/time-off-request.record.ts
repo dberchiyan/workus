@@ -1,7 +1,6 @@
 import type { Prisma } from '../../../../generated/prisma/client';
 
 export const MAX_REQUEST_RESPONSIBLES = 10;
-/** The newest comments of a request; a thread longer than this shows its latest part. */
 export const MAX_REQUEST_COMMENTS = 50;
 
 const personSelect = {
@@ -45,7 +44,6 @@ export type TimeOffRequestRecord = Prisma.TimeOffRequestGetPayload<{
     select: typeof timeOffRequestSelect;
 }>;
 
-/** A request with whose it is (admin lists). */
 export const managedTimeOffRequestSelect = {
     ...timeOffRequestSelect,
     employeeId: true,
@@ -65,7 +63,6 @@ export type TimeOffCommentRecord = Prisma.TimeOffRequestCommentGetPayload<{
     select: typeof timeOffCommentSelect;
 }>;
 
-/** What a status change checks and records (one row, no relations). */
 export const requestStateSelect = {
     id: true,
     employeeId: true,
@@ -78,7 +75,6 @@ export type RequestStateRecord = Prisma.TimeOffRequestGetPayload<{
     select: typeof requestStateSelect;
 }>;
 
-/** What balances are summed from. */
 export const heldDaysSelect = {
     type: true,
     status: true,
@@ -87,7 +83,6 @@ export const heldDaysSelect = {
 } satisfies Prisma.TimeOffRequestSelect;
 export type HeldDaysRecord = Prisma.TimeOffRequestGetPayload<{ select: typeof heldDaysSelect }>;
 
-/** Who is off and when (dashboard). */
 export const absenceSelect = {
     employeeId: true,
     startsAt: true,
@@ -96,7 +91,6 @@ export const absenceSelect = {
 } satisfies Prisma.TimeOffRequestSelect;
 export type AbsenceRecord = Prisma.TimeOffRequestGetPayload<{ select: typeof absenceSelect }>;
 
-/** A request as the calendar draws it. */
 export const calendarRequestSelect = {
     id: true,
     employeeId: true,
@@ -110,7 +104,6 @@ export type CalendarRequestRecord = Prisma.TimeOffRequestGetPayload<{
     select: typeof calendarRequestSelect;
 }>;
 
-/** A request on the admin dashboard: whose, what and its state. */
 export const dashboardRequestSelect = {
     id: true,
     type: true,
@@ -131,7 +124,6 @@ export type DashboardRequestRecord = Prisma.TimeOffRequestGetPayload<{
     select: typeof dashboardRequestSelect;
 }>;
 
-/** An approved request as the insights count it. */
 export const absenceDaysSelect = {
     employeeId: true,
     type: true,
@@ -142,7 +134,6 @@ export type AbsenceDaysRecord = Prisma.TimeOffRequestGetPayload<{
     select: typeof absenceDaysSelect;
 }>;
 
-/** What a notification about a request needs: its summary, whose it is, who decides it. */
 export const requestNoticeSelect = {
     id: true,
     organisationId: true,

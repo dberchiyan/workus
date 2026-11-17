@@ -1,9 +1,3 @@
-/** Development seed data — fictional people only. */
-
-/**
- * Password of every seeded account. Public on purpose: the accounts are fictional and the seed
- * runs only with APP_ENV=dev, so they never exist outside a developer's database.
- */
 export const SEED_PASSWORD = 'Workus-Dev-2026!';
 
 export interface SeedPerson {
@@ -12,11 +6,8 @@ export interface SeedPerson {
     email: string;
 }
 
-/** OSDB: the first organisation (its id is fixed by the tenancy migration). */
 export const OSDB_ID = '01960000-0000-7000-8000-000000000001';
-/** Vortex: a second, smaller company — nothing is shared with OSDB. */
 export const VORTEX_ID = '01960000-0000-7000-8000-000000000002';
-/** Lumen Studio: registered, waiting for a platform admin's approval. */
 export const LUMEN_ID = '01960000-0000-7000-8000-000000000003';
 
 export const OSDB_OWNERS: SeedPerson[] = [{ firstName: 'Sophia', lastName: 'Carter', email: 'sophia.carter@osdb.io' }];
@@ -31,17 +22,10 @@ export interface SeedEmployee {
     lastName: string;
     email: string;
     position: string;
-    /**
-     * Start date as days before the seed run: most people joined 3–7 years ago (a long salary
-     * history); recent hires have only their starting salary.
-     */
     startedDaysAgo: number;
-    /** Termination as days before the seed run (negative = planned); absent → active. */
     terminatedDaysAgo?: number;
-    /** With a termination: one of the termination reasons; OTHER needs a comment. */
     terminationReason?: 'RESIGNATION' | 'DISMISSAL' | 'END_OF_CONTRACT' | 'LAYOFF' | 'OTHER';
     terminationComment?: string;
-    /** Nobody is responsible yet (shows on the "No responsible" card). */
     isUnassigned?: true;
 }
 
@@ -339,7 +323,6 @@ export const EMPLOYEES: SeedEmployee[] = [
         position: 'Frontend Developer',
         startedDaysAgo: 3,
     },
-    // Joining and leaving soon (the admin dashboard's "Joining & leaving").
     {
         firstName: 'Nora',
         lastName: 'Starling',
@@ -634,15 +617,9 @@ export const VORTEX_EMPLOYEES: SeedEmployee[] = [
 export interface SeedOrganisation {
     id: string;
     name: string;
-    /** ACTIVE, or PENDING — a sign-up waiting for a platform admin. */
     status: 'ACTIVE' | 'PENDING';
-    /**
-     * The plan in effect, isGrantedPlan without a subscription (the demo shows one company on Business
-     * and one on Starter — the latter over its employee limit, so adding people is blocked).
-     */
     plan: 'STARTER' | 'TEAM' | 'BUSINESS';
     owners: SeedPerson[];
-    /** Responsible for the employees, in turns. */
     admins: SeedPerson[];
     employees: SeedEmployee[];
 }
@@ -666,7 +643,6 @@ export const ORGANISATIONS: SeedOrganisation[] = [
         admins: VORTEX_ADMINS,
         employees: VORTEX_EMPLOYEES,
     },
-    /** A sign-up waiting for approval: just its owner, so the platform's queue is never empty. */
     {
         id: LUMEN_ID,
         name: 'Lumen Studio',
@@ -678,7 +654,6 @@ export const ORGANISATIONS: SeedOrganisation[] = [
     },
 ];
 
-/** The internal organisation of Workus platform admins (created by the approval migration). */
 export const PLATFORM_ID = '01960000-0000-7000-8000-000000000000';
 
 export const PLATFORM_ADMINS: SeedPerson[] = [{ firstName: 'Alex', lastName: 'Morgan', email: 'admin@workus.io' }];

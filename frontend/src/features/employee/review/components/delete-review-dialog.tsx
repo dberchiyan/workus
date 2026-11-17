@@ -42,7 +42,6 @@ export function DeleteReviewDialog({
     const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);
     const cancelRef = useRef<HTMLButtonElement>(null);
 
-    // Irreversible action: the safe choice gets the initial focus.
     useEffect(() => {
         if (open) {
             requestAnimationFrame(() => {

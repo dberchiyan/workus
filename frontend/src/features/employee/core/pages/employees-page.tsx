@@ -34,7 +34,6 @@ export function EmployeesPage(): ReactElement {
     const [isAddOpen, setIsAddOpen] = useState(false);
     const addButtonRef = useRef<HTMLButtonElement>(null);
     const [createdName, setCreatedName] = useState<string | null>(null);
-    // At the plan's employee limit the page says so; the API refuses the next hire anyway.
     const plan = usePlan();
     const can = useAccess();
     const totalActive = useEmployeeSummary().data?.totalActive;
@@ -45,7 +44,6 @@ export function EmployeesPage(): ReactElement {
 
     return (
         <div className="flex flex-col gap-6">
-            {/* Top-aligned: the taller button must not push the heading below other pages' headings. */}
             <div className="flex flex-wrap items-start justify-between gap-3">
                 <Typography ref={headingRef} tabIndex={-1} variant="h4" component="h1" className="outline-none">
                     {t('title')}
@@ -84,7 +82,6 @@ export function EmployeesPage(): ReactElement {
                     id={listId}
                     params={params}
                     onSort={(field, direction) => {
-                        // Header click toggles; the phone sort menu passes the direction explicitly.
                         const sortDirection =
                             direction ??
                             (params.sortField === field && params.sortDirection === 'asc' ? 'desc' : 'asc');
@@ -112,11 +109,9 @@ export function EmployeesPage(): ReactElement {
                     setCreatedName(`${employee.firstName} ${employee.lastName}`);
                 }}
                 onExited={() => {
-                    // Dialog closed → focus returns to its trigger (ux.md → Focus moves with the UI).
                     addButtonRef.current?.focus();
                 }}
             />
-            {/* Polite status; stays until dismissed or replaced (no auto-dismiss of unread messages). */}
             <Snackbar
                 open={createdName !== null}
                 onClose={(_event, reason) => {

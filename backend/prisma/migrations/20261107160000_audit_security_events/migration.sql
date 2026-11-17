@@ -1,5 +1,3 @@
--- Security log (auth module): sign-ins, failed and refused sign-ins, sign-outs, password changes
--- and ended sessions, recorded against the user (target type user, no employee).
 ALTER TABLE "audit_events" DROP CONSTRAINT "ck_audit_events_action";
 ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_action"
     CHECK ("action" IN ('employee.created', 'employee.updated', 'employee.terminated',

@@ -8,7 +8,6 @@ import { TimeOffService } from '../../time-off/service/time-off.service';
 import type { DashboardRequests } from '../../time-off/service/time-off.types';
 import type { AdminDashboard } from './dashboard.types';
 
-/** Reviews due and people starting / leaving: the next 30 days. */
 const WINDOW_DAYS = 30;
 
 const asDate = (iso: string): Date => new Date(`${iso}T00:00:00Z`);

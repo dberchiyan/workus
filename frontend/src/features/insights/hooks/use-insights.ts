@@ -6,7 +6,6 @@ import type { components } from '@/shared/types/api';
 import { insightsApi } from '../api/insights-api';
 import type { Insights, InsightsFilter } from '../types';
 
-/** No tenant id: the organisation comes from the session (see auth queryKeys). */
 export const insightsKeys = {
     all: ['insights'] as const,
     year: (filter: InsightsFilter): readonly ['insights', 'year', InsightsFilter] =>

@@ -4,9 +4,7 @@ import { databaseUrl } from './src/common/config/database-url';
 
 try {
     process.loadEnvFile('.env');
-} catch {
-    // No .env file: variables come from the environment (CI, deployed runtime).
-}
+} catch {}
 
 export default defineConfig({
     schema: 'prisma/schema',
@@ -22,7 +20,6 @@ export default defineConfig({
             username: env('DATABASE_USERNAME'),
             password: env('DATABASE_PASSWORD'),
         }),
-        // Needed only by `db:check` and `db:migrate:dev` (local); never used at runtime.
         ...(process.env.SHADOW_DATABASE_URL ? { shadowDatabaseUrl: process.env.SHADOW_DATABASE_URL } : {}),
     },
 });

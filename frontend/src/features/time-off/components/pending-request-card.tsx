@@ -14,7 +14,6 @@ import { RequestPerson } from './request-person';
 import { ResponsibleSummary } from './responsible-summary';
 import { TYPE_VISUALS } from './time-off-visuals';
 
-/** A request waiting longer than this is called out. */
 const LONG_WAIT_DAYS = 2;
 
 export interface PendingRequestCardProps {

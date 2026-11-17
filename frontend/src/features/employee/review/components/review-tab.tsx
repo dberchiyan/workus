@@ -32,7 +32,6 @@ export interface ReviewTabProps {
     employeeId: string;
 }
 
-/** Reviews shown a page at a time (the list comes whole — the salary history needs all of it). */
 const REVIEWS_PAGE_SIZE = 10;
 
 /** Salary overview on top, then the reviews (newest first, ten a page); add, view, edit and delete. */
@@ -41,12 +40,9 @@ export function ReviewTab({ employeeId }: ReviewTabProps): ReactElement {
     const { data, isPending, isError, error, refetch } = useEmployeeReviews(employeeId);
     const [page, setPage] = useState(0);
     const [dialog, setDialog] = useState<DialogState>({ kind: 'none' });
-    // The last shown review stays mounted during the closing transition.
     const [lastReview, setLastReview] = useState<Review | null>(null);
     const [notice, setNotice] = useState<string | null>(null);
-    // A fresh form (values, Idempotency-Key, errors) for every opening.
     const [formKey, setFormKey] = useState(0);
-    // Kept through the closing transition, so the title doesn't flip from Edit to Add.
     const [formReview, setFormReview] = useState<Review | null>(null);
     const addButtonRef = useRef<HTMLButtonElement>(null);
     const triggerRef = useRef<HTMLElement | null>(null);
@@ -113,7 +109,6 @@ export function ReviewTab({ employeeId }: ReviewTabProps): ReactElement {
     }
 
     const pages = Math.ceil(data.content.length / REVIEWS_PAGE_SIZE);
-    // A delete can empty the last page: stay on the last one that exists.
     const current = Math.max(0, Math.min(page, pages - 1));
     const shown = data.content.slice(current * REVIEWS_PAGE_SIZE, (current + 1) * REVIEWS_PAGE_SIZE);
     const number = (value: number) => new Intl.NumberFormat(i18n.language).format(value);
@@ -147,10 +142,6 @@ export function ReviewTab({ employeeId }: ReviewTabProps): ReactElement {
                     </Typography>
                 </div>
             ) : (
-                // The tab card's own width decides (container query), not the viewport: the card is
-                // narrower on a 1200 px desktop with the side column than on a 1024 px tablet without it.
-                // 44rem: the narrowest width where the fixed Date/Status/Salary columns plus room for
-                // Title and Responsible fit.
                 <div className="@container">
                     <div className="hidden @[44rem]:block">
                         <ReviewTable reviews={shown} onAction={onAction} />
@@ -190,7 +181,6 @@ export function ReviewTab({ employeeId }: ReviewTabProps): ReactElement {
                 onClose={close}
                 onSaved={(review) => {
                     close();
-                    // A new review is the newest: show the first page, where it lands.
                     if (!formReview) {
                         setPage(0);
                     }
@@ -226,7 +216,6 @@ export function ReviewTab({ employeeId }: ReviewTabProps): ReactElement {
                 onDeleted={(review) => {
                     close();
                     setNotice(t('delete.deleted', { title: review.title }));
-                    // The deleted row's menu button is gone; focus goes to "Add review".
                     triggerRef.current = addButtonRef.current;
                 }}
                 onExited={restoreFocus}

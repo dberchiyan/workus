@@ -26,7 +26,6 @@ import { CALENDAR_PAGE_SIZES, useCalendarParams } from '../hooks/use-calendar-pa
  */
 export function CalendarPage(): ReactElement {
     const { t, i18n } = useTranslation('timeOff');
-    // Today (UTC, as everywhere), fixed for the visit (no clock in render).
     const [today] = useState(todayUtcIso);
     const currentMonth = today.slice(0, ISO_MONTH_LENGTH);
     const { params, update, requestHref } = useCalendarParams(currentMonth);
@@ -44,7 +43,6 @@ export function CalendarPage(): ReactElement {
     );
 
     const data = calendar.data;
-    // A month or filter change keeps the old grid until the new one arrives.
     const rows =
         calendar.isPlaceholderData && data?.from.slice(0, ISO_MONTH_LENGTH) !== params.month
             ? undefined

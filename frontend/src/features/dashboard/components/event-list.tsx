@@ -4,9 +4,7 @@ import type { ReactNode } from 'react';
 import { cn } from '@/shared/lib/cn';
 
 export interface EventListProps {
-    /** More than one page: keep five rows' height so the last page does not shrink the card. */
     paged: boolean;
-    /** The rows are an older page while the next one loads. */
     stale: boolean;
     children: ReactNode;
 }

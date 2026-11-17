@@ -1,5 +1,3 @@
--- Reverts 20261108140000_audit_user_created. Fails while user.created events exist
--- (append-only — incidents only).
 ALTER TABLE "audit_events" DROP CONSTRAINT "ck_audit_events_action";
 ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_action"
 CHECK ("action" IN ('employee.created', 'employee.updated', 'employee.terminated',

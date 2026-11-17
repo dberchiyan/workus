@@ -12,7 +12,6 @@ CREATE TABLE "idempotency_keys" (
     CONSTRAINT "pk_idempotency_keys" PRIMARY KEY ("id")
 );
 
--- Leading user_id also serves the foreign key.
 CREATE UNIQUE INDEX "uq_idempotency_keys_user_id_key" ON "idempotency_keys"("user_id", "key");
 CREATE INDEX "idx_idempotency_keys_expires_at" ON "idempotency_keys"("expires_at");
 

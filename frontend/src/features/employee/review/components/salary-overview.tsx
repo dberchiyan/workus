@@ -12,7 +12,6 @@ import { formatPercentChange, formatReviewDate } from '../format';
 import type { EmployeeReviews } from '../types';
 import { SalaryHistoryChart } from './salary-history-chart';
 
-/** Current salary, change vs the previous completed review, and the history chart. */
 const PREVIOUS = -2;
 
 export function SalaryOverview({ salary }: { salary: EmployeeReviews['salary'] }): ReactElement {

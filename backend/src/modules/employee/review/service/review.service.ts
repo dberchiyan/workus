@@ -83,7 +83,6 @@ const lockStarting = (review: ReviewRecord, command: UpdateReviewCommand): void 
     }
 };
 
-/** One salary per employee; a company of this size never comes close. */
 const MAX_SALARIES = 5000;
 
 const PREVIOUS = -2;
@@ -321,7 +320,6 @@ export class ReviewService {
         }
         const after = await this.findOne(organisationId, reviewId);
         const changes = reviewUpdatedChanges(before, after);
-        // A save without edits changes nothing worth a history entry.
         if (changes.length > 0) {
             await this.auditService.record({
                 action: AuditAction.REVIEW_UPDATED,
@@ -337,7 +335,6 @@ export class ReviewService {
     async delete(organisationId: string, employeeId: string, reviewId: string): Promise<void> {
         const review = await this.findOne(organisationId, reviewId);
         if (review.kind === ReviewKind.STARTING) {
-            // The salary history starts here; edit it instead.
             throw new BusinessRuleException('errors.review.startingNotDeletable');
         }
         await this.reviewRepository.delete(organisationId, reviewId);

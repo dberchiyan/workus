@@ -12,20 +12,16 @@ const DEFAULT_SIZE = 50;
 const MONTH = /^(19|20)\d{2}-(0[1-9]|1[0-2])$/;
 
 export interface CalendarParams {
-    /** `YYYY-MM`; absent → the current month (UTC). */
     month: string;
-    /** Never empty: at least one type stays on. */
     types: TimeOffType[];
     search: string;
     page: number;
     size: number;
-    /** The request open in the dialog (admins). */
     request: string | undefined;
 }
 
 const readTypes = (raw: string | null): TimeOffType[] => {
     const types = (raw ?? '').split(',').filter(isTimeOffType);
-    // In the fixed order, so the same choice is the same query.
     return types.length > 0 ? TIME_OFF_TYPES.filter((type) => types.includes(type)) : [...TIME_OFF_TYPES];
 };
 
@@ -60,7 +56,6 @@ export const useCalendarParams = (
         };
     }, [searchParams, currentMonth]);
 
-    /** Any filter goes back to the first page; the page and the open request do not. */
     const update = useCallback(
         (changes: Partial<CalendarParams>) => {
             setSearchParams(
@@ -83,14 +78,12 @@ export const useCalendarParams = (
                     }
                     return next;
                 },
-                // Changing the month or closing a request is a step back should undo; filters replace.
                 { replace: !('month' in changes || 'request' in changes) },
             );
         },
         [setSearchParams, currentMonth],
     );
 
-    /** The link that opens a request over the calendar as it is now (opening is a history step). */
     const requestHref = useCallback(
         (requestId: string): string => {
             const next = new URLSearchParams(searchParams);

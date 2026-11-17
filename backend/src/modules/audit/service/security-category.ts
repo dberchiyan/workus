@@ -1,6 +1,5 @@
 import { AuditAction } from './audit-action';
 
-/** Security-log filter groups (Settings → Security log, an employee's Security tab). */
 export const SECURITY_CATEGORIES = ['SIGN_INS', 'FAILED', 'PASSWORD', 'SESSIONS'] as const;
 export type SecurityCategory = (typeof SECURITY_CATEGORIES)[number];
 
@@ -16,5 +15,4 @@ export const SECURITY_CATEGORY_ACTIONS: Record<SecurityCategory, readonly AuditA
     ],
 };
 
-/** Every security-log action: the log never shows other events about the account (e.g. a role change). */
 export const ALL_SECURITY_ACTIONS: readonly AuditAction[] = Object.values(SECURITY_CATEGORY_ACTIONS).flat();

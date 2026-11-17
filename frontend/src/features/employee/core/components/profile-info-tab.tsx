@@ -9,7 +9,6 @@ import type { EmployeeProfileMock } from '../mocks/employee-profile-mock';
 import type { EmployeeProfile } from '../types';
 import { DetailSection } from './detail-section';
 
-/** Holidays can be taken six months after the start date. */
 const HOLIDAY_ELIGIBILITY_MONTHS = 6;
 
 export interface ProfileInfoTabProps {

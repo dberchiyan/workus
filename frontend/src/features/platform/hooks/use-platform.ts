@@ -7,7 +7,6 @@ import type { components } from '@/shared/types/api';
 import { platformApi } from '../api/platform-api';
 import type { Company, CompanyPeople, CompanyStatus } from '../types';
 
-/** Platform data is not tenant data: the platform admin's cache is cleared on sign-out too. */
 export const platformKeys = {
     all: ['platform'] as const,
     companies: (): readonly ['platform', 'companies'] => [...platformKeys.all, 'companies'] as const,

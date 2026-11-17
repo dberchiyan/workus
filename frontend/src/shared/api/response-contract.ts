@@ -6,7 +6,6 @@ import { ApiContractError } from './api-error';
 import { HttpStatus } from './http-status';
 import { RESPONSE_SCHEMAS } from './schemas.generated';
 
-/** How many mismatches an error lists (keeps it readable). */
 const MAX_ISSUES = 5;
 
 /** The schema the contract gives for this call; undefined when it answers no JSON. */
@@ -14,7 +13,6 @@ const schemaFor = (method: string | undefined, url: string | undefined): z.ZodTy
     if (!url) {
         return undefined;
     }
-    // The path only: query strings travel in `params`, but be safe if one is in the URL.
     const path = new URL(url, 'http://contract.local').pathname;
     const verb = (method ?? 'get').toLowerCase();
     return RESPONSE_SCHEMAS.find((entry) => entry.method === verb && entry.pattern.test(path))?.schema;

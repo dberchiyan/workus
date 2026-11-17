@@ -62,7 +62,6 @@ export class IdempotencyKeyStore {
             },
         });
         if (!existing) {
-            // Released between our insert and read (the first attempt failed): claim again.
             return this.claim(request);
         }
         if (existing.expiresAt.getTime() <= Date.now()) {

@@ -111,7 +111,6 @@ export class ReviewRepository {
         if (count === 0) {
             return false;
         }
-        // Responsibles are replaced as a set.
         await this.txHost.tx.employeeReviewResponsible.deleteMany({
             where: { organisationId, reviewId },
         });

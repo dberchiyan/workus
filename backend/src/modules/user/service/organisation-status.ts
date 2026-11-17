@@ -1,4 +1,3 @@
-/** Mirrored by ck_organisations_status. A new company is PENDING until a platform admin decides. */
 export const OrganisationStatus = {
     PENDING: 'PENDING',
     ACTIVE: 'ACTIVE',

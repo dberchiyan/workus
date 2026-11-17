@@ -5,7 +5,6 @@ import type { TransactionalAdapterPrisma } from '@nestjs-cls/transactional-adapt
 import type { PrismaService } from '../../../../common/persistence/prisma.service';
 import { type PositionCategoryRecord, positionCategorySelect } from './record/position-category.record';
 
-/** A handful of categories by nature; bounded defensively. */
 const MAX_CATEGORIES = 50;
 
 @Injectable()

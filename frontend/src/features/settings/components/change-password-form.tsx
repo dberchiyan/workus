@@ -16,7 +16,6 @@ import type { ErrorCode } from '@/shared/types';
 
 import { changePasswordSchema, type ChangePasswordValues } from '../schemas';
 
-/** Keeps every helper line's height while it is empty, so the form never shifts. */
 const RESERVED_LINE = ' ';
 const FIELDS = new Set<string>(['currentPassword', 'newPassword', 'confirmPassword']);
 const isField = (field: string): field is keyof ChangePasswordValues => FIELDS.has(field);
@@ -40,7 +39,6 @@ export function ChangePasswordForm(): ReactElement {
     });
     const { errors, isSubmitting } = form.formState;
     const rulesId = useId();
-    // Live values for the rules box.
     const [currentPassword, newPassword, confirmPassword] = useWatch({
         control: form.control,
         name: ['currentPassword', 'newPassword', 'confirmPassword'],
@@ -91,7 +89,6 @@ export function ChangePasswordForm(): ReactElement {
     });
 
     return (
-        // One-off geometry: the rules box is wide enough for every rule on one line.
         <form
             noValidate
             className="grid grid-cols-1 gap-6 @3xl:grid-cols-[minmax(0,28rem)_22rem]"

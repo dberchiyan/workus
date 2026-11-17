@@ -11,15 +11,12 @@ import { formatMoney } from '@/shared/lib/money';
 
 import type { PlanOffer } from '../types';
 
-/** What every plan has, listed before the plan's own features. */
 const BASE_FEATURES = ['directory', 'timeOff', 'calendar'] as const;
 
 export interface PlanCardProps {
     offer: PlanOffer;
     isCurrent: boolean;
-    /** The plan the subscription switches to at the period end. */
     isScheduled?: boolean;
-    /** What the button does, if there is one. */
     action?: { label: string; onClick: () => void; loading: boolean } | undefined;
 }
 

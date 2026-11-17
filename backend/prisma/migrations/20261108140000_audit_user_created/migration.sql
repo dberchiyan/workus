@@ -1,4 +1,3 @@
--- An owner can add administrators in the app: logged as user.created (target the new user).
 ALTER TABLE "audit_events" DROP CONSTRAINT "ck_audit_events_action";
 ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_action"
 CHECK ("action" IN ('employee.created', 'employee.updated', 'employee.terminated',

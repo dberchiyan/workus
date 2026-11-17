@@ -44,7 +44,6 @@ export interface NewTimeOffRequest {
     createdBy: string;
 }
 
-/** Requests in one window are few; bounded defensively. */
 const MAX_HELD_ROWS = 500;
 
 const managedWhere = (organisationId: string, criteria: TimeOffRequestCriteria): Prisma.TimeOffRequestWhereInput => ({
@@ -97,7 +96,6 @@ export class TimeOffRequestRepository {
             ...(changedSince ? { OR: [{ status: TimeOffStatus.PENDING }, { updatedAt: { gte: changedSince } }] } : {}),
         } satisfies Prisma.TimeOffRequestWhereInput;
         const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
-        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [totalElements, content] = await Promise.all([
             this.txHost.tx.timeOffRequest.count({ where }),
             this.txHost.tx.timeOffRequest.findMany({ where, select: timeOffRequestSelect, ...page }),
@@ -113,7 +111,6 @@ export class TimeOffRequestRepository {
     ): Promise<{ content: ManagedTimeOffRequestRecord[]; totalElements: number }> {
         const where = managedWhere(organisationId, criteria);
         const page = toPrismaPage(pageable, managedOrderByFor, (direction) => ({ id: direction }));
-        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [totalElements, content] = await Promise.all([
             this.txHost.tx.timeOffRequest.count({ where }),
             this.txHost.tx.timeOffRequest.findMany({
@@ -240,7 +237,6 @@ export class TimeOffRequestRepository {
         if (holidays.length === 0) {
             return 0;
         }
-        // Pairs, so a holiday of one organisation never touches another's requests.
         const organisationIds = holidays.map((holiday) => holiday.organisationId);
         const days = holidays.map((holiday) => holiday.day);
         return this.txHost.tx.$executeRaw`
@@ -452,11 +448,8 @@ export class TimeOffRequestRepository {
     }
 }
 
-/** A year of approved requests for the whole company. */
 const MAX_YEAR_ABSENCES = 20_000;
 
-/** One request per person per day at most. */
 const MAX_DAYS_IN_MONTH = 31;
 
-/** A company has a bounded number of people off in one week. */
 const MAX_ABSENCES = 500;

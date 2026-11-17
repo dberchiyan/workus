@@ -1,10 +1,6 @@
 import { readFile } from 'node:fs/promises';
 import { gzipSync } from 'node:zlib';
 
-/**
- * Bundle budgets, gzipped: the entry chunk (quality.md: ≤ 250 KB) and everything the first page
- * load fetches — the entry plus the chunks index.html preloads, which is what a visitor waits for.
- */
 const ENTRY_BUDGET = 250 * 1024;
 const INITIAL_BUDGET = 330 * 1024;
 const dist = new URL('../dist/', import.meta.url);

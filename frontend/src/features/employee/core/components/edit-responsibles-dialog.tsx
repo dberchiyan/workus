@@ -32,7 +32,6 @@ export interface EditResponsiblesDialogProps {
     employee: EmployeeProfile;
     open: boolean;
     onClose: () => void;
-    /** After the closing transition — the place to return focus. */
     onExited: () => void;
 }
 
@@ -75,7 +74,6 @@ export function EditResponsiblesDialog({
     const error = form.formState.errors.responsibleUserIds;
     const isSaving = form.formState.isSubmitting;
 
-    // Dialog open → the search field (ux.md → Focus moves with the UI).
     useEffect(() => {
         if (open) {
             requestAnimationFrame(() => {
@@ -84,7 +82,6 @@ export function EditResponsiblesDialog({
         }
     }, [open]);
 
-    // An actionable async error takes focus: the form line, or the field it is about.
     useEffect(() => {
         if (errorCount > 0) {
             errorRef.current?.focus();
@@ -96,7 +93,6 @@ export function EditResponsiblesDialog({
         }
     }, [fieldErrorCount]);
 
-    // Nobody is responsible for themselves: the employee is not offered.
     const options: ResponsibleOption[] = (candidates.data ?? [])
         .filter((person) => person.id !== employee.userId)
         .map((person) => ({

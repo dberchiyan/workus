@@ -16,15 +16,12 @@ import type { ErrorCode } from '@/shared/types';
 
 import type { Plan } from '../types';
 
-/** What the owner is about to do with the plan. */
 export type PlanChangeKind = 'upgrade' | 'downgrade' | 'giveUp' | 'keep';
 
 export interface PlanChange {
     kind: PlanChangeKind;
-    /** The plan the request names (Starter for ending the subscription). */
     target: Plan;
     current: Plan;
-    /** The period end (ISO instant), when the change applies then. */
     periodEndsAt: string | null;
 }
 
@@ -74,7 +71,6 @@ export function PlanChangeDialog({
     const titleId = useId();
     const descriptionId = useId();
     const cancelRef = useRef<HTMLButtonElement>(null);
-    // Money-moving or irreversible: the safe choice gets the initial focus.
     useEffect(() => {
         if (open) {
             requestAnimationFrame(() => {
@@ -96,7 +92,6 @@ export function PlanChangeDialog({
               new Date(change.periodEndsAt),
           )
         : null;
-    // When it applies: now (an upgrade, giving a plan up), or at the period end.
     const when =
         kind === 'downgrade' && date
             ? t('billing:change.when.onDate', { date })

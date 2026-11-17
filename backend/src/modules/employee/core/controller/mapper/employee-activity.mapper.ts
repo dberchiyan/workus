@@ -3,7 +3,6 @@ import { isRecordAction } from '../../../../audit/service/audit-action';
 import type { EmployeeActivityPageResponse } from '../dto/employee-activity.response';
 
 export const toEmployeeActivityPageResponse = (page: AuditEventPage): EmployeeActivityPageResponse => ({
-    // Security events have no employee, so they never come here; the filter keeps the type exact.
     content: page.content.flatMap((event) =>
         isRecordAction(event.action)
             ? [

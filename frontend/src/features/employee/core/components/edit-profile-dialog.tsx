@@ -19,7 +19,6 @@ export interface EditProfileDialogProps {
     employee: EmployeeProfile;
     open: boolean;
     onClose: () => void;
-    /** After the closing transition — the place to return focus. */
     onExited: () => void;
 }
 

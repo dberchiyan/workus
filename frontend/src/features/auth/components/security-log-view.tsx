@@ -27,7 +27,6 @@ export interface SecurityLogViewProps {
     log: UseQueryResult<SecurityLog>;
     category: SecurityCategory | undefined;
     onCategory: (category: SecurityCategory | undefined) => void;
-    /** Zero-based; another filter starts again from the first page (the caller resets it). */
     page: number;
     onPage: (page: number) => void;
 }
@@ -66,7 +65,6 @@ export function SecurityLogView({ log, category, onCategory, page, onPage }: Sec
     return (
         <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                {/* On a phone the options stay on one line and scroll sideways. */}
                 <div ref={trackScrollEdges} className="app-scroll-fade overflow-x-auto">
                     <ToggleButtonGroup
                         exclusive
@@ -74,7 +72,6 @@ export function SecurityLogView({ log, category, onCategory, page, onPage }: Sec
                         value={category ?? ALL}
                         aria-label={t('securityLog.filter')}
                         onChange={(_event, value: unknown) => {
-                            // Clicking the selected button again keeps it (one option is always on).
                             if (value !== null) {
                                 onCategory(isSecurityCategory(value) ? value : undefined);
                             }

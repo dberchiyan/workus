@@ -14,14 +14,9 @@ import type { EmployeeListItem } from '../types';
 
 export interface EmployeeIdentityProps {
     employee: Pick<EmployeeListItem, 'id' | 'userId' | 'firstName' | 'lastName' | 'email'>;
-    /** Table cell: one line each, cut with "…" (the full text is in the tooltip). */
     isCompact?: boolean;
 }
 
-/**
- * The name links to the profile and its ::after stretches over the whole row/card (which is
- * `relative`), so a click anywhere opens it while keyboard and screen readers get one real link.
- */
 const STRETCHED_LINK = 'after:absolute after:inset-0';
 
 /** Avatar, full name and email. */

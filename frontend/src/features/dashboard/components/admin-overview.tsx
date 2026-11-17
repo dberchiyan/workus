@@ -20,7 +20,6 @@ import { ISO_DAY_LENGTH } from '@/shared/lib/units';
 import { useAdminDashboard } from '../hooks/use-admin-dashboard';
 
 const DAY_MS = 86_400_000;
-/** A request waiting longer than this is called out. */
 const LONG_WAIT_DAYS = 2;
 
 function Hint({ icon, tone, children }: { icon?: ReactNode; tone?: 'error'; children: ReactNode }) {
@@ -29,7 +28,6 @@ function Hint({ icon, tone, children }: { icon?: ReactNode; tone?: 'error'; chil
             variant="body2"
             component="div"
             color={tone === 'error' ? 'error' : 'textSecondary'}
-            // No wrap: in a narrow (two-column phone) card the text wraps beside the icon, not under it.
             className="flex min-h-6 items-start gap-1"
         >
             {icon}
@@ -65,7 +63,6 @@ export function AdminOverview(): ReactElement {
         );
     }
 
-    // Whole days between the oldest request and the server's today (pure: no clock in render).
     const waitedDays = data?.pendingRequests.oldestCreatedAt
         ? Math.max(
               0,

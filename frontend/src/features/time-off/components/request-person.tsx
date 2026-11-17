@@ -11,7 +11,6 @@ import type { ManagedRequest } from '../types';
 
 export interface RequestPersonProps {
     request: ManagedRequest;
-    /** The name opens the request; its accessible name says which one. */
     label: string;
 }
 

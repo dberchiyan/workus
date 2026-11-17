@@ -24,7 +24,6 @@ import { formatDateTime, formatTime } from '../activity-format';
 import type { ActivityAction, ActivityEvent } from '../types';
 import { ActivityChangeRow } from './activity-change-row';
 
-/** More than this many changes → the rest behind "Show all". */
 const COLLAPSED_CHANGES = 5;
 
 const ACTION_STYLE = {
@@ -92,7 +91,6 @@ const ACTION_STYLE = {
 
 export interface ActivityEventItemProps {
     event: ActivityEvent;
-    /** The rail line continues below every item except the very last one. */
     isLast: boolean;
 }
 
@@ -155,7 +153,6 @@ export function ActivityEventItem({ event, isLast }: ActivityEventItemProps): Re
                     </Tooltip>
                 </div>
                 {event.changes.length > 0 && (
-                    // Indented under the headline text, past the avatar (size-7 + gap-3 = 2.5rem).
                     <div className="mt-2 sm:pl-10">
                         <dl id={changesId} className="m-0 flex flex-col divide-y divide-divider">
                             {visible.map((change) => (

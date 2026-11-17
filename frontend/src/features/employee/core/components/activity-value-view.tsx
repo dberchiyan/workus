@@ -106,7 +106,6 @@ export function ActivityValueView({ value }: { value: ActivityValue }): ReactEle
             );
         case 'feedback':
         case 'redacted':
-            // Rendered by the change row (added / edited / removed); the value is never logged.
             return null;
     }
 }

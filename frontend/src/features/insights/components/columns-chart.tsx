@@ -11,12 +11,9 @@ import { niceScale } from '../chart';
 
 export interface ChartColumn {
     key: string;
-    /** Under the column: short on wider screens, narrow on phones. */
     label: string;
     narrowLabel: string;
-    /** Follow `series`; null = a month that has not started. */
     values: number[] | null;
-    /** Tooltip and accessible name. */
     description: string;
 }
 
@@ -24,11 +21,9 @@ export interface ColumnsChartProps {
     label: string;
     columns: ChartColumn[];
     series: { key: string; className: string; hidden: boolean }[];
-    /** Stacked (parts of a whole) or side by side (two measures). */
     mode: 'stacked' | 'paired';
     selectedKey: string | undefined;
     onSelect: (key: string) => void;
-    /** Changes when the data set changes, so the bars grow again. */
     animationKey: string;
 }
 
@@ -118,7 +113,6 @@ export function ColumnsChart(props: ColumnsChartProps): ReactElement {
                                                         <span
                                                             key={props.series[part]?.key ?? part}
                                                             className={cn(
-                                                                // A 2px paper gap between parts (dataviz spacer).
                                                                 'block w-full border-t-2 border-background-paper first:border-t-0',
                                                                 props.series[part]?.className,
                                                             )}

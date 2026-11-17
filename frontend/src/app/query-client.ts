@@ -8,7 +8,6 @@ export const queryClient = new QueryClient({
     defaultOptions: {
         queries: {
             staleTime: 30_000,
-            // Never retry a 4xx (data.md → Server state), nor an answer that breaks the contract.
             retry: (failureCount, error) =>
                 !(isApiError(error) && error.isClientError) &&
                 !(error instanceof ApiContractError) &&

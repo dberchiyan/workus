@@ -7,17 +7,14 @@ model AuditEvent {
   organisationId String       @map("organisation_id") @db.Uuid
   organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_audit_events_organisation_id")
 
-  action      String    @db.VarChar(64) // <resource>.<past_tense> — CHECK in migration
-  actorUserId String?   @map("actor_user_id") @db.Uuid // null = the system
+  action      String    @db.VarChar(64)
+  actorUserId String?   @map("actor_user_id") @db.Uuid
   actor       User?     @relation("AuditEventActor", fields: [actorUserId], references: [id], onDelete: Restrict, map: "fk_audit_events_actor_user_id")
-  /// The employee whose history shows the event.
   employeeId  String?   @map("employee_id") @db.Uuid
   employee    Employee? @relation(fields: [organisationId, employeeId], references: [organisationId, id], onDelete: Restrict, map: "fk_audit_events_employee_id")
-  targetType  String    @map("target_type") @db.VarChar(32) // employee | review — CHECK in migration
+  targetType  String    @map("target_type") @db.VarChar(32)
   targetId    String    @map("target_id") @db.Uuid
-  /// Name of the target at the time (e.g. the review title).
   targetLabel String    @map("target_label") @db.VarChar(255)
-  /// Minimal before/after summary: [{ field, from, to }] — never secrets or full documents.
   changes     Json      @db.JsonB
   ipAddress   String?   @map("ip_address") @db.VarChar(64)
   userAgent   String?   @map("user_agent") @db.VarChar(512)

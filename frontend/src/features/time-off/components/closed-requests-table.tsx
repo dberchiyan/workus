@@ -13,7 +13,6 @@ import type { ManagedRequest } from '../types';
 import { RequestPerson } from './request-person';
 import { TimeOffStatusChip, TimeOffTypeChip } from './time-off-chips';
 
-/** Shares of a 12-part row, so free space is spread over every column. */
 const COLUMNS = [
     { key: 'employee', width: 'w-3/12' },
     { key: 'type', width: 'w-2/12' },

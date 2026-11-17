@@ -5,9 +5,7 @@ import { MAX_SEARCH_LENGTH } from '../../../../common/dto/limits';
 import { isTimeOffType, TIME_OFF_TYPES, type TimeOffType } from '../../service/time-off-type';
 
 export const TimeOffCalendarQuerySchema = z.object({
-    /** The month shown, `YYYY-MM`. */
     month: z.string({ error: 'validation.invalid' }).regex(/^(19|20)\d{2}-(0[1-9]|1[0-2])$/, 'validation.invalid'),
-    /** Comma-separated request types to show; absent → all of them. */
     types: z
         .string()
         .optional()
@@ -22,7 +20,6 @@ export const TimeOffCalendarQuerySchema = z.object({
             }
             return [...new Set(types)];
         }),
-    /** Words matched against the person's first name, last name or email. */
     search: z.string().trim().max(MAX_SEARCH_LENGTH, 'validation.search.tooLong').optional(),
 });
 

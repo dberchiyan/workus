@@ -1,8 +1,3 @@
-/**
- * Money arrives as `{ amount: "4500.0000", currency: "USD" }` and stays a string. Never
- * parseFloat/Number() an amount (data.md → Money): formatting takes the string, comparisons
- * and chart geometry use exact integers (BigInt, 4 decimal places).
- */
 export interface Money {
     amount: string;
     currency: string;
@@ -37,7 +32,6 @@ export const formatMoney = (money: Money, locale: string): string =>
         style: 'currency',
         currency: money.currency,
         maximumFractionDigits: toUnits(money.amount) % UNIT_FACTOR === 0n ? 0 : CENT_DIGITS,
-        // The amount is a validated decimal string (API contract); Intl formats it without a float.
     }).format(money.amount as Intl.StringNumericLiteral);
 
 /**

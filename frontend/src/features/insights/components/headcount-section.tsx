@@ -17,7 +17,6 @@ import { InsightSection } from './insight-section';
 
 export interface HeadcountSectionProps {
     filter: InsightsFilter;
-    /** A group's colour class — stable per group across the page. */
     colorFor: (groupId: string, index: number) => string;
 }
 
@@ -36,7 +35,6 @@ export function HeadcountSection({ filter, colorFor }: HeadcountSectionProps): R
 
     const started = data?.months.filter((month) => month.counts !== null) ?? [];
     const lastStarted = started.at(-1)?.month;
-    // The picked month while it exists in this year's data; otherwise the latest one.
     const selected = picked !== undefined && started.some((month) => month.month === picked) ? picked : lastStarted;
     const selectedCounts = data?.months.find((month) => month.month === selected)?.counts ?? null;
     const total = (counts: number[] | null) => (counts ?? []).reduce((sum, value) => sum + value, 0);
@@ -110,7 +108,6 @@ export function HeadcountSection({ filter, colorFor }: HeadcountSectionProps): R
                                 if (next.has(key)) {
                                     next.delete(key);
                                 } else if (next.size < series.length - 1) {
-                                    // One group always stays on.
                                     next.add(key);
                                 }
                                 return next;

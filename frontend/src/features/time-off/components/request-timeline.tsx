@@ -14,7 +14,6 @@ export interface RequestTimelineProps {
     requestId: string;
     history: readonly TimeOffHistoryItem[];
     comments: readonly TimeOffComment[];
-    /** The reason given with a rejection, shown under it. */
     decisionComment: string | null;
     viewerId: string;
 }
@@ -51,7 +50,6 @@ export function RequestTimeline({
                 const { action, actor } = entry.item;
                 return (
                     <li key={`event-${entry.item.id}`} className="flex items-start gap-3">
-                        {/* The rail dot sits where comment avatars do, so the feed reads as one column. */}
                         <span aria-hidden className="flex size-7 shrink-0 items-center justify-center">
                             <span className="size-2 rounded-full bg-primary" />
                         </span>

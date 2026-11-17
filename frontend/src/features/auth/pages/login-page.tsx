@@ -59,7 +59,6 @@ export function LoginPage(): ReactElement {
                                     {t('login.title')}
                                 </Typography>
                                 <LoginForm />
-                                {/* The demo pays with test keys: the card to use is said here. */}
                                 <BillingTestModeNote />
                             </CardContent>
                         </Card>

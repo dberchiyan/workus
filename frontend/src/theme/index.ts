@@ -38,10 +38,6 @@ declare module '@mui/material/styles' {
     }
 }
 
-/**
- * Soft, layered elevation (a tight contact shadow + a wide ambient one) in the scheme's shadow
- * colours, instead of Material's grey stacks: 1 = cards, 2–8 = menus and popovers, 9+ = dialogs.
- */
 const SOFT = 'var(--mui-palette-shadow-soft)';
 const STRONG = 'var(--mui-palette-shadow-strong)';
 const elevation = (level: number): string => {
@@ -78,7 +74,6 @@ const focusRing = (offset: number) => ({
 });
 
 export const theme = createTheme({
-    // nativeColor: MUI derives tints with CSS color-mix(), so OKLCH tokens work as they are.
     cssVariables: { colorSchemeSelector: 'class', nativeColor: true },
     colorSchemes: {
         light: { palette: TOKENS.colors.light },
@@ -89,17 +84,12 @@ export const theme = createTheme({
     shadows,
     typography: muiTypography,
     components: {
-        // The page reserves the scrollbar gutter (html { scrollbar-gutter: stable }), so MUI's
-        // scroll lock would compensate twice and shift the page sideways when a menu/dialog opens.
         MuiModal: { defaultProps: { disableScrollLock: true } },
-        // Popover (Menu, Select, Autocomplete lists) passes its own value to Modal — set below.
         MuiTypography: { defaultProps: { variantMapping: { metric: 'p', tableHeader: 'span' } } },
-        // No Material ripples: state shows through colour and the focus ring.
         MuiButtonBase: {
             defaultProps: { disableRipple: true },
             styleOverrides: { root: focusRing(2) },
         },
-        // Rows inside a list or menu: the ring sits inside, so it is not clipped.
         MuiMenuItem: { styleOverrides: { root: focusRing(-2) } },
         MuiListItemButton: { styleOverrides: { root: focusRing(-2) } },
         MuiButton: {
@@ -109,7 +99,6 @@ export const theme = createTheme({
         MuiIconButton: {
             styleOverrides: { root: { minWidth: 44, minHeight: 44, ...pressable(0.94) } },
         },
-        // Loading placeholders shimmer (a light sweep) — still when motion is reduced.
         MuiSkeleton: {
             defaultProps: { animation: 'wave' },
             styleOverrides: {
@@ -118,8 +107,6 @@ export const theme = createTheme({
                 },
             },
         },
-        // Surfaces: no dark-mode overlay gradient; menus and popovers get a hairline so they read
-        // on dark backgrounds as well as by their shadow.
         MuiPaper: { styleOverrides: { root: { backgroundImage: 'none' } } },
         MuiPopover: {
             defaultProps: { disableScrollLock: true },
@@ -130,8 +117,6 @@ export const theme = createTheme({
                 }),
             },
         },
-        // Segmented control: the options sit in a soft inset track and the chosen one is a raised
-        // pill (paper + contact shadow; a lighter surface in dark mode). No dividers between options.
         MuiToggleButtonGroup: {
             styleOverrides: {
                 root: ({ theme: t }) => ({
@@ -154,8 +139,6 @@ export const theme = createTheme({
                 },
             },
         },
-        // Touch targets ≥ 44 px under a finger (ux.md); compact under a mouse — 36 px, the small
-        // size 30 px — so the track (+ 3 px padding) lines up with a 44 px field beside it.
         MuiToggleButton: {
             styleOverrides: {
                 root: ({ theme: t }) => ({
@@ -191,20 +174,17 @@ export const theme = createTheme({
                 },
             ],
         },
-        // Page numbers stay compact under a mouse and grow to 44 px under a finger.
         MuiPaginationItem: {
             styleOverrides: {
                 root: { '@media (pointer: coarse)': { minWidth: 44, height: 44, borderRadius: 22 } },
             },
         },
-        // "Rows per page", the range and the page buttons wrap at phone width instead of overflowing.
         MuiTablePagination: {
             styleOverrides: {
                 toolbar: { flexWrap: 'wrap', justifyContent: 'flex-end', rowGap: 4 },
                 spacer: { display: 'none' },
             },
         },
-        // A centred dialog on a phone keeps a 16 px edge (MUI's 32 px leaves a narrow column).
         MuiDialog: {
             styleOverrides: {
                 paper: ({ theme: t, ownerState }) =>
@@ -221,7 +201,6 @@ export const theme = createTheme({
             },
         },
         MuiTableCell: {
-            // Header row reads as chrome, not data: muted, smaller, on a light band with a rule below.
             styleOverrides: {
                 head: ({ theme: t }) => ({
                     ...t.typography.tableHeader,
@@ -231,7 +210,6 @@ export const theme = createTheme({
                 }),
             },
         },
-        // Body rows answer the pointer with a quiet tint (rows open profiles and requests).
         MuiTableRow: {
             styleOverrides: {
                 root: ({ theme: t }) => ({
@@ -242,11 +220,9 @@ export const theme = createTheme({
                 }),
             },
         },
-        // Cards are flat: a hairline and a contact shadow, the same in both schemes.
         MuiCard: {
             defaultProps: { elevation: 1 },
             styleOverrides: {
-                // Every card, `outlined` included, so they all look alike.
                 root: ({ theme: t }) => ({
                     borderRadius: TOKENS.radius.lg,
                     border: `1px solid ${t.vars.palette.divider}`,

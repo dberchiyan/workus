@@ -1,7 +1,6 @@
 import { Prisma } from '../../generated/prisma/client';
 import { MONEY_SCALE, PERCENT, PERCENT_SCALE } from '../dto/limits';
 
-/** Money is a Decimal in code, NUMERIC(19,4) in the database, a string on the wire. */
 export type Decimal = Prisma.Decimal;
 
 export const Currency = { USD: 'USD' } as const;

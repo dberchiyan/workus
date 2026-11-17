@@ -12,7 +12,6 @@ import { isWeekendIso } from '../calendar';
 export interface CalendarDayHeaderProps {
     date: string;
     today: boolean;
-    /** The holiday's name, if the day is one. */
     holiday?: string | undefined;
     weekday: string;
     ref?: Ref<HTMLTableCellElement>;
@@ -50,7 +49,6 @@ export function CalendarDayHeader({ date, today, holiday, weekday, ref }: Calend
             {holiday !== undefined && <span className="sr-only">{t('calendar.page.holiday', { name: holiday })}</span>}
         </th>
     );
-    // The name on hover; screen readers get it from the cell itself.
     return holiday === undefined ? (
         header
     ) : (

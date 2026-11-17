@@ -62,7 +62,6 @@ export function RequestDialog({
                             lastName={request.employee.lastName}
                         />
                         <span className="flex min-w-0 flex-1 flex-col">
-                            {/* A phone has no room to cut the name short: it wraps there, truncates from sm. */}
                             <Typography variant="h6" component="h2" className="sm:truncate">
                                 {t('manage.dialog.title', { name: fullName(request.employee) })}
                             </Typography>
@@ -74,7 +73,6 @@ export function RequestDialog({
                             >
                                 {t('manage.dialog.profile', { position: request.employee.positionTitle })}
                             </Link>
-                            {/* Phone: the status goes under the name; from sm it sits beside it. */}
                             <span className="mt-1 sm:hidden">
                                 <TimeOffStatusChip status={request.status} />
                             </span>

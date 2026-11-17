@@ -13,7 +13,6 @@ import {
     type WebhookEvent,
 } from '../../service/billing-gateway';
 
-/** A fake month, so "next charge" shows a date. */
 const FAKE_PERIOD_DAYS = 30;
 const PERIOD_MS = FAKE_PERIOD_DAYS * DAY_MS;
 
@@ -26,7 +25,6 @@ const PERIOD_MS = FAKE_PERIOD_DAYS * DAY_MS;
  */
 @Injectable()
 export class FakeBillingGateway extends BillingGateway {
-    /** No card is ever asked for, so there is no test card to name. */
     readonly isTestMode = false;
     private readonly subscriptions = new Map<string, ProviderSubscription>();
 
@@ -133,7 +131,6 @@ export class FakeBillingGateway extends BillingGateway {
     }
 
     parseWebhook(): WebhookEvent {
-        // The fake sends no webhooks, so none can be genuine.
         throw new WebhookSignatureException();
     }
 }

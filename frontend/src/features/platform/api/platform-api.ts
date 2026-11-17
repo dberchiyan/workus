@@ -7,7 +7,6 @@ export const COMPANY_PEOPLE_PAGE_SIZE = 10;
 
 const BASE = '/api/v1/platform/organisations';
 
-/** Workus platform administration (platform admins only). */
 export const platformApi = {
     /** Waiting companies oldest first (the queue); the others newest first. */
     companies: async (status: CompanyStatus, search: string, page: number): Promise<CompanyPage> =>

@@ -25,8 +25,6 @@ export function EmployeeDetailsStep({ form }: EmployeeDetailsStepProps): ReactEl
     const { register, control, formState } = form;
     const { errors } = formState;
 
-    // Dialog open → first control; back with a server error → the field in error
-    // (ux.md → Focus moves with the UI).
     useEffect(() => {
         const firstInError = DETAILS_FIELDS.find((name) => form.getFieldState(name).error);
         form.setFocus(firstInError ?? 'firstName');

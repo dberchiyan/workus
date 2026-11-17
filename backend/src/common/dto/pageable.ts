@@ -60,7 +60,6 @@ const parsePageable = <F extends string>(options: PageableOptions<F>, request: R
     return { page, size, sort: { field: sortField, direction } };
 };
 
-/** Binds the parsed page request (api.md → Pagination). */
 export const PageableQuery = createParamDecorator(
     (options: PageableOptions<string>, context: ExecutionContext): Pageable =>
         parsePageable(options, context.switchToHttp().getRequest<Request>()),

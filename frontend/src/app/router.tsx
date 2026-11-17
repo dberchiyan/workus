@@ -27,14 +27,11 @@ export const router = createBrowserRouter([
         element: <RequireAuth />,
         children: [
             {
-                // A company waiting for approval (or rejected) sees only its status screen.
                 element: <OrganisationGate />,
                 children: [
                     {
                         element: <AppLayout />,
                         children: [
-                            // Each section behind its part of ACCESS (features/auth/access.ts) — the same entry
-                            // that shows or hides its menu item.
                             {
                                 element: <RequireAccess part="section.dashboard" />,
                                 children: [{ path: PATHS.dashboard, element: route(<DashboardPage />) }],

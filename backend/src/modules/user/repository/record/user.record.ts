@@ -28,7 +28,6 @@ export const userProfileSelect = {
 } satisfies Prisma.UserSelect;
 export type UserProfileRecord = Prisma.UserGetPayload<{ select: typeof userProfileSelect }>;
 
-/** An administrator (owner or admin) of the organisation, as Settings → Administrators lists them. */
 export const administratorSelect = {
     id: true,
     firstName: true,

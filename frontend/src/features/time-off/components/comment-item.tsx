@@ -25,7 +25,6 @@ import type { TimeOffComment } from '../types';
 export interface CommentItemProps {
     requestId: string;
     comment: TimeOffComment;
-    /** The signed-in user: their own comments can be edited and deleted. */
     viewerId: string | undefined;
 }
 

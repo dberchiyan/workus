@@ -25,7 +25,6 @@ import type {
 
 export interface InsightFilter {
     year: number;
-    /** One position category (its positions become the groups); absent → every category. */
     categoryId?: string | undefined;
 }
 
@@ -116,7 +115,6 @@ export class InsightsService {
         });
         const day = referenceDay(filter.year, today);
         const previousDay = monthEnd(filter.year - 1, MONTHS_PER_YEAR);
-        // Groups nobody belonged to all year add nothing to the chart.
         const used = groups.map((_, index) => months.some((month) => (month.counts?.[index] ?? 0) > 0));
         return {
             groups: groups.filter((_, index) => used[index]),

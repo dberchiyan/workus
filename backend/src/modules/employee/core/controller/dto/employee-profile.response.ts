@@ -19,10 +19,8 @@ export class EmployeeProfileResponse extends createZodDto(
             category: z.object({ id: z.uuid(), name: z.string() }),
         }),
         startsAt: z.iso.date(),
-        /** Null when not recorded. */
         bornAt: z.iso.date().nullable(),
         terminatedAt: z.iso.date().nullable(),
-        /** Set together with terminatedAt. */
         termination: z
             .object({
                 reason: TerminationReasonSchema,
@@ -48,7 +46,6 @@ export class EmployeeProfileResponse extends createZodDto(
             }),
         ),
         createdAt: z.iso.datetime(),
-        /** Send back on update (optimistic locking). */
         version: z.number().int().min(0),
     }),
 ) {}

@@ -79,6 +79,5 @@ export const useOwnSecurityLog = (
     useQuery({
         queryKey: authKeys.securityLog(category, page),
         queryFn: () => accountApi.securityLog(category, page),
-        // Another page or filter keeps the current rows on screen until its own arrive.
         placeholderData: keepPreviousData,
     });

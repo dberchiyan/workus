@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-/** Mirrors backend LoginRequestSchema (auth/controller/dto/login.request.ts). */
 export const EMAIL_MAX_LENGTH = 254;
 export const PASSWORD_MAX_LENGTH = 128;
 export const LOGIN_FIELD_LIMITS = {

@@ -35,7 +35,6 @@ export class BillingWebhookController {
         @Headers(SIGNATURE_HEADER) signature: string | undefined,
     ): Promise<WebhookReceiptResponse> {
         if (!request.rawBody) {
-            // Nothing to verify a signature over.
             throw new WebhookSignatureException();
         }
         const { isDuplicate } = await this.billingService.receiveWebhook(request.rawBody, signature);

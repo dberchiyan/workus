@@ -1,12 +1,9 @@
 import type { EmployeeStatus } from '../employee-status';
 
-/** Resolved list criteria — the repository turns it into a `where`. */
 export interface EmployeeCriteria {
-    /** Each term must match first name, last name or email. */
     searchTerms: string[];
     status: EmployeeStatus;
     categoryId: string | undefined;
-    /** Holders of one position (Settings → Company structure). */
     positionId?: string | undefined;
     today: Date;
 }

@@ -1,4 +1,3 @@
-// The opsz build: optical sizes (Inter Display cut for headings), same family name.
 import '@fontsource-variable/inter/opsz.css';
 
 import CssBaseline from '@mui/material/CssBaseline';

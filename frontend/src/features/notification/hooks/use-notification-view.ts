@@ -6,11 +6,8 @@ import { PATHS, requestPath } from '@/shared/lib/paths';
 import type { AppNotification } from '../types';
 
 export interface NotificationView {
-    /** One sentence: who did what. */
     message: string;
-    /** The request's dates. */
     period: string;
-    /** Where it leads: one's own request on the dashboard, anyone else's on Requests. */
     href: string;
 }
 

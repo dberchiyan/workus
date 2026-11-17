@@ -1,4 +1,3 @@
-/** "Chrome on macOS" from a user-agent string — enough to recognise one's own devices. */
 export interface DeviceSummary {
     browser: string | null;
     os: string | null;

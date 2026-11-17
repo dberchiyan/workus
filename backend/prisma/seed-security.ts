@@ -4,11 +4,8 @@ import { UserRole } from '../src/modules/user/service/user-role';
 
 const HOUR_MS = 3_600_000;
 const DAY_MS = 24 * HOUR_MS;
-/** How far back the story goes (at most; never before the account existed). */
 const WINDOW_DAYS = 21;
-/** Accounts are created two weeks before the start date (as in the seeded Activity). */
 const ADDED_BEFORE_START_DAYS = 14;
-/** Marks the seeded rows, so a second run skips them while real sign-ins never count. */
 const SEED_TRACE = 'seed-security-log';
 
 const DEVICES = {
@@ -25,7 +22,6 @@ const DEVICES = {
 } as const;
 type Device = keyof typeof DEVICES;
 
-/** Each person's computer and phone, by turns. */
 const DEVICE_PAIRS: readonly [Device, Device][] = [
     ['macChrome', 'iphone'],
     ['windowsEdge', 'android'],
@@ -47,7 +43,6 @@ type Action = (typeof AuditAction)[keyof typeof AuditAction];
 
 interface Step {
     action: Action;
-    /** Place in the person's window: 0 = its start, 1 = its end. */
     at: number;
     actor: 'self' | 'none' | 'admin';
     place: 'office' | 'home' | 'mobile' | 'stranger';
@@ -130,7 +125,6 @@ const storyFor = (index: number): Step[] => {
             });
         }
     } else {
-        // Their own typo this time.
         steps.push({
             action: AuditAction.AUTH_SIGN_IN_FAILED,
             at: 0.5,
@@ -234,7 +228,6 @@ export const seedSecurityLog = async (prisma: PrismaClient, organisationId: stri
             userAgent,
             traceId: SEED_TRACE,
         });
-        // A minute's jitter per person, so two people's lines never read the same.
         const jitter = (index % 7) * 7 * 60_000;
         const story = storyFor(index)
             .filter((step) => step.actor !== 'admin' || admin)
@@ -248,7 +241,6 @@ export const seedSecurityLog = async (prisma: PrismaClient, organisationId: stri
                 ),
             );
         if (left !== null && left < now) {
-            // Ended by the admin who recorded the termination; a sign-in a day later is refused.
             story.push(
                 event(AuditAction.AUTH_SESSIONS_ENDED_ON_TERMINATION, left, admin?.id ?? null, ipOf('office', 0), null),
             );

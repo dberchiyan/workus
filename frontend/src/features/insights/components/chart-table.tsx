@@ -33,7 +33,6 @@ export function ChartTable({ caption, columns, rows }: ChartTableProps): ReactEl
                         <TableRow key={row.key}>
                             {row.cells.map((cell, index) => (
                                 <TableCell
-                                    // Cells of one row share no stable id; their column is their identity.
                                     key={columns[index] ?? index}
                                     component={index === 0 ? 'th' : 'td'}
                                     scope={index === 0 ? 'row' : undefined}

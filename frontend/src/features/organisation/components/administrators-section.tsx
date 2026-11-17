@@ -41,7 +41,6 @@ export function AdministratorsSection(): ReactElement {
     const administrators = useAdministrators(deferredSearch, page);
     const [changing, setChanging] = useState<{ administrator: Administrator; key: number } | null>(null);
     const [open, setOpen] = useState(false);
-    // Add admin: remounted on each opening (a fresh form and Idempotency-Key).
     const [addOpening, setAddOpening] = useState(0);
     const [isAddOpen, setIsAddOpen] = useState(false);
     const addButtonRef = useRef<HTMLButtonElement>(null);

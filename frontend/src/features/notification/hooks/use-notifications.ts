@@ -9,7 +9,6 @@ import type { AppNotification, NotificationPage } from '../types';
 import { notificationKeys } from './query-keys';
 
 export const NOTIFICATIONS_PAGE_SIZE = 10;
-/** The bell asks for news this often while the tab is visible (no push channel yet). */
 const POLL_MS = 60_000;
 
 /** The badge: polled while the tab is visible and on focus. */

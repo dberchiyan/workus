@@ -81,7 +81,6 @@ export const toTimeOffCommentResponse = (comment: TimeOffCommentRecord): TimeOff
 /** Fields every view of a request shares. */
 const requestFields = (request: TimeOffRequestRecord, history: AuditEvent[]) => ({
     id: request.id,
-    // Guarded by ck_time_off_requests_type / _status.
     type: isTimeOffType(request.type) ? request.type : TimeOffType.DAY_OFF,
     startsAt: isoDate(request.startsAt),
     endsAt: isoDate(request.endsAt),
@@ -94,7 +93,6 @@ const requestFields = (request: TimeOffRequestRecord, history: AuditEvent[]) => 
     decidedBy: request.decider ? person(request.decider) : null,
     responsibles: request.responsibles.map(({ responsible }) => person(responsible)),
     history: historyOf(history),
-    // Read newest first (bounded), shown oldest first.
     comments: request.comments.map(toTimeOffCommentResponse).reverse(),
     commentCount: request._count.comments,
 });
@@ -156,7 +154,6 @@ export const toTimeOffCalendarResponse = (calendar: TimeOffCalendar): TimeOffCal
         },
         requests: requests.map((request) => ({
             id: request.id,
-            // Guarded by ck_time_off_requests_type / _status.
             type: isTimeOffType(request.type) ? request.type : TimeOffType.DAY_OFF,
             status: isTimeOffStatus(request.status) ? request.status : TimeOffStatus.PENDING,
             startsAt: isoDate(request.startsAt),

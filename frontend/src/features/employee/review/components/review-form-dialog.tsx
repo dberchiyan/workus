@@ -26,7 +26,6 @@ import { FeedbackTabsField } from './feedback-tabs-field';
 
 export interface ReviewFormDialogProps {
     employeeId: string;
-    /** null → add a review; otherwise edit this one. */
     review: Review | null;
     open: boolean;
     onClose: () => void;
@@ -54,7 +53,6 @@ export function ReviewFormDialog({
         onSaved,
     );
     const isEdit = review !== null;
-    // A starting review keeps the start reviewedAt and stays completed (the server enforces it too).
     const isStarting = review?.kind === 'STARTING';
     const { register, control, formState } = form;
     const { errors } = formState;
@@ -68,7 +66,6 @@ export function ReviewFormDialog({
     const [search, setSearch] = useState('');
     const candidates = useReviewCandidates(search, open);
 
-    // Dialog open → first control (ux.md → Focus moves with the UI).
     useEffect(() => {
         if (open) {
             requestAnimationFrame(() => {

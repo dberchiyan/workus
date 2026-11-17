@@ -16,7 +16,6 @@ import { InsightSection } from './insight-section';
 
 export interface TenureSectionProps {
     filter: InsightsFilter;
-    /** A category's colour class (the same on every chart). */
     colorFor: (groupId: string, index: number) => string;
 }
 

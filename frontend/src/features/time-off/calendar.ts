@@ -1,7 +1,6 @@
 import { DAYS_PER_WEEK, ISO_DAY_LENGTH, MONTHS_PER_YEAR, SATURDAY, SUNDAY } from '@/shared/lib/units';
 
 const A_SUNDAY = '2023-01-01';
-/** Calendar dates as `YYYY-MM-DD` strings; maths in UTC so a day never shifts. */
 
 const DAY_MS = 86_400_000;
 const toDate = (iso: string): Date => new Date(`${iso}T00:00:00Z`);
@@ -46,7 +45,6 @@ export const monthGrid = (
     const weeks = Array.from({ length: cells.length / DAYS_PER_WEEK }, (_, week) =>
         cells.slice(week * DAYS_PER_WEEK, week * DAYS_PER_WEEK + DAYS_PER_WEEK),
     );
-    // 2023-01-01 was a Sunday: offset from it for each column's weekday.
     const short = new Intl.DateTimeFormat(locale, { weekday: 'short', timeZone: 'UTC' });
     const long = new Intl.DateTimeFormat(locale, { weekday: 'long', timeZone: 'UTC' });
     const labels = Array.from({ length: 7 }, (_, column) => {

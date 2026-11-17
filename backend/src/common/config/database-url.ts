@@ -1,4 +1,3 @@
-/** The PostgreSQL connection settings, as the app, Prisma and the seed read them. */
 export interface DatabaseSettings {
     host: string;
     port: number;

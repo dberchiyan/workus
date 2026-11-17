@@ -26,17 +26,13 @@ export function InsightsPage(): ReactElement {
     const { t } = useTranslation('insights');
     useDocumentTitle(t('pageTitle'));
     const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
-    // This year and month (UTC, as the figures), read once per visit (no clock in render).
     const [now] = useState(nowUtc);
     const { filter, update } = useInsightsParams(now.year);
     const filterKey = `${String(filter.year)}-${filter.categoryId ?? 'all'}`;
-    // A Business feature: a lower plan sees the prompt and asks the API for nothing.
     const upgrade = useUpgrade('insights');
     const categoryData = useInsightCategories(!upgrade.locked).data;
     const categories = useMemo(() => categoryData?.categories ?? [], [categoryData]);
 
-    // A category keeps its colour everywhere (its place among all categories); positions within
-    // one category take colours by their own order.
     const colorFor = useCallback(
         (groupId: string, index: number) => {
             const place = categories.findIndex((category) => category.id === groupId);
@@ -81,7 +77,6 @@ export function InsightsPage(): ReactElement {
                     </div>
                     <InsightsToolbar filter={filter} currentYear={now.year} categories={categories} onChange={update} />
                 </div>
-                {/* Another year or category starts each chart afresh (selection, hidden groups). */}
                 <HeadcountSection key={`headcount-${filterKey}`} filter={filter} colorFor={colorFor} />
                 <TurnoverSection key={`turnover-${filterKey}`} filter={filter} now={now} />
                 <TenureSection filter={filter} colorFor={colorFor} />

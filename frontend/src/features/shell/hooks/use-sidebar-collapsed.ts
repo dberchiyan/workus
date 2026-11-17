@@ -19,9 +19,7 @@ export const useSidebarCollapsed = (): { isCollapsed: boolean; toggle: () => voi
             const next = !current;
             try {
                 window.localStorage.setItem(STORAGE_KEY, String(next));
-            } catch {
-                // Not remembered; the sidebar still toggles.
-            }
+            } catch {}
             return next;
         });
     };

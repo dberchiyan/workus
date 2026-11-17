@@ -20,15 +20,9 @@ export interface DateRange {
 export interface RangeCalendarProps {
     value: DateRange;
     onChange: (range: DateRange) => void;
-    /** Company holidays (`YYYY-MM-DD` → name): shown in red, still pickable. */
     holidays?: ReadonlyMap<string, string>;
 }
 
-/**
- * A month grid (WAI-ARIA grid pattern) for a date range: the first click picks the first day,
- * the next one on or after it picks the last; a single day is a valid range. Arrow keys move by
- * day / week, Home / End to the week's ends, PageUp / PageDown by month; Enter or Space picks.
- */
 const NO_HOLIDAYS: ReadonlyMap<string, string> = new Map();
 
 export function RangeCalendar({ value, onChange, holidays = NO_HOLIDAYS }: RangeCalendarProps): ReactElement {
@@ -37,9 +31,7 @@ export function RangeCalendar({ value, onChange, holidays = NO_HOLIDAYS }: Range
     const titleId = useId();
     const [month, setMonth] = useState(() => value.start.slice(0, ISO_MONTH_LENGTH));
     const [focused, setFocused] = useState(value.start);
-    // After a first click the next one picks the last day.
     const [isPickingEnd, setIsPickingEnd] = useState(false);
-    // Keyboard moves focus with the active day (also across months); clicks do not.
     const shouldMoveFocus = useRef(false);
     const gridRef = useRef<HTMLTableElement>(null);
     const today = todayUtcIso();
@@ -124,8 +116,6 @@ export function RangeCalendar({ value, onChange, holidays = NO_HOLIDAYS }: Range
                     <ChevronRightOutlined aria-hidden />
                 </IconButton>
             </div>
-            {/* WAI-ARIA APG date grid: a table with role="grid" and roving focus on day buttons. */}
-            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role */}
             <table ref={gridRef} role="grid" aria-labelledby={titleId} className="w-full border-collapse">
                 <thead>
                     <tr>
@@ -143,7 +133,6 @@ export function RangeCalendar({ value, onChange, holidays = NO_HOLIDAYS }: Range
                         <tr key={week.find((day) => day !== null) ?? week.length}>
                             {week.map((date, index) => {
                                 if (date === null) {
-                                    // Padding cells have no date; their column is their identity.
                                     return <td key={`pad-${String(index)}`} />;
                                 }
                                 const isEdge = date === value.start || date === value.end;

@@ -44,7 +44,6 @@ export class NotificationRepository {
     ): Promise<{ content: NotificationRecord[]; totalElements: number }> {
         const where = { organisationId, recipientUserId } satisfies Prisma.NotificationWhereInput;
         const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
-        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [totalElements, content] = await Promise.all([
             this.txHost.tx.notification.count({ where }),
             this.txHost.tx.notification.findMany({ where, select: notificationSelect, ...page }),
@@ -95,7 +94,6 @@ export class NotificationRepository {
         return this.txHost.tx.notification.findMany({
             where: { type, subjectId: { in: subjectIds }, createdAt: { gte: since } },
             select: { recipientUserId: true, subjectId: true },
-            // At most 10 responsible people a request.
             take: subjectIds.length * MAX_NOTICES_PER_SUBJECT,
         });
     }

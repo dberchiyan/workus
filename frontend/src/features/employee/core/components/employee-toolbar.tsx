@@ -15,7 +15,6 @@ type SortOption = (typeof SORTS)[number];
 
 export interface EmployeeToolbarProps {
     params: EmployeeListParams;
-    /** Matching employees; absent while the first page loads. */
     total: number | undefined;
     onSearch: (search: string) => void;
     onStatus: (status: EmployeeStatus) => void;

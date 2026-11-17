@@ -7,7 +7,6 @@ import { useTranslation } from 'react-i18next';
 import { cn } from '@/shared/lib/cn';
 import { PASSWORD_LIMITS, PASSWORD_RULES } from '@/shared/lib/password-rules';
 
-/** A rule of the form using the box (e.g. "differs from the current one"), already worded. */
 export interface ExtraPasswordRule {
     key: string;
     label: string;

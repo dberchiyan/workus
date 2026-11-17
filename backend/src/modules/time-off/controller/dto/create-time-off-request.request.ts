@@ -4,7 +4,6 @@ import { z } from 'zod';
 import { TIME_OFF_TYPES } from '../../service/time-off-type';
 
 export const NOTE_MAX_LENGTH = 500;
-/** Calendar days one request may cover. */
 export const MAX_PERIOD_DAYS = 60;
 const DAY_MS = 86_400_000;
 
@@ -17,9 +16,7 @@ export class CreateTimeOffRequestRequest extends createZodDto(
         .object({
             type: TimeOffTypeSchema,
             startsAt: z.iso.date('validation.period.start'),
-            /** Inclusive. */
             endsAt: z.iso.date('validation.period.end'),
-            /** Blank → none. */
             note: z.preprocess(
                 (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
                 z.string().trim().max(NOTE_MAX_LENGTH, 'validation.note.tooLong').optional(),

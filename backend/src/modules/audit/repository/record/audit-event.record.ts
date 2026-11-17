@@ -19,7 +19,6 @@ export const auditEventSelect = {
 } satisfies Prisma.AuditEventSelect;
 export type AuditEventRecord = Prisma.AuditEventGetPayload<{ select: typeof auditEventSelect }>;
 
-/** A security-log entry: what, when, from where. */
 export const securityEventSelect = {
     id: true,
     occurredAt: true,

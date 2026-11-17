@@ -9,7 +9,6 @@ import { Providers } from './providers';
 import { queryClient } from './query-client';
 import { router } from './router';
 
-/** 401 mid-session → queryClient.clear() → sign-in with "session expired" → back after login. */
 setSessionLostHandler((_code, config) => {
     if (config?.url && AUTH_SESSION_ENDPOINTS.includes(config.url)) {
         return;

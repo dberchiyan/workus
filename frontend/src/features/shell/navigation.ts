@@ -32,10 +32,8 @@ export interface NavItem {
     section: NavSection;
     path: string;
     icon: ComponentType<SvgIconProps>;
-    /** The part of `ACCESS` that decides who sees it (cosmetic — the backend enforces access). */
     access: AccessPart;
     placement: 'main' | 'bottom';
-    /** Loads the page's code on hover or focus, so the click renders at once. */
     preload: () => Promise<unknown>;
 }
 

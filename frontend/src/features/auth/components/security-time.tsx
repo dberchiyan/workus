@@ -6,11 +6,8 @@ import { formatAgo } from '@/shared/lib/format-ago';
 import { ISO_DAY_LENGTH } from '@/shared/lib/units';
 
 export interface SecurityTimeProps {
-    /** The (oldest) instant. */
     from: string;
-    /** The newest instant of a group, or null for one event. */
     to: string | null;
-    /** `YYYY-MM-DD` of today, UTC. */
     today: string;
     now: number;
 }

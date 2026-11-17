@@ -50,7 +50,6 @@ export const useRenameOrganisation = (): UseMutationResult<
         mutationFn: organisationApi.rename,
         onSuccess: async (organisation) => {
             queryClient.setQueryData(organisationKeys.current(), organisation);
-            // The account menu shows the name from /auth/me.
             await queryClient.invalidateQueries({ queryKey: authKeys.me() });
         },
     });

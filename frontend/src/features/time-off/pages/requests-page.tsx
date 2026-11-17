@@ -23,7 +23,6 @@ export function RequestsPage(): ReactElement {
     const { data: user } = useCurrentUser();
     const { params, update } = useRequestsParams();
     const decisions = useRequestDecisions();
-    // One clock reading per visit: "waiting N days" must not change between renders.
     const [now] = useState(() => Date.now());
     const onSearch = useCallback(
         (search: string) => {

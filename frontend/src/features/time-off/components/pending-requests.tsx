@@ -14,7 +14,6 @@ import type { ManagedRequest, TimeOffDecision } from '../types';
 import { PendingRequestCard } from './pending-request-card';
 import { SectionHeader } from './section-header';
 
-/** Cards shown at first and added by "Show more"; the API allows up to 100 per page. */
 const STEP = 12;
 const MAX = 96;
 

@@ -1,4 +1,3 @@
--- Back to plain text: the document's text nodes joined with spaces (formatting is lost).
 CREATE FUNCTION pg_temp.doc_text(doc JSONB) RETURNS VARCHAR(2000) LANGUAGE SQL IMMUTABLE AS $$
   SELECT left(string_agg(value #>> '{}', ' '), 2000) FROM jsonb_path_query(doc, 'strict $.**.text') AS t(value)
 $$;

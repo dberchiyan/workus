@@ -4,7 +4,6 @@ import { todayUtcIso } from '@/shared/lib/utc-day';
 
 import type { TerminationReason } from './types';
 
-/** Mirrors backend CreateEmployeeRequestSchema (employee/controller/dto/create-employee.request.ts). */
 export const EMPLOYEE_LIMITS = {
     name: 100,
     email: 254,
@@ -74,7 +73,6 @@ export const createEmployeeSchema = z.object({
         .pipe(z.email(MESSAGES.emailInvalid)),
     positionId: z.uuid(MESSAGES.positionRequired),
     startsAt: z.iso.date(MESSAGES.startDateInvalid),
-    /** Monthly USD, a decimal string with up to two places — never a number (data.md → Money). */
     startingSalary: z
         .string()
         .trim()
@@ -90,7 +88,6 @@ export const createEmployeeSchema = z.object({
     ),
     telegram: optionalMatching(EMPLOYEE_LIMITS.telegram, /^@?[A-Za-z0-9_]{5,32}$/, MESSAGES.telegramInvalid),
     address: z.string().trim().max(EMPLOYEE_LIMITS.address, MESSAGES.addressTooLong),
-    /** Optional `YYYY-MM-DD`; blank is fine. The server checks "not in the future" by its own terminatedAt. */
     bornAt: z
         .string()
         .refine(
@@ -104,7 +101,6 @@ export const createEmployeeSchema = z.object({
 export type CreateEmployeeFormValues = z.input<typeof createEmployeeSchema>;
 export type CreateEmployeeFormOutput = z.output<typeof createEmployeeSchema>;
 
-/** Edit profile: the Add employee details without the starting salary (edited as its review). */
 export const updateEmployeeSchema = createEmployeeSchema.omit({
     startingSalary: true,
     responsibleUserIds: true,
@@ -114,7 +110,6 @@ export type UpdateEmployeeFormOutput = z.output<typeof updateEmployeeSchema>;
 
 export const TERMINATION_COMMENT_MAX = 500;
 
-/** Mirrors backend TerminateEmployeeRequest. */
 export const terminateEmployeeSchema = z
     .object({
         terminatedAt: z.iso.date('validation:terminationDate.invalid'),
@@ -132,7 +127,6 @@ export const terminateEmployeeSchema = z
     });
 export type TerminateEmployeeFormValues = z.input<typeof terminateEmployeeSchema>;
 
-/** Fields validated when leaving step 1 ("Details"). */
 export const DETAILS_FIELDS = [
     'firstName',
     'lastName',
@@ -158,7 +152,6 @@ export const TERMINATION_REASONS = [
 const TERMINATION_REASON_SET: ReadonlySet<string> = new Set(TERMINATION_REASONS);
 export const isTerminationReason = (value: string): value is TerminationReason => TERMINATION_REASON_SET.has(value);
 
-/** Mirrors backend company-structure.request.ts. */
 export const STRUCTURE_LIMITS = { departmentName: 100, positionTitle: 150 } as const;
 
 /** One name in the company structure: a department's name or a position's title. */

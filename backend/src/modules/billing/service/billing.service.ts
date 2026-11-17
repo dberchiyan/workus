@@ -270,11 +270,9 @@ export class BillingService {
         const before = await this.requireBilling(organisationId);
         const isCurrent = before.billingSubscriptionId === subscription.id;
         if (subscription.state === SubscriptionState.PENDING) {
-            // Not paid yet (checkout open or abandoned): nothing changes.
             return;
         }
         if (subscription.state === SubscriptionState.ENDED && !isCurrent) {
-            // An older or never-recorded subscription ended: the current state stays.
             return;
         }
         const next = this.nextColumns(before, subscription);
@@ -325,7 +323,6 @@ export class BillingService {
             subscriptionStatus: isPastDue ? SubscriptionStatus.PAST_DUE : SubscriptionStatus.ACTIVE,
             scheduledPlan,
             periodEndsAt: subscription.periodEndsAt,
-            // The grace period counts from the first failure we saw, not from each retry.
             pastDueAt: isPastDue ? (before.pastDueAt ?? new Date()) : null,
             billingSubscriptionId: subscription.id,
         };
@@ -420,7 +417,6 @@ export class BillingService {
             email: owner?.email ?? principal.email,
         });
         if (!(await this.billingRepository.setCustomerId(billing.id, customerId))) {
-            // Another request stored one meanwhile; that one is the company's.
             const current = await this.requireBilling(billing.id);
             return current.billingCustomerId ?? customerId;
         }

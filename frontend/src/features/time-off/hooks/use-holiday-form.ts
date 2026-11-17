@@ -61,7 +61,6 @@ export const useHolidayForm = (
     const [idempotencyKey] = useState(() => crypto.randomUUID());
     const [errorCode, setErrorCode] = useState<ErrorCode | null>(null);
     const errorRef = useRef<HTMLDivElement>(null);
-    // An actionable error that is not a field's gets the focus (ux.md → Focus).
     useEffect(() => {
         if (errorCode) {
             errorRef.current?.focus();

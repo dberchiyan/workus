@@ -37,10 +37,8 @@ export function ResetPasswordDialog({ employee, open, onClose, onExited }: Reset
     const descriptionId = useId();
     const doneHintId = useId();
     const theme = useTheme();
-    // The password step is a full-screen sheet on phones, so the password stays on one line.
     const isPhone = useMediaQuery(theme.breakpoints.down('sm'));
     const reset = useResetPassword(employee.id);
-    // One key per opening: a retry of this reset never resets twice.
     const [idempotencyKey] = useState(() => crypto.randomUUID());
     const [password, setPassword] = useState<string | null | undefined>(undefined);
     const [isSaved, setIsSaved] = useState(false);
@@ -78,7 +76,6 @@ export function ResetPasswordDialog({ employee, open, onClose, onExited }: Reset
     };
 
     const finish = (): void => {
-        // The password leaves memory with the dialog.
         setPassword(undefined);
         reset.reset();
         onClose();
@@ -87,7 +84,6 @@ export function ResetPasswordDialog({ employee, open, onClose, onExited }: Reset
     return (
         <Dialog
             open={open}
-            // The result step closes only through Done, so the password is not lost by accident.
             onClose={isDone || reset.isPending ? undefined : onClose}
             maxWidth={isDone ? 'sm' : 'xs'}
             fullWidth

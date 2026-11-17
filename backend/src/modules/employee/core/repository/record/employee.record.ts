@@ -1,6 +1,5 @@
 import type { Prisma } from '../../../../../generated/prisma/client';
 
-/** Shown per row; the rest is summarised by `_count`. */
 export const RESPONSIBLES_PER_ROW = 3;
 
 export const employeeListItemSelect = {
@@ -41,7 +40,6 @@ export type ResponsibleCandidateRecord = Prisma.UserGetPayload<{
     select: typeof responsibleCandidateSelect;
 }>;
 
-/** Bounded: a profile shows everyone responsible, but never an unbounded list. */
 export const PROFILE_RESPONSIBLES_LIMIT = 20;
 
 export const employeeProfileSelect = {
@@ -81,7 +79,6 @@ export type EmployeeProfileRecord = Prisma.EmployeeGetPayload<{
     select: typeof employeeProfileSelect;
 }>;
 
-/** What other modules need to plan time off: dates and who decides. */
 export const employeeTimeOffSelect = {
     id: true,
     startsAt: true,
@@ -92,7 +89,6 @@ export type EmployeeTimeOffRecord = Prisma.EmployeeGetPayload<{
     select: typeof employeeTimeOffSelect;
 }>;
 
-/** One row of the time-off calendar. */
 export const employeeCalendarSelect = {
     id: true,
     startsAt: true,
@@ -104,7 +100,6 @@ export type EmployeeCalendarRecord = Prisma.EmployeeGetPayload<{
     select: typeof employeeCalendarSelect;
 }>;
 
-/** Who starts or leaves, and when (dashboard). */
 export const employeeMovementSelect = {
     id: true,
     startsAt: true,
@@ -115,7 +110,6 @@ export type EmployeeMovementRecord = Prisma.EmployeeGetPayload<{
     select: typeof employeeMovementSelect;
 }>;
 
-/** Everyone with their dates and position — the base of the company figures (insights). */
 export const employeeRosterSelect = {
     id: true,
     startsAt: true,

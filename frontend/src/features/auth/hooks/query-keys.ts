@@ -1,9 +1,5 @@
 import type { SecurityCategory } from '../types';
 
-/**
- * No tenant id: a user belongs to one organisation (it comes from the session) and the cache is
- * cleared on sign-out, so one cache never holds two organisations' data.
- */
 export const authKeys = {
     all: ['auth'] as const,
     me: (): readonly ['auth', 'me'] => [...authKeys.all, 'me'] as const,

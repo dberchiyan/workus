@@ -20,7 +20,6 @@ import { RequestDetails } from './request-details';
 import { ResponsibleSummary } from './responsible-summary';
 import { TimeOffStatusChip, TimeOffTypeChip } from './time-off-chips';
 
-/** Shares of a 12-part row, so free space is spread over every column, not one. */
 const COLUMNS = [
     { key: 'type', width: 'w-2/12' },
     { key: 'period', width: 'w-3/12' },

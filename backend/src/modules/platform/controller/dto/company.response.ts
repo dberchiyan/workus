@@ -31,11 +31,9 @@ export const CompanySchema = z
         name: z.string(),
         status: CompanyStatusSchema,
         createdAt: z.iso.datetime(),
-        /** The latest approval or rejection; null while it waits for the first decision. */
         decidedAt: z.iso.datetime().nullable(),
         decidedBy: z.object({ firstName: z.string(), lastName: z.string() }).nullable(),
         rejectionReason: z.string().max(MAX_REJECTION_REASON_LENGTH).nullable(),
-        /** Up to 3, oldest first. */
         owners: z.array(PersonSchema),
         adminCount: z.number().int().min(0),
         activeEmployeeCount: z.number().int().min(0),
@@ -69,7 +67,6 @@ const CompanyUserSchema = z
         lastName: z.string(),
         email: z.string(),
         role: z.enum(['OWNER', 'ADMIN', 'MANAGER', 'EMPLOYEE']),
-        /** TERMINATED: an employee whose employment has ended. */
         status: z.enum(['ACTIVE', 'TERMINATED']),
         createdAt: z.iso.datetime(),
     })
@@ -80,7 +77,6 @@ export class CompanyUserPageResponse extends createZodDto(
 ) {}
 
 export const CompanyUserQuerySchema = z.object({
-    /** Owners, admins, or employees (managers included); absent → everyone. */
     people: z.enum(COMPANY_PEOPLE).optional(),
     search: z.string().trim().max(MAX_SEARCH_LENGTH, 'validation.search.tooLong').optional(),
 });

@@ -44,7 +44,6 @@ export class CompanyRepository {
             AND: nameTerms(criteria.searchTerms),
         };
         const page = toPrismaPage(pageable, companyOrderBy, (direction) => ({ id: direction }));
-        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [totalElements, content] = await Promise.all([
             this.txHost.tx.organisation.count({ where }),
             this.txHost.tx.organisation.findMany({
@@ -91,7 +90,6 @@ export class CompanyRepository {
             })),
         };
         const page = toPrismaPage(pageable, userOrderBy, (direction) => ({ id: direction }));
-        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [totalElements, content] = await Promise.all([
             this.txHost.tx.user.count({ where }),
             this.txHost.tx.user.findMany({ where, select: companyUserSelect, ...page }),

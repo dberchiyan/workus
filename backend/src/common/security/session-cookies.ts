@@ -4,7 +4,6 @@ import type { CookieOptions, Response } from 'express';
 import { AppConfigService } from '../config/app-config.service';
 import { CSRF_COOKIE_NAME } from './csrf.guard';
 
-/** What a started session gives the browser. */
 export interface IssuedSession {
     token: string;
     csrfToken: string;

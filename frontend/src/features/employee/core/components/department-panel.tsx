@@ -17,7 +17,6 @@ import type { Department, StructurePosition } from '../types';
 import { PositionHoldersDialog } from './position-holders-dialog';
 import { StructureNameForm } from './structure-name-form';
 
-/** Row actions: shown on hover or focus where there is a mouse, always on touch screens. */
 const ROW_ACTIONS =
     'flex shrink-0 items-center transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover:opacity-100 [@media(hover:hover)]:group-focus-within:opacity-100';
 
@@ -36,8 +35,6 @@ function ActionButton({
     if (reason) {
         return (
             <Tooltip title={reason}>
-                {/* A disabled button gets no events; its focusable wrapper explains why. */}
-                {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- tooltip trigger for a disabled action (WAI-ARIA tooltip pattern) */}
                 <span tabIndex={0} aria-label={`${label}. ${reason}`} className="inline-flex rounded-full">
                     <IconButton aria-label={label} disabled>
                         {children}
@@ -55,7 +52,6 @@ function ActionButton({
 
 export interface DepartmentPanelProps {
     department: Department;
-    /** The plan has no structure management: names and counts only, no editing controls. */
     readOnly?: boolean;
     onRemoveDepartment: () => void;
     onRemovePosition: (position: StructurePosition) => void;
@@ -75,7 +71,6 @@ export function DepartmentPanel({
     const [renaming, setRenaming] = useState(false);
     const [renamingPositionId, setRenamingPositionId] = useState<string | null>(null);
     const [adding, setAdding] = useState(false);
-    // Kept after closing until the dialog has faded out; `opening` remounts it on page 1.
     const [holders, setHolders] = useState<{ position: StructurePosition; opening: number } | null>(null);
     const [holdersOpen, setHoldersOpen] = useState(false);
     const positionKey = useRef(crypto.randomUUID());
@@ -172,7 +167,6 @@ export function DepartmentPanel({
                                 >
                                     <WorkOutlineOutlined fontSize="small" />
                                 </span>
-                                {/* On a phone the count goes under the title, so the title keeps its width. */}
                                 <span className="flex min-w-0 flex-1 flex-col items-start gap-0.5 sm:flex-row sm:items-center sm:gap-3">
                                     <Typography
                                         variant="subtitle2"

@@ -1,6 +1,5 @@
 import { z } from 'zod';
 
-/** Mirrored by `users.first_name` / `users.last_name` (VARCHAR(100)). */
 export const PERSON_NAME_MAX_LENGTH = 100;
 
 /** A first or last name: trimmed, required, ≤ 100 (sign-up, adding people, renaming oneself). */

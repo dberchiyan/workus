@@ -1,5 +1,3 @@
--- Reverts 20261107180000_time_off_company_holidays. Fails if audit events of holidays or
--- requests with 0 days exist — delete / fix them first (incidents only).
 ALTER TABLE "audit_events" DROP CONSTRAINT "ck_audit_events_target_type";
 ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_target_type"
     CHECK ("target_type" IN ('employee', 'review', 'time_off_request', 'user'));

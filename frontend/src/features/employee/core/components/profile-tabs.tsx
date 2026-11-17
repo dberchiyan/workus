@@ -27,7 +27,6 @@ export function ProfileTabs({ employee, mock }: ProfileTabsProps): ReactElement 
     const { t } = useTranslation('employee');
     const { tab, setTab } = useProfileTab();
     const baseId = useId();
-    // Reviews are a Team feature: a lower plan sees the prompt instead (the API refuses too).
     const reviews = useUpgrade('reviews');
     const labels: Record<ProfileTab, string> = {
         info: t('profile.tabs.info'),
@@ -38,7 +37,6 @@ export function ProfileTabs({ employee, mock }: ProfileTabsProps): ReactElement 
     };
 
     return (
-        // flex-1: on desktop the card reaches at least the bottom of the leave balances beside it.
         <Card variant="outlined" className="flex flex-1 flex-col">
             <Tabs
                 value={tab}

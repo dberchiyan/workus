@@ -1,4 +1,3 @@
--- CreateTable
 CREATE TABLE "audit_events" (
     "id" UUID NOT NULL DEFAULT uuidv7(),
     "occurred_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -19,19 +18,14 @@ CREATE TABLE "audit_events" (
     CONSTRAINT "ck_audit_events_changes_array" CHECK (jsonb_typeof("changes") = 'array')
 );
 
--- CreateIndex
 CREATE INDEX "idx_audit_events_employee_id_occurred_at" ON "audit_events"("employee_id", "occurred_at");
 
--- CreateIndex
 CREATE INDEX "idx_audit_events_actor_user_id" ON "audit_events"("actor_user_id");
 
--- AddForeignKey
 ALTER TABLE "audit_events" ADD CONSTRAINT "fk_audit_events_actor_user_id" FOREIGN KEY ("actor_user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- AddForeignKey
 ALTER TABLE "audit_events" ADD CONSTRAINT "fk_audit_events_employee_id" FOREIGN KEY ("employee_id") REFERENCES "employees"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
--- Append-only (data.md → Audit log): the application can only INSERT.
 CREATE FUNCTION "audit_events_append_only"() RETURNS trigger
 LANGUAGE plpgsql AS $$
 BEGIN

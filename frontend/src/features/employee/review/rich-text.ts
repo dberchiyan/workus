@@ -1,6 +1,5 @@
 import type { RichTextDoc } from './types';
 
-/** Mirrors the server limit: characters of text in the document. */
 export const FEEDBACK_MAX_TEXT = 2000;
 
 export const richTextLength = (node: unknown): number => {

@@ -1,13 +1,3 @@
-/**
- * Generates runtime response schemas (Zod) from backend/openapi.json — the same contract the
- * TypeScript types come from — and a table of which schema each endpoint answers with. The API
- * client checks every JSON response against it (src/shared/api/responseContract.ts).
- *
- * Shapes and types only: patterns, lengths and ranges are the server's input rules, not checked
- * here. Objects strip unknown keys (a server may add a field without breaking the client).
- *
- * Usage: node scripts/generate-api-schemas.ts
- */
 import { readFileSync, writeFileSync } from 'node:fs';
 import { dirname, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -131,7 +121,6 @@ const zodOf = (schema: Schema, lazyRefs: ReadonlySet<string>): string => {
     return wrap(concrete.length > 1 ? union(concrete.map(one)) : one(concrete[0]));
 };
 
-// Response schemas of every operation (JSON 2xx), and the component schemas they need.
 const operations = Object.entries(spec.paths).flatMap(([path, methods]) =>
     Object.entries(methods).flatMap(([method, operation]) => {
         const success = Object.entries(operation.responses ?? {}).find(([status]) => /^2\d\d$/.test(status));
@@ -158,7 +147,6 @@ for (const { schema } of operations) {
     }
 }
 
-// Dependency order; a reference back to a schema not yet declared is deferred with z.lazy.
 const byName = new Map(
     Object.entries(spec.components.schemas)
         .filter(([key]) => needed.has(identifier(key)))
@@ -205,7 +193,6 @@ const lines = [
     '// Run `npm run generate:api` after the API changes.',
     "import { z } from 'zod';",
     '',
-    // Recursive schemas need an explicit type (TypeScript cannot infer a self-reference).
     ...ordered.map(
         (name) =>
             `export const ${name}${lazy.has(name) ? ': z.ZodType' : ''} = ${PURE}${zodOf(byName.get(name) ?? {}, lazy)};`,
@@ -229,7 +216,6 @@ const lines = [
     '];',
     '',
 ];
-// Self-check: a call to each endpoint must find its own entry first — no other path may shadow it.
 const sorted = [...operations].sort(
     (a, b) =>
         specificity(b.path).localeCompare(specificity(a.path)) ||

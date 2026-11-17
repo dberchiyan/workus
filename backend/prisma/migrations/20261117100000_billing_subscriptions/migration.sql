@@ -1,6 +1,3 @@
--- Monthly subscriptions (Stripe): the plan in effect, the subscription's state and the provider's
--- ids live on the company (existing companies start on Starter); webhook deliveries are stored
--- before they are processed; plan changes go to the company's history.
 ALTER TABLE "organisations"
     ADD COLUMN "plan" VARCHAR(16) NOT NULL DEFAULT 'STARTER',
     ADD COLUMN "subscription_status" VARCHAR(16) NOT NULL DEFAULT 'NONE',
@@ -18,11 +15,9 @@ ALTER TABLE "organisations"
 ALTER TABLE "organisations"
     ADD CONSTRAINT "ck_organisations_subscription_status"
     CHECK ("subscription_status" IN ('NONE', 'ACTIVE', 'PAST_DUE'));
--- A failed payment is dated (the grace period counts from it); nothing else is.
 ALTER TABLE "organisations"
     ADD CONSTRAINT "ck_organisations_past_due_at"
     CHECK (("subscription_status" = 'PAST_DUE') = ("past_due_at" IS NOT NULL));
--- A subscription id exists exactly while there is a subscription.
 ALTER TABLE "organisations"
     ADD CONSTRAINT "ck_organisations_billing_subscription_id"
     CHECK (("subscription_status" = 'NONE') = ("billing_subscription_id" IS NULL));

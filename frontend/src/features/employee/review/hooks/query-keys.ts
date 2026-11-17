@@ -1,4 +1,3 @@
-/** No tenant id: the organisation comes from the session. Reviews are scoped by the employee. */
 export const reviewKeys = {
     all: ['reviews'] as const,
     forEmployee: (employeeId: string): readonly ['reviews', 'employee', string] =>

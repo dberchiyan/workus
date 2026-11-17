@@ -18,7 +18,6 @@ CREATE TABLE "employee_reviews" (
 
     CONSTRAINT "pk_employee_reviews" PRIMARY KEY ("id"),
     CONSTRAINT "ck_employee_reviews_status" CHECK ("status" IN ('COMPLETED', 'SCHEDULED', 'CANCELED')),
-    -- Amount and currency travel together; a completed review always records the salary.
     CONSTRAINT "ck_employee_reviews_salary_pair" CHECK (("salary_amount" IS NULL) = ("salary_currency" IS NULL)),
     CONSTRAINT "ck_employee_reviews_completed_salary" CHECK ("status" <> 'COMPLETED' OR "salary_amount" IS NOT NULL),
     CONSTRAINT "ck_employee_reviews_salary_positive" CHECK ("salary_amount" IS NULL OR "salary_amount" > 0)

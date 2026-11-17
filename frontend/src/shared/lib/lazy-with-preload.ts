@@ -1,7 +1,6 @@
 import { type ComponentType, lazy, type LazyExoticComponent } from 'react';
 
 export type PreloadableComponent<T extends ComponentType> = LazyExoticComponent<T> & {
-    /** Fetches the page's code ahead of time (hover, focus); safe to call again. */
     preload: () => Promise<unknown>;
 };
 

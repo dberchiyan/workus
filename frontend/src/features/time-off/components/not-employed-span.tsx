@@ -20,7 +20,6 @@ export function NotEmployedSpan({ reason, employee }: NotEmployedSpanProps): Rea
         : t('calendar.page.notEmployedKey');
     return (
         <Tooltip title={description} describeChild followCursor>
-            {/* A focusable tooltip trigger (WAI-ARIA tooltip pattern) so keyboard users get the reason. */}
             <span
                 // eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex
                 tabIndex={0}

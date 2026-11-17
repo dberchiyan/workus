@@ -19,7 +19,6 @@ import type { ErrorCode } from '@/shared/types';
 import { useRegister } from '../hooks/use-organisation';
 import { ORGANISATION_LIMITS, type RegistrationOutput, registrationSchema, type RegistrationValues } from '../schemas';
 
-/** Keeps every helper line's height while it is empty, so the form never shifts. */
 const RESERVED_LINE = ' ';
 const FIELDS = new Set<string>(['organisationName', 'firstName', 'lastName', 'email', 'password']);
 const isField = (field: string): field is keyof RegistrationValues => FIELDS.has(field);
@@ -53,7 +52,6 @@ export function SignupForm(): ReactElement {
     const { errors, isSubmitting } = form.formState;
     const password = useWatch({ control: form.control, name: 'password' });
 
-    // A new step's heading takes focus, so screen readers hear where they are (not on first load).
     useEffect(() => {
         if (movedRef.current) {
             stepHeadingRef.current?.focus();

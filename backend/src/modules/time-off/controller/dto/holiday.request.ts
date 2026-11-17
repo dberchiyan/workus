@@ -12,7 +12,6 @@ const holidayFields = {
         .trim()
         .min(1, 'validation.holiday.nameRequired')
         .max(HOLIDAY_NAME_MAX, 'validation.holiday.nameTooLong'),
-    /** Copied to the same day of the next year. */
     isRecurring: z.boolean({ error: 'validation.invalid' }),
 };
 

@@ -8,12 +8,9 @@ import { TimeOffRequestRepository } from '../repository/time-off-request.reposit
 import { employeeUserIdOf, requestNotice, responsibleUserIdsOf } from './time-off-notices';
 
 const DAY_MS = 86_400_000;
-/** A pending request older than this reminds its responsible people, at most this often. */
 export const REMINDER_AFTER_DAYS = 3;
-/** Requests reminded about in one run (the oldest first). */
 const MAX_REMINDERS_PER_RUN = 500;
 
-/** Who hears about a request: its employee, its responsible people, or both. */
 export type NoticeAudience = 'employee' | 'responsibles' | 'everyone' | readonly string[];
 
 /**

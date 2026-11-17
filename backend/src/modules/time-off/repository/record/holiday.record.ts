@@ -11,7 +11,6 @@ export const holidaySelect = {
 } satisfies Prisma.CompanyHolidaySelect;
 export type HolidayRecord = Prisma.CompanyHolidayGetPayload<{ select: typeof holidaySelect }>;
 
-/** A holiday as a day off on the calendar. */
 export const holidayDaySelect = { heldAt: true, name: true } satisfies Prisma.CompanyHolidaySelect;
 export type HolidayDayRecord = Prisma.CompanyHolidayGetPayload<{
     select: typeof holidayDaySelect;

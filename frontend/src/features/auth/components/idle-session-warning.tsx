@@ -19,9 +19,7 @@ import { useCurrentUser } from '../hooks/use-current-user';
 import type { LoginLocationState } from '../hooks/use-login-redirect';
 import { useLogout } from '../hooks/use-logout';
 
-/** The warning shows this long before the session ends. */
 const WARNING_MS = 2 * MINUTE_MS;
-/** The server records activity at most once a minute — count a minute short to be safe. */
 const SAFETY_MS = 60_000;
 const TICK_MS = 1_000;
 
@@ -60,7 +58,6 @@ export function IdleSessionWarning(): ReactElement {
         idleMinutes === undefined ? Infinity : lastApiActivity() + idleMinutes * MINUTE_MS - SAFETY_MS - now;
     const open = remaining > 0 && remaining <= WARNING_MS;
 
-    // Time is up: the session is gone on the server too — go to sign-in and say why.
     useEffect(() => {
         if (remaining > 0) {
             return;
@@ -76,7 +73,6 @@ export function IdleSessionWarning(): ReactElement {
     const stay = async () => {
         setStaying(true);
         try {
-            // Any request counts as activity; this one also re-reads who is signed in.
             await queryClient.refetchQueries({ queryKey: authKeys.me() });
         } finally {
             setStaying(false);
@@ -91,12 +87,8 @@ export function IdleSessionWarning(): ReactElement {
             fullWidth
             aria-labelledby={titleId}
             aria-describedby={textId}
-            // The dialog opens on the safe choice (ux.md → focus moves with the UI). The focus trap
-            // may put focus on the dialog itself (e.g. after a page moved focus to its heading):
-            // hand it on to the button.
             slotProps={{ transition: { onEntered: () => stayRef.current?.focus() } }}
             onFocus={(event) => {
-                // Focus on the backdrop container (outside the dialog box itself) goes to the button.
                 if (event.target instanceof HTMLElement && !event.target.closest('[role="dialog"]')) {
                     stayRef.current?.focus();
                 }

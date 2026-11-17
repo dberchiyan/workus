@@ -5,17 +5,14 @@ import { pageableOptions } from '../../../../common/dto/pageable';
 import { ISO_MONTH_LENGTH } from '../../../../common/time/iso-day';
 
 const HOUR_MS = 3_600_000;
-/** A day is 24 hours in UTC; a little slack, never more. */
 const MAX_DAY_HOURS = 26;
 
-/** Event lists: by date, then name — the order is fixed, only page and size apply. */
 export const EVENTS_PAGEABLE = pageableOptions({
     sortable: ['date'] as const,
     defaultSort: 'date,asc',
 });
 export type EventsSortField = (typeof EVENTS_PAGEABLE.sortable)[number];
 
-/** The instants a day (today, UTC — days are UTC everywhere) starts and ends. */
 export const InstantRangeQuerySchema = z
     .object({
         from: z.iso.datetime({ offset: true, error: 'validation.invalid' }),
@@ -31,7 +28,6 @@ export const InstantRangeQuerySchema = z
 
 export class InstantRangeQuery extends createZodDto(InstantRangeQuerySchema) {}
 
-/** Calendar dates `from` ≤ `to`, both in one month (a day, or the whole month). */
 export const DateRangeQuerySchema = z
     .object({
         from: z.iso.date('validation.invalid'),

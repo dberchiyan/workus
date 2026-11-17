@@ -1,13 +1,7 @@
-/**
- * The one source of colours, radii and breakpoints for MUI and Tailwind. Colours are OKLCH
- * (perceptually even steps; MUI reads them natively — `nativeColor` in theme/index.ts).
- */
 export const TOKENS = {
     breakpoints: { xs: 0, sm: 600, md: 900, lg: 1200, xl: 1536 },
-    /** Controls (inputs, buttons, chips) · menus and popovers · cards and dialogs. */
     radius: { sm: 8, md: 12, lg: 16 },
     layout: { sidebarWidth: 240, railWidth: 80, topBarHeight: 64 },
-    /** Max content widths (Tailwind `max-w-*`). `page` = every signed-in page (set once in AppLayout). */
     containers: { page: 1536 },
     colors: {
         light: {
@@ -42,7 +36,6 @@ export const TOKENS = {
                 disabled: 'oklch(62.5% 0.026 240.3)',
             },
             divider: 'oklch(93.2% 0.009 236)',
-            /** Shadow colours: `soft` for the contact shadow, `strong` for the ambient one. */
             shadow: { soft: 'oklch(30% 0.04 240 / 0.06)', strong: 'oklch(30% 0.04 240 / 0.12)' },
             badge: {
                 activeBackground: 'oklch(93.7% 0.020 216.2)',
@@ -50,11 +43,6 @@ export const TOKENS = {
                 neutralBackground: 'oklch(94.1% 0.007 247.9)',
                 neutralText: 'oklch(48.3% 0.033 243.6)',
             },
-            /**
-             * Status badges (`StatusBadge`): a soft fill, a dot and the word — the text ≥ 6:1 on its
-             * fill. Success = done / active, warning = waiting, info = planned, danger = refused,
-             * neutral = ended.
-             */
             status: {
                 successBackground: 'oklch(95.5% 0.035 155)',
                 successText: 'oklch(42% 0.09 155)',
@@ -72,7 +60,6 @@ export const TOKENS = {
                 neutralText: 'oklch(46% 0.03 243)',
                 neutralDot: 'oklch(70% 0.02 245)',
             },
-            /** Blue, teal, violet, pink, amber, green, indigo, cyan — white initials ≥ 5:1 on each. */
             avatar: {
                 c1: 'oklch(50.7% 0.120 254.6)',
                 c2: 'oklch(51.8% 0.085 185.3)',
@@ -84,10 +71,6 @@ export const TOKENS = {
                 c8: 'oklch(50.7% 0.094 227.8)',
                 text: 'oklch(100.0% 0.000 0)',
             },
-            /**
-             * Chart series in fixed order — validated categorical palette (CVD ΔE ≥ 8 between neighbours);
-             * slots 3–5 sit under 3:1 on white, so charts carry labels, a legend and a table view.
-             */
             chart: {
                 c1: 'oklch(57.5% 0.163 255.5)',
                 c2: 'oklch(67.1% 0.175 40.6)',
@@ -98,7 +81,6 @@ export const TOKENS = {
                 c7: 'oklch(43.3% 0.167 283.6)',
                 c8: 'oklch(62.3% 0.191 24.9)',
             },
-            /** Light sidebar in the paper colour: a hairline apart, the active item a soft primary pill. */
             sidebar: {
                 background: 'oklch(100.0% 0.000 0)',
                 text: 'oklch(48.3% 0.033 243.6)',

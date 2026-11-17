@@ -7,9 +7,7 @@ export const StructurePositionSchema = z
     .object({
         id: z.uuid(),
         title: z.string(),
-        /** People holding it today (leavers not counted). */
         employeeCount: z.number().int().min(0),
-        /** Nobody — current or former — holds it, so it can be removed. */
         isRemovable: z.boolean(),
         version: z.number().int(),
     })
@@ -19,7 +17,6 @@ export const DepartmentSchema = z
     .object({
         id: z.uuid(),
         name: z.string(),
-        /** Positions by title. */
         positions: z.array(StructurePositionSchema).max(MAX_POSITIONS),
         version: z.number().int(),
     })

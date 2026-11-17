@@ -12,7 +12,6 @@ export interface TypeOptionsProps {
     name: string;
     value: TimeOffType;
     onChange: (value: TimeOffType) => void;
-    /** The form focuses the group through the checked option. */
     inputRef: Ref<HTMLInputElement>;
 }
 

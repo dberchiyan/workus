@@ -22,7 +22,6 @@ export interface ManagedRequestsQuery {
     size: number;
 }
 
-/** Each decision is a sub-resource of the request (api.md → Paths). */
 const DECISION_PATHS = {
     approve: 'approval',
     reject: 'rejection',
@@ -31,7 +30,6 @@ const DECISION_PATHS = {
 
 const requestUrl = (requestId: string): string => `${BASE}/${encodeURIComponent(requestId)}`;
 
-/** Every employee's requests (admin). */
 export const managedRequestsApi = {
     /** Pending: the longest waiting first; closed: the latest change first. */
     list: async (query: ManagedRequestsQuery): Promise<ManagedRequestPage> =>

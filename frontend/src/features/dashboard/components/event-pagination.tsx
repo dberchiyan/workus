@@ -6,7 +6,6 @@ import { useTranslation } from 'react-i18next';
 import { EVENTS_PAGE_SIZE } from '../types';
 
 export interface EventPaginationProps {
-    /** Labels the page buttons ("Reviews pages"). */
     label: string;
     page: number;
     total: number;

@@ -18,7 +18,6 @@ import { NavItemLink } from './nav-item-link';
 export interface SidebarContentProps {
     isCollapsed: boolean;
     onNavigate?: () => void;
-    /** Desktop only: folds the sidebar to the icon rail and back. */
     onToggleCollapsed?: () => void;
 }
 
@@ -32,9 +31,6 @@ export function SidebarContent({ isCollapsed, onNavigate, onToggleCollapsed }: S
             aria-label={t('shell:nav.label')}
             className="flex h-full flex-col gap-6 border-r border-sidebar-border bg-sidebar-background px-3 pb-[max(1rem,env(safe-area-inset-bottom))]"
         >
-            {/* Arbitrary value above: safe-area inset for devices with a home indicator. */}
-            {/* Brand row: as tall as the top bar, so its rule sits level with the top bar's border; same
-          inset as the rule above Settings. */}
             <div
                 className={cn(
                     'flex h-top-bar-height shrink-0 items-center gap-3 border-b border-sidebar-border px-1',

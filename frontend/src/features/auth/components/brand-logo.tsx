@@ -8,7 +8,6 @@ import { cn } from '@/shared/lib/cn';
 import { LANDING_PATH } from '../landing';
 
 export interface BrandLogoProps {
-    /** The mark and name lead to the landing page (signed-out screens). */
     linkHome?: boolean;
 }
 
@@ -38,7 +37,6 @@ export function BrandLogo({ linkHome = false }: BrandLogoProps): ReactElement {
     return (
         <div className="flex flex-col items-center gap-2 text-center">
             {linkHome ? (
-                // A full page load: the server answers a signed-out `/` with the landing page.
                 <a
                     href={LANDING_PATH}
                     aria-label={t('app.home')}

@@ -14,12 +14,9 @@ import {
     TimeOffNoticeParamsSchema,
 } from './notification-type';
 
-/** One event to tell several people about. */
 export interface Notice {
-    /** The subject's organisation — every recipient belongs to it. */
     organisationId: string;
     type: NotificationType;
-    /** Null = the system. Never notified of their own action. */
     actorUserId: string | null;
     recipientUserIds: readonly string[];
     subject: { type: NotificationSubjectType; id: string };
@@ -27,7 +24,6 @@ export interface Notice {
 }
 
 const DAY_MS = 86_400_000;
-/** Notifications are a feed, not a record: older ones are deleted. */
 const RETENTION_DAYS = 90;
 
 /**
