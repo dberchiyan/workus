@@ -1,0 +1,141 @@
+import PersonAddAltOutlined from '@mui/icons-material/PersonAddAltOutlined';
+import Button from '@mui/material/Button';
+import Snackbar from '@mui/material/Snackbar';
+import Typography from '@mui/material/Typography';
+import { useCallback, useId, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import { useDocumentTitle } from '@/shared/hooks/use-document-title';
+import { usePageHeadingFocus } from '@/shared/hooks/use-page-heading-focus';
+import { AddEmployeeDialog } from '../components/add-employee-dialog';
+import { CategoryTabs } from '../components/category-tabs';
+import { EmployeeList } from '../components/employee-list';
+import { EmployeeStatsCards } from '../components/employee-stats-cards';
+import { useEmployeeListParams } from '../hooks/use-employee-list-params';
+import { useEmployeeSummary, usePositionCategories } from '../hooks/use-employee-queries';
+import { useAccess, usePlan } from '@/features/auth';
+import { UpgradePrompt } from '@/shared/components/upgrade-prompt';
+
+export default function EmployeesPage() {
+    const { t } = useTranslation('employee');
+    useDocumentTitle(t('pageTitle'));
+    const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
+    const listId = useId();
+    const { params, update } = useEmployeeListParams();
+    const { data: counts } = usePositionCategories({ status: params.status, search: params.search });
+    const onSearch = useCallback(
+        (search: string) => {
+            update({ search });
+        },
+        [update],
+    );
+    const [isAddOpen, setIsAddOpen] = useState(false);
+    const addButtonRef = useRef<HTMLButtonElement>(null);
+    const [createdName, setCreatedName] = useState<string | null>(null);
+    // At the plan's employee limit the page says so; the API refuses the next hire anyway.
+    const plan = usePlan();
+    const can = useAccess();
+    const totalActive = useEmployeeSummary().data?.totalActive;
+    const limitReached =
+        plan.maxEmployees !== null && totalActive !== undefined && totalActive >= plan.maxEmployees
+            ? { limit: plan.maxEmployees, count: totalActive }
+            : null;
+
+    return (
+        <div className="flex flex-col gap-6">
+            {/* Top-aligned: the taller button must not push the heading below other pages' headings. */}
+            <div className="flex flex-wrap items-start justify-between gap-3">
+                <Typography ref={headingRef} tabIndex={-1} variant="h4" component="h1" className="outline-none">
+                    {t('title')}
+                </Typography>
+                <Button
+                    ref={addButtonRef}
+                    variant="contained"
+                    startIcon={<PersonAddAltOutlined aria-hidden />}
+                    onClick={() => {
+                        setCreatedName(null);
+                        setIsAddOpen(true);
+                    }}
+                >
+                    {t('add.open')}
+                </Button>
+            </div>
+            {limitReached && (
+                <UpgradePrompt
+                    compact
+                    reason={{ kind: 'limit', ...limitReached }}
+                    requiredPlan={plan.plan === 'STARTER' ? 'TEAM' : 'BUSINESS'}
+                    hasBillingAccount={can('settings.billing')}
+                />
+            )}
+            <EmployeeStatsCards />
+            <div className="flex flex-col gap-4">
+                <CategoryTabs
+                    counts={counts}
+                    categoryId={params.categoryId}
+                    onChange={(categoryId) => {
+                        update({ categoryId });
+                    }}
+                    controlsId={listId}
+                />
+                <EmployeeList
+                    id={listId}
+                    params={params}
+                    onSort={(field, direction) => {
+                        // Header click toggles; the phone sort menu passes the direction explicitly.
+                        const sortDirection =
+                            direction ??
+                            (params.sortField === field && params.sortDirection === 'asc' ? 'desc' : 'asc');
+                        update({ sortField: field, sortDirection });
+                    }}
+                    onSearch={onSearch}
+                    onStatus={(status) => {
+                        update({ status });
+                    }}
+                    onPage={(page, size) => {
+                        update({ page, size });
+                    }}
+                    onClear={() => {
+                        update({ search: '', status: 'ACTIVE', categoryId: undefined });
+                    }}
+                />
+            </div>
+            <AddEmployeeDialog
+                open={isAddOpen}
+                onClose={() => {
+                    setIsAddOpen(false);
+                }}
+                onCreated={(employee) => {
+                    setIsAddOpen(false);
+                    setCreatedName(`${employee.firstName} ${employee.lastName}`);
+                }}
+                onExited={() => {
+                    // Dialog closed → focus returns to its trigger (ux.md → Focus moves with the UI).
+                    addButtonRef.current?.focus();
+                }}
+            />
+            {/* Polite status; stays until dismissed or replaced (no auto-dismiss of unread messages). */}
+            <Snackbar
+                open={createdName !== null}
+                onClose={(_event, reason) => {
+                    if (reason !== 'clickaway') {
+                        setCreatedName(null);
+                    }
+                }}
+                message={createdName ? t('add.created', { name: createdName }) : ''}
+                action={
+                    <Button
+                        color="inherit"
+                        size="small"
+                        onClick={() => {
+                            setCreatedName(null);
+                        }}
+                    >
+                        {t('add.dismiss')}
+                    </Button>
+                }
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                slotProps={{ content: { role: 'status' } }}
+            />
+        </div>
+    );
+}

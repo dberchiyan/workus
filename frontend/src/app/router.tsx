@@ -9,8 +9,8 @@ import { InsightsPage } from '@/features/insights';
 import { OrganisationGate, SignupPage } from '@/features/organisation';
 import { CompaniesPage, CompanyPage } from '@/features/platform';
 import { CalendarPage, RequestsPage } from '@/features/time-off';
-import { PageLoader } from '@/shared/components/PageLoader';
-import { RouteErrorBoundary } from '@/shared/components/RouteErrorBoundary';
+import { PageLoader } from '@/shared/components/page-loader';
+import { RouteErrorBoundary } from '@/shared/components/route-error-boundary';
 import { PATHS } from '@/shared/lib/paths';
 
 const route = (element: ReactNode): ReactNode => (

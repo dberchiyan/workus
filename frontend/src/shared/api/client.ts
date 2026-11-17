@@ -2,9 +2,9 @@ import axios, { AxiosError, type InternalAxiosRequestConfig } from 'axios';
 import i18n from 'i18next';
 import { env } from '@/shared/config/env';
 import type { ErrorCode, ErrorResponse } from '@/shared/types';
-import { ApiError } from './apiError';
+import { ApiError } from './api-error';
 import { markApiActivity } from './activity';
-import { checkResponseContract } from './responseContract';
+import { checkResponseContract } from './response-contract';
 
 const TIMEOUT_MS = 15_000;
 const CSRF_COOKIE = 'XSRF-TOKEN';

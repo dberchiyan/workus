@@ -1,0 +1,183 @@
+import { keepPreviousData, useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import type { ApiError } from '@/shared/api/api-error';
+import { employeeApi } from '../api/employee-api';
+import type {
+    CreateEmployeeRequest,
+    CreatedEmployee,
+    EmployeeFilters,
+    EmployeeListParams,
+    EmployeeProfile,
+    PasswordReset,
+    TerminateEmployeeRequest,
+    UpdateEmployeeRequest,
+    UpdateResponsiblesRequest,
+} from '../types';
+import { employeeReviewsKey } from '@/features/employee/review';
+import { EmployeeProfilePage } from '../route-pages';
+import { employeeKeys } from './query-keys';
+
+const QUICK_SEARCH_SIZE = 6;
+
+export const useEmployees = (params: EmployeeListParams, enabled = true) =>
+    useQuery({
+        queryKey: employeeKeys.list(params),
+        queryFn: () => employeeApi.list(params),
+        placeholderData: keepPreviousData,
+        enabled,
+    });
+
+/** A few active people by name or email — the command menu's people search (shell). */
+export const useEmployeeQuickSearch = (search: string, enabled: boolean) =>
+    useEmployees(
+        {
+            categoryId: undefined,
+            status: 'ACTIVE',
+            search,
+            page: 1,
+            size: QUICK_SEARCH_SIZE,
+            sortField: 'name',
+            sortDirection: 'asc',
+        },
+        enabled,
+    );
+
+export const useEmployeeSummary = () => useQuery({ queryKey: employeeKeys.summary(), queryFn: employeeApi.summary });
+
+export const usePositionCategories = (filters: EmployeeFilters) =>
+    useQuery({
+        queryKey: employeeKeys.categories(filters),
+        queryFn: () => employeeApi.categories(filters),
+        placeholderData: keepPreviousData,
+    });
+
+const POSITIONS_STALE_MS = 5 * 60_000;
+
+export const usePositionOptions = (enabled: boolean) =>
+    useQuery({
+        queryKey: employeeKeys.positions(),
+        queryFn: employeeApi.positions,
+        staleTime: POSITIONS_STALE_MS,
+        enabled,
+    });
+
+export const useResponsibleCandidates = (search: string, enabled: boolean) =>
+    useQuery({
+        queryKey: employeeKeys.responsibleCandidates(search),
+        queryFn: () => employeeApi.responsibleCandidates(search),
+        placeholderData: keepPreviousData,
+        enabled,
+    });
+
+/** Not optimistic; on success the list, cards and tab counts are refetched. */
+export const useCreateEmployee = () => {
+    const queryClient = useQueryClient();
+    return useMutation<CreatedEmployee, ApiError, { request: CreateEmployeeRequest; idempotencyKey: string }>({
+        mutationFn: ({ request, idempotencyKey }) => employeeApi.create(request, idempotencyKey),
+        // The answer holds the generated password: never kept in the mutation cache.
+        gcTime: 0,
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: employeeKeys.lists() }),
+                queryClient.invalidateQueries({ queryKey: employeeKeys.summary() }),
+                queryClient.invalidateQueries({ queryKey: [...employeeKeys.all, 'categories'] }),
+                queryClient.invalidateQueries({
+                    queryKey: [...employeeKeys.all, 'responsible-candidates'],
+                }),
+            ]);
+        },
+    });
+};
+
+/** Not optimistic; on success the profile, its history, the list and the cards are refetched. */
+export const useUpdateResponsibles = (employeeId: string) => {
+    const queryClient = useQueryClient();
+    return useMutation<EmployeeProfile, ApiError, UpdateResponsiblesRequest>({
+        mutationFn: (request) => employeeApi.updateResponsibles(employeeId, request),
+        onSuccess: async (profile) => {
+            queryClient.setQueryData(employeeKeys.detail(employeeId), profile);
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: employeeKeys.activity(employeeId) }),
+                queryClient.invalidateQueries({ queryKey: employeeKeys.lists() }),
+                queryClient.invalidateQueries({ queryKey: employeeKeys.summary() }),
+            ]);
+        },
+    });
+};
+
+/**
+ * Profile edits, terminations and their cancellation change the profile, its history, the list,
+ * the cards, the tab counts and — through the start date or canceled reviews — the reviews.
+ * Not optimistic.
+ */
+const useEmploymentMutation = <TVariables>(
+    employeeId: string,
+    mutationFn: (variables: TVariables) => Promise<void>,
+) => {
+    const queryClient = useQueryClient();
+    return useMutation<unknown, ApiError, TVariables>({
+        mutationFn,
+        onSuccess: async () => {
+            await Promise.all([
+                queryClient.invalidateQueries({ queryKey: employeeKeys.detail(employeeId) }),
+                queryClient.invalidateQueries({ queryKey: employeeKeys.lists() }),
+                queryClient.invalidateQueries({ queryKey: employeeKeys.summary() }),
+                queryClient.invalidateQueries({ queryKey: [...employeeKeys.all, 'categories'] }),
+                queryClient.invalidateQueries({
+                    queryKey: [...employeeKeys.all, 'responsible-candidates'],
+                }),
+                queryClient.invalidateQueries({ queryKey: employeeReviewsKey(employeeId) }),
+            ]);
+        },
+    });
+};
+
+export const useUpdateEmployee = (employeeId: string) =>
+    useEmploymentMutation(employeeId, (request: UpdateEmployeeRequest) => employeeApi.update(employeeId, request));
+
+export const useTerminateEmployee = (employeeId: string) =>
+    useEmploymentMutation(employeeId, (request: TerminateEmployeeRequest) =>
+        employeeApi.terminate(employeeId, request),
+    );
+
+export const useCancelTermination = (employeeId: string) =>
+    useEmploymentMutation(employeeId, (version: number) => employeeApi.cancelTermination(employeeId, version));
+
+const profileQuery = (employeeId: string) => ({
+    queryKey: employeeKeys.detail(employeeId),
+    queryFn: () => employeeApi.profile(employeeId),
+});
+
+export const useEmployeeProfile = (employeeId: string) => useQuery(profileQuery(employeeId));
+
+/** How long a hover's prefetch counts as fresh: opening the profile soon after shows it at once. */
+const PREFETCH_FRESH_MS = 30_000;
+
+/**
+ * Hover or focus on a link to a profile: fetch the page's code and the profile ahead, so the
+ * click shows it at once. Repeated calls within the freshness window do nothing.
+ */
+export const usePrefetchEmployeeProfile = (): ((employeeId: string) => void) => {
+    const queryClient = useQueryClient();
+    return (employeeId) => {
+        void EmployeeProfilePage.preload();
+        // A failed prefetch is silent: opening the profile asks again and shows the error there.
+        queryClient.query({ ...profileQuery(employeeId), staleTime: PREFETCH_FRESH_MS }).catch(() => undefined);
+    };
+};
+
+/**
+ * Gives the employee a new generated password (they are signed out everywhere). The answer holds
+ * the password: never kept in the mutation cache. Their security log changes.
+ */
+export const useResetPassword = (employeeId: string) => {
+    const queryClient = useQueryClient();
+    return useMutation<PasswordReset, ApiError, string>({
+        mutationFn: (idempotencyKey) => employeeApi.resetPassword(employeeId, idempotencyKey),
+        gcTime: 0,
+        onSuccess: async () => {
+            await queryClient.invalidateQueries({
+                queryKey: [...employeeKeys.detail(employeeId), 'security-log'],
+            });
+        },
+    });
+};

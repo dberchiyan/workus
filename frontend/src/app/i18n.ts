@@ -14,7 +14,7 @@ import enDashboard from '@/locales/en/dashboard.json';
 import enReview from '@/locales/en/review.json';
 import enSettings from '@/locales/en/settings.json';
 import enShell from '@/locales/en/shell.json';
-import enTimeOff from '@/locales/en/timeOff.json';
+import enTimeOff from '@/locales/en/time-off.json';
 import enValidation from '@/locales/en/validation.json';
 
 export const SUPPORTED_LOCALES = ['en'] as const;

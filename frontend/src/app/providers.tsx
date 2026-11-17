@@ -6,7 +6,7 @@ import { StyledEngineProvider, ThemeProvider } from '@mui/material/styles';
 import { QueryClientProvider } from '@tanstack/react-query';
 import type { ReactNode } from 'react';
 import { theme, typographyGlobalStyles } from '@/theme';
-import { queryClient } from './queryClient';
+import { queryClient } from './query-client';
 
 export interface ProvidersProps {
     children: ReactNode;

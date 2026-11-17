@@ -1,3 +1,3 @@
-import { lazyWithPreload } from '@/shared/lib/lazyWithPreload';
+import { lazyWithPreload } from '@/shared/lib/lazy-with-preload';
 
-export const DashboardPage = lazyWithPreload(() => import('./pages/DashboardPage'));
+export const DashboardPage = lazyWithPreload(() => import('./pages/dashboard-page'));

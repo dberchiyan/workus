@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { newPasswordSchema, PASSWORD_LIMITS } from '@/shared/lib/passwordRules';
+import { newPasswordSchema, PASSWORD_LIMITS } from '@/shared/lib/password-rules';
 
 /** Mirrors backend ChangePasswordRequest (auth/controller/dto/change-password.request.ts). */
 export const changePasswordSchema = z
