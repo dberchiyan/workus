@@ -32,13 +32,100 @@ const IMPORT_META_ENV = {
 export default tseslint.config(
     {
         ignores: [
-            'dist*'],
+            'dist/**',
+            'node_modules/**',
+            'src/shared/types/api.ts',
+            'src/shared/api/schemas.generated.ts',
+            'eslint.config.js',
+        ],
+    },
+    eslint.configs.recommended,
+    ...tseslint.configs.strictTypeChecked,
+    jsxA11y.flatConfigs.strict,
+    reactHooks.configs.flat.recommended,
+    {
+        languageOptions: {
+            globals: { ...globals.browser },
+            parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+        },
+        plugins: { 'react-refresh': reactRefresh, boundaries, 'simple-import-sort': simpleImportSort },
+        settings: {
+            'import/resolver': { typescript: { project: './tsconfig.app.json' } },
+            'boundaries/include': ['src/**/*'],
             'boundaries/elements': [
                 { type: 'app', pattern: 'src/app' },
-                { type: 'feature', pattern: 'src/features/employee*', '!@/features/employee*'],
+                { type: 'feature', pattern: 'src/features/employee/*', capture: ['featureName'] },
+                { type: 'feature', pattern: 'src/features/*', capture: ['featureName'] },
+                { type: 'shared', pattern: 'src/shared' },
+                { type: 'theme', pattern: 'src/theme' },
+                { type: 'locales', pattern: 'src/locales' },
+            ],
+        },
+        rules: {
+            'no-empty': ['error', { allowEmptyCatch: true }],
+            'no-console': 'error',
+            '@typescript-eslint/no-explicit-any': 'error',
+            '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
+            '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
+            'no-restricted-syntax': ['error', ...RESTRICTED_SYNTAX, IMPORT_META_ENV],
+            '@typescript-eslint/no-magic-numbers': [
+                'error',
+                {
+                    ignore: [-1, 0, 1, 2, '0n', '1n', '-1n'],
+                    ignoreArrayIndexes: true,
+                    ignoreDefaultValues: true,
+                    ignoreClassFieldInitialValues: true,
+                    ignoreEnums: true,
+                    ignoreNumericLiteralTypes: true,
+                    ignoreReadonlyClassProperties: true,
+                    ignoreTypeIndexes: true,
+                },
+            ],
+            '@typescript-eslint/explicit-module-boundary-types': 'error',
+            'simple-import-sort/imports': 'error',
+            'simple-import-sort/exports': 'error',
+            'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+            'boundaries/dependencies': [
+                'error',
+                {
+                    default: 'disallow',
+                    policies: [
+                        {
+                            from: { element: { type: 'app' } },
+                            allow: {
+                                to: { element: { types: ['app', 'feature', 'shared', 'theme', 'locales'] } },
+                            },
+                        },
+                        {
+                            from: { element: { type: 'feature' } },
+                            allow: { to: { element: { types: ['feature', 'shared', 'theme'] } } },
+                        },
+                        {
+                            from: { element: { type: 'shared' } },
+                            allow: { to: { element: { types: ['shared', 'theme'] } } },
+                        },
+                        { from: { element: { type: 'theme' } }, allow: { to: { element: { type: 'theme' } } } },
+                    ],
+                },
+            ],
+            'no-restricted-imports': [
+                'error',
+                {
+                    paths: [{ name: '@mui/icons-material', message: 'Import icons individually.' }],
+                    patterns: [
+                        {
+                            group: ['@/features/*/*', '!@/features/employee/*', '@/features/employee/*/*'],
                             message: 'Import a feature only through its index.ts.',
                         },
-                        { group: ['../..*.{ts,tsx}'],
+                        { group: ['../../*'], message: 'No ../../ chains — use the @/ alias.' },
+                        { group: ['framer-motion'], message: 'Use motion/react.' },
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ['src/features/**/*.{ts,tsx}'],
         rules: {
             'no-restricted-imports': [
                 'error',
@@ -46,10 +133,21 @@ export default tseslint.config(
                     paths: [{ name: '@mui/icons-material', message: 'Import icons individually.' }],
                     patterns: [
                         {
-                            group: ['@/features*'],
+                            group: ['@/features/*/*', '!@/features/employee/*', '@/features/employee/*/*'],
                             message: 'Import a feature only through its index.ts.',
                         },
-                        { group: ['@/app', '@/app*.{ts,tsx}'],
+                        { group: ['@/app', '@/app/*'], message: 'Features never import app/.' },
+                        {
+                            group: ['../../*'],
+                            message: 'Another feature is reached only through @/features/<name>.',
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ['src/features/employee/*/*.{ts,tsx}'],
         rules: {
             'no-restricted-imports': [
                 'error',
@@ -57,10 +155,21 @@ export default tseslint.config(
                     paths: [{ name: '@mui/icons-material', message: 'Import icons individually.' }],
                     patterns: [
                         {
-                            group: ['@/features*'],
+                            group: ['@/features/*/*', '!@/features/employee/*', '@/features/employee/*/*'],
                             message: 'Import a feature only through its index.ts.',
                         },
-                        { group: ['@/app', '@/app**', '!..*.ts'],
+                        { group: ['@/app', '@/app/*'], message: 'Features never import app/.' },
+                        {
+                            group: ['../../*', '../*/**', '!../*/'],
+                            message: 'Another feature is reached only through @/features/<group>/<name>.',
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ['vite.config.ts', 'scripts/**/*.ts'],
         languageOptions: { globals: { ...globals.node } },
     },
     {
@@ -73,8 +182,9 @@ export default tseslint.config(
     },
     {
         files: [
-            'src/theme*.ts',
-            'src*.ts',
+            'src/theme/**/*.ts',
+            'scripts/**/*.ts',
+            'src/**/mocks/**/*.ts',
             'src/features/auth/components/app-preview.tsx',
         ],
         rules: { '@typescript-eslint/no-magic-numbers': 'off' },

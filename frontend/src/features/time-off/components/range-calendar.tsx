@@ -116,6 +116,7 @@ export function RangeCalendar({ value, onChange, holidays = NO_HOLIDAYS }: Range
                     <ChevronRightOutlined aria-hidden />
                 </IconButton>
             </div>
+            {/* eslint-disable-next-line jsx-a11y/no-noninteractive-element-to-interactive-role -- WAI-ARIA APG date grid: the table is the grid */}
             <table ref={gridRef} role="grid" aria-labelledby={titleId} className="w-full border-collapse">
                 <thead>
                     <tr>

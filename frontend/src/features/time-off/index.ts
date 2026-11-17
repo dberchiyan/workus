@@ -11,6 +11,6 @@ export { HolidaysSection } from './components/holidays-section';
 export { ManagedRequestDialog } from './components/managed-request-dialog';
 export { MyTimeOff } from './components/my-time-off';
 export { TimeOffStatusChip, TimeOffTypeChip } from './components/time-off-chips';
+export { TYPE_VISUALS as TIME_OFF_TYPE_VISUALS } from './components/time-off-visuals';
 export { formatPeriod as formatTimeOffPeriod } from './format';
 export { isTimeOffStatus, isTimeOffType } from './types';
-export { TYPE_VISUALS as TIME_OFF_TYPE_VISUALS } from './components/time-off-visuals';

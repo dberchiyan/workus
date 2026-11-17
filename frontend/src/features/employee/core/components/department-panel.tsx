@@ -35,6 +35,7 @@ function ActionButton({
     if (reason) {
         return (
             <Tooltip title={reason}>
+                {/* eslint-disable-next-line jsx-a11y/no-noninteractive-tabindex -- tooltip trigger for a disabled action (WAI-ARIA tooltip pattern) */}
                 <span tabIndex={0} aria-label={`${label}. ${reason}`} className="inline-flex rounded-full">
                     <IconButton aria-label={label} disabled>
                         {children}
