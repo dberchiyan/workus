@@ -1,0 +1,43 @@
+{
+    "name": "workus-e2e",
+    "private": true,
+    "type": "module",
+    "engines": {
+        "node": ">=26.13.0 <27"
+    },
+    "scripts": {
+        "test": "playwright test",
+        "test:headed": "playwright test --headed",
+        "test:ui": "playwright test --ui",
+        "report": "playwright show-report",
+        "browsers": "playwright install --with-deps chromium",
+        "db:reset": "node setup/reset-database.ts",
+        "typecheck": "tsc --noEmit",
+        "lint": "eslint .",
+        "lint:fix": "eslint . --fix",
+        "format": "prettier --write .",
+        "format:check": "prettier --check ."
+    },
+    "devDependencies": {
+        "@eslint/js": "9.39.5",
+        "@playwright/test": "1.65.1",
+        "@types/node": "26.6.6",
+        "eslint": "9.39.5",
+        "eslint-plugin-playwright": "2.12.2",
+        "eslint-plugin-simple-import-sort": "14.0.0",
+        "globals": "17.14.0",
+        "lint-staged": "17.6.1",
+        "prettier": "3.9.10",
+        "typescript": "5.9.3",
+        "typescript-eslint": "8.72.1"
+    },
+    "lint-staged": {
+        "*.ts": [
+            "prettier --write",
+            "eslint --fix"
+        ],
+        "*.{json,md}": [
+            "prettier --write"
+        ]
+    }
+}

@@ -49,3 +49,57 @@ jobs:
       - run: npm run typecheck
       - run: npm run i18n:check
       - run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    services:
+      postgres:
+        image: postgres:18.6-alpine
+        env:
+          POSTGRES_USER: workus
+          POSTGRES_PASSWORD: workus
+          POSTGRES_DB: workus_e2e
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U workus"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_HOST: localhost
+      DATABASE_PORT: '5432'
+      DATABASE_USERNAME: workus
+      DATABASE_PASSWORD: workus
+      E2E_DATABASE_NAME: workus_e2e
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: e2e/package.json
+          cache: npm
+          cache-dependency-path: |
+            backend/package-lock.json
+            frontend/package-lock.json
+            e2e/package-lock.json
+      - run: npm ci
+        working-directory: backend
+      - run: npm ci
+        working-directory: frontend
+      - run: npm ci
+        working-directory: e2e
+      - run: npm run format:check && npm run lint && npm run typecheck
+        working-directory: e2e
+      - run: npx playwright install --with-deps chromium
+        working-directory: e2e
+      - run: npm test
+        working-directory: e2e
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: playwright-report
+          path: |
+            e2e/playwright-report
+            e2e/test-results
+          retention-days: 7
