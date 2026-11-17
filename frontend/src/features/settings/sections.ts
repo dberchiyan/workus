@@ -2,6 +2,7 @@ import AccountTreeOutlined from '@mui/icons-material/AccountTreeOutlined';
 import AdminPanelSettingsOutlined from '@mui/icons-material/AdminPanelSettingsOutlined';
 import BusinessOutlined from '@mui/icons-material/BusinessOutlined';
 import CelebrationOutlined from '@mui/icons-material/CelebrationOutlined';
+import CreditCardOutlined from '@mui/icons-material/CreditCardOutlined';
 import DevicesOutlined from '@mui/icons-material/DevicesOutlined';
 import PersonOutlineOutlined from '@mui/icons-material/PersonOutlineOutlined';
 import ShieldOutlined from '@mui/icons-material/ShieldOutlined';
@@ -18,6 +19,8 @@ export const SETTINGS_SECTIONS = [
   { key: 'security', group: 'you', icon: ShieldOutlined },
   /** Owners only (ACCESS 'settings.organisation'). */
   { key: 'organisation', group: 'company', icon: BusinessOutlined },
+  /** Owners only (ACCESS 'settings.billing'). */
+  { key: 'billing', group: 'company', icon: CreditCardOutlined },
   /** Admins and owners (ACCESS 'settings.structure'). */
   { key: 'structure', group: 'company', icon: AccountTreeOutlined },
   /** Admins only (ACCESS 'settings.holidays'). */
@@ -31,6 +34,7 @@ const SECTION_ACCESS: Partial<Record<SettingsSection, AccessPart>> = {
   holidays: 'settings.holidays',
   structure: 'settings.structure',
   organisation: 'settings.organisation',
+  billing: 'settings.billing',
   administrators: 'settings.administrators',
 };
 

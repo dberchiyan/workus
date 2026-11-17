@@ -8,6 +8,8 @@
   "ACCESS_ENDED": "Your access to Workus has ended — contact your administrator",
   "ORGANISATION_NOT_ACTIVE": "Your company is not approved yet",
   "DEMO_RESTRICTED": "Turned off for the shared demo accounts",
+  "PLAN_UPGRADE_REQUIRED": "This is part of the {plan} plan — upgrade in Settings → Billing",
+  "PLAN_LIMIT_REACHED": "The {plan} plan allows up to {limit} employees — upgrade in Settings → Billing to add more",
   "FORBIDDEN": "You don't have access to this action",
   "RESOURCE_NOT_FOUND": "The requested item was not found",
   "CONFLICT": "This conflicts with existing data — reload and try again",
@@ -19,6 +21,15 @@
   "RATE_LIMIT_EXCEEDED": "Too many attempts — try again in {minutes} minutes",
   "UPSTREAM_UNAVAILABLE": "A service we depend on is unavailable — try again later",
   "INTERNAL_ERROR": "Something went wrong on our side — try again later",
+  "billing": {
+    "alreadySubscribed": "Your company already has a subscription — change the plan under Manage billing",
+    "invalidSignature": "The webhook signature could not be verified",
+    "noBillingAccount": "There is nothing to manage yet — choose a plan first",
+    "noSubscription": "There is no subscription to change — choose a paid plan to start one",
+    "notPurchasable": "Choose a paid plan — Starter is free",
+    "providerRejected": "The payment provider refused the request — try again or contact support",
+    "samePlan": "Your company is already on this plan"
+  },
   "auth": {
     "currentPasswordWrong": "The current password is not right",
     "samePassword": "Choose a password different from the current one"

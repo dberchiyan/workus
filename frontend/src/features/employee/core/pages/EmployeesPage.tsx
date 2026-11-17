@@ -11,7 +11,9 @@ import { CategoryTabs } from '../components/CategoryTabs';
 import { EmployeeList } from '../components/EmployeeList';
 import { EmployeeStatsCards } from '../components/EmployeeStatsCards';
 import { useEmployeeListParams } from '../hooks/useEmployeeListParams';
-import { usePositionCategories } from '../hooks/useEmployeeQueries';
+import { useEmployeeSummary, usePositionCategories } from '../hooks/useEmployeeQueries';
+import { useAccess, usePlan } from '@/features/auth';
+import { UpgradePrompt } from '@/shared/components/UpgradePrompt';
 
 export default function EmployeesPage() {
   const { t } = useTranslation('employee');
@@ -29,6 +31,14 @@ export default function EmployeesPage() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const addButtonRef = useRef<HTMLButtonElement>(null);
   const [createdName, setCreatedName] = useState<string | null>(null);
+  // At the plan's employee limit the page says so; the API refuses the next hire anyway.
+  const plan = usePlan();
+  const can = useAccess();
+  const totalActive = useEmployeeSummary().data?.totalActive;
+  const limitReached =
+    plan.maxEmployees !== null && totalActive !== undefined && totalActive >= plan.maxEmployees
+      ? { limit: plan.maxEmployees, count: totalActive }
+      : null;
 
   return (
     <div className="flex flex-col gap-6">
@@ -55,6 +65,14 @@ export default function EmployeesPage() {
           {t('add.open')}
         </Button>
       </div>
+      {limitReached && (
+        <UpgradePrompt
+          compact
+          reason={{ kind: 'limit', ...limitReached }}
+          requiredPlan={plan.plan === 'STARTER' ? 'TEAM' : 'BUSINESS'}
+          canManage={can('settings.billing')}
+        />
+      )}
       <EmployeeStatsCards />
       <div className="flex flex-col gap-4">
         <CategoryTabs

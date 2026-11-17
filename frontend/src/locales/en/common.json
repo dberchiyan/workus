@@ -61,5 +61,38 @@
     "responsible": "Responsible: {{names}}",
     "more": "+{{count}}",
     "andMore": "{{count}} more"
+  },
+  "plans": {
+    "STARTER": "Starter",
+    "TEAM": "Team",
+    "BUSINESS": "Business"
+  },
+  "upgrade": {
+    "plan": "Available on the {{plan}} plan and above",
+    "seePlans": "See plans",
+    "askOwner": "Ask an owner of your company to upgrade the plan.",
+    "limit": {
+      "title": "Your plan allows up to {{limit}} employees",
+      "description_one": "You have {{people}} active employee. Move to the {{plan}} plan to add more — nothing is removed meanwhile.",
+      "description_other": "You have {{people}} active employees. Move to the {{plan}} plan to add more — nothing is removed meanwhile."
+    },
+    "features": {
+      "reviews": {
+        "title": "Reviews and salary history",
+        "description": "Record reviews with the agreed salary, see how pay changed over time and keep feedback from HR, team leads, the team and clients — on the {{plan}} plan."
+      },
+      "structure": {
+        "title": "Departments and positions",
+        "description": "Shape your own departments and positions, rename them and see who holds what — on the {{plan}} plan."
+      },
+      "insights": {
+        "title": "Yearly insights",
+        "description": "Headcount, turnover, tenure, absence and average salary for any year, for the company or one department — on the {{plan}} plan."
+      },
+      "exports": {
+        "title": "Export of change history and security log",
+        "description": "Download an employee’s whole change history and security log as CSV — on the {{plan}} plan."
+      }
+    }
   }
 }

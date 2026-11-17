@@ -9,6 +9,8 @@ export { useAccess } from './hooks/useAccess';
 export { ACCESS, type AccessPart, type UserRole } from './access';
 export { useLogout } from './hooks/useLogout';
 export { useCurrentUser } from './hooks/useCurrentUser';
+export { usePlan, useUpgrade, type CompanyPlan, type UpgradeState } from './hooks/usePlan';
+export { PLAN_FOR_FEATURE, type Plan, type PlanFeature } from './plan';
 export { authKeys } from './hooks/queryKeys';
 export { PageShell } from './components/PageShell';
 export { BrandLogo } from './components/BrandLogo';

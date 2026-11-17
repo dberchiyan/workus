@@ -15,6 +15,7 @@ import { TimingInterceptor } from './common/observability/timing.interceptor';
 import { PersistenceModule } from './common/persistence/persistence.module';
 import { AuthorizationGuard } from './common/security/authorization.guard';
 import { DemoGuard } from './common/security/demo.guard';
+import { PlanGuard } from './common/security/plan.guard';
 import { CsrfGuard } from './common/security/csrf.guard';
 import { JsonOnlyMiddleware } from './common/security/json-only.middleware';
 import { RateLimitGuard } from './common/security/rate-limit.guard';
@@ -31,6 +32,7 @@ import { UserModule } from './modules/user/user.module';
 import { NotificationModule } from './modules/notification/notification.module';
 import { OrganisationModule } from './modules/organisation/organisation.module';
 import { PlatformModule } from './modules/platform/platform.module';
+import { BillingModule } from './modules/billing/billing.module';
 
 @Module({
   imports: [
@@ -49,6 +51,7 @@ import { PlatformModule } from './modules/platform/platform.module';
     NotificationModule,
     AuthModule,
     OrganisationModule,
+    BillingModule,
     PlatformModule,
     EmployeeModule,
     ReviewModule,
@@ -64,6 +67,7 @@ import { PlatformModule } from './modules/platform/platform.module';
     { provide: APP_GUARD, useClass: RateLimitGuard },
     { provide: APP_GUARD, useClass: AuthorizationGuard },
     { provide: APP_GUARD, useClass: DemoGuard },
+    { provide: APP_GUARD, useClass: PlanGuard },
     { provide: APP_PIPE, useClass: ZodValidationPipe },
     // Outermost first: timing measures everything; idempotency stores the serialized response.
     { provide: APP_INTERCEPTOR, useClass: TimingInterceptor },

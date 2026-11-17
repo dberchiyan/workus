@@ -1,5 +1,6 @@
 import { createZodDto } from 'nestjs-zod';
 import { z } from 'zod';
+import { FeatureSchema, PlanSchema } from '../../../../common/dto/plan';
 import { ORGANISATION_STATUSES } from '../../../user/service/organisation-status';
 import { USER_ROLES } from '../../../user/service/user-role';
 
@@ -19,6 +20,15 @@ export const CurrentUserResponseSchema = z.object({
     status: z.enum(ORGANISATION_STATUSES).meta({ id: 'OrganisationStatus' }),
     /** Why a platform admin rejected it; null otherwise. */
     rejectionReason: z.string().max(500).nullable(),
+    /** What the company's plan allows — the UI shows upgrade prompts from it; the API enforces. */
+    billing: z.object({
+      plan: PlanSchema,
+      features: z.array(FeatureSchema).max(16),
+      /** Active employees the plan allows; null = unlimited. */
+      maxEmployees: z.number().int().min(1).nullable(),
+      /** A payment failed: the plan stays until this instant, then Starter (owners see a banner). */
+      pastDueUntil: z.iso.datetime().nullable(),
+    }),
   }),
   /** Minutes without activity after which the session ends (the client warns before). */
   idleTimeoutMinutes: z.number().int().min(1),

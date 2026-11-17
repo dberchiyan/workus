@@ -2,6 +2,7 @@ import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import { env } from '@/shared/config/env';
 import enAuth from '@/locales/en/auth.json';
+import enBilling from '@/locales/en/billing.json';
 import enCommon from '@/locales/en/common.json';
 import enEmployee from '@/locales/en/employee.json';
 import enErrors from '@/locales/en/errors.json';
@@ -25,6 +26,7 @@ export const resources = {
     validation: enValidation,
     errors: enErrors,
     auth: enAuth,
+    billing: enBilling,
     dashboard: enDashboard,
     employee: enEmployee,
     insights: enInsights,

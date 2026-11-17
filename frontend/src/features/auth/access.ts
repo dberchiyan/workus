@@ -38,6 +38,10 @@ export const ACCESS = {
   'settings.structure': ADMINS,
   /** Settings: the organisation's name — owners. */
   'settings.organisation': OWNERS,
+  /** Settings: the plan, payment and invoices — owners (the API refuses everyone else). */
+  'settings.billing': OWNERS,
+  /** The failed-payment banner: owners, who can act on it. */
+  'billing.banner': OWNERS,
   /** Settings: who runs the organisation — admins see it, owners change roles. */
   'settings.administrators': ADMINS,
   'administrators.changeRole': OWNERS,

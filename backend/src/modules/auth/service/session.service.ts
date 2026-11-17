@@ -12,6 +12,7 @@ import {
 import { generateToken, hashToken } from '../../../common/security/token-hash';
 import { AuditAction, AuditTargetType } from '../../audit/service/audit-action';
 import { AuditService } from '../../audit/service/audit.service';
+import { isPlan, Plan } from '../../../common/plan/plan';
 import { OrganisationStatus } from '../../user/service/organisation-status';
 import { EmployeeService } from '../../employee/core/service/employee.service';
 import type { SessionListRecord } from '../repository/record/session.record';
@@ -113,6 +114,8 @@ export class SessionService extends SessionAuthenticator {
         session.user.email,
         session.user.organisationId,
         session.user.organisation.status === OrganisationStatus.ACTIVE,
+        // Guarded by ck_organisations_plan.
+        isPlan(session.user.organisation.plan) ? session.user.organisation.plan : Plan.STARTER,
         session.id,
         session.authorities,
         session.clientType === ClientType.MOBILE ? ClientType.MOBILE : ClientType.WEB,

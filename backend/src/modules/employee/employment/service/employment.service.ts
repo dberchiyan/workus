@@ -1,5 +1,7 @@
 import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
+import { PlanLimitReachedException } from '../../../../common/exception/api.exception';
+import { BillingService } from '../../../billing/service/billing.service';
 import { AppConfigService } from '../../../../common/config/app-config.service';
 import { DemoRestrictedException } from '../../../../common/exception/api.exception';
 import { AuthService } from '../../../auth/service/auth.service';
@@ -30,6 +32,7 @@ export class EmploymentService {
     private readonly passwordHasher: PasswordHasher,
     private readonly authService: AuthService,
     private readonly config: AppConfigService,
+    private readonly billingService: BillingService,
   ) {}
 
   /**
@@ -55,6 +58,7 @@ export class EmploymentService {
     passwordHash: string,
     actorId: string,
   ): Promise<Omit<HiredEmployee, 'temporaryPassword'>> {
+    await this.requireRoomOnPlan(organisationId);
     const { startingSalary, ...employeeCommand } = command;
     const employee = await this.employeeService.create(
       organisationId,
@@ -79,6 +83,21 @@ export class EmploymentService {
       firstName: employee.user.firstName,
       lastName: employee.user.lastName,
     };
+  }
+
+  /**
+   * The plan's employee limit, enforced here (not only hidden in the UI): the 11th active
+   * employee on Starter is refused with the upgrade hint. Not serialised — two hires at the
+   * limit at once could both pass (accepted, as with time-off balances).
+   */
+  private async requireRoomOnPlan(organisationId: string): Promise<void> {
+    const { plan, maxEmployees } = await this.billingService.findEmployeeLimit(organisationId);
+    if (
+      maxEmployees !== null &&
+      (await this.employeeService.countActive(organisationId)) >= maxEmployees
+    ) {
+      throw new PlanLimitReachedException(plan, maxEmployees);
+    }
   }
 
   /** Edit the profile; a changed start date moves the starting salary with it. */

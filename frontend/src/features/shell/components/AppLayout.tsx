@@ -13,6 +13,7 @@ import { useIsPageLoading } from '../hooks/useIsPageLoading';
 import { useSidebarCollapsed } from '../hooks/useSidebarCollapsed';
 import { SidebarContent } from './SidebarContent';
 import { TopBar } from './TopBar';
+import { BillingBanner } from './BillingBanner';
 
 /** One key per page: Settings' sections (`/settings/<section>`) are one page with its own menu. */
 const pageTransitionKey = (pathname: string): string =>
@@ -84,7 +85,8 @@ export function AppLayout() {
           className="flex flex-1 flex-col px-4 py-6 outline-none md:px-8 md:py-8"
         >
           {/* One content width for every signed-in page (theme token `container-page`). */}
-          <div className="mx-auto flex w-full max-w-page flex-1 flex-col">
+          <div className="mx-auto flex w-full max-w-page flex-1 flex-col gap-6">
+            <BillingBanner />
             {/* Navigations run in a transition: the old page slides out, the new one in (CSS in
                 theme/tailwind.css); keyed by page, so filters and tabs (search params) and
                 Settings' sections (its own menu stays put) don't. */}

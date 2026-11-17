@@ -1,4 +1,5 @@
 import type { I18nPath } from '../i18n/i18n-path';
+import { type Feature, type Plan, PLAN_CATALOGUE } from '../plan/plan';
 import { ErrorCode } from './error-code';
 
 export type MessageArgs = Readonly<Record<string, string | number>>;
@@ -46,6 +47,35 @@ export class OrganisationNotActiveException extends ApiException {
 export class DemoRestrictedException extends ApiException {
   constructor() {
     super('DEMO_RESTRICTED', 'errors.DEMO_RESTRICTED');
+  }
+}
+
+/** 403 — the feature is on a higher plan; the hint names the cheapest plan that has it. */
+export class PlanUpgradeRequiredException extends ApiException {
+  constructor(
+    readonly feature: Feature,
+    readonly requiredPlan: Plan,
+  ) {
+    super('PLAN_UPGRADE_REQUIRED', 'errors.PLAN_UPGRADE_REQUIRED', {
+      plan: PLAN_CATALOGUE[requiredPlan].name,
+    });
+  }
+}
+
+/** 403 — the plan's employee limit is reached (the 11th employee on Starter). */
+export class PlanLimitReachedException extends ApiException {
+  constructor(plan: Plan, limit: number) {
+    super('PLAN_LIMIT_REACHED', 'errors.PLAN_LIMIT_REACHED', {
+      plan: PLAN_CATALOGUE[plan].name,
+      limit,
+    });
+  }
+}
+
+/** 401 — a webhook whose signature does not verify (or has no raw body to verify). */
+export class WebhookSignatureException extends ApiException {
+  constructor() {
+    super('UNAUTHORIZED', 'errors.billing.invalidSignature');
   }
 }
 

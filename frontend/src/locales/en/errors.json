@@ -8,6 +8,8 @@
   "ACCESS_ENDED": "Your access to Workus has ended — contact your administrator",
   "ORGANISATION_NOT_ACTIVE": "Your company is not approved yet",
   "DEMO_RESTRICTED": "Turned off for the shared demo accounts",
+  "PLAN_UPGRADE_REQUIRED": "This is part of a higher plan — upgrade in Settings → Billing",
+  "PLAN_LIMIT_REACHED": "Your plan’s employee limit is reached — upgrade in Settings → Billing to add more",
   "FORBIDDEN": "You don't have access to this action",
   "RESOURCE_NOT_FOUND": "The requested item was not found",
   "CONFLICT": "This conflicts with existing data — reload and try again",

@@ -6,7 +6,9 @@ import { useTranslation } from 'react-i18next';
 import { PROFILE_TABS, type ProfileTab, useProfileTab } from '../hooks/useProfileTab';
 import type { EmployeeProfileMock } from '../mocks/employeeProfileMock';
 import type { EmployeeProfile } from '../types';
+import { useUpgrade } from '@/features/auth';
 import { ReviewTab } from '@/features/employee/review';
+import { UpgradePrompt } from '@/shared/components/UpgradePrompt';
 import { ProfileActivityTab } from './ProfileActivityTab';
 import { ProfileFilesTab } from './ProfileFilesTab';
 import { ProfileInfoTab } from './ProfileInfoTab';
@@ -22,6 +24,8 @@ export function ProfileTabs({ employee, mock }: ProfileTabsProps) {
   const { t } = useTranslation('employee');
   const { tab, setTab } = useProfileTab();
   const baseId = useId();
+  // Reviews are a Team feature: a lower plan sees the prompt instead (the API refuses too).
+  const reviews = useUpgrade('reviews');
   const labels: Record<ProfileTab, string> = {
     info: t('profile.tabs.info'),
     files: t('profile.tabs.files', { count: mock.fileCount }),
@@ -63,7 +67,16 @@ export function ProfileTabs({ employee, mock }: ProfileTabsProps) {
       >
         {tab === 'info' && <ProfileInfoTab employee={employee} mock={mock} />}
         {tab === 'files' && <ProfileFilesTab mock={mock} />}
-        {tab === 'review' && <ReviewTab employeeId={employee.id} />}
+        {tab === 'review' &&
+          (reviews.locked ? (
+            <UpgradePrompt
+              reason={{ kind: 'feature', feature: 'reviews' }}
+              requiredPlan={reviews.requiredPlan}
+              canManage={reviews.canManage}
+            />
+          ) : (
+            <ReviewTab employeeId={employee.id} />
+          ))}
         {tab === 'activity' && <ProfileActivityTab employeeId={employee.id} />}
         {tab === 'security' && <ProfileSecurityTab employeeId={employee.id} />}
       </div>

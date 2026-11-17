@@ -67,6 +67,11 @@ Everything else works. A company you sign up yourself has no limits.
 **Fresh every day.** At 08:00 Kyiv time the demo database is reset and seeded again, with a few
 new time-off requests waiting for a decision.
 
+**Plans and payments** run through Stripe in **test mode** — no real money moves. OSDB is on
+Business, Vortex on Starter (over its 10-employee limit, so adding people and the paid features
+wait for an upgrade). Try it as Vortex's owner: Settings → Billing → *Upgrade to Team*, card
+`4242 4242 4242 4242`, any future expiry date, any CVC. The reset cancels the test subscriptions.
+
 ## Demo accounts
 
 Two seeded companies and a platform admin, on the **[live demo](https://demo-workus.osdb.io)** or
@@ -100,9 +105,17 @@ with **Create a company** opens once a platform admin approves it.
 | **Settings** — account, sessions, security log | ✅ | ✅ | ✅ | ✅ |
 | **Settings** — structure, holidays, administrators | ✅ | ✅ | — | — |
 | **Settings** — company name, admins, owners | ✅ | — | — | — |
+| **Settings** — billing: plan, card, invoices | ✅ | — | — | — |
 | **Companies** — approve sign-ups | — | — | — | ✅ |
 
 Also: **⌘K command menu**, notifications, full change history, light and dark themes, mobile layout.
+
+**Plans** (monthly, per company): **Starter** $0 — up to 10 employees, directory, time off, company
+calendar · **Team** $29 — up to 50 employees, + reviews and salary history, departments and
+positions · **Business** $79 — unlimited employees, + yearly insights, CSV export of the change
+history and security log. Upgrades are charged at once (Stripe Checkout); plan changes, the card,
+cancellation and invoices live in the Stripe Customer Portal; downgrades and cancellations apply at
+the end of the paid period; a failed payment keeps the plan for 7 days, then back to Starter.
 
 ## Architecture
 
@@ -199,7 +212,8 @@ Every package has `build`, `typecheck`, `lint` and `format:check`. The backend a
 | `db:migrate:create` | Creates a SQL migration |
 | `db:migrate:deploy` | Applies migrations |
 | `db:seed` | Loads the demo data |
-| `db:demo-reset` | Wipes and reseeds (demo mode only) |
+| `db:demo-reset` | Wipes and reseeds (demo mode only; cancels test subscriptions first) |
+| `stripe:setup` | Creates the Stripe prices, portal configuration (and webhook endpoint with `--webhook-url`) and prints the `.env` values |
 | `openapi:generate` | Writes `openapi.json` |
 
 **Changing the API:** run `openapi:generate` in the backend and `generate:api` in the frontend, then commit both.
@@ -213,3 +227,11 @@ Every package has `build`, `typecheck`, `lint` and `format:check`. The backend a
 | `frontend/.env` | Frontend build | Nothing |
 
 `DEMO_MODE=true` in `.env` or `backend/.env` turns on the [demo limits](#environments).
+
+**Billing:** `BILLING_PROVIDER=fake` (default) needs no Stripe account — a checkout "pays" at
+once and the portal only returns. For Stripe test mode: create a test key, run
+`STRIPE_SECRET_KEY=sk_test_… npm run stripe:setup` in `backend/` and paste its output into
+`backend/.env` (or the root `.env` for Compose); for local webhooks run
+`stripe listen --forward-to localhost:3000/api/v1/webhooks/stripe` and put its signing secret in
+`STRIPE_WEBHOOK_SECRET`. `APP_URL` is where Stripe sends people back to (`http://localhost:5173`
+with the Vite dev server, `http://localhost:8080` with Compose).

@@ -58,6 +58,8 @@ export const can = {
   renameSelf: policy([], isAdmin),
   /** The organisation's settings and people's roles. */
   owner: policy([], (principal) => principal.hasAuthority('OWNER')),
+  /** The plan, payment and invoices (Settings → Billing): owners, like the company's name. */
+  manageBilling: policy([], (principal) => principal.hasAuthority('OWNER')),
   /** Change one person's role: an owner, for a user of their organisation. */
   manageUserRole: policy(
     ['userId'],

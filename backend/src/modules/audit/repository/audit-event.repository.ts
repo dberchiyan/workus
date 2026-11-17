@@ -67,6 +67,40 @@ export class AuditEventRepository {
     return { content, totalElements };
   }
 
+  /** The whole history of an employee, newest first, bounded (exports). */
+  findByEmployee(
+    organisationId: string,
+    employeeId: string,
+    take: number,
+  ): Promise<AuditEventRecord[]> {
+    return this.txHost.tx.auditEvent.findMany({
+      where: { organisationId, employeeId },
+      select: auditEventSelect,
+      orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+      take,
+    });
+  }
+
+  /** The whole security log of a user, newest first, bounded (exports). */
+  findSecurity(
+    organisationId: string,
+    userId: string,
+    actions: readonly string[],
+    take: number,
+  ): Promise<SecurityEventRecord[]> {
+    return this.txHost.tx.auditEvent.findMany({
+      where: {
+        organisationId,
+        targetType: AuditTargetType.USER,
+        targetId: userId,
+        action: { in: [...actions] },
+      },
+      select: securityEventSelect,
+      orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+      take,
+    });
+  }
+
   /** A user's security log, newest first: events about the account with one of `actions`. */
   async findSecurityPage(
     organisationId: string,

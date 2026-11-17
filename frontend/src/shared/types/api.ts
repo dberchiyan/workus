@@ -330,6 +330,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/employees/{employeeId}/activity/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download an employee's whole change history as CSV (Business plan) */
+        get: operations["EmployeeActivityController_export"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/employees/{employeeId}/security-log": {
         parameters: {
             query?: never;
@@ -339,6 +356,23 @@ export interface paths {
         };
         /** An employee's security log (sign-ins, password changes, ended sessions), newest first */
         get: operations["EmployeeSecurityLogController_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/employees/{employeeId}/security-log/export": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Download an employee's whole security log as CSV (Business plan) */
+        get: operations["EmployeeSecurityLogController_export"];
         put?: never;
         post?: never;
         delete?: never;
@@ -566,6 +600,125 @@ export interface paths {
         /** Make an admin an owner or an owner an admin (owners only); the last owner stays */
         put: operations["OrganisationController_changeRole"];
         post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/info": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Whether payments run in test mode (shown on the sign-in page) */
+        get: operations["BillingController_info"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** The company's plan, subscription state and the plans on offer */
+        get: operations["BillingController_summary"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/checkout-sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Start the hosted checkout for a paid plan (charged at once); answers its URL */
+        post: operations["BillingController_startCheckout"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/plan": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /** Change the plan: a higher one applies now (charged at once), a lower one at the period end, Starter cancels; the current one keeps it */
+        put: operations["BillingController_changePlan"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/portal-sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Open the billing portal (card, invoices, plan changes, cancellation); answers its URL */
+        post: operations["BillingController_openPortal"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/billing/sync": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Re-read the company's subscription from the provider (after a checkout) and answer the state */
+        post: operations["BillingController_sync"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/webhooks/stripe": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Receive a Stripe event: verified by its signature, stored once, then applied */
+        post: operations["BillingWebhookController_receive"];
         delete?: never;
         options?: never;
         head?: never;
@@ -1116,7 +1269,7 @@ export interface components {
             status: "ok";
         };
         /** @enum {string} */
-        ErrorCode: "VALIDATION_FAILED" | "MALFORMED_REQUEST" | "INVALID_PARAMETER" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "SESSION_EXPIRED" | "FORBIDDEN" | "ACCESS_ENDED" | "ORGANISATION_NOT_ACTIVE" | "DEMO_RESTRICTED" | "RESOURCE_NOT_FOUND" | "CONFLICT" | "CONCURRENT_MODIFICATION" | "IDEMPOTENCY_KEY_REUSED" | "BUSINESS_RULE_VIOLATION" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "RATE_LIMIT_EXCEEDED" | "UPSTREAM_UNAVAILABLE" | "INTERNAL_ERROR";
+        ErrorCode: "VALIDATION_FAILED" | "MALFORMED_REQUEST" | "INVALID_PARAMETER" | "UNAUTHORIZED" | "INVALID_CREDENTIALS" | "SESSION_EXPIRED" | "FORBIDDEN" | "ACCESS_ENDED" | "ORGANISATION_NOT_ACTIVE" | "DEMO_RESTRICTED" | "PLAN_UPGRADE_REQUIRED" | "PLAN_LIMIT_REACHED" | "RESOURCE_NOT_FOUND" | "CONFLICT" | "CONCURRENT_MODIFICATION" | "IDEMPOTENCY_KEY_REUSED" | "BUSINESS_RULE_VIOLATION" | "PAYLOAD_TOO_LARGE" | "UNSUPPORTED_MEDIA_TYPE" | "RATE_LIMIT_EXCEEDED" | "UPSTREAM_UNAVAILABLE" | "INTERNAL_ERROR";
         ErrorResponse: {
             /** Format: date-time */
             timestamp: string;
@@ -1218,6 +1371,10 @@ export interface components {
         UserRole_Output: "PLATFORM_ADMIN" | "OWNER" | "ADMIN" | "MANAGER" | "EMPLOYEE";
         /** @enum {string} */
         OrganisationStatus_Output: "PENDING" | "ACTIVE" | "REJECTED";
+        /** @enum {string} */
+        Plan_Output: "STARTER" | "TEAM" | "BUSINESS";
+        /** @enum {string} */
+        PlanFeature_Output: "reviews" | "structure" | "insights" | "exports";
         CurrentUserResponse_Output: {
             /** Format: uuid */
             id: string;
@@ -1231,6 +1388,13 @@ export interface components {
                 name: string;
                 status: components["schemas"]["OrganisationStatus_Output"];
                 rejectionReason: string | null;
+                billing: {
+                    plan: components["schemas"]["Plan_Output"];
+                    features: components["schemas"]["PlanFeature_Output"][];
+                    maxEmployees: number | null;
+                    /** Format: date-time */
+                    pastDueUntil: string | null;
+                };
             };
             idleTimeoutMinutes: number;
             demoRestricted: boolean;
@@ -1406,7 +1570,7 @@ export interface components {
                 };
                 changes: {
                     /** @enum {string} */
-                    field: "title" | "date" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startDate" | "firstName" | "lastName" | "email" | "mobile" | "personalEmail" | "linkedinUrl" | "telegram" | "address" | "dateOfBirth" | "terminationDate" | "terminationReason" | "terminationComment" | "timeOffType" | "periodStart" | "periodEnd" | "days" | "note" | "decisionComment" | "name" | "recurring" | "role";
+                    field: "title" | "date" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startDate" | "firstName" | "lastName" | "email" | "mobile" | "personalEmail" | "linkedinUrl" | "telegram" | "address" | "dateOfBirth" | "terminationDate" | "terminationReason" | "terminationComment" | "timeOffType" | "periodStart" | "periodEnd" | "days" | "note" | "decisionComment" | "name" | "recurring" | "role" | "plan";
                     from: ({
                         /** @enum {string} */
                         kind: "text";
@@ -1661,6 +1825,51 @@ export interface components {
             email: string;
             role: components["schemas"]["AdministratorRole_Output"];
             version: number;
+        };
+        BillingInfoResponse_Output: {
+            testMode: boolean;
+        };
+        /** @enum {string} */
+        SubscriptionStatus_Output: "NONE" | "ACTIVE" | "PAST_DUE";
+        PlanOffer_Output: {
+            plan: components["schemas"]["Plan_Output"];
+            name: string;
+            monthlyPrice: components["schemas"]["Money_Output"];
+            maxEmployees: number | null;
+            features: components["schemas"]["PlanFeature_Output"][];
+        };
+        BillingResponse_Output: {
+            plan: components["schemas"]["Plan_Output"];
+            status: components["schemas"]["SubscriptionStatus_Output"];
+            scheduledPlan: components["schemas"]["Plan_Output"] | null;
+            /** Format: date-time */
+            currentPeriodEnd: string | null;
+            /** Format: date-time */
+            pastDueSince: string | null;
+            /** Format: date-time */
+            graceEndsAt: string | null;
+            canManage: boolean;
+            granted: boolean;
+            testMode: boolean;
+            plans: components["schemas"]["PlanOffer_Output"][];
+        };
+        CheckoutSessionRequest: {
+            /** @enum {string} */
+            plan: "TEAM" | "BUSINESS";
+        };
+        BillingRedirectResponse_Output: {
+            /** Format: uri */
+            url: string;
+        };
+        /** @enum {string} */
+        Plan: "STARTER" | "TEAM" | "BUSINESS";
+        ChangePlanRequest: {
+            plan: components["schemas"]["Plan"];
+        };
+        WebhookReceiptResponse_Output: {
+            /** @enum {boolean} */
+            received: true;
+            duplicate: boolean;
         };
         Company_Output: {
             /** Format: uuid */
@@ -3374,7 +3583,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description FORBIDDEN | PLAN_LIMIT_REACHED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -3701,6 +3910,62 @@ export interface operations {
             };
         };
     };
+    EmployeeActivityController_export: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description CSV file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN | PLAN_UPGRADE_REQUIRED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
     EmployeeSecurityLogController_list: {
         parameters: {
             query?: {
@@ -3758,6 +4023,62 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    EmployeeSecurityLogController_export: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description CSV file */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": string;
+                };
+            };
+            /** @description INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN | PLAN_UPGRADE_REQUIRED */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description RESOURCE_NOT_FOUND */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "text/csv": components["schemas"]["ErrorResponse"];
                 };
             };
         };
@@ -3975,7 +4296,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description FORBIDDEN | PLAN_UPGRADE_REQUIRED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4035,7 +4356,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description PLAN_UPGRADE_REQUIRED | FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4091,7 +4412,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description FORBIDDEN | PLAN_UPGRADE_REQUIRED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4162,7 +4483,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description PLAN_UPGRADE_REQUIRED | FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4291,7 +4612,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description PLAN_UPGRADE_REQUIRED | FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4347,7 +4668,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description FORBIDDEN | PLAN_UPGRADE_REQUIRED */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -4695,6 +5016,366 @@ export interface operations {
             };
             /** @description BUSINESS_RULE_VIOLATION */
             422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    BillingController_info: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingInfoResponse_Output"];
+                };
+            };
+            /** @description RATE_LIMIT_EXCEEDED */
+            429: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    BillingController_summary: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingResponse_Output"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    BillingController_startCheckout: {
+        parameters: {
+            query?: never;
+            header: {
+                /** @description UUID per logical operation, reused on retry */
+                "Idempotency-Key": string;
+            };
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CheckoutSessionRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingRedirectResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED | INVALID_PARAMETER */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description IDEMPOTENCY_KEY_REUSED */
+            409: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UPSTREAM_UNAVAILABLE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    BillingController_changePlan: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ChangePlanRequest"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingResponse_Output"];
+                };
+            };
+            /** @description VALIDATION_FAILED */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UPSTREAM_UNAVAILABLE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    BillingController_openPortal: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingRedirectResponse_Output"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description BUSINESS_RULE_VIOLATION */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UPSTREAM_UNAVAILABLE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    BillingController_sync: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BillingResponse_Output"];
+                };
+            };
+            /** @description UNAUTHORIZED | SESSION_EXPIRED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description FORBIDDEN */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UPSTREAM_UNAVAILABLE */
+            503: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    BillingWebhookController_receive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["WebhookReceiptResponse_Output"];
+                };
+            };
+            /** @description MALFORMED_REQUEST */
+            400: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNAUTHORIZED */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description UNSUPPORTED_MEDIA_TYPE */
+            415: {
                 headers: {
                     [name: string]: unknown;
                 };
@@ -5087,7 +5768,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description PLAN_UPGRADE_REQUIRED | FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5149,7 +5830,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description PLAN_UPGRADE_REQUIRED | FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5222,7 +5903,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description PLAN_UPGRADE_REQUIRED | FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5281,7 +5962,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description PLAN_UPGRADE_REQUIRED | FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -5346,7 +6027,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description PLAN_UPGRADE_REQUIRED | FORBIDDEN */
             403: {
                 headers: {
                     [name: string]: unknown;
@@ -7013,7 +7694,7 @@ export interface operations {
                     "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            /** @description FORBIDDEN */
+            /** @description FORBIDDEN | PLAN_UPGRADE_REQUIRED */
             403: {
                 headers: {
                     [name: string]: unknown;

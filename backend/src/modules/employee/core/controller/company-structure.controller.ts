@@ -8,6 +8,8 @@ import { Idempotent } from '../../../../common/idempotency/idempotent.decorator'
 import { CurrentPrincipal } from '../../../../common/security/current-principal.decorator';
 import { can } from '../../../../common/security/policies';
 import type { Principal } from '../../../../common/security/principal';
+import { Feature } from '../../../../common/plan/plan';
+import { RequiresFeature } from '../../../../common/security/plan.guard';
 import { Authorize } from '../../../../common/security/security.decorators';
 import { CompanyStructureService } from '../service/company-structure.service';
 import { EMPLOYEE_PAGEABLE, type EmployeeSortField } from '../service/employee-sort';
@@ -52,10 +54,17 @@ export class CompanyStructureController {
   @Post('departments')
   @HttpCode(HttpStatus.OK)
   @Authorize(can.manageStructure)
+  @RequiresFeature(Feature.STRUCTURE)
   @Idempotent()
   @ApiOperation({ summary: 'Add a department (at the end)' })
   @ZodResponse({ status: HttpStatus.OK, type: DepartmentResponse })
-  @ApiErrors('VALIDATION_FAILED', ...READ_ERRORS, 'CONFLICT', 'BUSINESS_RULE_VIOLATION')
+  @ApiErrors(
+    'VALIDATION_FAILED',
+    ...READ_ERRORS,
+    'CONFLICT',
+    'BUSINESS_RULE_VIOLATION',
+    'PLAN_UPGRADE_REQUIRED',
+  )
   async createDepartment(
     @CurrentPrincipal() principal: Principal,
     @Body() request: CreateDepartmentRequest,
@@ -72,8 +81,10 @@ export class CompanyStructureController {
   @Put('departments/:departmentId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Authorize(can.manageDepartment)
+  @RequiresFeature(Feature.STRUCTURE)
   @ApiOperation({ summary: 'Rename a department' })
   @ApiErrors(
+    'PLAN_UPGRADE_REQUIRED',
     'VALIDATION_FAILED',
     'INVALID_PARAMETER',
     ...READ_ERRORS,
@@ -97,8 +108,15 @@ export class CompanyStructureController {
   @Delete('departments/:departmentId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Authorize(can.manageDepartment)
+  @RequiresFeature(Feature.STRUCTURE)
   @ApiOperation({ summary: 'Remove a department that has no positions' })
-  @ApiErrors('INVALID_PARAMETER', ...READ_ERRORS, 'RESOURCE_NOT_FOUND', 'BUSINESS_RULE_VIOLATION')
+  @ApiErrors(
+    'INVALID_PARAMETER',
+    ...READ_ERRORS,
+    'RESOURCE_NOT_FOUND',
+    'BUSINESS_RULE_VIOLATION',
+    'PLAN_UPGRADE_REQUIRED',
+  )
   async removeDepartment(
     @CurrentPrincipal() principal: Principal,
     @UuidParam('departmentId') departmentId: string,
@@ -109,10 +127,12 @@ export class CompanyStructureController {
   @Post('departments/:departmentId/positions')
   @HttpCode(HttpStatus.OK)
   @Authorize(can.manageDepartment)
+  @RequiresFeature(Feature.STRUCTURE)
   @Idempotent()
   @ApiOperation({ summary: 'Add a position to a department' })
   @ZodResponse({ status: HttpStatus.OK, type: StructurePositionResponse })
   @ApiErrors(
+    'PLAN_UPGRADE_REQUIRED',
     'VALIDATION_FAILED',
     'INVALID_PARAMETER',
     ...READ_ERRORS,
@@ -154,8 +174,10 @@ export class CompanyStructureController {
   @Put('positions/:positionId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Authorize(can.managePosition)
+  @RequiresFeature(Feature.STRUCTURE)
   @ApiOperation({ summary: 'Rename a position (everyone holding it shows the new title)' })
   @ApiErrors(
+    'PLAN_UPGRADE_REQUIRED',
     'VALIDATION_FAILED',
     'INVALID_PARAMETER',
     ...READ_ERRORS,
@@ -179,8 +201,15 @@ export class CompanyStructureController {
   @Delete('positions/:positionId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Authorize(can.managePosition)
+  @RequiresFeature(Feature.STRUCTURE)
   @ApiOperation({ summary: 'Remove a position nobody holds (current or former employees)' })
-  @ApiErrors('INVALID_PARAMETER', ...READ_ERRORS, 'RESOURCE_NOT_FOUND', 'BUSINESS_RULE_VIOLATION')
+  @ApiErrors(
+    'INVALID_PARAMETER',
+    ...READ_ERRORS,
+    'RESOURCE_NOT_FOUND',
+    'BUSINESS_RULE_VIOLATION',
+    'PLAN_UPGRADE_REQUIRED',
+  )
   async removePosition(
     @CurrentPrincipal() principal: Principal,
     @UuidParam('positionId') positionId: string,

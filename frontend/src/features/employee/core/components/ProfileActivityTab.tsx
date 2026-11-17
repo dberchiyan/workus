@@ -13,6 +13,7 @@ import { formatDayHeading, dayKey } from '../activityFormat';
 import { ACTIVITY_PAGE_SIZE, useEmployeeActivity } from '../hooks/useEmployeeActivity';
 import type { ActivityEvent } from '../types';
 import { ActivityEventItem } from './ActivityEventItem';
+import { ExportButton } from './ExportButton';
 import { ProfileEmptyState } from './ProfileEmptyState';
 
 interface DayGroup {
@@ -111,9 +112,12 @@ export function ProfileActivityTab({ employeeId }: { employeeId: string }) {
         <Typography id={headingId} variant="h6" component="h3">
           {t('profile.activity.title')}
         </Typography>
-        <Typography variant="body2" color="textSecondary" className="app-tabular">
-          {t('profile.activity.summary', { count: total })}
-        </Typography>
+        <div className="flex items-center gap-3">
+          <Typography variant="body2" color="textSecondary" className="app-tabular">
+            {t('profile.activity.summary', { count: total })}
+          </Typography>
+          <ExportButton employeeId={employeeId} kind="activity" />
+        </div>
       </div>
       <div
         aria-busy={query.isPlaceholderData}

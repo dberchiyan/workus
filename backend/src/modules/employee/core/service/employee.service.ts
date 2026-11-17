@@ -14,7 +14,12 @@ import {
   changeOf,
 } from '../../../audit/service/audit-change';
 import { AuditService } from '../../../audit/service/audit.service';
-import type { AuditEventPage, SecurityEventPage } from '../../../audit/service/audit.types';
+import type {
+  AuditEvent,
+  AuditEventPage,
+  SecurityEvent,
+  SecurityEventPage,
+} from '../../../audit/service/audit.types';
 import type { AuditEventSortField } from '../../../audit/service/audit-sort';
 import type { SecurityCategory } from '../../../audit/service/security-category';
 import { UserService } from '../../../user/service/user.service';
@@ -57,6 +62,8 @@ const NEW_HIRE_WINDOW_DAYS = 30;
 /** Insights read the whole roster in memory; a company of this size never comes close. */
 const MAX_ROSTER = 5000;
 const TERMINATION_WINDOW_DAYS = 90;
+/** Rows per export: one person's history stays far below this; a file, not pages (api.md). */
+const MAX_EXPORT_EVENTS = 5000;
 
 @Injectable()
 export class EmployeeService {
@@ -83,6 +90,11 @@ export class EmployeeService {
       pageable,
     );
     return { ...page, today };
+  }
+
+  /** Active employees today (planned leavers included) — what the plan's limit counts. */
+  countActive(organisationId: string): Promise<number> {
+    return this.employeeRepository.countActive(organisationId, todayUtc());
   }
 
   /**
@@ -535,6 +547,23 @@ export class EmployeeService {
       throw new ResourceNotFoundException();
     }
     return this.auditService.findPageByEmployee(organisationId, employeeId, pageable);
+  }
+
+  /** The employee's whole change history for a CSV export (Business plan), newest first. */
+  async findAllActivity(organisationId: string, employeeId: string): Promise<AuditEvent[]> {
+    if (!(await this.employeeRepository.existsById(organisationId, employeeId))) {
+      throw new ResourceNotFoundException();
+    }
+    return this.auditService.findAllByEmployee(organisationId, employeeId, MAX_EXPORT_EVENTS);
+  }
+
+  /** The employee's whole security log for a CSV export (Business plan), newest first. */
+  async findAllSecurityLog(organisationId: string, employeeId: string): Promise<SecurityEvent[]> {
+    const userId = await this.employeeRepository.findUserIdById(organisationId, employeeId);
+    if (!userId) {
+      throw new ResourceNotFoundException();
+    }
+    return this.auditService.findAllSecurity(organisationId, userId, MAX_EXPORT_EVENTS);
   }
 
   /** The employee's security log (their account's sign-ins, password changes…), for admins. */

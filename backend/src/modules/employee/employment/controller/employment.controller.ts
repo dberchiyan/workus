@@ -38,6 +38,7 @@ export class EmploymentController {
     'CONFLICT',
     'IDEMPOTENCY_KEY_REUSED',
     'BUSINESS_RULE_VIOLATION',
+    'PLAN_LIMIT_REACHED',
   )
   hire(
     @Body() request: CreateEmployeeRequest,

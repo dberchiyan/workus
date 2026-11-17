@@ -12,7 +12,13 @@ import {
   type AuditTargetType,
 } from './audit-action';
 import { AuditChangesSchema } from './audit-change';
-import type { AuditEvent, AuditEventPage, NewAuditEvent, SecurityEventPage } from './audit.types';
+import type {
+  AuditEvent,
+  AuditEventPage,
+  NewAuditEvent,
+  SecurityEvent,
+  SecurityEventPage,
+} from './audit.types';
 import type { AuditEventSortField } from './audit-sort';
 import {
   ALL_SECURITY_ACTIONS,
@@ -121,6 +127,52 @@ export class AuditService {
       ),
       totalElements: page.totalElements,
     };
+  }
+
+  /** The whole history of an employee, newest first, bounded (exports). */
+  async findAllByEmployee(
+    organisationId: string,
+    employeeId: string,
+    take: number,
+  ): Promise<AuditEvent[]> {
+    const records = await this.auditEventRepository.findByEmployee(
+      organisationId,
+      employeeId,
+      take,
+    );
+    return records.flatMap((record) => this.toEvent(record));
+  }
+
+  /** The whole security log of a user, newest first, bounded (exports). */
+  async findAllSecurity(
+    organisationId: string,
+    userId: string,
+    take: number,
+  ): Promise<SecurityEvent[]> {
+    const records = await this.auditEventRepository.findSecurity(
+      organisationId,
+      userId,
+      ALL_SECURITY_ACTIONS,
+      take,
+    );
+    const newDevices = await this.auditEventRepository.findNewDeviceSignIns(
+      userId,
+      records.map((record) => record.id),
+    );
+    return records.flatMap((record) =>
+      isAction(record.action)
+        ? [
+            {
+              id: record.id,
+              occurredAt: record.occurredAt,
+              action: record.action,
+              ipAddress: record.ipAddress,
+              userAgent: record.userAgent,
+              newDevice: newDevices.has(record.id),
+            },
+          ]
+        : [],
+    );
   }
 
   /** History of several targets (e.g. a page of requests), oldest first. */

@@ -5,6 +5,8 @@ import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { ApiErrors } from '../../../common/exception/api-errors.decorator';
 import { can } from '../../../common/security/policies';
+import { Feature } from '../../../common/plan/plan';
+import { RequiresFeature } from '../../../common/security/plan.guard';
 import { Authorize } from '../../../common/security/security.decorators';
 import { InsightsService } from '../service/insights.service';
 import { InsightsFilterQuery } from './dto/insights-filter.query';
@@ -19,12 +21,19 @@ export class InsightsController {
 
   @Get()
   @Authorize(can.viewInsights)
+  @RequiresFeature(Feature.INSIGHTS)
   @ApiOperation({
     summary:
       'Every figure for one year: headcount by month, tenure, turnover, absence leaders, average salary',
   })
   @ZodResponse({ status: HttpStatus.OK, type: InsightsResponse })
-  @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+  @ApiErrors(
+    'VALIDATION_FAILED',
+    'UNAUTHORIZED',
+    'SESSION_EXPIRED',
+    'FORBIDDEN',
+    'PLAN_UPGRADE_REQUIRED',
+  )
   async insights(
     @CurrentPrincipal() principal: Principal,
     @Query() query: InsightsFilterQuery,

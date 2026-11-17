@@ -15,6 +15,8 @@ export type I18nTranslations = {
         "ACCESS_ENDED": string;
         "ORGANISATION_NOT_ACTIVE": string;
         "DEMO_RESTRICTED": string;
+        "PLAN_UPGRADE_REQUIRED": string;
+        "PLAN_LIMIT_REACHED": string;
         "FORBIDDEN": string;
         "RESOURCE_NOT_FOUND": string;
         "CONFLICT": string;
@@ -26,6 +28,15 @@ export type I18nTranslations = {
         "RATE_LIMIT_EXCEEDED": string;
         "UPSTREAM_UNAVAILABLE": string;
         "INTERNAL_ERROR": string;
+        "billing": {
+            "alreadySubscribed": string;
+            "invalidSignature": string;
+            "noBillingAccount": string;
+            "noSubscription": string;
+            "notPurchasable": string;
+            "providerRejected": string;
+            "samePlan": string;
+        };
         "auth": {
             "currentPasswordWrong": string;
             "samePassword": string;

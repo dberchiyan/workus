@@ -1,0 +1,74 @@
+---
+import Button from '@/components/ui/Button.astro';
+import Container from '@/components/ui/Container.astro';
+import Icon from '@/components/ui/Icon.astro';
+import SectionHeading from '@/components/ui/SectionHeading.astro';
+import { LANDING } from '@/content/landing';
+import { SITE } from '@/content/site';
+
+const { pricing } = LANDING;
+const { plans } = pricing;
+---
+
+<section id="pricing" aria-labelledby="pricing-title" class="py-24 sm:py-32">
+  <Container>
+    <SectionHeading
+      id="pricing-title"
+      eyebrow={pricing.eyebrow}
+      title={pricing.title}
+      lead={pricing.lead}
+    />
+
+    <ul class="mx-auto mt-14 grid max-w-5xl gap-4 lg:grid-cols-3 lg:items-stretch">
+      {plans.map((plan, index) => {
+        const previous = plans[index - 1];
+        return (
+          <li
+            class:list={[
+              'reveal relative flex flex-col gap-6 rounded-panel bg-surface p-6 shadow-card ring-glass sm:p-8',
+              plan.highlighted && 'lg:-my-3 lg:py-11 ring-2 ring-brand/60',
+            ]}
+          >
+            <div class="flex flex-col gap-1.5">
+              <h3 class="text-lg font-semibold tracking-[-0.015em] text-ink">{plan.name}</h3>
+              <p class="text-sm text-muted">{plan.summary}</p>
+            </div>
+            <p class="flex items-baseline gap-1.5">
+              <span class="text-[2.75rem] leading-none font-bold tracking-[-0.03em] text-ink tabular-nums">
+                ${plan.price}
+              </span>
+              <span class="text-sm text-muted">{pricing.period}</span>
+            </p>
+            <p class="flex items-center gap-2 text-sm font-medium text-ink-2">
+              <Icon name="users" class="size-4.5 text-brand" />
+              {plan.limit}
+            </p>
+            <ul class="flex flex-col gap-2.5">
+              {previous && (
+                <li class="flex items-start gap-2.5 text-sm font-medium text-ink-2">
+                  <Icon name="plus" class="mt-0.5 size-4 shrink-0 text-brand" />
+                  {pricing.includes} {previous.name}
+                </li>
+              )}
+              {plan.features.map((feature) => (
+                <li class="flex items-start gap-2.5 text-sm text-muted">
+                  <Icon name="check" class="mt-0.5 size-4 shrink-0 text-brand" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+            <p class="mt-auto pt-2">
+              <Button
+                href={SITE.links.signUp}
+                variant={plan.highlighted ? 'primary' : 'secondary'}
+                class="w-full"
+              >
+                {pricing.cta}
+              </Button>
+            </p>
+          </li>
+        );
+      })}
+    </ul>
+  </Container>
+</section>

@@ -1,0 +1,100 @@
+{
+  "loading": "Loading",
+  "retry": "Try again",
+  "planNames": {
+    "STARTER": "Starter",
+    "TEAM": "Team",
+    "BUSINESS": "Business"
+  },
+  "status": {
+    "NONE": "Free",
+    "GRANTED": "Included",
+    "ACTIVE": "Active",
+    "PAST_DUE": "Payment failed"
+  },
+  "current": {
+    "title": "Your plan",
+    "description": "What your company is on, and what happens next.",
+    "free": "Free — no card needed. Upgrade any time below.",
+    "granted": "Included by Workus — nothing to pay, no card needed. Every feature of this plan is on.",
+    "nextCharge": "Next charge on {{date}}.",
+    "switchesOn": "Switches to {{plan}} on {{date}}.",
+    "endsOn": "Switches to Starter on {{date}} — the subscription ends then.",
+    "pastDue": "The last payment failed. Update your card under Manage billing before {{date}}, or your company goes back to Starter.",
+    "manage": "Manage billing",
+    "manageHint": "Update the card or download invoices. Plan changes work right here.",
+    "keep": "Keep {{plan}}"
+  },
+  "plans": {
+    "title": "Plans",
+    "description": "Monthly, cancel any time. Upgrades are charged at once.",
+    "descriptionSubscribed": "Upgrades apply at once; downgrades and cancellations at the end of the paid period.",
+    "current": "Current plan",
+    "perMonth": "/ month",
+    "unlimited": "Unlimited employees",
+    "upTo_one": "Up to {{limit}} employee",
+    "upTo_other": "Up to {{limit}} employees",
+    "upgradeTo": "Upgrade to {{plan}}",
+    "terms": "Prices in US dollars. Going back to Starter keeps your data: adding employees and paid features wait until you upgrade again.",
+    "features": {
+      "directory": "Employee directory",
+      "timeOff": "Time off requests",
+      "calendar": "Company calendar",
+      "reviews": "Reviews and salary history",
+      "structure": "Departments and positions",
+      "insights": "Yearly insights",
+      "exports": "Export of change history and security log"
+    },
+    "downgradeTo": "Downgrade to {{plan}}",
+    "switchToStarter": "Switch to Starter",
+    "chooseTo": "Choose {{plan}}",
+    "scheduled": "Scheduled"
+  },
+  "testMode": {
+    "title": "Test mode:",
+    "card": "no real money moves. Pay with card 4242 4242 4242 4242, any future expiry date and any CVC."
+  },
+  "notice": {
+    "upgraded": "Your company is now on the {{plan}} plan.",
+    "canceled": "Checkout canceled — nothing changed.",
+    "dismiss": "Dismiss"
+  },
+  "banner": {
+    "pastDue": "Your last payment failed. Update your card before {{date}}, or the company goes back to Starter.",
+    "open": "Open billing"
+  },
+  "change": {
+    "cancel": "Not now",
+    "when": {
+      "chargedNow": "Charged now",
+      "now": "Now",
+      "onDate": "On {{date}}"
+    },
+    "upgrade": {
+      "title": "Upgrade to {{plan}}?",
+      "text": "The difference for the rest of this period is charged to your card, and {{plan}} opens right away.",
+      "confirm": "Upgrade to {{plan}}"
+    },
+    "downgrade": {
+      "title": "Downgrade to {{plan}}?",
+      "text": "Until then you keep {{current}}. Its features lock on that day — nothing is deleted.",
+      "confirm": "Downgrade to {{plan}}"
+    },
+    "giveUp": {
+      "title": "Switch to Starter?",
+      "text": "The paid features lock right away — nothing is deleted. Adding people waits while you are over 10 employees.",
+      "confirm": "Switch to Starter"
+    },
+    "keep": {
+      "title": "Keep {{plan}}?",
+      "text": "The scheduled change is dropped and {{plan}} continues as before.",
+      "confirm": "Keep {{plan}}"
+    },
+    "done": {
+      "upgrade": "Your company is now on the {{plan}} plan.",
+      "downgrade": "Your company switches to {{plan}} on {{date}}.",
+      "giveUp": "Your company is now on Starter.",
+      "keep": "{{plan}} continues."
+    }
+  }
+}

@@ -26,5 +26,5 @@ export const useTenure = (filter: InsightsFilter) => useFigure(filter, 'tenure')
 export const useTurnover = (filter: InsightsFilter) => useFigure(filter, 'turnover');
 export const useAbsence = (filter: InsightsFilter) => useFigure(filter, 'absence');
 export const useSalary = (filter: InsightsFilter) => useFigure(filter, 'salary');
-export const useInsightCategories = () =>
-  useQuery({ queryKey: insightsKeys.categories(), queryFn: insightsApi.categories });
+export const useInsightCategories = (enabled = true) =>
+  useQuery({ queryKey: insightsKeys.categories(), queryFn: insightsApi.categories, enabled });

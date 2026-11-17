@@ -15,6 +15,14 @@ export class AppConfigService {
     return this.get('APP_ENV') === 'dev';
   }
 
+  /** Stripe test keys: payments are not real and the test card is worth naming (the demo). */
+  get isBillingTestMode(): boolean {
+    return (
+      this.get('BILLING_PROVIDER') === 'stripe' &&
+      (this.get('STRIPE_SECRET_KEY') ?? '').startsWith('sk_test_')
+    );
+  }
+
   get isDemo(): boolean {
     return this.get('DEMO_MODE');
   }

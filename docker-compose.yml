@@ -39,6 +39,8 @@ services:
     environment:
       <<: *database
       APP_ENV: dev
+      # The demo reset cancels the companies' test subscriptions before wiping the data.
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
     restart: 'no'
 
   backend:
@@ -70,6 +72,14 @@ services:
       # DEMO_MODE=true docker compose up → the public demo's restrictions (README → Environments).
       DEMO_MODE: ${DEMO_MODE:-false}
       DEMO_PROTECTED_EMAILS: ${DEMO_PROTECTED_EMAILS:-}
+      # Links back from the payment provider land on the app's origin (nginx).
+      APP_URL: http://localhost:${APP_PORT:-8080}
+      BILLING_PROVIDER: ${BILLING_PROVIDER:-fake}
+      STRIPE_SECRET_KEY: ${STRIPE_SECRET_KEY:-}
+      STRIPE_WEBHOOK_SECRET: ${STRIPE_WEBHOOK_SECRET:-}
+      STRIPE_PRICE_TEAM: ${STRIPE_PRICE_TEAM:-}
+      STRIPE_PRICE_BUSINESS: ${STRIPE_PRICE_BUSINESS:-}
+      STRIPE_PORTAL_CONFIGURATION: ${STRIPE_PORTAL_CONFIGURATION:-}
     healthcheck:
       test: ['CMD-SHELL', 'wget -qO- http://localhost:3000/health/live >/dev/null || exit 1']
       interval: 10s

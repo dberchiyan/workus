@@ -4,7 +4,11 @@ export const sessionAuthenticationSelect = {
   id: true,
   userId: true,
   user: {
-    select: { email: true, organisationId: true, organisation: { select: { status: true } } },
+    select: {
+      email: true,
+      organisationId: true,
+      organisation: { select: { status: true, plan: true } },
+    },
   },
   authorities: true,
   clientType: true,

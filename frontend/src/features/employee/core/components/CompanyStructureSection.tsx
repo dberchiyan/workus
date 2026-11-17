@@ -7,6 +7,8 @@ import Skeleton from '@mui/material/Skeleton';
 import Typography from '@mui/material/Typography';
 import { useId, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { useUpgrade } from '@/features/auth';
+import { UpgradePrompt } from '@/shared/components/UpgradePrompt';
 import { cn } from '@/shared/lib/cn';
 import { trackScrollEdges } from '@/shared/lib/scrollEdges';
 import {
@@ -33,6 +35,8 @@ export function CompanyStructureSection() {
   const { t, i18n } = useTranslation('employee');
   const titleId = useId();
   const structure = useCompanyStructure();
+  // Managing the structure is a Team feature: a lower plan reads it and sees the prompt.
+  const upgrade = useUpgrade('structure');
   const createDepartment = useCreateDepartment();
   const removeDepartment = useRemoveDepartment();
   const removePosition = useRemovePosition();
@@ -118,13 +122,15 @@ export function CompanyStructureSection() {
           <Typography variant="body2" color="textSecondary" className="max-w-sm">
             {t('structure.emptyHint')}
           </Typography>
-          <Button
-            variant="contained"
-            startIcon={<AddOutlined aria-hidden />}
-            onClick={startAddDepartment}
-          >
-            {t('structure.addDepartment')}
-          </Button>
+          {!upgrade.locked && (
+            <Button
+              variant="contained"
+              startIcon={<AddOutlined aria-hidden />}
+              onClick={startAddDepartment}
+            >
+              {t('structure.addDepartment')}
+            </Button>
+          )}
         </div>
       );
     }
@@ -193,6 +199,7 @@ export function CompanyStructureSection() {
               // A fresh panel (and its open forms) per department; it fades in.
               key={selected.id}
               department={selected}
+              readOnly={upgrade.locked}
               onRemoveDepartment={() => {
                 setRemoving({ kind: 'department', id: selected.id, name: selected.name });
                 setRemoveOpen(true);
@@ -219,7 +226,7 @@ export function CompanyStructureSection() {
             {t('structure.description')}
           </Typography>
         </div>
-        {departments.length > 0 && (
+        {departments.length > 0 && !upgrade.locked && (
           <Button
             variant="outlined"
             startIcon={<AddOutlined aria-hidden />}
@@ -230,6 +237,15 @@ export function CompanyStructureSection() {
           </Button>
         )}
       </div>
+      {upgrade.locked && (
+        <UpgradePrompt
+          compact
+          reason={{ kind: 'feature', feature: 'structure' }}
+          requiredPlan={upgrade.requiredPlan}
+          canManage={upgrade.canManage}
+          className="m-4 sm:mx-6"
+        />
+      )}
       {body}
       <RemoveStructureItemDialog
         item={removing}

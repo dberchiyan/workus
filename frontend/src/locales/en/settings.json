@@ -10,7 +10,8 @@
     "holidays": "Holidays",
     "structure": "Company structure",
     "organisation": "Company details",
-    "administrators": "Administrators"
+    "administrators": "Administrators",
+    "billing": "Billing"
   },
   "groups": {
     "you": "You",
@@ -23,7 +24,8 @@
     "organisation": "General",
     "structure": "Structure",
     "holidays": "Holidays",
-    "administrators": "Administrators"
+    "administrators": "Administrators",
+    "billing": "Billing"
   },
   "account": {
     "profile": {

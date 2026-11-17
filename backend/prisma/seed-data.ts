@@ -642,6 +642,11 @@ export interface SeedOrganisation {
   name: string;
   /** ACTIVE, or PENDING — a sign-up waiting for a platform admin. */
   status: 'ACTIVE' | 'PENDING';
+  /**
+   * The plan in effect, granted without a subscription (the demo shows one company on Business
+   * and one on Starter — the latter over its employee limit, so adding people is blocked).
+   */
+  plan: 'STARTER' | 'TEAM' | 'BUSINESS';
   owners: SeedPerson[];
   /** Responsible for the employees, in turns. */
   admins: SeedPerson[];
@@ -653,6 +658,7 @@ export const ORGANISATIONS: SeedOrganisation[] = [
     id: OSDB_ID,
     name: 'OSDB',
     status: 'ACTIVE',
+    plan: 'BUSINESS',
     owners: OSDB_OWNERS,
     admins: ADMINS,
     employees: EMPLOYEES,
@@ -661,6 +667,7 @@ export const ORGANISATIONS: SeedOrganisation[] = [
     id: VORTEX_ID,
     name: 'Vortex',
     status: 'ACTIVE',
+    plan: 'STARTER',
     owners: VORTEX_OWNERS,
     admins: VORTEX_ADMINS,
     employees: VORTEX_EMPLOYEES,
@@ -670,6 +677,7 @@ export const ORGANISATIONS: SeedOrganisation[] = [
     id: LUMEN_ID,
     name: 'Lumen Studio',
     status: 'PENDING',
+    plan: 'STARTER',
     owners: [{ firstName: 'Mila', lastName: 'Novak', email: 'mila.novak@lumen.io' }],
     admins: [],
     employees: [],

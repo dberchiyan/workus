@@ -1,3 +1,5 @@
+import type { Plan } from '../plan/plan';
+
 export const ClientType = {
   WEB: 'web',
   MOBILE: 'mobile',
@@ -16,6 +18,8 @@ export class Principal {
     readonly organisationId: string,
     /** The organisation is approved (ACTIVE): its data is reachable. */
     readonly isOrganisationActive: boolean,
+    /** The organisation's plan in effect — what PlanGuard checks (a snapshot per request). */
+    readonly plan: Plan,
     readonly sessionId: string,
     readonly authorities: readonly string[],
     readonly clientType: ClientType,

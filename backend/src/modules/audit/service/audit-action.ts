@@ -22,6 +22,8 @@ export const AuditAction = {
   /** A Workus platform admin decided on a sign-up (in the company's own history). */
   ORGANISATION_APPROVED: 'organisation.approved',
   ORGANISATION_REJECTED: 'organisation.rejected',
+  /** The plan in effect changed (a subscription started, changed, ended or lapsed). */
+  ORGANISATION_PLAN_CHANGED: 'organisation.plan_changed',
   USER_ROLE_CHANGED: 'user.role_changed',
   /** An owner added an administrator (an account with a generated password). */
   USER_CREATED: 'user.created',

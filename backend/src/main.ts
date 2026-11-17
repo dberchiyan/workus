@@ -1,9 +1,11 @@
 import 'reflect-metadata';
+import type { RawBodyRequest } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import type { NestExpressApplication } from '@nestjs/platform-express';
 import { SwaggerModule } from '@nestjs/swagger';
 import cookieParser from 'cookie-parser';
 import type { NextFunction, Request, Response } from 'express';
+import type { IncomingMessage, ServerResponse } from 'node:http';
 import helmet from 'helmet';
 import { ClsMiddleware } from 'nestjs-cls';
 import { Logger, PinoLogger } from 'nestjs-pino';
@@ -16,6 +18,8 @@ import { buildOpenApiDocument } from './openapi';
 const BODY_LIMIT = '1mb';
 const DOCS_PATH = 'docs';
 const PERMISSIONS_POLICY = 'camera=(), microphone=(), geolocation=(), payment=(), usb=()';
+/** Webhooks are authenticated by a signature over the raw body (integrations.md → Webhooks). */
+const WEBHOOK_PATH_PREFIX = '/api/v1/webhooks/';
 
 const bootstrap = async (): Promise<void> => {
   const app = await NestFactory.create<NestExpressApplication>(AppModule, {
@@ -39,7 +43,19 @@ const bootstrap = async (): Promise<void> => {
   app.set('trust proxy', trustProxyHops > 0 ? trustProxyHops : false);
   app.disable('x-powered-by');
   app.use(new ClsMiddleware(CLS_MIDDLEWARE_OPTIONS).use);
-  app.useBodyParser('json', { limit: BODY_LIMIT });
+  app.useBodyParser('json', {
+    limit: BODY_LIMIT,
+    // The raw bytes are kept for webhook routes only: their signature covers the exact body.
+    verify: (
+      request: RawBodyRequest<IncomingMessage>,
+      _response: ServerResponse,
+      buffer: Buffer,
+    ) => {
+      if (request.url?.startsWith(WEBHOOK_PATH_PREFIX)) {
+        request.rawBody = buffer;
+      }
+    },
+  });
   app.use(cookieParser());
 
   const strictHelmet = helmet({

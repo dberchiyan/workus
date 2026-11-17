@@ -984,7 +984,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "FORBIDDEN | PLAN_LIMIT_REACHED",
             "content": {
               "application/json": {
                 "schema": {
@@ -1420,6 +1420,73 @@
         ]
       }
     },
+    "/api/v1/employees/{employeeId}/activity/export": {
+      "get": {
+        "operationId": "EmployeeActivityController_export",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "CSV file",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "INVALID_PARAMETER",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN | PLAN_UPGRADE_REQUIRED",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "RESOURCE_NOT_FOUND",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "Download an employee's whole change history as CSV (Business plan)",
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
     "/api/v1/employees/{employeeId}/security-log": {
       "get": {
         "operationId": "EmployeeSecurityLogController_list",
@@ -1528,6 +1595,73 @@
           }
         ],
         "summary": "An employee's security log (sign-ins, password changes, ended sessions), newest first",
+        "tags": [
+          "Employees"
+        ]
+      }
+    },
+    "/api/v1/employees/{employeeId}/security-log/export": {
+      "get": {
+        "operationId": "EmployeeSecurityLogController_export",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "CSV file",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "INVALID_PARAMETER",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN | PLAN_UPGRADE_REQUIRED",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "RESOURCE_NOT_FOUND",
+            "content": {
+              "text/csv": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "Download an employee's whole security log as CSV (Business plan)",
         "tags": [
           "Employees"
         ]
@@ -1827,7 +1961,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "FORBIDDEN | PLAN_UPGRADE_REQUIRED",
             "content": {
               "application/json": {
                 "schema": {
@@ -1904,7 +2038,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "PLAN_UPGRADE_REQUIRED | FORBIDDEN",
             "content": {
               "application/json": {
                 "schema": {
@@ -1969,7 +2103,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "FORBIDDEN | PLAN_UPGRADE_REQUIRED",
             "content": {
               "application/json": {
                 "schema": {
@@ -2067,7 +2201,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "PLAN_UPGRADE_REQUIRED | FORBIDDEN",
             "content": {
               "application/json": {
                 "schema": {
@@ -2253,7 +2387,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "PLAN_UPGRADE_REQUIRED | FORBIDDEN",
             "content": {
               "application/json": {
                 "schema": {
@@ -2318,7 +2452,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "FORBIDDEN | PLAN_UPGRADE_REQUIRED",
             "content": {
               "application/json": {
                 "schema": {
@@ -2811,6 +2945,456 @@
         "summary": "Make an admin an owner or an owner an admin (owners only); the last owner stays",
         "tags": [
           "Organisation"
+        ]
+      }
+    },
+    "/api/v1/billing/info": {
+      "get": {
+        "operationId": "BillingController_info",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingInfoResponse_Output"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "RATE_LIMIT_EXCEEDED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Whether payments run in test mode (shown on the sign-in page)",
+        "tags": [
+          "Billing"
+        ]
+      }
+    },
+    "/api/v1/billing": {
+      "get": {
+        "operationId": "BillingController_summary",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingResponse_Output"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "The company's plan, subscription state and the plans on offer",
+        "tags": [
+          "Billing"
+        ]
+      }
+    },
+    "/api/v1/billing/checkout-sessions": {
+      "post": {
+        "operationId": "BillingController_startCheckout",
+        "parameters": [
+          {
+            "name": "Idempotency-Key",
+            "required": true,
+            "in": "header",
+            "description": "UUID per logical operation, reused on retry",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckoutSessionRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingRedirectResponse_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_FAILED | INVALID_PARAMETER",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "IDEMPOTENCY_KEY_REUSED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "BUSINESS_RULE_VIOLATION",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "UPSTREAM_UNAVAILABLE",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "Start the hosted checkout for a paid plan (charged at once); answers its URL",
+        "tags": [
+          "Billing"
+        ]
+      }
+    },
+    "/api/v1/billing/plan": {
+      "put": {
+        "operationId": "BillingController_changePlan",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePlanRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingResponse_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "VALIDATION_FAILED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "BUSINESS_RULE_VIOLATION",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "UPSTREAM_UNAVAILABLE",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "Change the plan: a higher one applies now (charged at once), a lower one at the period end, Starter cancels; the current one keeps it",
+        "tags": [
+          "Billing"
+        ]
+      }
+    },
+    "/api/v1/billing/portal-sessions": {
+      "post": {
+        "operationId": "BillingController_openPortal",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingRedirectResponse_Output"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "BUSINESS_RULE_VIOLATION",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "UPSTREAM_UNAVAILABLE",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "Open the billing portal (card, invoices, plan changes, cancellation); answers its URL",
+        "tags": [
+          "Billing"
+        ]
+      }
+    },
+    "/api/v1/billing/sync": {
+      "post": {
+        "operationId": "BillingController_sync",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BillingResponse_Output"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED | SESSION_EXPIRED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "FORBIDDEN",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "UPSTREAM_UNAVAILABLE",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "session": []
+          }
+        ],
+        "summary": "Re-read the company's subscription from the provider (after a checkout) and answer the state",
+        "tags": [
+          "Billing"
+        ]
+      }
+    },
+    "/api/v1/webhooks/stripe": {
+      "post": {
+        "operationId": "BillingWebhookController_receive",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WebhookReceiptResponse_Output"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "MALFORMED_REQUEST",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "UNAUTHORIZED",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "415": {
+            "description": "UNSUPPORTED_MEDIA_TYPE",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "summary": "Receive a Stripe event: verified by its signature, stored once, then applied",
+        "tags": [
+          "Webhooks"
         ]
       }
     },
@@ -3366,7 +3950,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "PLAN_UPGRADE_REQUIRED | FORBIDDEN",
             "content": {
               "application/json": {
                 "schema": {
@@ -3452,7 +4036,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "PLAN_UPGRADE_REQUIRED | FORBIDDEN",
             "content": {
               "application/json": {
                 "schema": {
@@ -3539,7 +4123,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "PLAN_UPGRADE_REQUIRED | FORBIDDEN",
             "content": {
               "application/json": {
                 "schema": {
@@ -3614,7 +4198,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "PLAN_UPGRADE_REQUIRED | FORBIDDEN",
             "content": {
               "application/json": {
                 "schema": {
@@ -3689,7 +4273,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "PLAN_UPGRADE_REQUIRED | FORBIDDEN",
             "content": {
               "application/json": {
                 "schema": {
@@ -6105,7 +6689,7 @@
             }
           },
           "403": {
-            "description": "FORBIDDEN",
+            "description": "FORBIDDEN | PLAN_UPGRADE_REQUIRED",
             "content": {
               "application/json": {
                 "schema": {
@@ -6172,6 +6756,8 @@
           "ACCESS_ENDED",
           "ORGANISATION_NOT_ACTIVE",
           "DEMO_RESTRICTED",
+          "PLAN_UPGRADE_REQUIRED",
+          "PLAN_LIMIT_REACHED",
           "RESOURCE_NOT_FOUND",
           "CONFLICT",
           "CONCURRENT_MODIFICATION",
@@ -6604,6 +7190,23 @@
           "REJECTED"
         ]
       },
+      "Plan_Output": {
+        "type": "string",
+        "enum": [
+          "STARTER",
+          "TEAM",
+          "BUSINESS"
+        ]
+      },
+      "PlanFeature_Output": {
+        "type": "string",
+        "enum": [
+          "reviews",
+          "structure",
+          "insights",
+          "exports"
+        ]
+      },
       "CurrentUserResponse_Output": {
         "type": "object",
         "properties": {
@@ -6643,13 +7246,48 @@
                 "type": "string",
                 "maxLength": 500,
                 "nullable": true
+              },
+              "billing": {
+                "type": "object",
+                "properties": {
+                  "plan": {
+                    "$ref": "#/components/schemas/Plan_Output"
+                  },
+                  "features": {
+                    "maxItems": 16,
+                    "type": "array",
+                    "items": {
+                      "$ref": "#/components/schemas/PlanFeature_Output"
+                    }
+                  },
+                  "maxEmployees": {
+                    "type": "integer",
+                    "minimum": 1,
+                    "maximum": 9007199254740991,
+                    "nullable": true
+                  },
+                  "pastDueUntil": {
+                    "type": "string",
+                    "format": "date-time",
+                    "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+                    "nullable": true
+                  }
+                },
+                "required": [
+                  "plan",
+                  "features",
+                  "maxEmployees",
+                  "pastDueUntil"
+                ],
+                "additionalProperties": false
               }
             },
             "required": [
               "id",
               "name",
               "status",
-              "rejectionReason"
+              "rejectionReason",
+              "billing"
             ],
             "additionalProperties": false
           },
@@ -7484,7 +8122,8 @@
                           "decisionComment",
                           "name",
                           "recurring",
-                          "role"
+                          "role",
+                          "plan"
                         ]
                       },
                       "from": {
@@ -8698,6 +9337,194 @@
           "email",
           "role",
           "version"
+        ],
+        "additionalProperties": false
+      },
+      "BillingInfoResponse_Output": {
+        "type": "object",
+        "properties": {
+          "testMode": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "testMode"
+        ],
+        "additionalProperties": false
+      },
+      "SubscriptionStatus_Output": {
+        "type": "string",
+        "enum": [
+          "NONE",
+          "ACTIVE",
+          "PAST_DUE"
+        ]
+      },
+      "PlanOffer_Output": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "$ref": "#/components/schemas/Plan_Output"
+          },
+          "name": {
+            "type": "string",
+            "maxLength": 32
+          },
+          "monthlyPrice": {
+            "$ref": "#/components/schemas/Money_Output"
+          },
+          "maxEmployees": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 9007199254740991,
+            "nullable": true
+          },
+          "features": {
+            "maxItems": 16,
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PlanFeature_Output"
+            }
+          }
+        },
+        "required": [
+          "plan",
+          "name",
+          "monthlyPrice",
+          "maxEmployees",
+          "features"
+        ],
+        "additionalProperties": false
+      },
+      "BillingResponse_Output": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "$ref": "#/components/schemas/Plan_Output"
+          },
+          "status": {
+            "$ref": "#/components/schemas/SubscriptionStatus_Output"
+          },
+          "scheduledPlan": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Plan_Output"
+              }
+            ],
+            "nullable": true
+          },
+          "currentPeriodEnd": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "nullable": true
+          },
+          "pastDueSince": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "nullable": true
+          },
+          "graceEndsAt": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
+            "nullable": true
+          },
+          "canManage": {
+            "type": "boolean"
+          },
+          "granted": {
+            "type": "boolean"
+          },
+          "testMode": {
+            "type": "boolean"
+          },
+          "plans": {
+            "type": "array",
+            "maxItems": 8,
+            "items": {
+              "$ref": "#/components/schemas/PlanOffer_Output"
+            }
+          }
+        },
+        "required": [
+          "plan",
+          "status",
+          "scheduledPlan",
+          "currentPeriodEnd",
+          "pastDueSince",
+          "graceEndsAt",
+          "canManage",
+          "granted",
+          "testMode",
+          "plans"
+        ],
+        "additionalProperties": false
+      },
+      "CheckoutSessionRequest": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "type": "string",
+            "enum": [
+              "TEAM",
+              "BUSINESS"
+            ]
+          }
+        },
+        "required": [
+          "plan"
+        ]
+      },
+      "BillingRedirectResponse_Output": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "format": "uri"
+          }
+        },
+        "required": [
+          "url"
+        ],
+        "additionalProperties": false
+      },
+      "Plan": {
+        "type": "string",
+        "enum": [
+          "STARTER",
+          "TEAM",
+          "BUSINESS"
+        ]
+      },
+      "ChangePlanRequest": {
+        "type": "object",
+        "properties": {
+          "plan": {
+            "$ref": "#/components/schemas/Plan"
+          }
+        },
+        "required": [
+          "plan"
+        ]
+      },
+      "WebhookReceiptResponse_Output": {
+        "type": "object",
+        "properties": {
+          "received": {
+            "type": "boolean",
+            "enum": [
+              true
+            ]
+          },
+          "duplicate": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "received",
+          "duplicate"
         ],
         "additionalProperties": false
       },

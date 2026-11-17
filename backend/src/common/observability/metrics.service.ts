@@ -33,6 +33,28 @@ export class MetricsService {
     registers: [this.registry],
   });
 
+  /** Calls to the payment provider by operation and outcome (integrations.md). */
+  readonly billingProviderCalls = new Counter({
+    name: 'billing_provider_calls_total',
+    help: 'Payment provider calls by operation and outcome',
+    labelNames: ['operation', 'outcome'] as const,
+    registers: [this.registry],
+  });
+
+  readonly webhookSignatureFailures = new Counter({
+    name: 'webhook_signature_failures_total',
+    help: 'Webhook deliveries refused for a bad signature',
+    labelNames: ['provider'] as const,
+    registers: [this.registry],
+  });
+
+  readonly billingWebhookEvents = new Counter({
+    name: 'billing_webhook_events_total',
+    help: 'Billing webhook events by type and outcome',
+    labelNames: ['type', 'outcome'] as const,
+    registers: [this.registry],
+  });
+
   constructor() {
     collectDefaultMetrics({ register: this.registry });
   }

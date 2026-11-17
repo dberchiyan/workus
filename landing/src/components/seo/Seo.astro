@@ -1,4 +1,5 @@
 ---
+import { LANDING } from '@/content/landing';
 import { SITE } from '@/content/site';
 
 interface Props {
@@ -43,6 +44,14 @@ const jsonLd = {
       url: site.href,
       description: SITE.description,
       publisher: { '@id': `${site.href}#organization` },
+      // The plans (monthly, per company), so search results can show the free tier.
+      offers: LANDING.pricing.plans.map((plan) => ({
+        '@type': 'Offer',
+        name: plan.name,
+        price: plan.price,
+        priceCurrency: 'USD',
+        category: plan.limit,
+      })),
     },
   ],
 };

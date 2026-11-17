@@ -7,6 +7,8 @@ import { Idempotent } from '../../../../common/idempotency/idempotent.decorator'
 import { CurrentPrincipal } from '../../../../common/security/current-principal.decorator';
 import { can } from '../../../../common/security/policies';
 import type { Principal } from '../../../../common/security/principal';
+import { Feature } from '../../../../common/plan/plan';
+import { RequiresFeature } from '../../../../common/security/plan.guard';
 import { Authorize } from '../../../../common/security/security.decorators';
 import { ReviewService } from '../service/review.service';
 import { CreateReviewRequest, UpdateReviewRequest } from './dto/create-review.request';
@@ -20,9 +22,11 @@ export class ReviewController {
 
   @Get()
   @Authorize(can.viewEmployeeReviews)
+  @RequiresFeature(Feature.REVIEWS)
   @ApiOperation({ summary: "List an employee's reviews with the salary history" })
   @ZodResponse({ status: HttpStatus.OK, type: EmployeeReviewsResponse })
   @ApiErrors(
+    'PLAN_UPGRADE_REQUIRED',
     'INVALID_PARAMETER',
     'UNAUTHORIZED',
     'SESSION_EXPIRED',
@@ -41,10 +45,12 @@ export class ReviewController {
   @Post()
   @HttpCode(HttpStatus.OK)
   @Authorize(can.manageEmployeeReviews)
+  @RequiresFeature(Feature.REVIEWS)
   @Idempotent()
   @ApiOperation({ summary: 'Add a review (with salary and feedback) to an employee' })
   @ZodResponse({ status: HttpStatus.OK, type: ReviewResponse })
   @ApiErrors(
+    'PLAN_UPGRADE_REQUIRED',
     'VALIDATION_FAILED',
     'INVALID_PARAMETER',
     'UNAUTHORIZED',
@@ -70,9 +76,11 @@ export class ReviewController {
 
   @Get(':reviewId')
   @Authorize(can.accessEmployeeReview)
+  @RequiresFeature(Feature.REVIEWS)
   @ApiOperation({ summary: 'Return one review of the employee' })
   @ZodResponse({ status: HttpStatus.OK, type: ReviewResponse })
   @ApiErrors(
+    'PLAN_UPGRADE_REQUIRED',
     'INVALID_PARAMETER',
     'UNAUTHORIZED',
     'SESSION_EXPIRED',
@@ -89,9 +97,11 @@ export class ReviewController {
 
   @Put(':reviewId')
   @Authorize(can.accessEmployeeReview)
+  @RequiresFeature(Feature.REVIEWS)
   @ApiOperation({ summary: 'Update a review; the version must match the one read' })
   @ZodResponse({ status: HttpStatus.OK, type: ReviewResponse })
   @ApiErrors(
+    'PLAN_UPGRADE_REQUIRED',
     'VALIDATION_FAILED',
     'INVALID_PARAMETER',
     'UNAUTHORIZED',
@@ -120,8 +130,10 @@ export class ReviewController {
   @Delete(':reviewId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @Authorize(can.accessEmployeeReview)
+  @RequiresFeature(Feature.REVIEWS)
   @ApiOperation({ summary: 'Delete a review (its salary leaves the history)' })
   @ApiErrors(
+    'PLAN_UPGRADE_REQUIRED',
     'INVALID_PARAMETER',
     'UNAUTHORIZED',
     'SESSION_EXPIRED',

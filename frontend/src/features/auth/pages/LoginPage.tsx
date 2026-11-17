@@ -5,6 +5,7 @@ import Typography from '@mui/material/Typography';
 import { domAnimation, LazyMotion, m, useReducedMotion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
 import { Navigate, Link as RouterLink } from 'react-router';
+import { BillingTestModeNote } from '@/features/billing';
 import { PATHS } from '@/shared/lib/paths';
 import { PageLoader } from '@/shared/components/PageLoader';
 import { PageShell } from '../components/PageShell';
@@ -54,6 +55,8 @@ export default function LoginPage() {
                   {t('login.title')}
                 </Typography>
                 <LoginForm />
+                {/* The demo pays with test keys: the card to use is said here. */}
+                <BillingTestModeNote />
               </CardContent>
             </Card>
             <Typography variant="body2" color="textSecondary" className="text-center">

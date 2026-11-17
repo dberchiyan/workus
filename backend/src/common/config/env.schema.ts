@@ -2,6 +2,13 @@ import { z } from 'zod';
 
 const booleanString = z.enum(['true', 'false']).transform((value) => value === 'true');
 
+/** An optional secret or id: unset or empty both mean "none". */
+const optionalString = z
+  .string()
+  .max(255)
+  .optional()
+  .transform((value) => (value ? value : undefined));
+
 const commaSeparated = z
   .string()
   .min(1)
@@ -51,6 +58,18 @@ export const envSchema = z.object({
         .filter((item) => item.length > 0),
     )
     .pipe(z.array(z.email())),
+  // The app's public origin — where the payment provider sends people back to (checkout, portal).
+  APP_URL: z.url({ protocol: /^https?$/ }).transform((url) => url.replace(/\/+$/, '')),
+  // Billing (integrations module): `fake` keeps everything in memory for local work; `stripe`
+  // needs the keys below (test keys locally and on the demo — sandbox vs production is config).
+  BILLING_PROVIDER: z.enum(['fake', 'stripe']).default('fake'),
+  STRIPE_SECRET_KEY: optionalString,
+  STRIPE_WEBHOOK_SECRET: optionalString,
+  // Price ids of the monthly Team and Business plans (`npm run stripe:setup` creates them).
+  STRIPE_PRICE_TEAM: optionalString,
+  STRIPE_PRICE_BUSINESS: optionalString,
+  // Customer Portal configuration (downgrades at the period end); empty = the account's default.
+  STRIPE_PORTAL_CONFIGURATION: optionalString,
 });
 
 export type Env = z.infer<typeof envSchema>;
@@ -76,6 +95,21 @@ export const validateEnv = (raw: Record<string, unknown>): Env => {
     throw new Error(
       'Invalid environment configuration: a __Host- SESSION_COOKIE_NAME requires COOKIE_SECURE=true and an empty COOKIE_DOMAIN',
     );
+  }
+  if (result.data.BILLING_PROVIDER === 'stripe') {
+    const missing = (
+      [
+        'STRIPE_SECRET_KEY',
+        'STRIPE_WEBHOOK_SECRET',
+        'STRIPE_PRICE_TEAM',
+        'STRIPE_PRICE_BUSINESS',
+      ] as const
+    ).filter((key) => result.data[key] === undefined);
+    if (missing.length > 0) {
+      throw new Error(
+        `Invalid environment configuration: BILLING_PROVIDER=stripe needs ${missing.join(', ')}`,
+      );
+    }
   }
   if (result.data.COOKIE_SAME_SITE === 'none' && !result.data.COOKIE_SECURE) {
     throw new Error(

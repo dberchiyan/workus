@@ -113,4 +113,19 @@ export const employeeApi = {
         params: search ? { search } : {},
       })
     ).data.content,
+  /** CSV files (Business plan); the response is a blob, not JSON. */
+  exportActivity: async (employeeId: string): Promise<Blob> =>
+    (
+      await apiClient.get<Blob>(
+        `/api/v1/employees/${encodeURIComponent(employeeId)}/activity/export`,
+        { responseType: 'blob' },
+      )
+    ).data,
+  exportSecurityLog: async (employeeId: string): Promise<Blob> =>
+    (
+      await apiClient.get<Blob>(
+        `/api/v1/employees/${encodeURIComponent(employeeId)}/security-log/export`,
+        { responseType: 'blob' },
+      )
+    ).data,
 };

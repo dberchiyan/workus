@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next';
 import { Navigate, NavLink, useParams } from 'react-router';
 import { useAccess } from '@/features/auth';
 import { AdministratorsSection, OrganisationSection } from '@/features/organisation';
+import { BillingSection } from '@/features/billing';
 import { CompanyStructureSection } from '@/features/employee/core';
 import { HolidaysSection } from '@/features/time-off';
 import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
@@ -132,6 +133,7 @@ export default function SettingsPage() {
           {section === 'holidays' && <HolidaysSection />}
           {section === 'structure' && <CompanyStructureSection />}
           {section === 'organisation' && <OrganisationSection />}
+          {section === 'billing' && <BillingSection />}
           {section === 'administrators' && <AdministratorsSection />}
         </div>
       </div>

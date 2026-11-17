@@ -60,9 +60,20 @@ const seedOrganisation = async (
   const organisationId = organisation.id;
   await prisma.organisation.upsert({
     where: { id: organisationId },
-    create: { id: organisationId, name: organisation.name, status: organisation.status },
+    create: {
+      id: organisationId,
+      name: organisation.name,
+      status: organisation.status,
+      plan: organisation.plan,
+    },
     update: {},
     select: { id: true },
+  });
+  // The plan is seed data while nobody pays: OSDB exists before the seed (the tenancy
+  // migration creates it), so a re-run realigns a granted plan but never a live subscription.
+  await prisma.organisation.updateMany({
+    where: { id: organisationId, subscriptionStatus: 'NONE' },
+    data: { plan: organisation.plan },
   });
   const { owners, admins: adminPeople, employees: people } = organisation;
   const users = await prisma.user.createMany({

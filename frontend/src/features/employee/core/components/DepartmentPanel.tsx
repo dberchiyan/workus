@@ -56,6 +56,8 @@ function ActionButton({
 
 export interface DepartmentPanelProps {
   department: Department;
+  /** The plan has no structure management: names and counts only, no editing controls. */
+  readOnly?: boolean;
   onRemoveDepartment: () => void;
   onRemovePosition: (position: StructurePosition) => void;
 }
@@ -63,6 +65,7 @@ export interface DepartmentPanelProps {
 /** One department: its name (renamed in place), then its positions with who holds them. */
 export function DepartmentPanel({
   department,
+  readOnly = false,
   onRemoveDepartment,
   onRemovePosition,
 }: DepartmentPanelProps) {
@@ -117,7 +120,7 @@ export function DepartmentPanel({
                 })}
               </Typography>
             </div>
-            <div className="flex shrink-0 items-center">
+            <div className={cn('flex shrink-0 items-center', readOnly && 'hidden')}>
               <ActionButton
                 label={t('structure.renameDepartment', { name: department.name })}
                 onClick={() => {
@@ -226,7 +229,7 @@ export function DepartmentPanel({
                     </Typography>
                   )}
                 </span>
-                <span className={ROW_ACTIONS}>
+                <span className={cn(ROW_ACTIONS, readOnly && 'hidden')}>
                   <ActionButton
                     label={t('structure.renamePosition', { title: position.title })}
                     onClick={() => {
@@ -262,7 +265,7 @@ export function DepartmentPanel({
             </Typography>
           </li>
         )}
-        <li className="px-2 pt-1 pb-1 sm:px-3">
+        <li className={cn('px-2 pt-1 pb-1 sm:px-3', readOnly && 'hidden')}>
           {adding ? (
             <StructureNameForm
               kind="position"

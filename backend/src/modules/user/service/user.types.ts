@@ -1,3 +1,4 @@
+import type { Plan } from '../../../common/plan/plan';
 import type { OrganisationStatus } from './organisation-status';
 import type { UserRole } from './user-role';
 
@@ -21,6 +22,9 @@ export interface UserProfile {
     name: string;
     status: OrganisationStatus;
     rejectionReason: string | null;
+    /** The plan in effect (common/plan) and, after a failed payment, since when. */
+    plan: Plan;
+    pastDueSince: Date | null;
   };
 }
 

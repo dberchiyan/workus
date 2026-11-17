@@ -12,6 +12,10 @@ export const ErrorCode = {
   ORGANISATION_NOT_ACTIVE: 403,
   /** Turned off in the public demo (DEMO_MODE): it would lock other visitors out. */
   DEMO_RESTRICTED: 403,
+  /** The action belongs to a higher plan (the message names it); upgrade in Settings → Billing. */
+  PLAN_UPGRADE_REQUIRED: 403,
+  /** The plan's employee limit is reached; upgrade in Settings → Billing to add more. */
+  PLAN_LIMIT_REACHED: 403,
   RESOURCE_NOT_FOUND: 404,
   CONFLICT: 409,
   CONCURRENT_MODIFICATION: 409,
