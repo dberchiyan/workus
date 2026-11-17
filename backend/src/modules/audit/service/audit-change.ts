@@ -14,7 +14,7 @@ const PersonSchema = z.object({
 
 export const AuditValueSchema = z.discriminatedUnion('kind', [
     z.object({ kind: z.literal('text'), text: z.string().max(255) }),
-    z.object({ kind: z.literal('date'), date: z.iso.date() }),
+    z.object({ kind: z.literal('date'), at: z.iso.date() }),
     z.object({ kind: z.literal('money'), money: MoneySchema }),
     z.object({ kind: z.literal('reviewStatus'), status: z.string().max(32) }),
     z.object({ kind: z.literal('people'), people: z.array(PersonSchema).max(20) }),
@@ -30,7 +30,8 @@ export type AuditValue = z.infer<typeof AuditValueSchema>;
 
 export const AuditField = {
     TITLE: 'title',
-    DATE: 'date',
+    REVIEWED_AT: 'reviewedAt',
+    HELD_AT: 'heldAt',
     STATUS: 'status',
     SALARY: 'salary',
     RESPONSIBLES: 'responsibles',
@@ -39,7 +40,7 @@ export const AuditField = {
     FEEDBACK_TEAM: 'feedbackTeam',
     FEEDBACK_CLIENT: 'feedbackClient',
     POSITION: 'position',
-    START_DATE: 'startDate',
+    STARTS_AT: 'startsAt',
     FIRST_NAME: 'firstName',
     LAST_NAME: 'lastName',
     EMAIL: 'email',
@@ -48,18 +49,18 @@ export const AuditField = {
     LINKEDIN_URL: 'linkedinUrl',
     TELEGRAM: 'telegram',
     ADDRESS: 'address',
-    DATE_OF_BIRTH: 'dateOfBirth',
-    TERMINATION_DATE: 'terminationDate',
+    BORN_AT: 'bornAt',
+    TERMINATED_AT: 'terminatedAt',
     TERMINATION_REASON: 'terminationReason',
     TERMINATION_COMMENT: 'terminationComment',
     TIME_OFF_TYPE: 'timeOffType',
-    PERIOD_START: 'periodStart',
-    PERIOD_END: 'periodEnd',
+    PERIOD_STARTS_AT: 'periodStartsAt',
+    PERIOD_ENDS_AT: 'periodEndsAt',
     DAYS: 'days',
     NOTE: 'note',
     DECISION_COMMENT: 'decisionComment',
     NAME: 'name',
-    RECURRING: 'recurring',
+    RECURRING: 'isRecurring',
     ROLE: 'role',
     PLAN: 'plan',
 } as const;
@@ -79,7 +80,7 @@ export const AuditChangesSchema = z.array(AuditChangeSchema).max(32);
 /** Value builders, so callers never hand-write the tagged shapes. */
 export const auditValue = {
     text: (text: string): AuditValue => ({ kind: 'text', text: text.slice(0, 255) }),
-    date: (date: Date): AuditValue => ({ kind: 'date', date: date.toISOString().slice(0, 10) }),
+    date: (date: Date): AuditValue => ({ kind: 'date', at: date.toISOString().slice(0, 10) }),
     money: (money: z.infer<typeof MoneySchema>): AuditValue => ({ kind: 'money', money }),
     reviewStatus: (status: string): AuditValue => ({ kind: 'reviewStatus', status }),
     people: (people: z.infer<typeof PersonSchema>[]): AuditValue => ({ kind: 'people', people }),

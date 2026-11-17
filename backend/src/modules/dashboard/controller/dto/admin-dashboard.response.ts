@@ -38,7 +38,7 @@ export class AdminDashboardResponse extends createZodDto(
             next: z
                 .object({
                     kind: z.enum(['JOINING', 'LEAVING']),
-                    date: z.iso.date(),
+                    movedAt: z.iso.date(),
                     employeeId: z.uuid(),
                     person: PersonSchema,
                 })
@@ -61,8 +61,8 @@ const DashboardRequestSchema = z
         id: z.uuid(),
         type: z.enum(['VACATION', 'SICK_DAY', 'DAY_OFF']),
         status: z.enum(['PENDING', 'APPROVED', 'REJECTED', 'CANCELED']),
-        startDate: z.iso.date(),
-        endDate: z.iso.date(),
+        startsAt: z.iso.date(),
+        endsAt: z.iso.date(),
         days: z.number().int(),
         createdAt: z.iso.datetime(),
         employee: EmployeeSchema,
@@ -73,7 +73,7 @@ const DashboardReviewSchema = z
     .object({
         id: z.uuid(),
         title: z.string(),
-        reviewDate: z.iso.date(),
+        reviewedAt: z.iso.date(),
         status: z.enum(['SCHEDULED', 'COMPLETED']),
         employee: EmployeeSchema,
     })

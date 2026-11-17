@@ -83,7 +83,7 @@ export function DeleteReviewDialog({
                 <Typography variant="body1" className="[overflow-wrap:anywhere]">
                     {t('delete.body', {
                         title: review.title,
-                        date: formatReviewDate(review.date, i18n.language),
+                        reviewedAt: formatReviewDate(review.reviewedAt, i18n.language),
                     })}
                 </Typography>
                 {isCompletedWithSalary && review.salary && (

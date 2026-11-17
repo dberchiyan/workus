@@ -10,10 +10,10 @@ export const ReviewKindSchema = z.enum(REVIEW_KINDS).meta({ id: 'ReviewKind' });
 export const ReviewSchema = z
     .object({
         id: z.uuid(),
-        /** STARTING: the salary at hire — dated the start date, always completed, cannot be deleted. */
+        /** STARTING: the salary at hire — dated the start reviewedAt, always completed, cannot be deleted. */
         kind: ReviewKindSchema,
         title: z.string(),
-        date: z.iso.date(),
+        reviewedAt: z.iso.date(),
         status: ReviewStatusSchema,
         /** New monthly salary agreed in the review; null when not recorded. */
         salary: MoneySchema.nullable(),
@@ -39,7 +39,7 @@ export class EmployeeReviewsResponse extends createZodDto(
             /** Percent vs the previous completed review, one decimal, e.g. "12.5". */
             changePercent: z.string().nullable(),
             /** Completed reviews, oldest first. */
-            history: z.array(z.object({ date: z.iso.date(), salary: MoneySchema })),
+            history: z.array(z.object({ reviewedAt: z.iso.date(), salary: MoneySchema })),
         }),
         content: z.array(ReviewSchema),
     }),

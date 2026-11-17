@@ -32,7 +32,7 @@ export function ReviewCardList({ reviews, onAction }: { reviews: readonly Review
                     <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
                         <ReviewStatusChip status={review.status} />
                         <Typography variant="body2" color="textSecondary" className="app-tabular">
-                            {formatReviewDate(review.date, i18n.language)}
+                            {formatReviewDate(review.reviewedAt, i18n.language)}
                         </Typography>
                         <Typography
                             variant="body2"

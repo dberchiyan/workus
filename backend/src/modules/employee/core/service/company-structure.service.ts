@@ -21,7 +21,7 @@ import type { EmployeePage } from './employee.types';
 
 export interface StructurePosition extends StructurePositionRecord {
     employeeCount: number;
-    removable: boolean;
+    isRemovable: boolean;
 }
 
 export interface Department extends Omit<DepartmentRecord, 'positions'> {
@@ -57,7 +57,7 @@ export class CompanyStructureService {
             positions: department.positions.map((position) => ({
                 ...position,
                 employeeCount: activeByPosition.get(position.id) ?? 0,
-                removable: !holdersByPosition.has(position.id),
+                isRemovable: !holdersByPosition.has(position.id),
             })),
         }));
     }
@@ -170,7 +170,7 @@ export class CompanyStructureService {
             target: { type: AuditTargetType.POSITION, id: position.id, label: position.title },
             changes: changeOf(AuditField.TITLE, null, auditValue.text(position.title)),
         });
-        return { ...position, employeeCount: 0, removable: true };
+        return { ...position, employeeCount: 0, isRemovable: true };
     }
 
     @Transactional()

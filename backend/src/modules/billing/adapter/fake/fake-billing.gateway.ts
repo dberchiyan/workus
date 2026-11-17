@@ -36,8 +36,8 @@ export class FakeBillingGateway extends BillingGateway {
             customerId: request.customerId,
             state: SubscriptionState.ACTIVE,
             plan: request.plan,
-            currentPeriodEnd: new Date(Date.now() + PERIOD_MS),
-            cancelAtPeriodEnd: false,
+            periodEndsAt: new Date(Date.now() + PERIOD_MS),
+            isEndingAtPeriodEnd: false,
             scheduledPlan: null,
         };
         this.subscriptions.set(subscription.id, subscription);
@@ -66,8 +66,8 @@ export class FakeBillingGateway extends BillingGateway {
             customerId: '',
             state: SubscriptionState.ACTIVE,
             plan: null,
-            currentPeriodEnd: new Date(Date.now() + PERIOD_MS),
-            cancelAtPeriodEnd: false,
+            periodEndsAt: new Date(Date.now() + PERIOD_MS),
+            isEndingAtPeriodEnd: false,
             scheduledPlan: null,
         };
         this.subscriptions.set(subscriptionId, restored);
@@ -87,20 +87,20 @@ export class FakeBillingGateway extends BillingGateway {
         const current = this.require(subscriptionId);
         const next: ProviderSubscription =
             when === 'now'
-                ? { ...current, plan, cancelAtPeriodEnd: false, scheduledPlan: null }
-                : { ...current, cancelAtPeriodEnd: false, scheduledPlan: plan };
+                ? { ...current, plan, isEndingAtPeriodEnd: false, scheduledPlan: null }
+                : { ...current, isEndingAtPeriodEnd: false, scheduledPlan: plan };
         this.subscriptions.set(subscriptionId, next);
         return Promise.resolve(next);
     }
 
-    cancelAtPeriodEnd(subscriptionId: string): Promise<ProviderSubscription> {
-        const next = { ...this.require(subscriptionId), cancelAtPeriodEnd: true, scheduledPlan: null };
+    isEndingAtPeriodEnd(subscriptionId: string): Promise<ProviderSubscription> {
+        const next = { ...this.require(subscriptionId), isEndingAtPeriodEnd: true, scheduledPlan: null };
         this.subscriptions.set(subscriptionId, next);
         return Promise.resolve(next);
     }
 
     keepPlan(subscriptionId: string): Promise<ProviderSubscription> {
-        const next = { ...this.require(subscriptionId), cancelAtPeriodEnd: false, scheduledPlan: null };
+        const next = { ...this.require(subscriptionId), isEndingAtPeriodEnd: false, scheduledPlan: null };
         this.subscriptions.set(subscriptionId, next);
         return Promise.resolve(next);
     }
@@ -120,8 +120,8 @@ export class FakeBillingGateway extends BillingGateway {
             customerId: existing?.customerId ?? '',
             state: SubscriptionState.ENDED,
             plan: existing?.plan ?? null,
-            currentPeriodEnd: null,
-            cancelAtPeriodEnd: false,
+            periodEndsAt: null,
+            isEndingAtPeriodEnd: false,
             scheduledPlan: null,
         };
         this.subscriptions.set(subscriptionId, ended);

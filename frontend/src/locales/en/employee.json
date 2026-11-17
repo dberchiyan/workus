@@ -22,8 +22,8 @@
         "sortOptions": {
             "name,asc": "Name, A–Z",
             "name,desc": "Name, Z–A",
-            "startDate,desc": "Start date, newest first",
-            "startDate,asc": "Start date, oldest first"
+            "startsAt,desc": "Start date, newest first",
+            "startsAt,asc": "Start date, oldest first"
         }
     },
     "status": {
@@ -212,7 +212,7 @@
             },
             "fields": {
                 "title": "Title",
-                "date": "Date",
+                "reviewedAt": "Date",
                 "status": "Status",
                 "salary": "Salary",
                 "responsibles": "Responsible people",
@@ -221,7 +221,7 @@
                 "feedbackTeam": "Team feedback",
                 "feedbackClient": "Client feedback",
                 "position": "Position",
-                "startDate": "Start date",
+                "startsAt": "Start date",
                 "firstName": "First name",
                 "lastName": "Last name",
                 "email": "Work email",
@@ -230,20 +230,21 @@
                 "linkedinUrl": "LinkedIn",
                 "telegram": "Telegram",
                 "address": "Address",
-                "terminationDate": "Termination date",
+                "terminatedAt": "Termination date",
                 "terminationReason": "Reason",
                 "terminationComment": "Comment",
                 "timeOffType": "Type",
-                "periodStart": "First day",
-                "periodEnd": "Last day",
+                "periodStartsAt": "First day",
+                "periodEndsAt": "Last day",
                 "days": "Working days",
                 "note": "Note",
                 "decisionComment": "Reason",
-                "dateOfBirth": "Date of birth",
+                "bornAt": "Date of birth",
                 "name": "Name",
-                "recurring": "Repeats every year",
+                "isRecurring": "Repeats every year",
                 "role": "Role",
-                "plan": "Plan"
+                "plan": "Plan",
+                "heldAt": "Date"
             },
             "previous": "Before:",
             "current": "After:",

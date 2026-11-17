@@ -287,7 +287,7 @@ export interface paths {
         };
         /** Return one employee with contacts and responsibles */
         get: operations["EmployeeController_profile"];
-        /** Edit name, work email, position, start date and contacts; the version must match the one read */
+        /** Edit name, work email, position, start terminatedAt and contacts; the version must match the one read */
         put: operations["EmploymentController_update"];
         post?: never;
         delete?: never;
@@ -872,7 +872,7 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        /** Terminate the employee from a date (or change the termination); later scheduled reviews are canceled */
+        /** Terminate the employee from a terminatedAt (or change the termination); later scheduled reviews are canceled */
         put: operations["EmploymentController_terminate"];
         post?: never;
         /** Cancel the termination; the employee is active again */
@@ -1307,9 +1307,9 @@ export interface components {
             request: {
                 type: string;
                 /** Format: date */
-                startDate: string;
+                startsAt: string;
                 /** Format: date */
-                endDate: string;
+                endsAt: string;
                 employee: {
                     /** Format: uuid */
                     userId: string;
@@ -1350,9 +1350,9 @@ export interface components {
             request: {
                 type: string;
                 /** Format: date */
-                startDate: string;
+                startsAt: string;
                 /** Format: date */
-                endDate: string;
+                endsAt: string;
                 employee: {
                     /** Format: uuid */
                     userId: string;
@@ -1393,11 +1393,11 @@ export interface components {
                     features: components["schemas"]["PlanFeature_Output"][];
                     maxEmployees: number | null;
                     /** Format: date-time */
-                    pastDueUntil: string | null;
+                    graceEndsAt: string | null;
                 };
             };
             idleTimeoutMinutes: number;
-            demoRestricted: boolean;
+            isDemoRestricted: boolean;
         };
         ChangePasswordRequest: {
             currentPassword: string;
@@ -1435,7 +1435,7 @@ export interface components {
             occurredAt: string;
             ip: string | null;
             userAgent: string | null;
-            newDevice: boolean;
+            isNewDevice: boolean;
         };
         SecurityLogResponse_Output: {
             content: components["schemas"]["SecurityEvent_Output"][];
@@ -1467,9 +1467,9 @@ export interface components {
             }[];
             responsibleCount: number;
             /** Format: date */
-            startDate: string;
+            startsAt: string;
             /** Format: date */
-            terminatedOn: string | null;
+            terminatedAt: string | null;
             status: components["schemas"]["EmployeeStatus_Output"];
         };
         /** @enum {string} */
@@ -1508,11 +1508,11 @@ export interface components {
                 };
             };
             /** Format: date */
-            startDate: string;
+            startsAt: string;
             /** Format: date */
-            dateOfBirth: string | null;
+            bornAt: string | null;
             /** Format: date */
-            terminatedOn: string | null;
+            terminatedAt: string | null;
             termination: {
                 reason: components["schemas"]["TerminationReason_Output"];
                 comment: string | null;
@@ -1570,7 +1570,7 @@ export interface components {
                 };
                 changes: {
                     /** @enum {string} */
-                    field: "title" | "date" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startDate" | "firstName" | "lastName" | "email" | "mobile" | "personalEmail" | "linkedinUrl" | "telegram" | "address" | "dateOfBirth" | "terminationDate" | "terminationReason" | "terminationComment" | "timeOffType" | "periodStart" | "periodEnd" | "days" | "note" | "decisionComment" | "name" | "recurring" | "role" | "plan";
+                    field: "title" | "reviewedAt" | "heldAt" | "status" | "salary" | "responsibles" | "feedbackHr" | "feedbackTeamLead" | "feedbackTeam" | "feedbackClient" | "position" | "startsAt" | "firstName" | "lastName" | "email" | "mobile" | "personalEmail" | "linkedinUrl" | "telegram" | "address" | "bornAt" | "terminatedAt" | "terminationReason" | "terminationComment" | "timeOffType" | "periodStartsAt" | "periodEndsAt" | "days" | "note" | "decisionComment" | "name" | "isRecurring" | "role" | "plan";
                     from: ({
                         /** @enum {string} */
                         kind: "text";
@@ -1579,7 +1579,7 @@ export interface components {
                         /** @enum {string} */
                         kind: "date";
                         /** Format: date */
-                        date: string;
+                        at: string;
                     } | {
                         /** @enum {string} */
                         kind: "money";
@@ -1632,7 +1632,7 @@ export interface components {
                         /** @enum {string} */
                         kind: "date";
                         /** Format: date */
-                        date: string;
+                        at: string;
                     } | {
                         /** @enum {string} */
                         kind: "money";
@@ -1730,7 +1730,7 @@ export interface components {
             id: string;
             title: string;
             employeeCount: number;
-            removable: boolean;
+            isRemovable: boolean;
             version: number;
         };
         CompanyStructureResponse_Output: {
@@ -1758,7 +1758,7 @@ export interface components {
             id: string;
             title: string;
             employeeCount: number;
-            removable: boolean;
+            isRemovable: boolean;
             version: number;
         };
         RenamePositionRequest: {
@@ -1827,7 +1827,7 @@ export interface components {
             version: number;
         };
         BillingInfoResponse_Output: {
-            testMode: boolean;
+            isTestMode: boolean;
         };
         /** @enum {string} */
         SubscriptionStatus_Output: "NONE" | "ACTIVE" | "PAST_DUE";
@@ -1843,14 +1843,14 @@ export interface components {
             status: components["schemas"]["SubscriptionStatus_Output"];
             scheduledPlan: components["schemas"]["Plan_Output"] | null;
             /** Format: date-time */
-            currentPeriodEnd: string | null;
+            periodEndsAt: string | null;
             /** Format: date-time */
-            pastDueSince: string | null;
+            pastDueAt: string | null;
             /** Format: date-time */
             graceEndsAt: string | null;
-            canManage: boolean;
-            granted: boolean;
-            testMode: boolean;
+            hasBillingAccount: boolean;
+            isGrantedPlan: boolean;
+            isTestMode: boolean;
             plans: components["schemas"]["PlanOffer_Output"][];
         };
         CheckoutSessionRequest: {
@@ -1869,7 +1869,7 @@ export interface components {
         WebhookReceiptResponse_Output: {
             /** @enum {boolean} */
             received: true;
-            duplicate: boolean;
+            isDuplicate: boolean;
         };
         Company_Output: {
             /** Format: uuid */
@@ -1956,7 +1956,7 @@ export interface components {
             kind: components["schemas"]["ReviewKind_Output"];
             title: string;
             /** Format: date */
-            date: string;
+            reviewedAt: string;
             status: components["schemas"]["ReviewStatus_Output"];
             salary: components["schemas"]["Money_Output"] | null;
             responsibles: {
@@ -2038,7 +2038,7 @@ export interface components {
                 changePercent: string | null;
                 history: {
                     /** Format: date */
-                    date: string;
+                    reviewedAt: string;
                     salary: components["schemas"]["Money_Output"];
                 }[];
             };
@@ -2083,7 +2083,7 @@ export interface components {
         CreateReviewRequest: {
             title: string;
             /** Format: date */
-            date: string;
+            reviewedAt: string;
             /** @enum {string} */
             status: "COMPLETED" | "SCHEDULED" | "CANCELED";
             salary?: string;
@@ -2154,7 +2154,7 @@ export interface components {
             kind: components["schemas"]["ReviewKind_Output"];
             title: string;
             /** Format: date */
-            date: string;
+            reviewedAt: string;
             status: components["schemas"]["ReviewStatus_Output"];
             salary: components["schemas"]["Money_Output"] | null;
             responsibles: {
@@ -2228,7 +2228,7 @@ export interface components {
         UpdateReviewRequest: {
             title: string;
             /** Format: date */
-            date: string;
+            reviewedAt: string;
             /** @enum {string} */
             status: "COMPLETED" | "SCHEDULED" | "CANCELED";
             salary?: string;
@@ -2265,7 +2265,7 @@ export interface components {
             /** Format: uuid */
             positionId: string;
             /** Format: date */
-            startDate: string;
+            startsAt: string;
             startingSalary: string;
             mobile?: string;
             personalEmail?: string;
@@ -2273,7 +2273,7 @@ export interface components {
             telegram?: string;
             address?: string;
             /** Format: date */
-            dateOfBirth?: string;
+            bornAt?: string;
             /** @default [] */
             responsibleUserIds: string[];
         };
@@ -2291,21 +2291,21 @@ export interface components {
             /** Format: uuid */
             positionId: string;
             /** Format: date */
-            startDate: string;
+            startsAt: string;
             mobile?: string;
             personalEmail?: string;
             linkedinUrl?: string;
             telegram?: string;
             address?: string;
             /** Format: date */
-            dateOfBirth?: string;
+            bornAt?: string;
             version: number;
         };
         /** @enum {string} */
         TerminationReason: "RESIGNATION" | "DISMISSAL" | "END_OF_CONTRACT" | "LAYOFF" | "OTHER";
         TerminateEmployeeRequest: {
             /** Format: date */
-            date: string;
+            terminatedAt: string;
             reason: components["schemas"]["TerminationReason"];
             comment?: string;
             version: number;
@@ -2322,9 +2322,9 @@ export interface components {
             content: {
                 type: components["schemas"]["TimeOffType_Output"];
                 /** Format: date */
-                cycleStart: string;
+                cycleStartsAt: string;
                 /** Format: date */
-                cycleEnd: string;
+                cycleEndsAt: string;
                 allowance: number | null;
                 used: number;
                 pending: number;
@@ -2336,9 +2336,9 @@ export interface components {
             id: string;
             type: components["schemas"]["TimeOffType_Output"];
             /** Format: date */
-            startDate: string;
+            startsAt: string;
             /** Format: date */
-            endDate: string;
+            endsAt: string;
             days: number;
             status: components["schemas"]["TimeOffStatus_Output"];
             note: string | null;
@@ -2407,9 +2407,9 @@ export interface components {
         CreateTimeOffRequestRequest: {
             type: components["schemas"]["TimeOffType"];
             /** Format: date */
-            startDate: string;
+            startsAt: string;
             /** Format: date */
-            endDate: string;
+            endsAt: string;
             note?: string;
         };
         TimeOffRequestResponse_Output: {
@@ -2417,9 +2417,9 @@ export interface components {
             id: string;
             type: components["schemas"]["TimeOffType_Output"];
             /** Format: date */
-            startDate: string;
+            startsAt: string;
             /** Format: date */
-            endDate: string;
+            endsAt: string;
             days: number;
             status: components["schemas"]["TimeOffStatus_Output"];
             note: string | null;
@@ -2490,9 +2490,9 @@ export interface components {
                 lastName: string;
                 positionTitle: string;
                 /** Format: date */
-                startDate: string;
+                startsAt: string;
                 /** Format: date */
-                terminatedOn: string | null;
+                terminatedAt: string | null;
             };
             requests: {
                 /** Format: uuid */
@@ -2500,9 +2500,9 @@ export interface components {
                 type: components["schemas"]["TimeOffType_Output"];
                 status: components["schemas"]["TimeOffStatus_Output"];
                 /** Format: date */
-                startDate: string;
+                startsAt: string;
                 /** Format: date */
-                endDate: string;
+                endsAt: string;
                 days: number;
             }[];
         };
@@ -2515,7 +2515,7 @@ export interface components {
             to: string;
             holidays: {
                 /** Format: date */
-                date: string;
+                heldAt: string;
                 name: string;
             }[];
         };
@@ -2524,9 +2524,9 @@ export interface components {
             id: string;
             type: components["schemas"]["TimeOffType_Output"];
             /** Format: date */
-            startDate: string;
+            startsAt: string;
             /** Format: date */
-            endDate: string;
+            endsAt: string;
             days: number;
             status: components["schemas"]["TimeOffStatus_Output"];
             note: string | null;
@@ -2591,9 +2591,9 @@ export interface components {
             id: string;
             type: components["schemas"]["TimeOffType_Output"];
             /** Format: date */
-            startDate: string;
+            startsAt: string;
             /** Format: date */
-            endDate: string;
+            endsAt: string;
             days: number;
             status: components["schemas"]["TimeOffStatus_Output"];
             note: string | null;
@@ -2659,10 +2659,10 @@ export interface components {
             /** Format: uuid */
             id: string;
             /** Format: date */
-            date: string;
+            heldAt: string;
             name: string;
-            recurring: boolean;
-            carriedOver: boolean;
+            isRecurring: boolean;
+            isCarriedOver: boolean;
             version: number;
         };
         HolidayListResponse_Output: {
@@ -2670,25 +2670,25 @@ export interface components {
         };
         CreateHolidayRequest: {
             /** Format: date */
-            date: string;
+            heldAt: string;
             name: string;
-            recurring: boolean;
+            isRecurring: boolean;
         };
         HolidayResponse_Output: {
             /** Format: uuid */
             id: string;
             /** Format: date */
-            date: string;
+            heldAt: string;
             name: string;
-            recurring: boolean;
-            carriedOver: boolean;
+            isRecurring: boolean;
+            isCarriedOver: boolean;
             version: number;
         };
         UpdateHolidayRequest: {
             /** Format: date */
-            date: string;
+            heldAt: string;
             name: string;
-            recurring: boolean;
+            isRecurring: boolean;
             version: number;
         };
         AdminDashboardResponse_Output: {
@@ -2720,7 +2720,7 @@ export interface components {
                     /** @enum {string} */
                     kind: "JOINING" | "LEAVING";
                     /** Format: date */
-                    date: string;
+                    movedAt: string;
                     /** Format: uuid */
                     employeeId: string;
                     person: {
@@ -2740,9 +2740,9 @@ export interface components {
             /** @enum {string} */
             status: "PENDING" | "APPROVED" | "REJECTED" | "CANCELED";
             /** Format: date */
-            startDate: string;
+            startsAt: string;
             /** Format: date */
-            endDate: string;
+            endsAt: string;
             days: number;
             /** Format: date-time */
             createdAt: string;
@@ -2765,7 +2765,7 @@ export interface components {
             id: string;
             title: string;
             /** Format: date */
-            reviewDate: string;
+            reviewedAt: string;
             /** @enum {string} */
             status: "SCHEDULED" | "COMPLETED";
             employee: {
@@ -2853,7 +2853,7 @@ export interface components {
                         lastName: string;
                         positionTitle: string;
                         /** Format: date */
-                        date: string;
+                        movedAt: string;
                     }[];
                     left: {
                         /** Format: uuid */
@@ -2864,7 +2864,7 @@ export interface components {
                         lastName: string;
                         positionTitle: string;
                         /** Format: date */
-                        date: string;
+                        movedAt: string;
                     }[];
                 }[];
                 hiredTotal: number;
@@ -3495,7 +3495,7 @@ export interface operations {
                 categoryId?: string;
                 page?: number;
                 size?: number;
-                /** @description One of: name,asc|desc, startDate,asc|desc */
+                /** @description One of: name,asc|desc, startsAt,asc|desc */
                 sort?: string;
             };
             header?: never;
@@ -4526,7 +4526,7 @@ export interface operations {
             query?: {
                 page?: number;
                 size?: number;
-                /** @description One of: name,asc|desc, startDate,asc|desc */
+                /** @description One of: name,asc|desc, startsAt,asc|desc */
                 sort?: string;
             };
             header?: never;

@@ -27,7 +27,7 @@ export const CurrentUserResponseSchema = z.object({
             /** Active employees the plan allows; null = unlimited. */
             maxEmployees: z.number().int().min(1).nullable(),
             /** A payment failed: the plan stays until this instant, then Starter (owners see a banner). */
-            pastDueUntil: z.iso.datetime().nullable(),
+            graceEndsAt: z.iso.datetime().nullable(),
         }),
     }),
     /** Minutes without activity after which the session ends (the client warns before). */
@@ -36,7 +36,7 @@ export const CurrentUserResponseSchema = z.object({
      * One of the public demo's shared showcase accounts: actions that would lock other visitors
      * out are turned off for it. False for everyone else (a company a visitor created included).
      */
-    demoRestricted: z.boolean(),
+    isDemoRestricted: z.boolean(),
 });
 
 export class CurrentUserResponse extends createZodDto(CurrentUserResponseSchema) {}

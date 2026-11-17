@@ -105,12 +105,12 @@ export function EmployeeDetailsStep({ form }: EmployeeDetailsStepProps) {
                     )}
                 />
                 <TextField
-                    {...register('startDate')}
+                    {...register('startsAt')}
                     type="date"
                     required
                     label={t('add.fields.startDate')}
-                    error={Boolean(errors.startDate)}
-                    helperText={message(errors.startDate)}
+                    error={Boolean(errors.startsAt)}
+                    helperText={message(errors.startsAt)}
                     slotProps={{ inputLabel: { shrink: true } }}
                 />
                 <TextField
@@ -135,12 +135,12 @@ export function EmployeeDetailsStep({ form }: EmployeeDetailsStepProps) {
                     {t('add.sections.contact')}
                 </Typography>
                 <TextField
-                    {...register('dateOfBirth')}
+                    {...register('bornAt')}
                     type="date"
                     label={t('add.fields.dateOfBirth')}
                     autoComplete="bday"
-                    error={Boolean(errors.dateOfBirth)}
-                    helperText={message(errors.dateOfBirth)}
+                    error={Boolean(errors.bornAt)}
+                    helperText={message(errors.bornAt)}
                     slotProps={{ inputLabel: { shrink: true } }}
                 />
                 {text('mobile', {

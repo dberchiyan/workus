@@ -35,7 +35,7 @@ export const useNotificationView = () => {
                   : t(`message.${notification.type}`, values);
         return {
             message,
-            period: formatTimeOffPeriod(request.startDate, request.endDate, i18n.language),
+            period: formatTimeOffPeriod(request.startsAt, request.endsAt, i18n.language),
             href: own
                 ? `${PATHS.dashboard}?request=${encodeURIComponent(notification.subject.id)}`
                 : requestPath(notification.subject.id),

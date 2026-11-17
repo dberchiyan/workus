@@ -57,7 +57,7 @@ export function SalaryOverview({ salary }: { salary: EmployeeReviews['salary'] }
                         <Icon aria-hidden fontSize="small" />
                         {t('salary.change', {
                             percent: formatPercentChange(change, locale),
-                            date: formatReviewDate(previous.date, locale),
+                            reviewedAt: formatReviewDate(previous.reviewedAt, locale),
                         })}
                     </Typography>
                 )}

@@ -38,8 +38,8 @@ const isSameColumns = (before: OrganisationBillingRecord, next: SubscriptionColu
     before.plan === next.plan &&
     before.subscriptionStatus === next.subscriptionStatus &&
     before.scheduledPlan === next.scheduledPlan &&
-    before.currentPeriodEnd?.getTime() === next.currentPeriodEnd?.getTime() &&
-    before.pastDueSince?.getTime() === next.pastDueSince?.getTime() &&
+    before.periodEndsAt?.getTime() === next.periodEndsAt?.getTime() &&
+    before.pastDueAt?.getTime() === next.pastDueAt?.getTime() &&
     before.billingSubscriptionId === next.billingSubscriptionId;
 
 /**
@@ -60,8 +60,8 @@ export class BillingService {
         @InjectPinoLogger(BillingService.name) private readonly logger: PinoLogger,
     ) {}
 
-    info(): { testMode: boolean } {
-        return { testMode: this.gateway.isTestMode };
+    info(): { isTestMode: boolean } {
+        return { isTestMode: this.gateway.isTestMode };
     }
 
     async summary(organisationId: string): Promise<BillingSummary> {
@@ -106,7 +106,7 @@ export class BillingService {
      * Changes the plan from the app (CONTEXT.md → Plans and billing). With a subscription: a
      * higher plan applies now (charged at once), a lower one at the period end, Starter means a
      * cancellation at the period end, and the current plan again keeps it (drops a pending
-     * change). Without one: Starter gives a granted plan up; a paid plan goes through checkout.
+     * change). Without one: Starter gives a isGrantedPlan plan up; a paid plan goes through checkout.
      */
     async changePlan(principal: Principal, target: Plan): Promise<BillingSummary> {
         const organisationId = principal.organisationId;
@@ -124,7 +124,7 @@ export class BillingService {
         const subscriptionId = billing.billingSubscriptionId;
         let subscription: ProviderSubscription;
         if (target === Plan.STARTER) {
-            subscription = await this.gateway.cancelAtPeriodEnd(subscriptionId);
+            subscription = await this.gateway.isEndingAtPeriodEnd(subscriptionId);
         } else if (target === current) {
             if (billing.scheduledPlan === null) {
                 return this.summary(organisationId);
@@ -145,8 +145,8 @@ export class BillingService {
             plan: Plan.STARTER,
             subscriptionStatus: SubscriptionStatus.NONE,
             scheduledPlan: null,
-            currentPeriodEnd: null,
-            pastDueSince: null,
+            periodEndsAt: null,
+            pastDueAt: null,
             billingSubscriptionId: null,
         });
         await this.auditService.record({
@@ -195,7 +195,7 @@ export class BillingService {
      * answered 200 once stored: a processing failure is recorded on the row and the nightly
      * reconciliation catches up.
      */
-    async receiveWebhook(rawBody: Buffer, signature: string | undefined): Promise<{ duplicate: boolean }> {
+    async receiveWebhook(rawBody: Buffer, signature: string | undefined): Promise<{ isDuplicate: boolean }> {
         const event = this.gateway.parseWebhook(rawBody, signature);
         const stored = await this.billingRepository.createEvent({
             providerEventId: event.id,
@@ -206,11 +206,11 @@ export class BillingService {
             customerId: event.customerId,
         });
         if (!stored) {
-            this.metrics.billingWebhookEvents.inc({ type: event.type, outcome: 'duplicate' });
-            return { duplicate: true };
+            this.metrics.billingWebhookEvents.inc({ type: event.type, outcome: 'isDuplicate' });
+            return { isDuplicate: true };
         }
         await this.processEvent(event.id);
-        return { duplicate: false };
+        return { isDuplicate: false };
     }
 
     /** Resolves the company, re-reads the subscription (the truth) and applies it. */
@@ -307,13 +307,13 @@ export class BillingService {
                 plan: Plan.STARTER,
                 subscriptionStatus: SubscriptionStatus.NONE,
                 scheduledPlan: null,
-                currentPeriodEnd: null,
-                pastDueSince: null,
+                periodEndsAt: null,
+                pastDueAt: null,
                 billingSubscriptionId: null,
             };
         }
         const plan = subscription.plan ?? toPlan(before.plan);
-        const scheduledPlan = subscription.cancelAtPeriodEnd
+        const scheduledPlan = subscription.isEndingAtPeriodEnd
             ? Plan.STARTER
             : subscription.scheduledPlan && subscription.scheduledPlan !== plan
               ? subscription.scheduledPlan
@@ -323,9 +323,9 @@ export class BillingService {
             plan,
             subscriptionStatus: isPastDue ? SubscriptionStatus.PAST_DUE : SubscriptionStatus.ACTIVE,
             scheduledPlan,
-            currentPeriodEnd: subscription.currentPeriodEnd,
+            periodEndsAt: subscription.periodEndsAt,
             // The grace period counts from the first failure we saw, not from each retry.
-            pastDueSince: isPastDue ? (before.pastDueSince ?? new Date()) : null,
+            pastDueAt: isPastDue ? (before.pastDueAt ?? new Date()) : null,
             billingSubscriptionId: subscription.id,
         };
     }
@@ -337,8 +337,8 @@ export class BillingService {
             customerId: '',
             state: SubscriptionState.ENDED,
             plan: null,
-            currentPeriodEnd: null,
-            cancelAtPeriodEnd: false,
+            periodEndsAt: null,
+            isEndingAtPeriodEnd: false,
             scheduledPlan: null,
         });
     }
@@ -441,12 +441,12 @@ export class BillingService {
             plan,
             status,
             scheduledPlan: billing.scheduledPlan ? toPlan(billing.scheduledPlan) : null,
-            currentPeriodEnd: billing.currentPeriodEnd,
-            pastDueSince: billing.pastDueSince,
-            graceEndsAt: billing.pastDueSince ? graceEndsAt(billing.pastDueSince) : null,
-            canManage: billing.billingCustomerId !== null,
-            granted: status === SubscriptionStatus.NONE && plan !== Plan.STARTER,
-            testMode: this.gateway.isTestMode,
+            periodEndsAt: billing.periodEndsAt,
+            pastDueAt: billing.pastDueAt,
+            graceEndsAt: billing.pastDueAt ? graceEndsAt(billing.pastDueAt) : null,
+            hasBillingAccount: billing.billingCustomerId !== null,
+            isGrantedPlan: status === SubscriptionStatus.NONE && plan !== Plan.STARTER,
+            isTestMode: this.gateway.isTestMode,
             plans: PLANS.map((name) => PLAN_CATALOGUE[name]),
         };
     }

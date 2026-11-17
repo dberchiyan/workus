@@ -52,7 +52,7 @@ export function DecisionFeedback({ decisions }: DecisionFeedbackProps) {
                           t(`manage.notice.${notice.decision}`, {
                               name: fullName(notice.request.employee),
                               type: t(`types.${notice.request.type}`),
-                              period: formatPeriod(notice.request.startDate, notice.request.endDate, i18n.language),
+                              period: formatPeriod(notice.request.startsAt, notice.request.endsAt, i18n.language),
                           })}
                 </Alert>
             </Snackbar>

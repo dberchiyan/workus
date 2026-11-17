@@ -27,7 +27,7 @@ const feedbackDoc = (review: ReviewRecord, column: FeedbackColumn) => {
 /** Plain fields; feedback is handled apart (logged as present/absent, never its text). */
 const plainValues = (review: ReviewRecord): [AuditField, AuditValue | null][] => [
     [AuditField.TITLE, auditValue.text(review.title)],
-    [AuditField.DATE, auditValue.date(review.reviewDate)],
+    [AuditField.REVIEWED_AT, auditValue.date(review.reviewedAt)],
     [AuditField.STATUS, auditValue.reviewStatus(review.status)],
     [
         AuditField.SALARY,

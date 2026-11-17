@@ -17,8 +17,8 @@ export const toNotificationResponse = (notification: NotificationRecord): Notifi
         subject: { type: notification.subjectType, id: notification.subjectId },
         request: {
             type: params.data.requestType,
-            startDate: params.data.startDate,
-            endDate: params.data.endDate,
+            startsAt: params.data.startsAt,
+            endsAt: params.data.endsAt,
             employee: params.data.employee,
             waitingDays: params.data.waitingDays ?? null,
         },

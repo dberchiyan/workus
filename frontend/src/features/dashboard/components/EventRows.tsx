@@ -20,9 +20,9 @@ const dayMonth = (iso: string, locale: string): string =>
 export function RequestEventRow({ request, href }: { request: DashboardRequest; href: string }) {
     const { t, i18n } = useTranslation('dashboard');
     const period =
-        request.startDate === request.endDate
-            ? dayMonth(request.startDate, i18n.language)
-            : `${dayMonth(request.startDate, i18n.language)} – ${dayMonth(request.endDate, i18n.language)}`;
+        request.startsAt === request.endsAt
+            ? dayMonth(request.startsAt, i18n.language)
+            : `${dayMonth(request.startsAt, i18n.language)} – ${dayMonth(request.endsAt, i18n.language)}`;
     const madeAt = new Intl.DateTimeFormat(i18n.language, {
         timeStyle: 'short',
         timeZone: 'UTC',
@@ -74,7 +74,7 @@ export function ReviewEventRow({ review }: { review: DashboardReview }) {
                     {review.title}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" className="app-tabular">
-                    {dayMonth(review.reviewDate, i18n.language)}
+                    {dayMonth(review.reviewedAt, i18n.language)}
                 </Typography>
             </span>
             <span className="shrink-0">

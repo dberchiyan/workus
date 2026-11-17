@@ -241,7 +241,7 @@ export function CompanyStructureSection() {
                     compact
                     reason={{ kind: 'feature', feature: 'structure' }}
                     requiredPlan={upgrade.requiredPlan}
-                    canManage={upgrade.canManage}
+                    hasBillingAccount={upgrade.hasBillingAccount}
                     className="m-4 sm:mx-6"
                 />
             )}

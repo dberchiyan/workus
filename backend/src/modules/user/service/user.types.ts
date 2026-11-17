@@ -24,7 +24,7 @@ export interface UserProfile {
         rejectionReason: string | null;
         /** The plan in effect (common/plan) and, after a failed payment, since when. */
         plan: Plan;
-        pastDueSince: Date | null;
+        pastDueAt: Date | null;
     };
 }
 

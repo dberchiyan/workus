@@ -8,7 +8,7 @@ import type { EmployeeListParams, EmployeeStatus } from '../types';
 import { EmployeeSearchField } from './EmployeeSearchField';
 
 const STATUSES: readonly EmployeeStatus[] = ['ACTIVE', 'TERMINATED'];
-const SORTS = ['name,asc', 'name,desc', 'startDate,desc', 'startDate,asc'] as const;
+const SORTS = ['name,asc', 'name,desc', 'startsAt,desc', 'startsAt,asc'] as const;
 type SortOption = (typeof SORTS)[number];
 
 export interface EmployeeToolbarProps {
@@ -65,7 +65,7 @@ export function EmployeeToolbar({ params, total, onSearch, onStatus, onSort }: E
                         const [field, direction] =
                             option === 'name,asc' || option === 'name,desc'
                                 ? (['name', option === 'name,asc' ? 'asc' : 'desc'] as const)
-                                : (['startDate', option === 'startDate,asc' ? 'asc' : 'desc'] as const);
+                                : (['startsAt', option === 'startsAt,asc' ? 'asc' : 'desc'] as const);
                         onSort(field, direction);
                     }
                 }}

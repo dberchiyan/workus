@@ -198,13 +198,13 @@ export const seedSecurityLog = async (prisma: PrismaClient, organisationId: stri
     });
     const employees = await prisma.employee.findMany({
         where: { organisationId },
-        select: { userId: true, startDate: true, terminatedOn: true },
-        orderBy: { startDate: 'asc' },
+        select: { userId: true, startsAt: true, terminatedAt: true },
+        orderBy: { startsAt: 'asc' },
     });
 
     const rows = employees.flatMap((employee, index) => {
-        const added = employee.startDate.getTime() - ADDED_BEFORE_START_DAYS * DAY_MS;
-        const left = employee.terminatedOn ? employee.terminatedOn.getTime() + 9 * HOUR_MS : null;
+        const added = employee.startsAt.getTime() - ADDED_BEFORE_START_DAYS * DAY_MS;
+        const left = employee.terminatedAt ? employee.terminatedAt.getTime() + 9 * HOUR_MS : null;
         const from = Math.max(now - WINDOW_DAYS * DAY_MS, added + 9 * HOUR_MS);
         const to = Math.min(now - 2 * HOUR_MS, left ?? Infinity);
         if (seeded.has(employee.userId) || to - from < DAY_MS) {

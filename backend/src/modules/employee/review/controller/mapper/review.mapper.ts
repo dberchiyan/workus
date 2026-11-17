@@ -6,7 +6,7 @@ import { readRichText } from '../../service/rich-text';
 import type { EmployeeReviews, SalaryPoint } from '../../service/review.types';
 import type { EmployeeReviewsResponse, ReviewResponse } from '../dto/review.response';
 
-const isoDate = (date: Date): string => date.toISOString().slice(0, 10);
+const isoDate = (reviewedAt: Date): string => reviewedAt.toISOString().slice(0, 10);
 const money = (point: SalaryPoint | null) => (point ? toMoney(point.amount, point.currency) : null);
 
 export const toReviewResponse = (review: ReviewRecord): ReviewResponse => ({
@@ -14,7 +14,7 @@ export const toReviewResponse = (review: ReviewRecord): ReviewResponse => ({
     // Guarded by ck_employee_reviews_kind.
     kind: isReviewKind(review.kind) ? review.kind : ReviewKind.REGULAR,
     title: review.title,
-    date: isoDate(review.reviewDate),
+    reviewedAt: isoDate(review.reviewedAt),
     // Guarded by ck_employee_reviews_status.
     status: isReviewStatus(review.status) ? review.status : ReviewStatus.SCHEDULED,
     salary: review.salaryAmount && review.salaryCurrency ? toMoney(review.salaryAmount, review.salaryCurrency) : null,
@@ -39,7 +39,7 @@ export const toEmployeeReviewsResponse = (result: EmployeeReviews): EmployeeRevi
         previous: money(result.salary.previous),
         changePercent: result.salary.changePercent,
         history: result.salary.history.map((point) => ({
-            date: isoDate(point.date),
+            reviewedAt: isoDate(point.reviewedAt),
             salary: toMoney(point.amount, point.currency),
         })),
     },

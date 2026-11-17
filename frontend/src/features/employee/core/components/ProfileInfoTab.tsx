@@ -24,8 +24,8 @@ export function ProfileInfoTab({ employee, mock }: ProfileInfoTabProps) {
             <span className="sr-only"> {t('profile.values.opensInNewTab')}</span>
         </Link>
     );
-    const tenureUntil = employee.terminatedOn ?? todayIso();
-    const tenure = yearsAndMonthsBetween(employee.startDate, tenureUntil);
+    const tenureUntil = employee.terminatedAt ?? todayIso();
+    const tenure = yearsAndMonthsBetween(employee.startsAt, tenureUntil);
     const { contacts } = employee;
 
     return (
@@ -50,17 +50,17 @@ export function ProfileInfoTab({ employee, mock }: ProfileInfoTabProps) {
                         key: 'dob',
                         label: t('profile.fields.dateOfBirth'),
                         value:
-                            employee.dateOfBirth &&
+                            employee.bornAt &&
                             t('profile.values.age', {
-                                date: date(employee.dateOfBirth),
-                                count: yearsAndMonthsBetween(employee.dateOfBirth, todayIso()).years,
+                                date: date(employee.bornAt),
+                                count: yearsAndMonthsBetween(employee.bornAt, todayIso()).years,
                             }),
                     },
                     {
                         key: 'start',
                         label: t('profile.fields.startDate'),
                         value: t('profile.values.tenure', {
-                            date: date(employee.startDate),
+                            date: date(employee.startsAt),
                             duration:
                                 tenure.years === 0 && tenure.months === 0
                                     ? t('profile.values.lessThanMonth')
@@ -74,12 +74,12 @@ export function ProfileInfoTab({ employee, mock }: ProfileInfoTabProps) {
                                           }),
                         }),
                     },
-                    ...(employee.terminatedOn && employee.termination
+                    ...(employee.terminatedAt && employee.termination
                         ? [
                               {
                                   key: 'terminated',
                                   label: t('profile.fields.terminatedOn'),
-                                  value: date(employee.terminatedOn),
+                                  value: date(employee.terminatedAt),
                               },
                               {
                                   key: 'terminationReason',
@@ -93,7 +93,7 @@ export function ProfileInfoTab({ employee, mock }: ProfileInfoTabProps) {
                     {
                         key: 'holiday',
                         label: t('profile.fields.holidayEligibility'),
-                        value: date(addMonthsIso(employee.startDate, HOLIDAY_ELIGIBILITY_MONTHS)),
+                        value: date(addMonthsIso(employee.startsAt, HOLIDAY_ELIGIBILITY_MONTHS)),
                     },
                     {
                         key: 'laptop',

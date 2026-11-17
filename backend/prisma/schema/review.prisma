@@ -8,7 +8,7 @@ model EmployeeReview {
   /// STARTING = the salary agreed at hire (one per employee, dated the start date, always COMPLETED); REGULAR otherwise.
   kind           String                      @default("REGULAR") @db.VarChar(16) // STARTING | REGULAR — CHECK in migration
   title          String                      @db.VarChar(150)
-  reviewDate     DateTime                    @map("review_date") @db.Date
+  reviewedAt     DateTime                    @map("reviewed_at") @db.Date
   status         String                      @db.VarChar(32) // COMPLETED | SCHEDULED | CANCELED — CHECK in migration
   salaryAmount   Decimal?                    @map("salary_amount") @db.Decimal(19, 4) // required when COMPLETED — CHECK
   salaryCurrency String?                     @map("salary_currency") @db.Char(3) // set together with the amount — CHECK
@@ -25,7 +25,7 @@ model EmployeeReview {
   responsibles   EmployeeReviewResponsible[]
 
   @@unique([organisationId, id], map: "uq_employee_reviews_organisation_id_id")
-  @@index([employeeId, reviewDate], map: "idx_employee_reviews_employee_id_review_date")
+  @@index([employeeId, reviewedAt], map: "idx_employee_reviews_employee_id_reviewed_at")
   @@map("employee_reviews")
 }
 

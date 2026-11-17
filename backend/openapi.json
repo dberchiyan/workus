@@ -869,7 +869,7 @@
             "name": "sort",
             "required": false,
             "in": "query",
-            "description": "One of: name,asc|desc, startDate,asc|desc",
+            "description": "One of: name,asc|desc, startsAt,asc|desc",
             "schema": {
               "type": "string",
               "default": "name,asc"
@@ -1218,7 +1218,7 @@
             "session": []
           }
         ],
-        "summary": "Edit name, work email, position, start date and contacts; the version must match the one read",
+        "summary": "Edit name, work email, position, start terminatedAt and contacts; the version must match the one read",
         "tags": [
           "Employees"
         ]
@@ -2281,7 +2281,7 @@
             "name": "sort",
             "required": false,
             "in": "query",
-            "description": "One of: name,asc|desc, startDate,asc|desc",
+            "description": "One of: name,asc|desc, startsAt,asc|desc",
             "schema": {
               "type": "string",
               "default": "name,asc"
@@ -4395,7 +4395,7 @@
             "session": []
           }
         ],
-        "summary": "Terminate the employee from a date (or change the termination); later scheduled reviews are canceled",
+        "summary": "Terminate the employee from a terminatedAt (or change the termination); later scheduled reviews are canceled",
         "tags": [
           "Employees"
         ]
@@ -6908,12 +6908,12 @@
                 "type": "string",
                 "maxLength": 16
               },
-              "startDate": {
+              "startsAt": {
                 "type": "string",
                 "format": "date",
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
               },
-              "endDate": {
+              "endsAt": {
                 "type": "string",
                 "format": "date",
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -6951,8 +6951,8 @@
             },
             "required": [
               "type",
-              "startDate",
-              "endDate",
+              "startsAt",
+              "endsAt",
               "employee",
               "waitingDays"
             ],
@@ -7090,12 +7090,12 @@
                 "type": "string",
                 "maxLength": 16
               },
-              "startDate": {
+              "startsAt": {
                 "type": "string",
                 "format": "date",
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
               },
-              "endDate": {
+              "endsAt": {
                 "type": "string",
                 "format": "date",
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -7133,8 +7133,8 @@
             },
             "required": [
               "type",
-              "startDate",
-              "endDate",
+              "startsAt",
+              "endsAt",
               "employee",
               "waitingDays"
             ],
@@ -7266,7 +7266,7 @@
                     "maximum": 9007199254740991,
                     "nullable": true
                   },
-                  "pastDueUntil": {
+                  "graceEndsAt": {
                     "type": "string",
                     "format": "date-time",
                     "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
@@ -7277,7 +7277,7 @@
                   "plan",
                   "features",
                   "maxEmployees",
-                  "pastDueUntil"
+                  "graceEndsAt"
                 ],
                 "additionalProperties": false
               }
@@ -7296,7 +7296,7 @@
             "minimum": 1,
             "maximum": 9007199254740991
           },
-          "demoRestricted": {
+          "isDemoRestricted": {
             "type": "boolean"
           }
         },
@@ -7308,7 +7308,7 @@
           "role",
           "organisation",
           "idleTimeoutMinutes",
-          "demoRestricted"
+          "isDemoRestricted"
         ],
         "additionalProperties": false
       },
@@ -7491,7 +7491,7 @@
               "null"
             ]
           },
-          "newDevice": {
+          "isNewDevice": {
             "type": "boolean"
           }
         },
@@ -7501,7 +7501,7 @@
           "occurredAt",
           "ip",
           "userAgent",
-          "newDevice"
+          "isNewDevice"
         ],
         "additionalProperties": false
       },
@@ -7615,12 +7615,12 @@
             "minimum": 0,
             "maximum": 9007199254740991
           },
-          "startDate": {
+          "startsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
           },
-          "terminatedOn": {
+          "terminatedAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -7639,8 +7639,8 @@
           "position",
           "responsibles",
           "responsibleCount",
-          "startDate",
-          "terminatedOn",
+          "startsAt",
+          "terminatedAt",
           "status"
         ],
         "additionalProperties": false
@@ -7790,18 +7790,18 @@
             ],
             "additionalProperties": false
           },
-          "startDate": {
+          "startsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
           },
-          "dateOfBirth": {
+          "bornAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
             "nullable": true
           },
-          "terminatedOn": {
+          "terminatedAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -7939,9 +7939,9 @@
           "email",
           "role",
           "position",
-          "startDate",
-          "dateOfBirth",
-          "terminatedOn",
+          "startsAt",
+          "bornAt",
+          "terminatedAt",
           "termination",
           "status",
           "contacts",
@@ -8092,7 +8092,8 @@
                         "type": "string",
                         "enum": [
                           "title",
-                          "date",
+                          "reviewedAt",
+                          "heldAt",
                           "status",
                           "salary",
                           "responsibles",
@@ -8101,7 +8102,7 @@
                           "feedbackTeam",
                           "feedbackClient",
                           "position",
-                          "startDate",
+                          "startsAt",
                           "firstName",
                           "lastName",
                           "email",
@@ -8110,18 +8111,18 @@
                           "linkedinUrl",
                           "telegram",
                           "address",
-                          "dateOfBirth",
-                          "terminationDate",
+                          "bornAt",
+                          "terminatedAt",
                           "terminationReason",
                           "terminationComment",
                           "timeOffType",
-                          "periodStart",
-                          "periodEnd",
+                          "periodStartsAt",
+                          "periodEndsAt",
                           "days",
                           "note",
                           "decisionComment",
                           "name",
-                          "recurring",
+                          "isRecurring",
                           "role",
                           "plan"
                         ]
@@ -8157,7 +8158,7 @@
                                   "date"
                                 ]
                               },
-                              "date": {
+                              "at": {
                                 "type": "string",
                                 "format": "date",
                                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -8165,7 +8166,7 @@
                             },
                             "required": [
                               "kind",
-                              "date"
+                              "at"
                             ],
                             "additionalProperties": false
                           },
@@ -8416,7 +8417,7 @@
                                   "date"
                                 ]
                               },
-                              "date": {
+                              "at": {
                                 "type": "string",
                                 "format": "date",
                                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -8424,7 +8425,7 @@
                             },
                             "required": [
                               "kind",
-                              "date"
+                              "at"
                             ],
                             "additionalProperties": false
                           },
@@ -8893,7 +8894,7 @@
             "minimum": 0,
             "maximum": 9007199254740991
           },
-          "removable": {
+          "isRemovable": {
             "type": "boolean"
           },
           "version": {
@@ -8906,7 +8907,7 @@
           "id",
           "title",
           "employeeCount",
-          "removable",
+          "isRemovable",
           "version"
         ],
         "additionalProperties": false
@@ -9020,7 +9021,7 @@
             "minimum": 0,
             "maximum": 9007199254740991
           },
-          "removable": {
+          "isRemovable": {
             "type": "boolean"
           },
           "version": {
@@ -9033,7 +9034,7 @@
           "id",
           "title",
           "employeeCount",
-          "removable",
+          "isRemovable",
           "version"
         ],
         "additionalProperties": false
@@ -9343,12 +9344,12 @@
       "BillingInfoResponse_Output": {
         "type": "object",
         "properties": {
-          "testMode": {
+          "isTestMode": {
             "type": "boolean"
           }
         },
         "required": [
-          "testMode"
+          "isTestMode"
         ],
         "additionalProperties": false
       },
@@ -9413,13 +9414,13 @@
             ],
             "nullable": true
           },
-          "currentPeriodEnd": {
+          "periodEndsAt": {
             "type": "string",
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
             "nullable": true
           },
-          "pastDueSince": {
+          "pastDueAt": {
             "type": "string",
             "format": "date-time",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
@@ -9431,13 +9432,13 @@
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z))$",
             "nullable": true
           },
-          "canManage": {
+          "hasBillingAccount": {
             "type": "boolean"
           },
-          "granted": {
+          "isGrantedPlan": {
             "type": "boolean"
           },
-          "testMode": {
+          "isTestMode": {
             "type": "boolean"
           },
           "plans": {
@@ -9452,12 +9453,12 @@
           "plan",
           "status",
           "scheduledPlan",
-          "currentPeriodEnd",
-          "pastDueSince",
+          "periodEndsAt",
+          "pastDueAt",
           "graceEndsAt",
-          "canManage",
-          "granted",
-          "testMode",
+          "hasBillingAccount",
+          "isGrantedPlan",
+          "isTestMode",
           "plans"
         ],
         "additionalProperties": false
@@ -9518,13 +9519,13 @@
               true
             ]
           },
-          "duplicate": {
+          "isDuplicate": {
             "type": "boolean"
           }
         },
         "required": [
           "received",
-          "duplicate"
+          "isDuplicate"
         ],
         "additionalProperties": false
       },
@@ -9883,7 +9884,7 @@
           "title": {
             "type": "string"
           },
-          "date": {
+          "reviewedAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -10051,7 +10052,7 @@
           "id",
           "kind",
           "title",
-          "date",
+          "reviewedAt",
           "status",
           "salary",
           "responsibles",
@@ -10298,7 +10299,7 @@
                 "items": {
                   "type": "object",
                   "properties": {
-                    "date": {
+                    "reviewedAt": {
                       "type": "string",
                       "format": "date",
                       "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -10308,7 +10309,7 @@
                     }
                   },
                   "required": [
-                    "date",
+                    "reviewedAt",
                     "salary"
                   ],
                   "additionalProperties": false
@@ -10533,7 +10534,7 @@
             "minLength": 1,
             "maxLength": 150
           },
-          "date": {
+          "reviewedAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -10670,7 +10671,7 @@
         },
         "required": [
           "title",
-          "date",
+          "reviewedAt",
           "status",
           "responsibleUserIds"
         ]
@@ -10878,7 +10879,7 @@
           "title": {
             "type": "string"
           },
-          "date": {
+          "reviewedAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -11046,7 +11047,7 @@
           "id",
           "kind",
           "title",
-          "date",
+          "reviewedAt",
           "status",
           "salary",
           "responsibles",
@@ -11253,7 +11254,7 @@
             "minLength": 1,
             "maxLength": 150
           },
-          "date": {
+          "reviewedAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -11395,7 +11396,7 @@
         },
         "required": [
           "title",
-          "date",
+          "reviewedAt",
           "status",
           "responsibleUserIds",
           "version"
@@ -11424,7 +11425,7 @@
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
-          "startDate": {
+          "startsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -11456,7 +11457,7 @@
             "type": "string",
             "maxLength": 500
           },
-          "dateOfBirth": {
+          "bornAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -11477,7 +11478,7 @@
           "lastName",
           "email",
           "positionId",
-          "startDate",
+          "startsAt",
           "startingSalary"
         ]
       },
@@ -11533,7 +11534,7 @@
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
-          "startDate": {
+          "startsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -11561,7 +11562,7 @@
             "type": "string",
             "maxLength": 500
           },
-          "dateOfBirth": {
+          "bornAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -11577,7 +11578,7 @@
           "lastName",
           "email",
           "positionId",
-          "startDate",
+          "startsAt",
           "version"
         ]
       },
@@ -11594,7 +11595,7 @@
       "TerminateEmployeeRequest": {
         "type": "object",
         "properties": {
-          "date": {
+          "terminatedAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -11613,7 +11614,7 @@
           }
         },
         "required": [
-          "date",
+          "terminatedAt",
           "reason",
           "version"
         ]
@@ -11665,12 +11666,12 @@
                 "type": {
                   "$ref": "#/components/schemas/TimeOffType_Output"
                 },
-                "cycleStart": {
+                "cycleStartsAt": {
                   "type": "string",
                   "format": "date",
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
                 },
-                "cycleEnd": {
+                "cycleEndsAt": {
                   "type": "string",
                   "format": "date",
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -11700,8 +11701,8 @@
               },
               "required": [
                 "type",
-                "cycleStart",
-                "cycleEnd",
+                "cycleStartsAt",
+                "cycleEndsAt",
                 "allowance",
                 "used",
                 "pending",
@@ -11727,12 +11728,12 @@
           "type": {
             "$ref": "#/components/schemas/TimeOffType_Output"
           },
-          "startDate": {
+          "startsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
           },
-          "endDate": {
+          "endsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -11911,8 +11912,8 @@
         "required": [
           "id",
           "type",
-          "startDate",
-          "endDate",
+          "startsAt",
+          "endsAt",
           "days",
           "status",
           "note",
@@ -12033,12 +12034,12 @@
           "type": {
             "$ref": "#/components/schemas/TimeOffType"
           },
-          "startDate": {
+          "startsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
           },
-          "endDate": {
+          "endsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -12050,8 +12051,8 @@
         },
         "required": [
           "type",
-          "startDate",
-          "endDate"
+          "startsAt",
+          "endsAt"
         ]
       },
       "TimeOffRequestResponse_Output": {
@@ -12065,12 +12066,12 @@
           "type": {
             "$ref": "#/components/schemas/TimeOffType_Output"
           },
-          "startDate": {
+          "startsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
           },
-          "endDate": {
+          "endsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -12249,8 +12250,8 @@
         "required": [
           "id",
           "type",
-          "startDate",
-          "endDate",
+          "startsAt",
+          "endsAt",
           "days",
           "status",
           "note",
@@ -12365,12 +12366,12 @@
               "positionTitle": {
                 "type": "string"
               },
-              "startDate": {
+              "startsAt": {
                 "type": "string",
                 "format": "date",
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
               },
-              "terminatedOn": {
+              "terminatedAt": {
                 "type": "string",
                 "format": "date",
                 "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$",
@@ -12383,8 +12384,8 @@
               "firstName",
               "lastName",
               "positionTitle",
-              "startDate",
-              "terminatedOn"
+              "startsAt",
+              "terminatedAt"
             ],
             "additionalProperties": false
           },
@@ -12404,12 +12405,12 @@
                 "status": {
                   "$ref": "#/components/schemas/TimeOffStatus_Output"
                 },
-                "startDate": {
+                "startsAt": {
                   "type": "string",
                   "format": "date",
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
                 },
-                "endDate": {
+                "endsAt": {
                   "type": "string",
                   "format": "date",
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -12424,8 +12425,8 @@
                 "id",
                 "type",
                 "status",
-                "startDate",
-                "endDate",
+                "startsAt",
+                "endsAt",
                 "days"
               ],
               "additionalProperties": false
@@ -12468,7 +12469,7 @@
             "items": {
               "type": "object",
               "properties": {
-                "date": {
+                "heldAt": {
                   "type": "string",
                   "format": "date",
                   "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -12478,7 +12479,7 @@
                 }
               },
               "required": [
-                "date",
+                "heldAt",
                 "name"
               ],
               "additionalProperties": false
@@ -12505,12 +12506,12 @@
           "type": {
             "$ref": "#/components/schemas/TimeOffType_Output"
           },
-          "startDate": {
+          "startsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
           },
-          "endDate": {
+          "endsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -12742,8 +12743,8 @@
         "required": [
           "id",
           "type",
-          "startDate",
-          "endDate",
+          "startsAt",
+          "endsAt",
           "days",
           "status",
           "note",
@@ -12792,12 +12793,12 @@
           "type": {
             "$ref": "#/components/schemas/TimeOffType_Output"
           },
-          "startDate": {
+          "startsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
           },
-          "endDate": {
+          "endsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -13029,8 +13030,8 @@
         "required": [
           "id",
           "type",
-          "startDate",
-          "endDate",
+          "startsAt",
+          "endsAt",
           "days",
           "status",
           "note",
@@ -13082,7 +13083,7 @@
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
-          "date": {
+          "heldAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -13090,10 +13091,10 @@
           "name": {
             "type": "string"
           },
-          "recurring": {
+          "isRecurring": {
             "type": "boolean"
           },
-          "carriedOver": {
+          "isCarriedOver": {
             "type": "boolean"
           },
           "version": {
@@ -13104,10 +13105,10 @@
         },
         "required": [
           "id",
-          "date",
+          "heldAt",
           "name",
-          "recurring",
-          "carriedOver",
+          "isRecurring",
+          "isCarriedOver",
           "version"
         ],
         "additionalProperties": false
@@ -13131,7 +13132,7 @@
       "CreateHolidayRequest": {
         "type": "object",
         "properties": {
-          "date": {
+          "heldAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -13141,14 +13142,14 @@
             "minLength": 1,
             "maxLength": 100
           },
-          "recurring": {
+          "isRecurring": {
             "type": "boolean"
           }
         },
         "required": [
-          "date",
+          "heldAt",
           "name",
-          "recurring"
+          "isRecurring"
         ]
       },
       "HolidayResponse_Output": {
@@ -13159,7 +13160,7 @@
             "format": "uuid",
             "pattern": "^([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[1-8][0-9a-fA-F]{3}-[89abAB][0-9a-fA-F]{3}-[0-9a-fA-F]{12}|00000000-0000-0000-0000-000000000000|ffffffff-ffff-ffff-ffff-ffffffffffff)$"
           },
-          "date": {
+          "heldAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -13167,10 +13168,10 @@
           "name": {
             "type": "string"
           },
-          "recurring": {
+          "isRecurring": {
             "type": "boolean"
           },
-          "carriedOver": {
+          "isCarriedOver": {
             "type": "boolean"
           },
           "version": {
@@ -13181,10 +13182,10 @@
         },
         "required": [
           "id",
-          "date",
+          "heldAt",
           "name",
-          "recurring",
-          "carriedOver",
+          "isRecurring",
+          "isCarriedOver",
           "version"
         ],
         "additionalProperties": false
@@ -13192,7 +13193,7 @@
       "UpdateHolidayRequest": {
         "type": "object",
         "properties": {
-          "date": {
+          "heldAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -13202,7 +13203,7 @@
             "minLength": 1,
             "maxLength": 100
           },
-          "recurring": {
+          "isRecurring": {
             "type": "boolean"
           },
           "version": {
@@ -13212,9 +13213,9 @@
           }
         },
         "required": [
-          "date",
+          "heldAt",
           "name",
-          "recurring",
+          "isRecurring",
           "version"
         ]
       },
@@ -13336,7 +13337,7 @@
                       "LEAVING"
                     ]
                   },
-                  "date": {
+                  "movedAt": {
                     "type": "string",
                     "format": "date",
                     "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -13371,7 +13372,7 @@
                 },
                 "required": [
                   "kind",
-                  "date",
+                  "movedAt",
                   "employeeId",
                   "person"
                 ],
@@ -13421,12 +13422,12 @@
               "CANCELED"
             ]
           },
-          "startDate": {
+          "startsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
           },
-          "endDate": {
+          "endsAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -13478,8 +13479,8 @@
           "id",
           "type",
           "status",
-          "startDate",
-          "endDate",
+          "startsAt",
+          "endsAt",
           "days",
           "createdAt",
           "employee"
@@ -13518,7 +13519,7 @@
           "title": {
             "type": "string"
           },
-          "reviewDate": {
+          "reviewedAt": {
             "type": "string",
             "format": "date",
             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -13566,7 +13567,7 @@
         "required": [
           "id",
           "title",
-          "reviewDate",
+          "reviewedAt",
           "status",
           "employee"
         ],
@@ -13902,7 +13903,7 @@
                           "positionTitle": {
                             "type": "string"
                           },
-                          "date": {
+                          "movedAt": {
                             "type": "string",
                             "format": "date",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -13914,7 +13915,7 @@
                           "firstName",
                           "lastName",
                           "positionTitle",
-                          "date"
+                          "movedAt"
                         ],
                         "additionalProperties": false
                       }
@@ -13943,7 +13944,7 @@
                           "positionTitle": {
                             "type": "string"
                           },
-                          "date": {
+                          "movedAt": {
                             "type": "string",
                             "format": "date",
                             "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))$"
@@ -13955,7 +13956,7 @@
                           "firstName",
                           "lastName",
                           "positionTitle",
-                          "date"
+                          "movedAt"
                         ],
                         "additionalProperties": false
                       }

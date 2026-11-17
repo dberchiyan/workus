@@ -7,7 +7,7 @@ import { type HolidayFormOutput, type HolidayFormValues, holidaySchema } from '.
 import type { Holiday } from '../types';
 import { useCreateHoliday, useUpdateHoliday } from './useHolidays';
 
-const FIELDS = new Set<string>(['date', 'name', 'recurring']);
+const FIELDS = new Set<string>(['heldAt', 'name', 'isRecurring']);
 const isField = (field: string): field is keyof HolidayFormValues => FIELDS.has(field);
 
 /**
@@ -31,8 +31,8 @@ export const useHolidayForm = (holiday: Holiday | undefined, defaultDate: string
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
         defaultValues: holiday
-            ? { date: holiday.date, name: holiday.name, recurring: holiday.recurring }
-            : { date: defaultDate, name: '', recurring: true },
+            ? { heldAt: holiday.heldAt, name: holiday.name, isRecurring: holiday.isRecurring }
+            : { heldAt: defaultDate, name: '', isRecurring: true },
     });
 
     const submit = form.handleSubmit(async (values) => {

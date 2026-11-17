@@ -7,8 +7,8 @@ export const COMMENT_MAX_LENGTH = 500;
 export class TerminateEmployeeRequest extends createZodDto(
     z
         .object({
-            /** Terminated from this date (inclusive); a future date plans the leave. */
-            date: z.iso.date('validation.terminationDate.invalid'),
+            /** Terminated from this terminatedAt (inclusive); a future terminatedAt plans the leave. */
+            terminatedAt: z.iso.date('validation.terminationDate.invalid'),
             reason: TerminationReasonSchema,
             /** Blank → none. Required when the reason is OTHER. */
             comment: z.preprocess(

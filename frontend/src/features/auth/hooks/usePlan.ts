@@ -9,7 +9,7 @@ export interface CompanyPlan {
     /** Active employees the plan allows; null = unlimited. */
     maxEmployees: number | null;
     /** A payment failed: the plan stays until then (owners see a banner). */
-    pastDueUntil: string | null;
+    graceEndsAt: string | null;
     has: (feature: PlanFeature) => boolean;
 }
 
@@ -22,7 +22,7 @@ export const usePlan = (): CompanyPlan => {
             plan: billing?.plan ?? 'STARTER',
             features,
             maxEmployees: billing?.maxEmployees ?? null,
-            pastDueUntil: billing?.pastDueUntil ?? null,
+            graceEndsAt: billing?.graceEndsAt ?? null,
             has: (feature) => features.includes(feature),
         };
     }, [billing]);
@@ -33,7 +33,7 @@ export interface UpgradeState {
     locked: boolean;
     requiredPlan: Plan;
     /** The person can open Settings → Billing (owners); others are told to ask an owner. */
-    canManage: boolean;
+    hasBillingAccount: boolean;
 }
 
 /** Whether a feature is locked for this company, and what the prompt should say. */
@@ -43,6 +43,6 @@ export const useUpgrade = (feature: PlanFeature): UpgradeState => {
     return {
         locked: !plan.has(feature),
         requiredPlan: PLAN_FOR_FEATURE[feature],
-        canManage: can('settings.billing'),
+        hasBillingAccount: can('settings.billing'),
     };
 };

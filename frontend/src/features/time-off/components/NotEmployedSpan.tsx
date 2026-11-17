@@ -4,13 +4,13 @@ import { formatDay } from '../format';
 
 export interface NotEmployedSpanProps {
     reason: 'before' | 'after';
-    employee: { startDate: string; terminatedOn: string | null };
+    employee: { startsAt: string; terminatedAt: string | null };
 }
 
 /** Fills a hatched run of days; hover or focus says why: not started yet, or no longer employed. */
 export function NotEmployedSpan({ reason, employee }: NotEmployedSpanProps) {
     const { t, i18n } = useTranslation('timeOff');
-    const date = reason === 'before' ? employee.startDate : employee.terminatedOn;
+    const date = reason === 'before' ? employee.startsAt : employee.terminatedAt;
     const description = date
         ? t(reason === 'before' ? 'calendar.notEmployed.starts' : 'calendar.notEmployed.left', {
               date: formatDay(date, i18n.language),

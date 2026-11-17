@@ -6,8 +6,8 @@ export const organisationBillingSelect = {
     plan: true,
     subscriptionStatus: true,
     scheduledPlan: true,
-    currentPeriodEnd: true,
-    pastDueSince: true,
+    periodEndsAt: true,
+    pastDueAt: true,
     billingCustomerId: true,
     billingSubscriptionId: true,
 } satisfies Prisma.OrganisationSelect;

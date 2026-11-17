@@ -25,16 +25,16 @@ export const BillingResponseSchema = z.object({
     /** The plan the subscription switches to when the paid period ends; null = it stays. */
     scheduledPlan: PlanSchema.nullable(),
     /** End of the paid period: the next charge, or when the scheduled change applies. */
-    currentPeriodEnd: z.iso.datetime().nullable(),
-    pastDueSince: z.iso.datetime().nullable(),
+    periodEndsAt: z.iso.datetime().nullable(),
+    pastDueAt: z.iso.datetime().nullable(),
     /** When the grace period ends and the company returns to Starter. */
     graceEndsAt: z.iso.datetime().nullable(),
     /** The company has a billing account: Manage billing (card, invoices, plan) can open. */
-    canManage: z.boolean(),
+    hasBillingAccount: z.boolean(),
     /** A paid plan held without a subscription (set by Workus). */
-    granted: z.boolean(),
+    isGrantedPlan: z.boolean(),
     /** Test keys: payments are not real (the demo). */
-    testMode: z.boolean(),
+    isTestMode: z.boolean(),
     plans: z.array(PlanOfferSchema).max(8),
 });
 export class BillingResponse extends createZodDto(BillingResponseSchema) {}
@@ -44,7 +44,7 @@ export const CheckoutSessionRequestSchema = z.object({
 });
 export class CheckoutSessionRequest extends createZodDto(CheckoutSessionRequestSchema) {}
 
-/** The plan to move to: Starter = cancel (or give a granted plan up); the current one = keep it. */
+/** The plan to move to: Starter = cancel (or give a isGrantedPlan plan up); the current one = keep it. */
 export const ChangePlanRequestSchema = z.object({ plan: PlanSchema });
 export class ChangePlanRequest extends createZodDto(ChangePlanRequestSchema) {}
 
@@ -54,13 +54,13 @@ export class BillingRedirectResponse extends createZodDto(BillingRedirectRespons
 
 export const BillingInfoResponseSchema = z.object({
     /** Payments run against test keys: the sign-in page shows the test card. */
-    testMode: z.boolean(),
+    isTestMode: z.boolean(),
 });
 export class BillingInfoResponse extends createZodDto(BillingInfoResponseSchema) {}
 
 export const WebhookReceiptResponseSchema = z.object({
     received: z.literal(true),
     /** The event was delivered before and changed nothing this time. */
-    duplicate: z.boolean(),
+    isDuplicate: z.boolean(),
 });
 export class WebhookReceiptResponse extends createZodDto(WebhookReceiptResponseSchema) {}

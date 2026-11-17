@@ -21,9 +21,9 @@ export interface ProfileHeaderProps {
 export function ProfileHeader({ employee, headingRef }: ProfileHeaderProps) {
     const { t, i18n } = useTranslation('employee');
     const termination =
-        employee.termination && employee.terminatedOn
+        employee.termination && employee.terminatedAt
             ? t(employee.status === 'TERMINATED' ? 'profile.termination.since' : 'profile.termination.leaves', {
-                  date: formatCalendarDate(employee.terminatedOn, i18n.language),
+                  date: formatCalendarDate(employee.terminatedAt, i18n.language),
                   reason: t(`termination.reasons.${employee.termination.reason}`),
               })
             : null;

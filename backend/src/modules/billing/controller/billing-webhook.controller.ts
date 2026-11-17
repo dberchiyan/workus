@@ -37,7 +37,7 @@ export class BillingWebhookController {
             // Nothing to verify a signature over.
             throw new WebhookSignatureException();
         }
-        const { duplicate } = await this.billingService.receiveWebhook(request.rawBody, signature);
-        return { received: true, duplicate };
+        const { isDuplicate } = await this.billingService.receiveWebhook(request.rawBody, signature);
+        return { received: true, isDuplicate };
     }
 }

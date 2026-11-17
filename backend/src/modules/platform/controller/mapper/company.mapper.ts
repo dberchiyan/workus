@@ -33,6 +33,6 @@ export const toCompanyUser = (user: CompanyUserRecord, today: Date): CompanyUser
     email: user.email,
     // Guarded by ck_users_role (a company never holds platform admins).
     role: ROLES.find((role) => role === user.role) ?? 'EMPLOYEE',
-    status: user.employee?.terminatedOn && user.employee.terminatedOn <= today ? 'TERMINATED' : 'ACTIVE',
+    status: user.employee?.terminatedAt && user.employee.terminatedAt <= today ? 'TERMINATED' : 'ACTIVE',
     createdAt: user.createdAt.toISOString(),
 });

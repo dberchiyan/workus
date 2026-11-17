@@ -2,7 +2,7 @@ CREATE TABLE "employee_reviews" (
     "id" UUID NOT NULL DEFAULT uuidv7(),
     "employee_id" UUID NOT NULL,
     "title" VARCHAR(150) NOT NULL,
-    "review_date" DATE NOT NULL,
+    "reviewed_at" DATE NOT NULL,
     "status" VARCHAR(32) NOT NULL,
     "salary_amount" DECIMAL(19,4),
     "salary_currency" CHAR(3),
@@ -24,7 +24,7 @@ CREATE TABLE "employee_reviews" (
     CONSTRAINT "ck_employee_reviews_salary_positive" CHECK ("salary_amount" IS NULL OR "salary_amount" > 0)
 );
 
-CREATE INDEX "idx_employee_reviews_employee_id_review_date" ON "employee_reviews"("employee_id", "review_date");
+CREATE INDEX "idx_employee_reviews_employee_id_reviewed_at" ON "employee_reviews"("employee_id", "reviewed_at");
 
 ALTER TABLE "employee_reviews" ADD CONSTRAINT "fk_employee_reviews_employee_id" FOREIGN KEY ("employee_id") REFERENCES "employees"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 

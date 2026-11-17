@@ -16,14 +16,14 @@ model Organisation {
   rejectionReason            String?                     @map("rejection_reason") @db.VarChar(500)
   /// The plan in effect — STARTER | TEAM | BUSINESS (CHECK); features and the employee limit follow it (common/plan).
   plan                       String                      @default("STARTER") @db.VarChar(16)
-  /// NONE (no paid subscription: Starter, or a plan granted by Workus) | ACTIVE | PAST_DUE — CHECK in migration.
+  /// NONE (no paid subscription: Starter, or a plan isGrantedPlan by Workus) | ACTIVE | PAST_DUE — CHECK in migration.
   subscriptionStatus         String                      @default("NONE") @map("subscription_status") @db.VarChar(16)
   /// The plan the subscription switches to when the paid period ends (a downgrade, or STARTER after a cancellation); null = it stays.
   scheduledPlan              String?                     @map("scheduled_plan") @db.VarChar(16)
   /// End of the paid period: the next charge, or when the scheduled change applies.
-  currentPeriodEnd           DateTime?                   @map("current_period_end") @db.Timestamptz(3)
+  periodEndsAt           DateTime?                   @map("period_ends_at") @db.Timestamptz(3)
   /// Since when the payment fails; the grace period counts from it (CHECK: set ⇔ PAST_DUE).
-  pastDueSince               DateTime?                   @map("past_due_since") @db.Timestamptz(3)
+  pastDueAt               DateTime?                   @map("past_due_at") @db.Timestamptz(3)
   /// The company's account and subscription at the payment provider (Stripe ids) — references only; our rows hold the workflow state.
   billingCustomerId          String?                     @unique(map: "uq_organisations_billing_customer_id") @map("billing_customer_id") @db.VarChar(64)
   billingSubscriptionId      String?                     @unique(map: "uq_organisations_billing_subscription_id") @map("billing_subscription_id") @db.VarChar(64)
@@ -48,7 +48,7 @@ model Organisation {
   billingEvents              BillingEvent[]
 
   @@index([status, createdAt], map: "idx_organisations_status_created_at")
-  @@index([subscriptionStatus, pastDueSince], map: "idx_organisations_subscription_status_past_due_since")
+  @@index([subscriptionStatus, pastDueAt], map: "idx_organisations_subscription_status_past_due_at")
   @@index([decidedBy], map: "idx_organisations_decided_by")
   @@map("organisations")
 }

@@ -34,7 +34,7 @@ export function ReviewViewDialog({ review, open, onClose, onEdit, onDelete, onEx
         return null;
     }
     const rows = [
-        { key: 'date', label: t('view.date'), value: formatReviewDate(review.date, i18n.language) },
+        { key: 'reviewedAt', label: t('view.date'), value: formatReviewDate(review.reviewedAt, i18n.language) },
         { key: 'status', label: t('view.status'), value: <ReviewStatusChip status={review.status} /> },
         {
             key: 'salary',

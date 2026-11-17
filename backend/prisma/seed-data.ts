@@ -637,7 +637,7 @@ export interface SeedOrganisation {
     /** ACTIVE, or PENDING — a sign-up waiting for a platform admin. */
     status: 'ACTIVE' | 'PENDING';
     /**
-     * The plan in effect, granted without a subscription (the demo shows one company on Business
+     * The plan in effect, isGrantedPlan without a subscription (the demo shows one company on Business
      * and one on Starter — the latter over its employee limit, so adding people is blocked).
      */
     plan: 'STARTER' | 'TEAM' | 'BUSINESS';

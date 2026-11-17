@@ -38,7 +38,7 @@ export const isReviewStatus = (value: string): value is (typeof REVIEW_STATUSES)
 export const createReviewSchema = z
     .object({
         title: z.string().trim().min(1, MESSAGES.titleRequired).max(REVIEW_LIMITS.title, MESSAGES.titleTooLong),
-        date: z.iso.date(MESSAGES.dateInvalid),
+        reviewedAt: z.iso.date(MESSAGES.dateInvalid),
         status: z
             .union([z.enum(REVIEW_STATUSES), z.literal('')])
             .refine((value) => value !== '', MESSAGES.statusRequired),

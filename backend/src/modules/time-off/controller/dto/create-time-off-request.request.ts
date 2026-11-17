@@ -15,9 +15,9 @@ export class CreateTimeOffRequestRequest extends createZodDto(
     z
         .object({
             type: TimeOffTypeSchema,
-            startDate: z.iso.date('validation.period.start'),
+            startsAt: z.iso.date('validation.period.start'),
             /** Inclusive. */
-            endDate: z.iso.date('validation.period.end'),
+            endsAt: z.iso.date('validation.period.end'),
             /** Blank → none. */
             note: z.preprocess(
                 (value) => (typeof value === 'string' && value.trim() === '' ? undefined : value),
@@ -26,17 +26,16 @@ export class CreateTimeOffRequestRequest extends createZodDto(
         })
         .superRefine((request, context) => {
             const days =
-                (Date.parse(`${request.endDate}T00:00:00Z`) - Date.parse(`${request.startDate}T00:00:00Z`)) / DAY_MS +
-                1;
+                (Date.parse(`${request.endsAt}T00:00:00Z`) - Date.parse(`${request.startsAt}T00:00:00Z`)) / DAY_MS + 1;
             if (days < 1) {
-                context.addIssue({ code: 'custom', path: ['endDate'], message: 'validation.period.order' });
+                context.addIssue({ code: 'custom', path: ['endsAt'], message: 'validation.period.order' });
             } else if (days > MAX_PERIOD_DAYS) {
                 context.addIssue({
                     code: 'too_big',
                     origin: 'number',
                     maximum: MAX_PERIOD_DAYS,
                     inclusive: true,
-                    path: ['endDate'],
+                    path: ['endsAt'],
                     message: 'validation.period.tooLong',
                 });
             }

@@ -19,7 +19,7 @@ import { ReviewStatusChip } from './ReviewStatusChip';
  */
 const COLUMNS = [
     { key: 'title', width: undefined },
-    { key: 'date', width: 'w-32' },
+    { key: 'reviewedAt', width: 'w-32' },
     { key: 'status', width: 'w-32' },
     { key: 'salary', width: 'w-26' },
     { key: 'responsible', width: undefined },
@@ -82,7 +82,7 @@ export function ReviewTable({ reviews, onAction }: ReviewTableProps) {
                         </TableCell>
                         <TableCell>
                             <Typography variant="body2" className="app-tabular whitespace-nowrap">
-                                {formatReviewDate(review.date, i18n.language)}
+                                {formatReviewDate(review.reviewedAt, i18n.language)}
                             </Typography>
                         </TableCell>
                         <TableCell>

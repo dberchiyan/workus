@@ -1,10 +1,10 @@
 -- CreateTable
 CREATE TABLE "company_holidays" (
     "id" UUID NOT NULL DEFAULT uuidv7(),
-    "date" DATE NOT NULL,
+    "held_at" DATE NOT NULL,
     "name" VARCHAR(100) NOT NULL,
-    "recurring" BOOLEAN NOT NULL DEFAULT false,
-    "carried_over" BOOLEAN NOT NULL DEFAULT false,
+    "is_recurring" BOOLEAN NOT NULL DEFAULT false,
+    "is_carried_over" BOOLEAN NOT NULL DEFAULT false,
     "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(3) NOT NULL,
     "created_by" UUID,
@@ -15,10 +15,10 @@ CREATE TABLE "company_holidays" (
 );
 
 -- CreateIndex
-CREATE INDEX "idx_company_holidays_recurring_carried_over" ON "company_holidays"("recurring", "carried_over");
+CREATE INDEX "idx_company_holidays_is_recurring_is_carried_over" ON "company_holidays"("is_recurring", "is_carried_over");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "uq_company_holidays_date" ON "company_holidays"("date");
+CREATE UNIQUE INDEX "uq_company_holidays_held_at" ON "company_holidays"("held_at");
 
 -- A name is not blank.
 ALTER TABLE "company_holidays"

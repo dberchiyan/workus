@@ -17,8 +17,8 @@ export const NotificationSchema = z
         /** The time-off request as it was when the notice was sent. */
         request: z.object({
             type: z.string().max(16),
-            startDate: z.iso.date(),
-            endDate: z.iso.date(),
+            startsAt: z.iso.date(),
+            endsAt: z.iso.date(),
             employee: z.object({
                 userId: z.uuid(),
                 firstName: z.string().max(100),

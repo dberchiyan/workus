@@ -14,7 +14,7 @@ export const useHolidays = (year: number) =>
         staleTime: HOLIDAYS_STALE_MS,
     });
 
-/** Holidays of these years by date (`YYYY-MM-DD` → name); empty while loading. */
+/** Holidays of these years by heldAt (`YYYY-MM-DD` → name); empty while loading. */
 export const useHolidayNames = (years: readonly number[]): ReadonlyMap<string, string> => {
     const results = useQueries({
         queries: [...new Set(years)].map((year) => ({
@@ -23,7 +23,7 @@ export const useHolidayNames = (years: readonly number[]): ReadonlyMap<string, s
             staleTime: HOLIDAYS_STALE_MS,
         })),
     });
-    return new Map(results.flatMap((result) => (result.data ?? []).map((holiday) => [holiday.date, holiday.name])));
+    return new Map(results.flatMap((result) => (result.data ?? []).map((holiday) => [holiday.heldAt, holiday.name])));
 };
 
 /**

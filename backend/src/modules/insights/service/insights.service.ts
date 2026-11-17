@@ -39,7 +39,7 @@ const earlier = (a: Date, b: Date): Date => (a < b ? a : b);
 const referenceDay = (year: number, today: Date): Date => earlier(monthEnd(year, 12), today);
 
 const employedOn = (employee: RosterEmployee, day: Date): boolean =>
-    employee.startDate <= day && (employee.terminatedOn === null || employee.terminatedOn > day);
+    employee.startsAt <= day && (employee.terminatedAt === null || employee.terminatedAt > day);
 
 /** Whole months from `start` to `end` (0 within the first month). */
 const wholeMonths = (start: Date, end: Date): number => {
@@ -130,7 +130,7 @@ export class InsightsService {
             ...group,
             employees: members.length,
             averageMonths: Math.round(
-                members.reduce((sum, person) => sum + wholeMonths(person.startDate, day), 0) / members.length,
+                members.reduce((sum, person) => sum + wholeMonths(person.startsAt, day), 0) / members.length,
             ),
         });
         const average = (day: Date): number | null => {
@@ -162,29 +162,29 @@ export class InsightsService {
 
     /** Starts and leaves per month (up to today), and the share of people who left. */
     private turnover(filter: InsightFilter, people: RosterEmployee[], today: Date): Turnover {
-        const inYear = (date: Date | null, year: number): date is Date =>
-            date !== null && date.getUTCFullYear() === year && date <= today;
+        const inYear = (movedAt: Date | null, year: number): movedAt is Date =>
+            movedAt !== null && movedAt.getUTCFullYear() === year && movedAt <= today;
         const months: TurnoverMonth[] = Array.from({ length: 12 }, (_, index) => ({
             month: index + 1,
             hired: [],
             left: [],
         }));
         for (const person of [...people].sort(byName)) {
-            if (inYear(person.startDate, filter.year)) {
-                months[person.startDate.getUTCMonth()]?.hired.push({
+            if (inYear(person.startsAt, filter.year)) {
+                months[person.startsAt.getUTCMonth()]?.hired.push({
                     ...personOf(person),
-                    date: person.startDate,
+                    movedAt: person.startsAt,
                 });
             }
-            if (inYear(person.terminatedOn, filter.year)) {
-                months[person.terminatedOn.getUTCMonth()]?.left.push({
+            if (inYear(person.terminatedAt, filter.year)) {
+                months[person.terminatedAt.getUTCMonth()]?.left.push({
                     ...personOf(person),
-                    date: person.terminatedOn,
+                    movedAt: person.terminatedAt,
                 });
             }
         }
         const rate = (year: number): number | null => {
-            const left = people.filter((person) => inYear(person.terminatedOn, year)).length;
+            const left = people.filter((person) => inYear(person.terminatedAt, year)).length;
             const counts = Array.from({ length: 12 }, (_, index) => index)
                 .filter((index) => new Date(Date.UTC(year, index, 1)) <= today)
                 .map((index) => {

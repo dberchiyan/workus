@@ -17,11 +17,11 @@ export class EmployeeProfileResponse extends createZodDto(
             title: z.string(),
             category: z.object({ id: z.uuid(), name: z.string() }),
         }),
-        startDate: z.iso.date(),
+        startsAt: z.iso.date(),
         /** Null when not recorded. */
-        dateOfBirth: z.iso.date().nullable(),
-        terminatedOn: z.iso.date().nullable(),
-        /** Set together with terminatedOn. */
+        bornAt: z.iso.date().nullable(),
+        terminatedAt: z.iso.date().nullable(),
+        /** Set together with terminatedAt. */
         termination: z
             .object({
                 reason: TerminationReasonSchema,

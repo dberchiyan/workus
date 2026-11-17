@@ -19,7 +19,7 @@ import type {
 
 /**
  * Employment events that span the employee and their reviews: hiring (with the starting
- * salary), editing the profile (the starting salary follows the start date) and terminating
+ * salary), editing the profile (the starting salary follows the start terminatedAt) and terminating
  * (reviews scheduled after the last day are canceled). Lives here because review already
  * depends on employee. Each is one transaction.
  */
@@ -62,7 +62,7 @@ export class EmploymentService {
             organisationId,
             employee.id,
             {
-                startDate: command.startDate,
+                startsAt: command.startsAt,
                 salary: startingSalary,
                 // A review needs someone responsible: the employee's people, otherwise whoever hired.
                 responsibleUserIds: responsibleUserIds.length > 0 ? responsibleUserIds : [actorId],
@@ -88,7 +88,7 @@ export class EmploymentService {
         }
     }
 
-    /** Edit the profile; a changed start date moves the starting salary with it. */
+    /** Edit the profile; a changed start terminatedAt moves the starting salary with it. */
     @Transactional()
     async update(
         organisationId: string,
@@ -98,8 +98,8 @@ export class EmploymentService {
     ): Promise<void> {
         await this.refuseDemoAccount(organisationId, employeeId);
         const { before, after } = await this.employeeService.update(organisationId, employeeId, command, actorId);
-        if (before.startDate.getTime() !== after.startDate.getTime()) {
-            await this.reviewService.moveStarting(organisationId, employeeId, command.startDate, actorId);
+        if (before.startsAt.getTime() !== after.startsAt.getTime()) {
+            await this.reviewService.moveStarting(organisationId, employeeId, command.startsAt, actorId);
         }
     }
 
@@ -113,9 +113,9 @@ export class EmploymentService {
     ): Promise<void> {
         await this.refuseDemoAccount(organisationId, employeeId);
         const { after } = await this.employeeService.terminate(organisationId, employeeId, command, actorId);
-        await this.reviewService.cancelScheduledAfter(organisationId, employeeId, command.date, actorId);
-        // Effective today or earlier: signed out now (a later date is handled on its day).
-        if (after.terminatedOn && after.terminatedOn <= todayUtc()) {
+        await this.reviewService.cancelScheduledAfter(organisationId, employeeId, command.terminatedAt, actorId);
+        // Effective today or earlier: signed out now (a later terminatedAt is handled on its day).
+        if (after.terminatedAt && after.terminatedAt <= todayUtc()) {
             await this.sessionService.endForTermination([{ userId: after.user.id, organisationId }]);
         }
     }

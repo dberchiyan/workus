@@ -18,7 +18,7 @@ const ReviewFieldsSchema = z.object({
         .trim()
         .min(1, 'validation.title.required')
         .max(TITLE_MAX_LENGTH, 'validation.title.tooLong'),
-    date: z.iso.date('validation.reviewDate.invalid'),
+    reviewedAt: z.iso.date('validation.reviewDate.invalid'),
     status: z.enum(REVIEW_STATUSES, { error: 'validation.reviewStatus.required' }),
     /** New monthly salary in USD. */
     salary: AmountInputSchema.optional(),

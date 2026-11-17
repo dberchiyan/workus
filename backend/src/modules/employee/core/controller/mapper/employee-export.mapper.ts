@@ -11,7 +11,7 @@ const describe = (value: AuditValue | null): string => {
         case 'text':
             return value.text;
         case 'date':
-            return value.date;
+            return value.at;
         case 'money':
             return `${value.money.amount} ${value.money.currency}`;
         case 'reviewStatus':
@@ -52,7 +52,7 @@ export const toActivityCsv = (events: readonly AuditEvent[]): string =>
         ]),
     );
 
-const SECURITY_HEADER = ['occurredAt', 'action', 'ipAddress', 'userAgent', 'newDevice'];
+const SECURITY_HEADER = ['occurredAt', 'action', 'ipAddress', 'userAgent', 'isNewDevice'];
 
 export const toSecurityLogCsv = (events: readonly SecurityEvent[]): string =>
     toCsv(
@@ -62,6 +62,6 @@ export const toSecurityLogCsv = (events: readonly SecurityEvent[]): string =>
             event.action,
             event.ipAddress ?? '',
             event.userAgent ?? '',
-            event.newDevice ? 'yes' : 'no',
+            event.isNewDevice ? 'yes' : 'no',
         ]),
     );

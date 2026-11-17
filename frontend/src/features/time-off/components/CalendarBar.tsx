@@ -29,7 +29,7 @@ export function CalendarBar({ request, span, href }: CalendarBarProps) {
     const description = t('calendar.bar', {
         type: t(`types.${request.type}`),
         status: t(`status.${request.status}`),
-        period: formatPeriod(request.startDate, request.endDate, i18n.language),
+        period: formatPeriod(request.startsAt, request.endsAt, i18n.language),
         days: t('requests.days', { count: request.days }),
     });
     const className = cn(
@@ -62,7 +62,7 @@ export function CalendarBar({ request, span, href }: CalendarBarProps) {
                 </Typography>
             </span>
             <Typography variant="body2" component="span" color="inherit">
-                {formatPeriod(request.startDate, request.endDate, i18n.language)}
+                {formatPeriod(request.startsAt, request.endsAt, i18n.language)}
             </Typography>
             <Typography variant="caption" component="span" color="inherit" className="opacity-80">
                 {t('calendar.barDetails', {

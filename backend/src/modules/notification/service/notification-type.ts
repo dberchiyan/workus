@@ -36,8 +36,8 @@ export type NotificationSubjectType = (typeof NotificationSubjectType)[keyof typ
  */
 export const TimeOffNoticeParamsSchema = z.object({
     requestType: z.string().max(16),
-    startDate: z.iso.date(),
-    endDate: z.iso.date(),
+    startsAt: z.iso.date(),
+    endsAt: z.iso.date(),
     /** Whose request it is; the recipient's own when they are this user. */
     employee: z.object({
         userId: z.uuid(),

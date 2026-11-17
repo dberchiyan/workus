@@ -98,13 +98,13 @@ export function SalaryHistoryChart({ history }: SalaryHistoryChartProps) {
         (high, point) => (compareMoney(point.salary, high.salary) > 0 ? point : high),
         first,
     ).salary;
-    const startMs = Date.parse(`${first.date}T00:00:00Z`);
-    const endMs = Math.max(nowMs, Date.parse(`${last.date}T00:00:00Z`) + DAY_MS);
-    const x = (date: string) =>
-        PAD + ((Date.parse(`${date}T00:00:00Z`) - startMs) / (endMs - startMs)) * (WIDTH - 2 * PAD);
+    const startMs = Date.parse(`${first.reviewedAt}T00:00:00Z`);
+    const endMs = Math.max(nowMs, Date.parse(`${last.reviewedAt}T00:00:00Z`) + DAY_MS);
+    const x = (reviewedAt: string) =>
+        PAD + ((Date.parse(`${reviewedAt}T00:00:00Z`) - startMs) / (endMs - startMs)) * (WIDTH - 2 * PAD);
     const y = (point: SalaryPoint) => HEIGHT - PAD - ratioBetween(point.salary, min, max) * (HEIGHT - 2 * PAD);
 
-    const points = history.map((point) => ({ point, cx: x(point.date), cy: y(point) }));
+    const points = history.map((point) => ({ point, cx: x(point.reviewedAt), cy: y(point) }));
     // Markers sit PAD in from the edges; the tail and the baseline run edge to edge.
     const path = `${smoothPath(points)} H ${WIDTH}`;
 
@@ -148,8 +148,8 @@ export function SalaryHistoryChart({ history }: SalaryHistoryChartProps) {
                         />
                         {points.map(({ point, cx, cy }) => (
                             <Tooltip
-                                key={point.date}
-                                title={`${formatReviewDate(point.date, locale)} · ${formatMoney(point.salary, locale)}`}
+                                key={point.reviewedAt}
+                                title={`${formatReviewDate(point.reviewedAt, locale)} · ${formatMoney(point.salary, locale)}`}
                                 placement="top"
                             >
                                 <g className="cursor-default">
@@ -170,10 +170,10 @@ export function SalaryHistoryChart({ history }: SalaryHistoryChartProps) {
             </div>
             <div className="flex justify-between" aria-hidden>
                 <Typography variant="caption" color="textSecondary" className="app-tabular">
-                    {formatReviewDate(first.date, locale, 'monthYear')}
+                    {formatReviewDate(first.reviewedAt, locale, 'monthYear')}
                 </Typography>
                 <Typography variant="caption" color="textSecondary" className="app-tabular">
-                    {formatReviewDate(last.date, locale, 'monthYear')}
+                    {formatReviewDate(last.reviewedAt, locale, 'monthYear')}
                 </Typography>
             </div>
             <table className="sr-only">
@@ -186,8 +186,8 @@ export function SalaryHistoryChart({ history }: SalaryHistoryChartProps) {
                 </thead>
                 <tbody>
                     {history.map((point) => (
-                        <tr key={point.date}>
-                            <td>{formatReviewDate(point.date, locale)}</td>
+                        <tr key={point.reviewedAt}>
+                            <td>{formatReviewDate(point.reviewedAt, locale)}</td>
                             <td>{formatMoney(point.salary, locale)}</td>
                         </tr>
                     ))}

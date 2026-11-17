@@ -13,8 +13,8 @@ export interface ProviderSubscription {
     customerId: string;
     state: SubscriptionState;
     plan: Plan | null;
-    currentPeriodEnd: Date | null;
-    cancelAtPeriodEnd: boolean;
+    periodEndsAt: Date | null;
+    isEndingAtPeriodEnd: boolean;
     scheduledPlan: Plan | null;
 }
 
@@ -52,7 +52,7 @@ export abstract class BillingGateway {
 
     abstract changePlan(subscriptionId: string, plan: Plan, when: 'now' | 'period_end'): Promise<ProviderSubscription>;
 
-    abstract cancelAtPeriodEnd(subscriptionId: string): Promise<ProviderSubscription>;
+    abstract isEndingAtPeriodEnd(subscriptionId: string): Promise<ProviderSubscription>;
 
     abstract keepPlan(subscriptionId: string): Promise<ProviderSubscription>;
 

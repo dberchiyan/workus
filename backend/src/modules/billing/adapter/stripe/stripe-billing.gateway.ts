@@ -26,7 +26,7 @@ const MAX_NETWORK_RETRIES = 2;
 const SIGNATURE_TOLERANCE_SECONDS = 300;
 const PROVIDER = 'stripe';
 
-/** Stripe's subscription statuses in our words; unknown ones count as ended (never granted). */
+/** Stripe's subscription statuses in our words; unknown ones count as ended (never isGrantedPlan). */
 const STATE_OF: Record<Stripe.Subscription.Status, SubscriptionState> = {
     active: SubscriptionState.ACTIVE,
     trialing: SubscriptionState.ACTIVE,
@@ -38,7 +38,7 @@ const STATE_OF: Record<Stripe.Subscription.Status, SubscriptionState> = {
     paused: SubscriptionState.ENDED,
 };
 
-/** Statuses Stripe may add later count as ended: a plan is never granted by accident. */
+/** Statuses Stripe may add later count as ended: a plan is never isGrantedPlan by accident. */
 const stateOf = (status: Stripe.Subscription.Status): SubscriptionState => STATE_OF[status] ?? SubscriptionState.ENDED;
 
 const idOf = (value: string | { id: string } | null | undefined): string | null =>
@@ -222,7 +222,7 @@ export class StripeBillingGateway extends BillingGateway {
         return this.requireSubscription(subscriptionId);
     }
 
-    async cancelAtPeriodEnd(subscriptionId: string): Promise<ProviderSubscription> {
+    async isEndingAtPeriodEnd(subscriptionId: string): Promise<ProviderSubscription> {
         await this.resetPending(subscriptionId);
         await this.call('subscriptions.update', () =>
             this.stripe.subscriptions.update(subscriptionId, { cancel_at_period_end: true }),
@@ -313,8 +313,8 @@ export class StripeBillingGateway extends BillingGateway {
             customerId: idOf(subscription.customer) ?? '',
             state: stateOf(subscription.status),
             plan: this.planOfPrice(item ? idOf(item.price) : null),
-            currentPeriodEnd: toDate(item?.current_period_end),
-            cancelAtPeriodEnd: subscription.cancel_at_period_end,
+            periodEndsAt: toDate(item?.current_period_end),
+            isEndingAtPeriodEnd: subscription.cancel_at_period_end,
             scheduledPlan: this.scheduledPlanOf(subscription),
         };
     }

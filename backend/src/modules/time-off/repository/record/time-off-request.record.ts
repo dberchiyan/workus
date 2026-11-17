@@ -14,8 +14,8 @@ const personSelect = {
 export const timeOffRequestSelect = {
     id: true,
     type: true,
-    startDate: true,
-    endDate: true,
+    startsAt: true,
+    endsAt: true,
     days: true,
     status: true,
     note: true,
@@ -71,8 +71,8 @@ export const requestStateSelect = {
     employeeId: true,
     status: true,
     type: true,
-    startDate: true,
-    endDate: true,
+    startsAt: true,
+    endsAt: true,
 } satisfies Prisma.TimeOffRequestSelect;
 export type RequestStateRecord = Prisma.TimeOffRequestGetPayload<{
     select: typeof requestStateSelect;
@@ -82,7 +82,7 @@ export type RequestStateRecord = Prisma.TimeOffRequestGetPayload<{
 export const heldDaysSelect = {
     type: true,
     status: true,
-    startDate: true,
+    startsAt: true,
     days: true,
 } satisfies Prisma.TimeOffRequestSelect;
 export type HeldDaysRecord = Prisma.TimeOffRequestGetPayload<{ select: typeof heldDaysSelect }>;
@@ -90,8 +90,8 @@ export type HeldDaysRecord = Prisma.TimeOffRequestGetPayload<{ select: typeof he
 /** Who is off and when (dashboard). */
 export const absenceSelect = {
     employeeId: true,
-    startDate: true,
-    endDate: true,
+    startsAt: true,
+    endsAt: true,
     employee: { select: { user: { select: { id: true, firstName: true, lastName: true } } } },
 } satisfies Prisma.TimeOffRequestSelect;
 export type AbsenceRecord = Prisma.TimeOffRequestGetPayload<{ select: typeof absenceSelect }>;
@@ -102,8 +102,8 @@ export const calendarRequestSelect = {
     employeeId: true,
     type: true,
     status: true,
-    startDate: true,
-    endDate: true,
+    startsAt: true,
+    endsAt: true,
     days: true,
 } satisfies Prisma.TimeOffRequestSelect;
 export type CalendarRequestRecord = Prisma.TimeOffRequestGetPayload<{
@@ -115,8 +115,8 @@ export const dashboardRequestSelect = {
     id: true,
     type: true,
     status: true,
-    startDate: true,
-    endDate: true,
+    startsAt: true,
+    endsAt: true,
     days: true,
     createdAt: true,
     employee: {
@@ -135,8 +135,8 @@ export type DashboardRequestRecord = Prisma.TimeOffRequestGetPayload<{
 export const absenceDaysSelect = {
     employeeId: true,
     type: true,
-    startDate: true,
-    endDate: true,
+    startsAt: true,
+    endsAt: true,
 } satisfies Prisma.TimeOffRequestSelect;
 export type AbsenceDaysRecord = Prisma.TimeOffRequestGetPayload<{
     select: typeof absenceDaysSelect;
@@ -147,8 +147,8 @@ export const requestNoticeSelect = {
     id: true,
     organisationId: true,
     type: true,
-    startDate: true,
-    endDate: true,
+    startsAt: true,
+    endsAt: true,
     createdAt: true,
     employee: { select: { user: { select: { id: true, firstName: true, lastName: true } } } },
     responsibles: { select: { responsibleUserId: true }, take: MAX_REQUEST_RESPONSIBLES },

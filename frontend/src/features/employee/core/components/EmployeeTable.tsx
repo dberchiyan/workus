@@ -19,7 +19,7 @@ const COLUMNS = [
     { key: 'name', width: 'w-[30%]' },
     { key: 'position', width: 'w-[22%]' },
     { key: 'responsible', width: 'w-[22%]' },
-    { key: 'startDate', width: 'w-[14%]' },
+    { key: 'startsAt', width: 'w-[14%]' },
     { key: 'status', width: 'w-[12%]' },
 ] as const;
 
@@ -78,7 +78,7 @@ export function EmployeeTable({ employees, params, onSort }: EmployeeTableProps)
                     <TableCell scope="col" className={HEAD_CELL}>
                         {t('table.responsible')}
                     </TableCell>
-                    {sortableHeader('startDate', t('table.startDate'))}
+                    {sortableHeader('startsAt', t('table.startDate'))}
                     <TableCell scope="col" className={HEAD_CELL}>
                         {t('table.status')}
                     </TableCell>
@@ -100,7 +100,7 @@ export function EmployeeTable({ employees, params, onSort }: EmployeeTableProps)
                         </TableCell>
                         <TableCell>
                             <Typography variant="body2" className="app-tabular whitespace-nowrap">
-                                {formatCalendarDate(employee.startDate, i18n.language)}
+                                {formatCalendarDate(employee.startsAt, i18n.language)}
                             </Typography>
                         </TableCell>
                         <TableCell>

@@ -24,8 +24,8 @@ export const requestNotice = (
     subject: { type: NotificationSubjectType.TIME_OFF_REQUEST, id: request.id },
     params: {
         requestType: request.type,
-        startDate: isoDay(request.startDate),
-        endDate: isoDay(request.endDate),
+        startsAt: isoDay(request.startsAt),
+        endsAt: isoDay(request.endsAt),
         employee: {
             userId: request.employee.user.id,
             firstName: request.employee.user.firstName,

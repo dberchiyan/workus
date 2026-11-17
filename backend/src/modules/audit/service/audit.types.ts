@@ -42,7 +42,7 @@ export interface SecurityEvent {
     ipAddress: string | null;
     userAgent: string | null;
     /** A sign-in from a device the user had not signed in from before. */
-    newDevice: boolean;
+    isNewDevice: boolean;
 }
 
 export interface SecurityEventPage {

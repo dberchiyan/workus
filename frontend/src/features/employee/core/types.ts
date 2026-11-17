@@ -6,7 +6,7 @@ export type EmployeeSummary = Schemas['EmployeeSummaryResponse_Output'];
 export type CategoryCounts = Schemas['PositionCategoryCountsResponse_Output'];
 export type EmployeeStatus = Schemas['EmployeeStatus'];
 
-export type EmployeeSortField = 'name' | 'startDate';
+export type EmployeeSortField = 'name' | 'startsAt';
 export type SortDirection = 'asc' | 'desc';
 
 /** List state as it lives in the URL (page is 1-based there, 0-based in the API). */

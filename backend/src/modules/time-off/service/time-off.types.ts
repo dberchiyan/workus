@@ -9,9 +9,9 @@ import type { TimeOffStatus, TimeOffType } from './time-off-type';
 
 export interface LeaveBalance {
     type: TimeOffType;
-    cycleStart: Date;
+    cycleStartsAt: Date;
     /** Last day of the cycle (inclusive). */
-    cycleEnd: Date;
+    cycleEndsAt: Date;
     /** Days per cycle; null = no limit (days off). */
     allowance: number | null;
     /** Approved working days in the cycle. */
@@ -50,8 +50,8 @@ export interface ManagedTimeOffRequestPage {
 
 export interface CreateTimeOffCommand {
     type: TimeOffType;
-    startDate: string;
-    endDate: string;
+    startsAt: string;
+    endsAt: string;
     note: string | undefined;
 }
 
@@ -84,7 +84,7 @@ export interface TimeOffCalendar {
     from: Date;
     to: Date;
     /** Company holidays in the month, by date. */
-    holidays: { date: Date; name: string }[];
+    holidays: { heldAt: Date; name: string }[];
     content: CalendarRow[];
     totalElements: number;
 }
@@ -94,8 +94,8 @@ export interface DashboardRequest {
     id: string;
     type: TimeOffType;
     status: TimeOffStatus;
-    startDate: Date;
-    endDate: Date;
+    startsAt: Date;
+    endsAt: Date;
     days: number;
     createdAt: Date;
     employee: {

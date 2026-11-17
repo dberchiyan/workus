@@ -60,7 +60,7 @@ export function RequestsTable({ requests, expandedId, onToggle, onCancel }: Requ
                 {requests.map((request) => {
                     const isOpen = expandedId === request.id;
                     const detailsId = `time-off-request-${request.id}`;
-                    const period = formatPeriod(request.startDate, request.endDate, i18n.language);
+                    const period = formatPeriod(request.startsAt, request.endsAt, i18n.language);
                     const type = t(`types.${request.type}`);
                     return (
                         <Fragment key={request.id}>

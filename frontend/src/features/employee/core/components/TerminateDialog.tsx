@@ -26,7 +26,7 @@ export interface TerminateDialogProps {
 }
 
 /**
- * Terminate from a date (today, past or future) with a reason; or change the termination. Says
+ * Terminate from a terminatedAt (today, past or future) with a reason; or change the termination. Says
  * what happens before the confirm button, which names the person (data.md → irreversible forms).
  */
 export function TerminateDialog({ employee, open, onClose, onExited }: TerminateDialogProps) {
@@ -40,12 +40,12 @@ export function TerminateDialog({ employee, open, onClose, onExited }: Terminate
     const { errors } = formState;
     const isChange = employee.termination !== null;
     const name = `${employee.firstName} ${employee.lastName}`;
-    const [date, reason] = watch(['date', 'reason']);
-    const isFuture = /^\d{4}-\d{2}-\d{2}$/.test(date) && date > todayIso();
+    const [terminatedAt, reason] = watch(['terminatedAt', 'reason']);
+    const isFuture = /^\d{4}-\d{2}-\d{2}$/.test(terminatedAt) && terminatedAt > todayIso();
 
     useEffect(() => {
         requestAnimationFrame(() => {
-            form.setFocus('date');
+            form.setFocus('terminatedAt');
         });
     }, [form]);
 
@@ -72,15 +72,15 @@ export function TerminateDialog({ employee, open, onClose, onExited }: Terminate
                 <DialogContent dividers className="flex flex-col gap-2">
                     <div className="grid grid-cols-1 gap-x-4 gap-y-2 sm:grid-cols-2">
                         <TextField
-                            {...register('date')}
+                            {...register('terminatedAt')}
                             type="date"
                             required
                             label={t('terminate.fields.date')}
-                            error={Boolean(errors.date)}
-                            helperText={message(errors.date)}
+                            error={Boolean(errors.terminatedAt)}
+                            helperText={message(errors.terminatedAt)}
                             slotProps={{
                                 inputLabel: { shrink: true },
-                                htmlInput: { min: employee.startDate },
+                                htmlInput: { min: employee.startsAt },
                             }}
                         />
                         <Controller
@@ -120,7 +120,7 @@ export function TerminateDialog({ employee, open, onClose, onExited }: Terminate
                         {isFuture
                             ? t('terminate.consequence.future', {
                                   name: employee.firstName,
-                                  date: formatCalendarDate(date, i18n.language),
+                                  terminatedAt: formatCalendarDate(terminatedAt, i18n.language),
                               })
                             : t('terminate.consequence.now', { name: employee.firstName })}{' '}
                         {t('terminate.consequence.reviews')}

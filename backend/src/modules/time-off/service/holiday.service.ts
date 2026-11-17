@@ -17,9 +17,9 @@ import { TimeOffRequestRepository } from '../repository/time-off-request.reposit
 import { isoDay, todayUtc } from './leave-policy';
 
 export interface HolidayInput {
-    date: string;
+    heldAt: string;
     name: string;
-    recurring: boolean;
+    isRecurring: boolean;
 }
 
 const asDate = (iso: string): Date => new Date(`${iso}T00:00:00Z`);
@@ -27,40 +27,40 @@ const asDate = (iso: string): Date => new Date(`${iso}T00:00:00Z`);
 /** A holiday as the day it takes from requests of its organisation. */
 const dayOf = (holiday: HolidayRecord): { organisationId: string; day: string } => ({
     organisationId: holiday.organisationId,
-    day: isoDay(holiday.date),
+    day: isoDay(holiday.heldAt),
 });
 
 /** The same day a year later; 29 February becomes 28 February. */
-const sameDayNextYear = (date: Date): Date => {
-    const year = date.getUTCFullYear() + 1;
-    const month = date.getUTCMonth();
+const sameDayNextYear = (heldAt: Date): Date => {
+    const year = heldAt.getUTCFullYear() + 1;
+    const month = heldAt.getUTCMonth();
     const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
-    return new Date(Date.UTC(year, month, Math.min(date.getUTCDate(), lastDay)));
+    return new Date(Date.UTC(year, month, Math.min(heldAt.getUTCDate(), lastDay)));
 };
 
-const fieldsOf = (holiday: { date: Date; name: string; recurring: boolean } | null) => ({
-    date: holiday ? auditValue.date(holiday.date) : null,
+const fieldsOf = (holiday: { heldAt: Date; name: string; isRecurring: boolean } | null) => ({
+    heldAt: holiday ? auditValue.date(holiday.heldAt) : null,
     name: holiday ? auditValue.text(holiday.name) : null,
-    recurring: holiday ? auditValue.flag(holiday.recurring) : null,
+    isRecurring: holiday ? auditValue.flag(holiday.isRecurring) : null,
 });
 
 const changesBetween = (
-    before: { date: Date; name: string; recurring: boolean } | null,
-    after: { date: Date; name: string; recurring: boolean } | null,
+    before: { heldAt: Date; name: string; isRecurring: boolean } | null,
+    after: { heldAt: Date; name: string; isRecurring: boolean } | null,
 ): AuditChange[] => {
     const from = fieldsOf(before);
     const to = fieldsOf(after);
     return [
-        ...changeOf(AuditField.DATE, from.date, to.date),
+        ...changeOf(AuditField.HELD_AT, from.heldAt, to.heldAt),
         ...changeOf(AuditField.NAME, from.name, to.name),
-        ...changeOf(AuditField.RECURRING, from.recurring, to.recurring),
+        ...changeOf(AuditField.RECURRING, from.isRecurring, to.isRecurring),
     ];
 };
 
 /**
  * Company holidays: days off for everyone, so time off on them takes no working day. Adding,
  * moving or removing one keeps the working days of held (pending, approved) requests in step.
- * A recurring holiday is copied to the same day of the next year once its own year has come —
+ * A isRecurring holiday is copied to the same day of the next year once its own year has come —
  * so the current and the next year are always filled in; each copy is then edited on its own.
  */
 @Injectable()
@@ -72,7 +72,7 @@ export class HolidayService implements OnApplicationBootstrap {
         @InjectPinoLogger(HolidayService.name) private readonly logger: PinoLogger,
     ) {}
 
-    /** One year's holidays, by date. */
+    /** One year's holidays, by heldAt. */
     findYear(organisationId: string, year: number): Promise<HolidayRecord[]> {
         return this.holidayRepository.findBetween(
             organisationId,
@@ -89,13 +89,13 @@ export class HolidayService implements OnApplicationBootstrap {
     /** `YYYY-MM-DD` of the holidays in [from, to] — working-day counts. */
     async datesBetween(organisationId: string, from: Date, to: Date): Promise<Set<string>> {
         const days = await this.holidayRepository.findDaysBetween(organisationId, from, to);
-        return new Set(days.map((day) => isoDay(day.date)));
+        return new Set(days.map((day) => isoDay(day.heldAt)));
     }
 
     @Transactional()
     async create(organisationId: string, input: HolidayInput, actorId: string): Promise<HolidayRecord> {
-        const holiday = { date: asDate(input.date), name: input.name, recurring: input.recurring };
-        await this.requireFreeDate(organisationId, holiday.date);
+        const holiday = { heldAt: asDate(input.heldAt), name: input.name, isRecurring: input.isRecurring };
+        await this.requireFreeDate(organisationId, holiday.heldAt);
         const created = await this.holidayRepository.create(organisationId, holiday, actorId);
         await this.requestRepository.shiftDaysForHolidays([dayOf(created)], -1);
         await this.auditService.record(this.event(AuditAction.HOLIDAY_CREATED, created, null, created));
@@ -115,18 +115,18 @@ export class HolidayService implements OnApplicationBootstrap {
             throw new ResourceNotFoundException();
         }
         const holiday: NewHoliday = {
-            date: asDate(input.date),
+            heldAt: asDate(input.heldAt),
             name: input.name,
-            recurring: input.recurring,
+            isRecurring: input.isRecurring,
         };
-        if (isoDay(holiday.date) !== isoDay(before.date)) {
-            await this.requireFreeDate(organisationId, holiday.date, id);
+        if (isoDay(holiday.heldAt) !== isoDay(before.heldAt)) {
+            await this.requireFreeDate(organisationId, holiday.heldAt, id);
         }
         const after = await this.holidayRepository.update(organisationId, id, input.version, holiday, actorId);
         if (!after) {
             throw new ConcurrentModificationException();
         }
-        if (isoDay(after.date) !== isoDay(before.date)) {
+        if (isoDay(after.heldAt) !== isoDay(before.heldAt)) {
             await this.requestRepository.shiftDaysForHolidays([dayOf(before)], 1);
             await this.requestRepository.shiftDaysForHolidays([dayOf(after)], -1);
         }
@@ -137,7 +137,7 @@ export class HolidayService implements OnApplicationBootstrap {
                 changes,
             });
         }
-        // Made recurring in a year that has come: its copy for the next year is due now.
+        // Made isRecurring in a year that has come: its copy for the next year is due now.
         await this.carryOver(organisationId, actorId);
         return (await this.holidayRepository.findById(organisationId, id)) ?? after;
     }
@@ -153,8 +153,8 @@ export class HolidayService implements OnApplicationBootstrap {
     }
 
     /**
-     * Copies every recurring holiday of a year that has come (up to this year) to the next year,
-     * once. A date already taken there is skipped. Runs after each change (that organisation) and
+     * Copies every isRecurring holiday of a year that has come (up to this year) to the next year,
+     * once. A heldAt already taken there is skipped. Runs after each change (that organisation) and
      * daily (every organisation — null), so a new year gets the following year's holidays on its
      * first day. Returns how many were copied.
      */
@@ -171,9 +171,9 @@ export class HolidayService implements OnApplicationBootstrap {
         const copies = await this.holidayRepository.createCopies(
             sources.map((source) => ({
                 organisationId: source.organisationId,
-                date: sameDayNextYear(source.date),
+                heldAt: sameDayNextYear(source.heldAt),
                 name: source.name,
-                recurring: true,
+                isRecurring: true,
             })),
             actorId,
         );
@@ -201,9 +201,9 @@ export class HolidayService implements OnApplicationBootstrap {
         }
     }
 
-    private async requireFreeDate(organisationId: string, date: Date, exceptId?: string): Promise<void> {
-        if (await this.holidayRepository.existsOnDate(organisationId, date, exceptId)) {
-            throw new BusinessConflictException('errors.holiday.dateTaken', {}, 'date');
+    private async requireFreeDate(organisationId: string, heldAt: Date, exceptId?: string): Promise<void> {
+        if (await this.holidayRepository.existsOnDate(organisationId, heldAt, exceptId)) {
+            throw new BusinessConflictException('errors.holiday.dateTaken', {}, 'heldAt');
         }
     }
 

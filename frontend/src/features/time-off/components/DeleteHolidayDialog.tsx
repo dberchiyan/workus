@@ -63,10 +63,10 @@ export function DeleteHolidayDialog({ holiday, open, onClose, onExited }: Delete
                 <Typography variant="body1" className="[overflow-wrap:anywhere]">
                     {t('holidays.delete.body', {
                         name: holiday.name,
-                        date: formatDay(holiday.date, i18n.language),
+                        heldAt: formatDay(holiday.heldAt, i18n.language),
                     })}
                 </Typography>
-                {holiday.recurring && holiday.carriedOver && (
+                {holiday.isRecurring && holiday.isCarriedOver && (
                     <Typography variant="body2" color="textSecondary">
                         {t('holidays.delete.copyStays')}
                     </Typography>

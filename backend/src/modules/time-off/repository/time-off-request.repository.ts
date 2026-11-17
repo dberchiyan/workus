@@ -35,8 +35,8 @@ export interface NewTimeOffRequest {
     organisationId: string;
     employeeId: string;
     type: string;
-    startDate: Date;
-    endDate: Date;
+    startsAt: Date;
+    endsAt: Date;
     days: number;
     note: string | null;
     responsibleUserIds: string[];
@@ -247,13 +247,13 @@ export class TimeOffRequestRepository {
       SET "days" = GREATEST(0, r."days" + ${delta}::int * (
         SELECT count(*)::int FROM unnest(${organisationIds}::uuid[], ${days}::date[]) AS h(org, day)
         WHERE h.org = r."organisation_id"
-          AND h.day BETWEEN r."start_date" AND r."end_date" AND EXTRACT(ISODOW FROM h.day) < 6
+          AND h.day BETWEEN r."starts_at" AND r."ends_at" AND EXTRACT(ISODOW FROM h.day) < 6
       ))
       WHERE r."status" IN (${TimeOffStatus.PENDING}, ${TimeOffStatus.APPROVED})
         AND EXISTS (
           SELECT 1 FROM unnest(${organisationIds}::uuid[], ${days}::date[]) AS h(org, day)
           WHERE h.org = r."organisation_id"
-            AND h.day BETWEEN r."start_date" AND r."end_date" AND EXTRACT(ISODOW FROM h.day) < 6
+            AND h.day BETWEEN r."starts_at" AND r."ends_at" AND EXTRACT(ISODOW FROM h.day) < 6
         )`;
     }
 
@@ -285,10 +285,10 @@ export class TimeOffRequestRepository {
                 organisationId,
                 employeeId,
                 status: { in: [...HOLDING_STATUSES] },
-                startDate: { gte: from, lte: to },
+                startsAt: { gte: from, lte: to },
             },
             select: heldDaysSelect,
-            orderBy: { startDate: 'asc' },
+            orderBy: { startsAt: 'asc' },
             take: MAX_HELD_ROWS,
         });
     }
@@ -301,8 +301,8 @@ export class TimeOffRequestRepository {
                     organisationId,
                     employeeId,
                     status: { in: [...HOLDING_STATUSES] },
-                    startDate: { lte: end },
-                    endDate: { gte: start },
+                    startsAt: { lte: end },
+                    endsAt: { gte: start },
                 },
             })) > 0
         );
@@ -314,8 +314,8 @@ export class TimeOffRequestRepository {
                 organisationId: request.organisationId,
                 employeeId: request.employeeId,
                 type: request.type,
-                startDate: request.startDate,
-                endDate: request.endDate,
+                startsAt: request.startsAt,
+                endsAt: request.endsAt,
                 days: request.days,
                 status: TimeOffStatus.PENDING,
                 note: request.note,
@@ -373,11 +373,11 @@ export class TimeOffRequestRepository {
             where: {
                 organisationId,
                 status: TimeOffStatus.APPROVED,
-                startDate: { lte: to },
-                endDate: { gte: from },
+                startsAt: { lte: to },
+                endsAt: { gte: from },
             },
             select: absenceDaysSelect,
-            orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+            orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
             take: MAX_YEAR_ABSENCES,
         });
     }
@@ -388,11 +388,11 @@ export class TimeOffRequestRepository {
             where: {
                 organisationId,
                 status: TimeOffStatus.APPROVED,
-                startDate: { lte: to },
-                endDate: { gte: from },
+                startsAt: { lte: to },
+                endsAt: { gte: from },
             },
             select: absenceSelect,
-            orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+            orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
             take: MAX_ABSENCES,
         });
     }
@@ -417,11 +417,11 @@ export class TimeOffRequestRepository {
                 employeeId: { in: employeeIds },
                 status: { in: [...HOLDING_STATUSES] },
                 type: { in: [...types] },
-                startDate: { lte: to },
-                endDate: { gte: from },
+                startsAt: { lte: to },
+                endsAt: { gte: from },
             },
             select: calendarRequestSelect,
-            orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+            orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
             take: employeeIds.length * MAX_DAYS_IN_MONTH,
         });
     }

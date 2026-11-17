@@ -22,7 +22,7 @@ export const userProfileSelect = {
             status: true,
             rejectionReason: true,
             plan: true,
-            pastDueSince: true,
+            pastDueAt: true,
         },
     },
 } satisfies Prisma.UserSelect;

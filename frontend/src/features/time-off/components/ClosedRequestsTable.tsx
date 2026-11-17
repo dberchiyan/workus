@@ -43,7 +43,7 @@ export function ClosedRequestsTable({ requests }: { requests: readonly ManagedRe
             </TableHead>
             <TableBody>
                 {requests.map((request) => {
-                    const period = formatPeriod(request.startDate, request.endDate, i18n.language);
+                    const period = formatPeriod(request.startsAt, request.endsAt, i18n.language);
                     const type = t(`types.${request.type}`);
                     const lastEvent = request.history.at(-1);
                     return (

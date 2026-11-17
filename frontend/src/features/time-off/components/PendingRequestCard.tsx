@@ -26,7 +26,7 @@ export function PendingRequestCard({ request, now, busy, onDecide }: PendingRequ
     const { t, i18n } = useTranslation('timeOff');
     const { icon: Icon, tone } = TYPE_VISUALS[request.type];
     const waited = daysSince(request.createdAt, now);
-    const period = formatPeriod(request.startDate, request.endDate, i18n.language);
+    const period = formatPeriod(request.startsAt, request.endsAt, i18n.language);
     const type = t(`types.${request.type}`);
     return (
         <Card variant="outlined" component="article" className="flex h-full flex-col gap-4 p-4">

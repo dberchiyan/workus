@@ -27,9 +27,9 @@ type Editing =
     | { kind: 'edit'; holiday: Holiday; key: number }
     | { kind: 'delete'; holiday: Holiday; key: number };
 
-/** The date as a small calendar tile: month over day number, the weekday under it. */
-function DateTile({ date, locale }: { date: string; locale: string }) {
-    const day = new Date(`${date}T00:00:00Z`);
+/** The heldAt as a small calendar tile: month over day number, the weekday under it. */
+function DateTile({ heldAt, locale }: { heldAt: string; locale: string }) {
+    const day = new Date(`${heldAt}T00:00:00Z`);
     const part = (options: Intl.DateTimeFormatOptions): string =>
         new Intl.DateTimeFormat(locale, { ...options, timeZone: 'UTC' }).format(day);
     return (
@@ -55,7 +55,7 @@ function DateTile({ date, locale }: { date: string; locale: string }) {
 }
 
 /**
- * Settings → Holidays (admin): the company's non-working days, a year at a time. A recurring
+ * Settings → Holidays (admin): the company's non-working days, a year at a time. A isRecurring
  * holiday is copied to the next year; each year's copy is changed on its own.
  */
 export function HolidaysSection() {
@@ -176,10 +176,10 @@ export function HolidaysSection() {
                             key={holiday.id}
                             className="flex items-center gap-4 border-b border-divider px-4 py-3 last:border-b-0 sm:px-6"
                         >
-                            <DateTile date={holiday.date} locale={locale} />
+                            <DateTile heldAt={holiday.heldAt} locale={locale} />
                             <div className="flex min-w-0 flex-1 flex-col gap-1">
                                 <Typography variant="subtitle2" component="p" className="[overflow-wrap:anywhere]">
-                                    <span className="sr-only">{`${fullDate.format(new Date(`${holiday.date}T00:00:00Z`))}: `}</span>
+                                    <span className="sr-only">{`${fullDate.format(new Date(`${holiday.heldAt}T00:00:00Z`))}: `}</span>
                                     {holiday.name}
                                 </Typography>
                                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
@@ -188,10 +188,10 @@ export function HolidaysSection() {
                                         color="textSecondary"
                                         className="flex items-center gap-1"
                                     >
-                                        {holiday.recurring && <AutorenewOutlined aria-hidden fontSize="inherit" />}
-                                        {holiday.recurring ? t('holidays.everyYear') : t('holidays.thisYearOnly')}
+                                        {holiday.isRecurring && <AutorenewOutlined aria-hidden fontSize="inherit" />}
+                                        {holiday.isRecurring ? t('holidays.everyYear') : t('holidays.thisYearOnly')}
                                     </Typography>
-                                    {isWeekendIso(holiday.date) && (
+                                    {isWeekendIso(holiday.heldAt) && (
                                         <Typography variant="caption" color="textSecondary">
                                             {t('holidays.onWeekend')}
                                         </Typography>
@@ -236,7 +236,7 @@ export function HolidaysSection() {
                 <HolidayDialog
                     key={editing.key}
                     holiday={editing.holiday}
-                    defaultDate={editing.holiday.date}
+                    defaultDate={editing.holiday.heldAt}
                     open={open}
                     onClose={close}
                     onExited={exited}

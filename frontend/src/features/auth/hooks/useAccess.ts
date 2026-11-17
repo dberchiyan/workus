@@ -6,6 +6,6 @@ import { useCurrentUser } from './useCurrentUser';
 export const useAccess = (): ((part: AccessPart) => boolean) => {
     const user = useCurrentUser().data;
     const role = user?.role;
-    const demoRestricted = user?.demoRestricted ?? false;
-    return useCallback((part: AccessPart) => canAccess(role, part, demoRestricted), [role, demoRestricted]);
+    const isDemoRestricted = user?.isDemoRestricted ?? false;
+    return useCallback((part: AccessPart) => canAccess(role, part, isDemoRestricted), [role, isDemoRestricted]);
 };

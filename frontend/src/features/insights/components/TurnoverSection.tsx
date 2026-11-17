@@ -57,12 +57,12 @@ export function TurnoverSection({ filter, now }: TurnoverSectionProps) {
                 </Typography>
                 <ul className="m-0 flex list-none flex-col gap-3 p-0">
                     {list.map((person) => (
-                        <li key={`${person.employeeId}-${person.date}`} className="flex">
+                        <li key={`${person.employeeId}-${person.movedAt}`} className="flex">
                             <PersonLine
                                 person={person}
                                 end={
                                     <Typography variant="caption" color="textSecondary" className="app-tabular">
-                                        {day(person.date)}
+                                        {day(person.movedAt)}
                                     </Typography>
                                 }
                             />

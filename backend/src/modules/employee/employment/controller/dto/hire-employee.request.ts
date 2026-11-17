@@ -5,7 +5,7 @@ import { AmountInputSchema } from '../../../../../common/dto/money';
 
 export const EMAIL_MAX_LENGTH = 254;
 export const MAX_RESPONSIBLES = 10;
-/** Mirrored by ck_employees_date_of_birth. */
+/** Mirrored by ck_employees_born_at. */
 const MIN_DATE_OF_BIRTH = '1900-01-01';
 
 /** Optional text: blank → absent; otherwise trimmed and checked by `schema`. */
@@ -25,7 +25,7 @@ export const CreateEmployeeRequestSchema = z.object({
         .max(EMAIL_MAX_LENGTH, 'validation.email.tooLong')
         .pipe(z.email('validation.email.invalid')),
     positionId: z.uuid('validation.position.required'),
-    startDate: z.iso.date('validation.startDate.invalid'),
+    startsAt: z.iso.date('validation.startDate.invalid'),
     /** Starting monthly salary in USD — recorded as the employee's first (starting) review. */
     startingSalary: z
         .string({ error: 'validation.startingSalary.required' })
@@ -50,7 +50,7 @@ export const CreateEmployeeRequestSchema = z.object({
     ),
     address: optional(text(500, 'validation.address.tooLong')),
     /** Optional; from 1900-01-01 up to today (the server's UTC date). */
-    dateOfBirth: optional(
+    bornAt: optional(
         z.iso
             .date('validation.dateOfBirth.invalid')
             .refine((value) => value >= MIN_DATE_OF_BIRTH, 'validation.dateOfBirth.invalid')

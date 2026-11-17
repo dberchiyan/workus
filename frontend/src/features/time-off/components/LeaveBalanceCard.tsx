@@ -48,8 +48,8 @@ export function LeaveBalanceCard({ balance, headingLevel }: LeaveBalanceCardProp
                         </Typography>
                         <Typography variant="caption" color="textSecondary" className="app-tabular">
                             {t('balances.cycle', {
-                                start: formatDay(balance.cycleStart, i18n.language),
-                                end: formatDay(balance.cycleEnd, i18n.language),
+                                start: formatDay(balance.cycleStartsAt, i18n.language),
+                                end: formatDay(balance.cycleEndsAt, i18n.language),
                             })}
                         </Typography>
                     </div>

@@ -14,8 +14,8 @@ export interface SubscriptionColumns {
     plan: string;
     subscriptionStatus: string;
     scheduledPlan: string | null;
-    currentPeriodEnd: Date | null;
-    pastDueSince: Date | null;
+    periodEndsAt: Date | null;
+    pastDueAt: Date | null;
     billingSubscriptionId: string | null;
 }
 
@@ -87,10 +87,10 @@ export class BillingRepository {
         return this.txHost.tx.organisation.findMany({
             where: {
                 subscriptionStatus: SubscriptionStatus.PAST_DUE,
-                pastDueSince: { lte: limit },
+                pastDueAt: { lte: limit },
             },
             select: organisationBillingSelect,
-            orderBy: [{ pastDueSince: 'asc' }, { id: 'asc' }],
+            orderBy: [{ pastDueAt: 'asc' }, { id: 'asc' }],
             take,
         });
     }

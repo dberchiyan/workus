@@ -85,7 +85,7 @@ export function ConfirmDecisionDialog({
                         t(`manage.confirm.${decision}.description`, {
                             name: fullName(request.employee),
                             type: t(`types.${request.type}`),
-                            period: formatPeriod(request.startDate, request.endDate, i18n.language),
+                            period: formatPeriod(request.startsAt, request.endsAt, i18n.language),
                         })}
                 </DialogContentText>
                 {decision === 'reject' && request && visuals && (
@@ -105,7 +105,7 @@ export function ConfirmDecisionDialog({
                                     {t(`types.${request.type}`)} · {t('requests.days', { count: request.days })}
                                 </Typography>
                                 <Typography variant="body2" color="textSecondary" className="app-tabular">
-                                    {formatPeriod(request.startDate, request.endDate, i18n.language)}
+                                    {formatPeriod(request.startsAt, request.endsAt, i18n.language)}
                                 </Typography>
                             </span>
                         </div>

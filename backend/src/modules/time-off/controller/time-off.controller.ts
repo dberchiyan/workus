@@ -93,8 +93,8 @@ export class TimeOffController {
         return toTimeOffRequestResponse(
             await this.timeOffService.create(principal.organisationId, principal.userId, {
                 type: request.type,
-                startDate: request.startDate,
-                endDate: request.endDate,
+                startsAt: request.startsAt,
+                endsAt: request.endsAt,
                 note: request.note,
             }),
         );

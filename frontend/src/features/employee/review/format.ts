@@ -1,4 +1,4 @@
-/** `YYYY-MM-DD` → localised date (UTC, so the day never shifts). */
+/** `YYYY-MM-DD` → localised reviewedAt (UTC, so the day never shifts). */
 export const formatReviewDate = (isoDate: string, locale: string, style: 'medium' | 'monthYear' = 'medium'): string =>
     new Intl.DateTimeFormat(
         locale,

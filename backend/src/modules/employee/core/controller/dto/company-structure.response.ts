@@ -8,7 +8,7 @@ export const StructurePositionSchema = z
         /** People holding it today (leavers not counted). */
         employeeCount: z.number().int().min(0),
         /** Nobody — current or former — holds it, so it can be removed. */
-        removable: z.boolean(),
+        isRemovable: z.boolean(),
         version: z.number().int(),
     })
     .meta({ id: 'StructurePosition' });

@@ -21,8 +21,8 @@ export const EmployeeListItemSchema = z
         /** Up to three; `responsibleCount` is the total. */
         responsibles: z.array(PersonSchema),
         responsibleCount: z.number().int().min(0),
-        startDate: z.iso.date(),
-        terminatedOn: z.iso.date().nullable(),
+        startsAt: z.iso.date(),
+        terminatedAt: z.iso.date().nullable(),
         status: EmployeeStatusSchema,
     })
     .meta({ id: 'EmployeeListItem' });

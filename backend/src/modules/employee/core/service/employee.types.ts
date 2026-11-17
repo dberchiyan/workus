@@ -30,14 +30,14 @@ export interface CreateEmployeeCommand {
     lastName: string;
     email: string;
     positionId: string;
-    startDate: string;
+    startsAt: string;
     mobile: string | undefined;
     personalEmail: string | undefined;
     linkedinUrl: string | undefined;
     telegram: string | undefined;
     address: string | undefined;
     /** `YYYY-MM-DD`. */
-    dateOfBirth: string | undefined;
+    bornAt: string | undefined;
     responsibleUserIds: string[];
 }
 
@@ -46,8 +46,8 @@ export type UpdateEmployeeCommand = Omit<CreateEmployeeCommand, 'responsibleUser
 };
 
 export interface TerminateEmployeeCommand {
-    /** Last-day semantics as stored: terminated from this date (inclusive). */
-    date: string;
+    /** Last-day semantics as stored: terminated from this terminatedAt (inclusive). */
+    terminatedAt: string;
     reason: string;
     comment: string | undefined;
     version: number;
@@ -61,8 +61,8 @@ export interface EmployeeProfile {
 /** For time off: the employee's dates and responsible people (who decide requests). */
 export interface EmployeeForTimeOff {
     id: string;
-    startDate: Date;
-    terminatedOn: Date | null;
+    startsAt: Date;
+    terminatedAt: Date | null;
     responsibleUserIds: string[];
 }
 
@@ -74,9 +74,9 @@ export interface EmployeeCalendarRow {
     firstName: string;
     lastName: string;
     positionTitle: string;
-    startDate: Date;
+    startsAt: Date;
     /** First day without work; null while employed. */
-    terminatedOn: Date | null;
+    terminatedAt: Date | null;
 }
 
 export interface EmployeeCalendarPage {
@@ -86,7 +86,7 @@ export interface EmployeeCalendarPage {
 
 export interface EmployeeMovement {
     kind: 'JOINING' | 'LEAVING';
-    date: Date;
+    movedAt: Date;
     employeeId: string;
     /** For the avatar colour. */
     userId: string;
@@ -125,9 +125,9 @@ export interface RosterEmployee {
     userId: string;
     firstName: string;
     lastName: string;
-    startDate: Date;
+    startsAt: Date;
     /** First day without work; null while employed. */
-    terminatedOn: Date | null;
+    terminatedAt: Date | null;
     position: { id: string; title: string };
     category: { id: string; name: string; sortOrder: number };
 }

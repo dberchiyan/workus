@@ -5,8 +5,8 @@ export const RESPONSIBLES_PER_ROW = 3;
 
 export const employeeListItemSelect = {
     id: true,
-    startDate: true,
-    terminatedOn: true,
+    startsAt: true,
+    terminatedAt: true,
     user: { select: { id: true, firstName: true, lastName: true, email: true } },
     position: { select: { id: true, title: true, category: { select: { id: true, name: true } } } },
     responsibles: {
@@ -46,8 +46,8 @@ export const PROFILE_RESPONSIBLES_LIMIT = 20;
 
 export const employeeProfileSelect = {
     id: true,
-    startDate: true,
-    terminatedOn: true,
+    startsAt: true,
+    terminatedAt: true,
     terminationReason: true,
     terminationComment: true,
     mobile: true,
@@ -55,7 +55,7 @@ export const employeeProfileSelect = {
     linkedinUrl: true,
     telegram: true,
     address: true,
-    dateOfBirth: true,
+    bornAt: true,
     createdAt: true,
     version: true,
     user: { select: { id: true, firstName: true, lastName: true, email: true, role: true } },
@@ -84,8 +84,8 @@ export type EmployeeProfileRecord = Prisma.EmployeeGetPayload<{
 /** What other modules need to plan time off: dates and who decides. */
 export const employeeTimeOffSelect = {
     id: true,
-    startDate: true,
-    terminatedOn: true,
+    startsAt: true,
+    terminatedAt: true,
     responsibles: { select: { responsibleUserId: true }, take: 10 },
 } satisfies Prisma.EmployeeSelect;
 export type EmployeeTimeOffRecord = Prisma.EmployeeGetPayload<{
@@ -95,8 +95,8 @@ export type EmployeeTimeOffRecord = Prisma.EmployeeGetPayload<{
 /** One row of the time-off calendar. */
 export const employeeCalendarSelect = {
     id: true,
-    startDate: true,
-    terminatedOn: true,
+    startsAt: true,
+    terminatedAt: true,
     user: { select: { id: true, firstName: true, lastName: true } },
     position: { select: { title: true } },
 } satisfies Prisma.EmployeeSelect;
@@ -107,8 +107,8 @@ export type EmployeeCalendarRecord = Prisma.EmployeeGetPayload<{
 /** Who starts or leaves, and when (dashboard). */
 export const employeeMovementSelect = {
     id: true,
-    startDate: true,
-    terminatedOn: true,
+    startsAt: true,
+    terminatedAt: true,
     user: { select: { id: true, firstName: true, lastName: true } },
 } satisfies Prisma.EmployeeSelect;
 export type EmployeeMovementRecord = Prisma.EmployeeGetPayload<{
@@ -118,8 +118,8 @@ export type EmployeeMovementRecord = Prisma.EmployeeGetPayload<{
 /** Everyone with their dates and position — the base of the company figures (insights). */
 export const employeeRosterSelect = {
     id: true,
-    startDate: true,
-    terminatedOn: true,
+    startsAt: true,
+    terminatedAt: true,
     user: { select: { id: true, firstName: true, lastName: true } },
     position: {
         select: {

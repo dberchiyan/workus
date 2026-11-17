@@ -47,19 +47,19 @@ export function CreateRequestDialog({ open, balances, onClose, onCreated, onExit
     const { form, submit, errorCode, errorRef, isSubmitting } = useCreateRequestForm(onCreated);
     const { register, control, formState, watch, setValue } = form;
     const { errors } = formState;
-    const [type, startDate, endDate] = watch(['type', 'startDate', 'endDate']);
+    const [type, startsAt, endsAt] = watch(['type', 'startsAt', 'endsAt']);
     // The years the range and the calendar can show: this one and the next.
     const thisYear = Number(todayUtcIso().slice(0, 4));
     const holidays = useHolidayNames([
         thisYear,
         thisYear + 1,
-        Number(startDate.slice(0, 4)) || thisYear,
-        Number(endDate.slice(0, 4)) || thisYear,
+        Number(startsAt.slice(0, 4)) || thisYear,
+        Number(endsAt.slice(0, 4)) || thisYear,
     ]);
-    const days = workingDaysBetween(startDate, endDate, holidays);
+    const days = workingDaysBetween(startsAt, endsAt, holidays);
     const balance = balances.find((item) => item.type === type);
     const isOverBalance = balance?.available != null && days > balance.available;
-    const rangeError = errors.startDate ?? errors.endDate;
+    const rangeError = errors.startsAt ?? errors.endsAt;
 
     useEffect(() => {
         requestAnimationFrame(() => {
@@ -114,8 +114,8 @@ export function CreateRequestDialog({ open, balances, onClose, onCreated, onExit
                                     {balance && (
                                         <Typography variant="body2" color="textSecondary" className="app-tabular">
                                             {t('balances.cycle', {
-                                                start: formatDay(balance.cycleStart, locale),
-                                                end: formatDay(balance.cycleEnd, locale),
+                                                start: formatDay(balance.cycleStartsAt, locale),
+                                                end: formatDay(balance.cycleEndsAt, locale),
                                             })}
                                         </Typography>
                                     )}
@@ -135,10 +135,10 @@ export function CreateRequestDialog({ open, balances, onClose, onCreated, onExit
                             </div>
                             <div className="rounded-lg border border-divider bg-background-paper p-3">
                                 <RangeCalendar
-                                    value={{ start: startDate, end: endDate }}
+                                    value={{ start: startsAt, end: endsAt }}
                                     onChange={(range) => {
-                                        setValue('startDate', range.start);
-                                        setValue('endDate', range.end);
+                                        setValue('startsAt', range.start);
+                                        setValue('endsAt', range.end);
                                     }}
                                     holidays={holidays}
                                 />
@@ -155,7 +155,7 @@ export function CreateRequestDialog({ open, balances, onClose, onCreated, onExit
                                     ? message(rangeError, { max: TIME_OFF_LIMITS.periodDays })
                                     : days === 0
                                       ? t('create.summaryNone')
-                                      : `${formatPeriod(startDate, endDate, locale)} · ${t('create.summary', { count: days })}${
+                                      : `${formatPeriod(startsAt, endsAt, locale)} · ${t('create.summary', { count: days })}${
                                             isOverBalance ? ` · ${t('create.overBalance')}` : ''
                                         }`}
                             </Typography>

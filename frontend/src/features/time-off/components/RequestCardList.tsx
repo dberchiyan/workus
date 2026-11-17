@@ -25,7 +25,7 @@ export function RequestCardList({ requests, expandedId, onToggle, onCancel }: Re
             {requests.map((request) => {
                 const isOpen = expandedId === request.id;
                 const detailsId = `time-off-request-card-${request.id}`;
-                const period = formatPeriod(request.startDate, request.endDate, i18n.language);
+                const period = formatPeriod(request.startsAt, request.endsAt, i18n.language);
                 const type = t(`types.${request.type}`);
                 return (
                     <li key={request.id} className="flex flex-col gap-2 px-4 py-3">

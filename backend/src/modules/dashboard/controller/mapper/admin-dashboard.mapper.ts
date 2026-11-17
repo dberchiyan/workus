@@ -38,7 +38,7 @@ export const toAdminDashboardResponse = ({
         next: movements.next
             ? {
                   kind: movements.next.kind,
-                  date: isoDate(movements.next.date),
+                  movedAt: isoDate(movements.next.movedAt),
                   employeeId: movements.next.employeeId,
                   person: {
                       id: movements.next.userId,
@@ -54,8 +54,8 @@ const toRequest = (request: DashboardRequest): DashboardRequestsResponse['conten
     id: request.id,
     type: request.type,
     status: request.status,
-    startDate: isoDate(request.startDate),
-    endDate: isoDate(request.endDate),
+    startsAt: isoDate(request.startsAt),
+    endsAt: isoDate(request.endsAt),
     days: request.days,
     createdAt: request.createdAt.toISOString(),
     employee: request.employee,
@@ -64,7 +64,7 @@ const toRequest = (request: DashboardRequest): DashboardRequestsResponse['conten
 const toReview = (review: DashboardReview): DashboardReviewsResponse['content'][number] => ({
     id: review.id,
     title: review.title,
-    reviewDate: isoDate(review.reviewDate),
+    reviewedAt: isoDate(review.reviewedAt),
     // Only scheduled and completed reviews are listed.
     status: review.status === 'COMPLETED' ? 'COMPLETED' : 'SCHEDULED',
     employee: review.employee,

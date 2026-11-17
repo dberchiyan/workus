@@ -71,7 +71,7 @@ export function SecurityEventRow({ group, today, now }: SecurityEventRowProps) {
                     action: t(`securityLog.short.${newest.action}`),
                     count,
                 });
-    const newDevice = events.some((event) => event.newDevice);
+    const isNewDevice = events.some((event) => event.isNewDevice);
     const repeatedFailures = newest.action === 'auth.sign_in_failed' && count >= REPEATED_FAILURES;
 
     const device = describeUserAgent(newest.userAgent);
@@ -108,7 +108,7 @@ export function SecurityEventRow({ group, today, now }: SecurityEventRowProps) {
                         >
                             {title}
                         </Typography>
-                        {newDevice && (
+                        {isNewDevice && (
                             <Typography
                                 variant="caption"
                                 component="span"

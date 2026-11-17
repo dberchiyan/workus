@@ -24,7 +24,7 @@ export interface NewReview {
     employeeId: string;
     kind: string;
     title: string;
-    reviewDate: Date;
+    reviewedAt: Date;
     status: string;
     salaryAmount: Decimal | null;
     salaryCurrency: string | null;
@@ -49,7 +49,7 @@ export class ReviewRepository {
         return this.txHost.tx.employeeReview.findMany({
             where: { organisationId, employeeId },
             select: reviewSelect,
-            orderBy: [{ reviewDate: 'desc' }, { id: 'desc' }],
+            orderBy: [{ reviewedAt: 'desc' }, { id: 'desc' }],
             take: MAX_REVIEWS,
         });
     }
@@ -61,7 +61,7 @@ export class ReviewRepository {
                 employeeId: review.employeeId,
                 kind: review.kind,
                 title: review.title,
-                reviewDate: review.reviewDate,
+                reviewedAt: review.reviewedAt,
                 status: review.status,
                 salaryAmount: review.salaryAmount,
                 salaryCurrency: review.salaryCurrency,
@@ -95,7 +95,7 @@ export class ReviewRepository {
             where: { id: reviewId, organisationId, version },
             data: {
                 title: changes.title,
-                reviewDate: changes.reviewDate,
+                reviewedAt: changes.reviewedAt,
                 status: changes.status,
                 salaryAmount: changes.salaryAmount,
                 salaryCurrency: changes.salaryCurrency,
@@ -132,50 +132,50 @@ export class ReviewRepository {
     findStarting(
         organisationId: string,
         employeeId: string,
-    ): Promise<{ id: string; title: string; reviewDate: Date } | null> {
+    ): Promise<{ id: string; title: string; reviewedAt: Date } | null> {
         return this.txHost.tx.employeeReview.findFirst({
             where: { organisationId, employeeId, kind: ReviewKind.STARTING },
-            select: { id: true, title: true, reviewDate: true },
+            select: { id: true, title: true, reviewedAt: true },
         });
     }
 
-    /** Any other review dated before `date`? */
-    async existsRegularBefore(organisationId: string, employeeId: string, date: Date): Promise<boolean> {
+    /** Any other review dated before `reviewedAt`? */
+    async existsRegularBefore(organisationId: string, employeeId: string, reviewedAt: Date): Promise<boolean> {
         return (
             (await this.txHost.tx.employeeReview.count({
                 where: {
                     organisationId,
                     employeeId,
                     kind: { not: ReviewKind.STARTING },
-                    reviewDate: { lt: date },
+                    reviewedAt: { lt: reviewedAt },
                 },
             })) > 0
         );
     }
 
-    async moveDate(organisationId: string, reviewId: string, reviewDate: Date, updatedBy: string): Promise<void> {
+    async moveDate(organisationId: string, reviewId: string, reviewedAt: Date, updatedBy: string): Promise<void> {
         await this.txHost.tx.employeeReview.update({
             where: { id: reviewId, organisationId },
-            data: { reviewDate, updatedBy, version: { increment: 1 } },
+            data: { reviewedAt, updatedBy, version: { increment: 1 } },
             select: { id: true },
         });
     }
 
-    /** Scheduled reviews dated after `date` (bounded like every list). */
+    /** Scheduled reviews dated after `reviewedAt` (bounded like every list). */
     findScheduledAfter(
         organisationId: string,
         employeeId: string,
-        date: Date,
+        reviewedAt: Date,
     ): Promise<{ id: string; title: string }[]> {
         return this.txHost.tx.employeeReview.findMany({
             where: {
                 organisationId,
                 employeeId,
                 status: ReviewStatus.SCHEDULED,
-                reviewDate: { gt: date },
+                reviewedAt: { gt: reviewedAt },
             },
             select: { id: true, title: true },
-            orderBy: { reviewDate: 'asc' },
+            orderBy: { reviewedAt: 'asc' },
             take: MAX_REVIEWS,
         });
     }
@@ -190,18 +190,18 @@ export class ReviewRepository {
     /** Scheduled reviews dated in [from, to]. */
     countScheduledBetween(organisationId: string, from: Date, to: Date): Promise<number> {
         return this.txHost.tx.employeeReview.count({
-            where: { organisationId, status: ReviewStatus.SCHEDULED, reviewDate: { gte: from, lte: to } },
+            where: { organisationId, status: ReviewStatus.SCHEDULED, reviewedAt: { gte: from, lte: to } },
         });
     }
 
-    /** Scheduled reviews whose date has passed (never completed or canceled). */
-    countScheduledBefore(organisationId: string, date: Date): Promise<number> {
+    /** Scheduled reviews whose reviewedAt has passed (never completed or canceled). */
+    countScheduledBefore(organisationId: string, reviewedAt: Date): Promise<number> {
         return this.txHost.tx.employeeReview.count({
-            where: { organisationId, status: ReviewStatus.SCHEDULED, reviewDate: { lt: date } },
+            where: { organisationId, status: ReviewStatus.SCHEDULED, reviewedAt: { lt: reviewedAt } },
         });
     }
 
-    /** Scheduled and completed regular reviews dated in [from, to], by date then name, a page at a time. */
+    /** Scheduled and completed regular reviews dated in [from, to], by reviewedAt then name, a page at a time. */
     async findScheduledOrCompletedBetween(
         organisationId: string,
         from: Date,
@@ -212,14 +212,14 @@ export class ReviewRepository {
             organisationId,
             kind: ReviewKind.REGULAR,
             status: { in: [ReviewStatus.SCHEDULED, ReviewStatus.COMPLETED] },
-            reviewDate: { gte: from, lte: to },
+            reviewedAt: { gte: from, lte: to },
         };
         const [totalElements, content] = await Promise.all([
             this.txHost.tx.employeeReview.count({ where }),
             this.txHost.tx.employeeReview.findMany({
                 where,
                 select: dashboardReviewSelect,
-                orderBy: [{ reviewDate: 'asc' }, { employee: { user: { firstName: 'asc' } } }, { id: 'asc' }],
+                orderBy: [{ reviewedAt: 'asc' }, { employee: { user: { firstName: 'asc' } } }, { id: 'asc' }],
                 skip: page.offset,
                 take: page.limit,
             }),
@@ -237,12 +237,12 @@ export class ReviewRepository {
             where: {
                 organisationId,
                 status: ReviewStatus.COMPLETED,
-                reviewDate: { lte: asOf },
+                reviewedAt: { lte: asOf },
                 salaryAmount: { not: null },
             },
             select: { employeeId: true, salaryAmount: true, salaryCurrency: true },
             distinct: ['employeeId'],
-            orderBy: [{ employeeId: 'asc' }, { reviewDate: 'desc' }, { createdAt: 'desc' }],
+            orderBy: [{ employeeId: 'asc' }, { reviewedAt: 'desc' }, { createdAt: 'desc' }],
             take: limit,
         });
     }

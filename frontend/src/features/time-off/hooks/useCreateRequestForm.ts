@@ -8,7 +8,7 @@ import { useCreateTimeOffRequest } from './useTimeOffQueries';
 
 const todayIso = (): string => new Date().toISOString().slice(0, 10);
 
-const FORM_FIELDS: ReadonlySet<string> = new Set(['type', 'startDate', 'endDate', 'note']);
+const FORM_FIELDS: ReadonlySet<string> = new Set(['type', 'startsAt', 'endsAt', 'note']);
 const isFormField = (field: string): field is keyof CreateTimeOffFormValues => FORM_FIELDS.has(field);
 
 /**
@@ -25,7 +25,7 @@ export const useCreateRequestForm = (onCreated: () => void) => {
         resolver: zodResolver(createTimeOffSchema),
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
-        defaultValues: { type: 'VACATION', startDate: todayIso(), endDate: todayIso(), note: '' },
+        defaultValues: { type: 'VACATION', startsAt: todayIso(), endsAt: todayIso(), note: '' },
     });
 
     useEffect(() => {
@@ -40,8 +40,8 @@ export const useCreateRequestForm = (onCreated: () => void) => {
             await create.mutateAsync({
                 request: {
                     type: values.type,
-                    startDate: values.startDate,
-                    endDate: values.endDate,
+                    startsAt: values.startsAt,
+                    endsAt: values.endsAt,
                     ...(values.note === '' ? {} : { note: values.note }),
                 },
                 idempotencyKey,

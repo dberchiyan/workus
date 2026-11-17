@@ -153,7 +153,7 @@ export class ReviewController {
 /** Request → command, field by field (never the DTO itself). */
 const toCommand = (request: CreateReviewRequest) => ({
     title: request.title,
-    date: request.date,
+    reviewedAt: request.reviewedAt,
     status: request.status,
     salary: request.salary,
     responsibleUserIds: request.responsibleUserIds,

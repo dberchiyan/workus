@@ -46,8 +46,8 @@ const addMonths = (date: Date, months: number): Date => {
 
 interface SeedReviewEmployee {
     id: string;
-    startDate: Date;
-    terminatedOn: Date | null;
+    startsAt: Date;
+    terminatedAt: Date | null;
     categoryName: string;
     responsibleUserIds: string[];
 }
@@ -88,21 +88,21 @@ export const seedReviews = async (
         const responsibleUserIds =
             employee.responsibleUserIds.length > 0 ? employee.responsibleUserIds : [fallbackResponsibleId];
         // Completed reviews happen up to today, or up to the last day if that came first.
-        const end = employee.terminatedOn && employee.terminatedOn < today ? employee.terminatedOn : today;
+        const end = employee.terminatedAt && employee.terminatedAt < today ? employee.terminatedAt : today;
         let salary = new Prisma.Decimal(BASE_SALARY[employee.categoryName] ?? 3000).plus((index % 5) * 100);
         const reviews: Omit<Prisma.EmployeeReviewCreateManyInput, 'organisationId'>[] = [
             {
                 employeeId: employee.id,
                 kind: ReviewKind.STARTING,
                 title: STARTING_REVIEW_TITLE,
-                reviewDate: employee.startDate,
+                reviewedAt: employee.startsAt,
                 status: 'COMPLETED',
                 salaryAmount: salary,
                 salaryCurrency: 'USD',
             },
         ];
         let round = 1;
-        let date = addMonths(employee.startDate, REVIEW_INTERVAL_MONTHS);
+        let date = addMonths(employee.startsAt, REVIEW_INTERVAL_MONTHS);
         const titleOf = (n: number): string => (n % 2 === 0 ? 'Annual review' : 'Mid-year review');
         while (date <= end) {
             const raise = new Prisma.Decimal((index + round * 3) % 7).dividedBy(100);
@@ -110,7 +110,7 @@ export const seedReviews = async (
             reviews.push({
                 employeeId: employee.id,
                 title: titleOf(round),
-                reviewDate: date,
+                reviewedAt: date,
                 status: 'COMPLETED',
                 salaryAmount: salary,
                 salaryCurrency: 'USD',
@@ -120,7 +120,7 @@ export const seedReviews = async (
                 feedbackClient: index % 2 === 0 ? doc(FEEDBACK.client[round % 2]) : Prisma.DbNull,
             });
             round += 1;
-            date = addMonths(employee.startDate, REVIEW_INTERVAL_MONTHS * round);
+            date = addMonths(employee.startsAt, REVIEW_INTERVAL_MONTHS * round);
         }
         // Every eleventh: the last review (within a month) was never held — it is overdue.
         const last = reviews.at(-1);
@@ -128,23 +128,23 @@ export const seedReviews = async (
             index % 11 === 5 &&
             last &&
             reviews.length > 1 &&
-            last.reviewDate instanceof Date &&
-            today.getTime() - last.reviewDate.getTime() < 30 * 86_400_000
+            last.reviewedAt instanceof Date &&
+            today.getTime() - last.reviewedAt.getTime() < 30 * 86_400_000
         ) {
             reviews[reviews.length - 1] = {
                 employeeId: employee.id,
                 title: last.title,
-                reviewDate: last.reviewDate,
+                reviewedAt: last.reviewedAt,
                 status: 'SCHEDULED',
                 salaryAmount: null,
                 salaryCurrency: null,
             };
         }
-        if (!employee.terminatedOn) {
+        if (!employee.terminatedAt) {
             reviews.push({
                 employeeId: employee.id,
                 title: titleOf(round),
-                reviewDate: date,
+                reviewedAt: date,
                 status: index % 9 === 4 ? 'CANCELED' : 'SCHEDULED',
                 salaryAmount: null,
                 salaryCurrency: null,

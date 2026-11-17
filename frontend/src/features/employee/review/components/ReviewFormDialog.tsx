@@ -44,7 +44,7 @@ export function ReviewFormDialog({ employeeId, review, open, onClose, onSaved, o
         onSaved,
     );
     const isEdit = review !== null;
-    // A starting review keeps the start date and stays completed (the server enforces it too).
+    // A starting review keeps the start reviewedAt and stays completed (the server enforces it too).
     const isStarting = review?.kind === 'STARTING';
     const { register, control, formState } = form;
     const { errors } = formState;
@@ -106,14 +106,14 @@ export function ReviewFormDialog({ employeeId, review, open, onClose, onSaved, o
                             slotProps={{ htmlInput: { maxLength: REVIEW_LIMITS.title } }}
                         />
                         <TextField
-                            {...register('date')}
+                            {...register('reviewedAt')}
                             type="date"
                             required
                             label={t('add.fields.date')}
                             disabled={isStarting}
-                            error={Boolean(errors.date)}
+                            error={Boolean(errors.reviewedAt)}
                             helperText={message(
-                                errors.date,
+                                errors.reviewedAt,
                                 undefined,
                                 isStarting ? t('starting.dateHint') : undefined,
                             )}

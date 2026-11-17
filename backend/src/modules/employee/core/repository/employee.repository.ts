@@ -32,7 +32,7 @@ import {
 const orderByFor = (field: EmployeeSortField, direction: SortDirection): Prisma.EmployeeOrderByWithRelationInput[] =>
     field === 'name'
         ? [{ user: { firstName: direction } }, { user: { lastName: direction } }]
-        : [{ startDate: direction }];
+        : [{ startsAt: direction }];
 
 /** Bounded lists for pickers. */
 const MAX_POSITIONS = 200;
@@ -42,13 +42,13 @@ export interface NewEmployee {
     organisationId: string;
     userId: string;
     positionId: string;
-    startDate: Date;
+    startsAt: Date;
     mobile: string | undefined;
     personalEmail: string | undefined;
     linkedinUrl: string | undefined;
     telegram: string | undefined;
     address: string | undefined;
-    dateOfBirth: Date | undefined;
+    bornAt: Date | undefined;
     responsibleUserIds: string[];
     createdBy: string;
 }
@@ -124,11 +124,11 @@ export class EmployeeRepository {
     ): Promise<{ content: BirthdayRow[]; totalElements: number }> {
         const where = Prisma.sql`
       WHERE e.organisation_id = ${organisationId}::uuid
-        AND e.date_of_birth IS NOT NULL
-        AND e.start_date <= ${criteria.to}::date
-        AND (e.terminated_on IS NULL OR e.terminated_on > ${criteria.from}::date)
-        AND EXTRACT(MONTH FROM e.date_of_birth) = ${criteria.month}
-        AND EXTRACT(DAY FROM e.date_of_birth) = ANY(${criteria.days}::int[])`;
+        AND e.born_at IS NOT NULL
+        AND e.starts_at <= ${criteria.to}::date
+        AND (e.terminated_at IS NULL OR e.terminated_at > ${criteria.from}::date)
+        AND EXTRACT(MONTH FROM e.born_at) = ${criteria.month}
+        AND EXTRACT(DAY FROM e.born_at) = ANY(${criteria.days}::int[])`;
         // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
         const [countRows, rows] = await Promise.all([
             this.txHost.tx.$queryRaw<unknown[]>`
@@ -136,8 +136,8 @@ export class EmployeeRepository {
             this.txHost.tx.$queryRaw<unknown[]>`
         SELECT e.id, u.id AS "userId", u.first_name AS "firstName", u.last_name AS "lastName",
                p.title AS "positionTitle",
-               EXTRACT(MONTH FROM e.date_of_birth)::int AS month,
-               EXTRACT(DAY FROM e.date_of_birth)::int AS day
+               EXTRACT(MONTH FROM e.born_at)::int AS month,
+               EXTRACT(DAY FROM e.born_at)::int AS day
         FROM employees e
         JOIN users u ON u.id = e.user_id
         JOIN positions p ON p.id = e.position_id
@@ -154,7 +154,7 @@ export class EmployeeRepository {
         return this.txHost.tx.employee.findMany({
             where: { organisationId },
             select: employeeRosterSelect,
-            orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+            orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
             take: limit,
         });
     }
@@ -166,17 +166,17 @@ export class EmployeeRepository {
     /** Hires with a start date in (from, to]. */
     countStartedBetween(organisationId: string, from: Date, to: Date): Promise<number> {
         return this.txHost.tx.employee.count({
-            where: { organisationId, startDate: { gt: from, lte: to } },
+            where: { organisationId, startsAt: { gt: from, lte: to } },
         });
     }
 
     /** Mean days since start over active employees; 0 when there are none. AVG over dates is raw SQL. */
     async averageTenureDays(organisationId: string, today: Date): Promise<number> {
         const rows = await this.txHost.tx.$queryRaw<unknown[]>`
-      SELECT COALESCE(AVG(${today}::date - start_date), 0)::float8 AS days
+      SELECT COALESCE(AVG(${today}::date - starts_at), 0)::float8 AS days
       FROM employees
       WHERE organisation_id = ${organisationId}::uuid
-        AND (terminated_on IS NULL OR terminated_on > ${today}::date)`;
+        AND (terminated_at IS NULL OR terminated_at > ${today}::date)`;
         const [row] = averageRowsSchema.parse(rows);
         return row?.days ?? 0;
     }
@@ -190,7 +190,7 @@ export class EmployeeRepository {
     /** Terminations dated in (from, to]. */
     countTerminatedBetween(organisationId: string, from: Date, to: Date): Promise<number> {
         return this.txHost.tx.employee.count({
-            where: { organisationId, terminatedOn: { gt: from, lte: to } },
+            where: { organisationId, terminatedAt: { gt: from, lte: to } },
         });
     }
 
@@ -214,13 +214,13 @@ export class EmployeeRepository {
                 organisationId: employee.organisationId,
                 userId: employee.userId,
                 positionId: employee.positionId,
-                startDate: employee.startDate,
+                startsAt: employee.startsAt,
                 mobile: employee.mobile ?? null,
                 personalEmail: employee.personalEmail ?? null,
                 linkedinUrl: employee.linkedinUrl ?? null,
                 telegram: employee.telegram ?? null,
                 address: employee.address ?? null,
-                dateOfBirth: employee.dateOfBirth ?? null,
+                bornAt: employee.bornAt ?? null,
                 createdBy: employee.createdBy,
                 updatedBy: employee.createdBy,
                 responsibles: {
@@ -272,13 +272,13 @@ export class EmployeeRepository {
         version: number,
         details: {
             positionId: string;
-            startDate: Date;
+            startsAt: Date;
             mobile: string | null;
             personalEmail: string | null;
             linkedinUrl: string | null;
             telegram: string | null;
             address: string | null;
-            dateOfBirth: Date | null;
+            bornAt: Date | null;
         },
         updatedBy: string,
     ): Promise<boolean> {
@@ -294,13 +294,13 @@ export class EmployeeRepository {
         organisationId: string,
         employeeId: string,
         version: number,
-        termination: { terminatedOn: Date; reason: string; comment: string | null } | null,
+        termination: { terminatedAt: Date; reason: string; comment: string | null } | null,
         updatedBy: string,
     ): Promise<boolean> {
         const { count } = await this.txHost.tx.employee.updateMany({
             where: { id: employeeId, organisationId, version },
             data: {
-                terminatedOn: termination?.terminatedOn ?? null,
+                terminatedAt: termination?.terminatedAt ?? null,
                 terminationReason: termination?.reason ?? null,
                 terminationComment: termination?.comment ?? null,
                 updatedBy,
@@ -322,7 +322,7 @@ export class EmployeeRepository {
         limit: number,
     ): Promise<{ userId: string; organisationId: string }[]> {
         return this.txHost.tx.employee.findMany({
-            where: { terminatedOn: { gte: from, lte: to } },
+            where: { terminatedAt: { gte: from, lte: to } },
             select: { userId: true, organisationId: true },
             orderBy: { id: 'asc' },
             take: limit,
@@ -356,9 +356,9 @@ export class EmployeeRepository {
     /** People starting in (from, to], soonest first (bounded). */
     findStartingBetween(organisationId: string, from: Date, to: Date): Promise<EmployeeMovementRecord[]> {
         return this.txHost.tx.employee.findMany({
-            where: { organisationId, startDate: { gt: from, lte: to } },
+            where: { organisationId, startsAt: { gt: from, lte: to } },
             select: employeeMovementSelect,
-            orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+            orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
             take: MAX_MOVEMENTS,
         });
     }
@@ -366,9 +366,9 @@ export class EmployeeRepository {
     /** People whose termination falls in (from, to], soonest first (bounded). */
     findLeavingBetween(organisationId: string, from: Date, to: Date): Promise<EmployeeMovementRecord[]> {
         return this.txHost.tx.employee.findMany({
-            where: { organisationId, terminatedOn: { gt: from, lte: to } },
+            where: { organisationId, terminatedAt: { gt: from, lte: to } },
             select: employeeMovementSelect,
-            orderBy: [{ terminatedOn: 'asc' }, { id: 'asc' }],
+            orderBy: [{ terminatedAt: 'asc' }, { id: 'asc' }],
             take: MAX_MOVEMENTS,
         });
     }

@@ -6,12 +6,12 @@ export interface BillingSummary {
     plan: Plan;
     status: SubscriptionStatus;
     scheduledPlan: Plan | null;
-    currentPeriodEnd: Date | null;
-    pastDueSince: Date | null;
+    periodEndsAt: Date | null;
+    pastDueAt: Date | null;
     graceEndsAt: Date | null;
-    canManage: boolean;
-    granted: boolean;
-    testMode: boolean;
+    hasBillingAccount: boolean;
+    isGrantedPlan: boolean;
+    isTestMode: boolean;
     plans: PlanOffer[];
 }
 

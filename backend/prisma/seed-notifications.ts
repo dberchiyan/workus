@@ -33,8 +33,8 @@ export const seedNotifications = async (prisma: PrismaClient, organisationId: st
             id: true,
             type: true,
             status: true,
-            startDate: true,
-            endDate: true,
+            startsAt: true,
+            endsAt: true,
             createdAt: true,
             decidedBy: true,
             decidedAt: true,
@@ -49,8 +49,8 @@ export const seedNotifications = async (prisma: PrismaClient, organisationId: st
     const rows = requests.flatMap((request) => {
         const params = {
             requestType: request.type,
-            startDate: isoDay(request.startDate),
-            endDate: isoDay(request.endDate),
+            startsAt: isoDay(request.startsAt),
+            endsAt: isoDay(request.endsAt),
             employee: {
                 userId: request.employee.user.id,
                 firstName: request.employee.user.firstName,

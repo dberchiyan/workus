@@ -62,8 +62,8 @@ const historyOf = (events: AuditEvent[]) =>
 export const toLeaveBalancesResponse = (balances: LeaveBalance[]): LeaveBalancesResponse => ({
     content: balances.map((balance) => ({
         type: balance.type,
-        cycleStart: isoDate(balance.cycleStart),
-        cycleEnd: isoDate(balance.cycleEnd),
+        cycleStartsAt: isoDate(balance.cycleStartsAt),
+        cycleEndsAt: isoDate(balance.cycleEndsAt),
         allowance: balance.allowance,
         used: balance.used,
         pending: balance.pending,
@@ -84,8 +84,8 @@ const requestFields = (request: TimeOffRequestRecord, history: AuditEvent[]) => 
     id: request.id,
     // Guarded by ck_time_off_requests_type / _status.
     type: isTimeOffType(request.type) ? request.type : TimeOffType.DAY_OFF,
-    startDate: isoDate(request.startDate),
-    endDate: isoDate(request.endDate),
+    startsAt: isoDate(request.startsAt),
+    endsAt: isoDate(request.endsAt),
     days: request.days,
     status: isTimeOffStatus(request.status) ? request.status : TimeOffStatus.PENDING,
     note: request.note,
@@ -142,7 +142,7 @@ export const toTimeOffCalendarResponse = (calendar: TimeOffCalendar): TimeOffCal
     from: isoDate(calendar.from),
     to: isoDate(calendar.to),
     holidays: calendar.holidays.map((holiday) => ({
-        date: isoDate(holiday.date),
+        heldAt: isoDate(holiday.heldAt),
         name: holiday.name,
     })),
     content: calendar.content.map(({ employee, requests }) => ({
@@ -152,16 +152,16 @@ export const toTimeOffCalendarResponse = (calendar: TimeOffCalendar): TimeOffCal
             firstName: employee.firstName,
             lastName: employee.lastName,
             positionTitle: employee.positionTitle,
-            startDate: isoDate(employee.startDate),
-            terminatedOn: employee.terminatedOn ? isoDate(employee.terminatedOn) : null,
+            startsAt: isoDate(employee.startsAt),
+            terminatedAt: employee.terminatedAt ? isoDate(employee.terminatedAt) : null,
         },
         requests: requests.map((request) => ({
             id: request.id,
             // Guarded by ck_time_off_requests_type / _status.
             type: isTimeOffType(request.type) ? request.type : TimeOffType.DAY_OFF,
             status: isTimeOffStatus(request.status) ? request.status : TimeOffStatus.PENDING,
-            startDate: isoDate(request.startDate),
-            endDate: isoDate(request.endDate),
+            startsAt: isoDate(request.startsAt),
+            endsAt: isoDate(request.endsAt),
             days: request.days,
         })),
     })),

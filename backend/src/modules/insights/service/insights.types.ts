@@ -40,8 +40,8 @@ export interface Tenure {
 
 export interface TurnoverMonth {
     month: number;
-    hired: (InsightPerson & { date: Date })[];
-    left: (InsightPerson & { date: Date })[];
+    hired: (InsightPerson & { movedAt: Date })[];
+    left: (InsightPerson & { movedAt: Date })[];
 }
 
 export interface Turnover {

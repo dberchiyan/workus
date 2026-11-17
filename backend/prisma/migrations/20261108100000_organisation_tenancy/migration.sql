@@ -70,7 +70,7 @@ ALTER TABLE "time_off_requests" DROP CONSTRAINT "fk_time_off_requests_decided_by
 ALTER TABLE "time_off_requests" DROP CONSTRAINT "fk_time_off_requests_employee_id";
 
 -- DropIndex
-DROP INDEX "uq_company_holidays_date";
+DROP INDEX "uq_company_holidays_held_at";
 
 -- DropIndex
 DROP INDEX "uq_employees_user_id";
@@ -118,7 +118,7 @@ ALTER TABLE "users" ALTER COLUMN "organisation_id" DROP DEFAULT;
 CREATE INDEX "idx_audit_events_organisation_id_occurred_at" ON "audit_events"("organisation_id", "occurred_at");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "uq_company_holidays_organisation_id_date" ON "company_holidays"("organisation_id", "date");
+CREATE UNIQUE INDEX "uq_company_holidays_organisation_id_held_at" ON "company_holidays"("organisation_id", "held_at");
 
 -- CreateIndex
 CREATE INDEX "idx_employee_responsibles_organisation_id" ON "employee_responsibles"("organisation_id");

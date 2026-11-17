@@ -81,7 +81,7 @@ export function CancelTerminationDialog({ employee, open, onClose, onExited }: C
                 <DialogContentText id={descriptionId}>
                     {t('cancelTermination.description', {
                         name: `${employee.firstName} ${employee.lastName}`,
-                        date: employee.terminatedOn ? formatCalendarDate(employee.terminatedOn, i18n.language) : '',
+                        date: employee.terminatedAt ? formatCalendarDate(employee.terminatedAt, i18n.language) : '',
                     })}
                 </DialogContentText>
             </DialogContent>

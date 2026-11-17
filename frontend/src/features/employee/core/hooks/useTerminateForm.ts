@@ -9,7 +9,7 @@ import { useTerminateEmployee } from './useEmployeeQueries';
 
 const todayIso = (): string => new Date().toISOString().slice(0, 10);
 
-const FORM_FIELDS: ReadonlySet<string> = new Set(['date', 'reason', 'comment']);
+const FORM_FIELDS: ReadonlySet<string> = new Set(['terminatedAt', 'reason', 'comment']);
 const isFormField = (field: string): field is keyof TerminateEmployeeFormValues => FORM_FIELDS.has(field);
 
 /**
@@ -26,7 +26,7 @@ export const useTerminateForm = (employee: EmployeeProfile, onSaved: () => void)
         mode: 'onSubmit',
         reValidateMode: 'onSubmit',
         defaultValues: {
-            date: employee.terminatedOn ?? todayIso(),
+            terminatedAt: employee.terminatedAt ?? todayIso(),
             reason: employee.termination?.reason ?? '',
             comment: employee.termination?.comment ?? '',
         },
@@ -45,7 +45,7 @@ export const useTerminateForm = (employee: EmployeeProfile, onSaved: () => void)
         }
         try {
             await terminate.mutateAsync({
-                date: values.date,
+                terminatedAt: values.terminatedAt,
                 reason: values.reason,
                 ...(values.comment.trim() === '' ? {} : { comment: values.comment.trim() }),
                 version: employee.version,

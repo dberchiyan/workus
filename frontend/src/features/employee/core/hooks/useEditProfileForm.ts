@@ -12,13 +12,13 @@ const valuesFor = (employee: EmployeeProfile): UpdateEmployeeFormValues => ({
     lastName: employee.lastName,
     email: employee.email,
     positionId: employee.position.id,
-    startDate: employee.startDate,
+    startsAt: employee.startsAt,
     mobile: employee.contacts.mobile ?? '',
     personalEmail: employee.contacts.personalEmail ?? '',
     linkedinUrl: employee.contacts.linkedinUrl ?? '',
     telegram: employee.contacts.telegram ?? '',
     address: employee.contacts.address ?? '',
-    dateOfBirth: employee.dateOfBirth ?? '',
+    bornAt: employee.bornAt ?? '',
 });
 
 const FORM_FIELDS: ReadonlySet<string> = new Set([
@@ -26,13 +26,13 @@ const FORM_FIELDS: ReadonlySet<string> = new Set([
     'lastName',
     'email',
     'positionId',
-    'startDate',
+    'startsAt',
     'mobile',
     'personalEmail',
     'linkedinUrl',
     'telegram',
     'address',
-    'dateOfBirth',
+    'bornAt',
 ] satisfies (keyof UpdateEmployeeFormValues)[]);
 const isFormField = (field: string): field is keyof UpdateEmployeeFormValues => FORM_FIELDS.has(field);
 
@@ -44,13 +44,13 @@ const toRequest = (values: UpdateEmployeeFormOutput, version: number): UpdateEmp
         lastName: values.lastName,
         email: values.email,
         positionId: values.positionId,
-        startDate: values.startDate,
+        startsAt: values.startsAt,
         ...(optional(values.mobile) ? { mobile: values.mobile } : {}),
         ...(optional(values.personalEmail) ? { personalEmail: values.personalEmail } : {}),
         ...(optional(values.linkedinUrl) ? { linkedinUrl: values.linkedinUrl } : {}),
         ...(optional(values.telegram) ? { telegram: values.telegram } : {}),
         ...(optional(values.address) ? { address: values.address } : {}),
-        ...(optional(values.dateOfBirth) ? { dateOfBirth: values.dateOfBirth } : {}),
+        ...(optional(values.bornAt) ? { bornAt: values.bornAt } : {}),
         version,
     };
 };

@@ -27,18 +27,18 @@ export interface PositionHoldersDialogProps {
 }
 
 /** Start date and time in the company; a start still ahead says when. */
-function Tenure({ startDate }: { startDate: string }) {
+function Tenure({ startsAt }: { startsAt: string }) {
     const { t, i18n } = useTranslation('employee');
     const today = todayUtcIso();
-    const date = formatCalendarDate(startDate, i18n.language);
-    if (startDate > today) {
+    const date = formatCalendarDate(startsAt, i18n.language);
+    if (startsAt > today) {
         return (
             <Typography variant="caption" color="textSecondary" className="app-tabular">
                 {t('structure.holders.starts', { date })}
             </Typography>
         );
     }
-    const days = Math.round((Date.parse(today) - Date.parse(startDate)) / DAY_MS);
+    const days = Math.round((Date.parse(today) - Date.parse(startsAt)) / DAY_MS);
     return (
         <span className="flex flex-col items-end text-right">
             <Typography variant="body2" component="span" className="app-tabular">
@@ -59,7 +59,7 @@ function HolderRow({ employee }: { employee: EmployeeListItem }) {
                 <EmployeeIdentity employee={employee} isCompact />
             </span>
             <span className="hidden shrink-0 min-[25rem]:flex">
-                <Tenure startDate={employee.startDate} />
+                <Tenure startsAt={employee.startsAt} />
             </span>
         </li>
     );

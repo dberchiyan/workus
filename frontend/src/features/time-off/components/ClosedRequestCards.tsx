@@ -11,7 +11,7 @@ export function ClosedRequestCards({ requests }: { requests: readonly ManagedReq
     return (
         <ul className="m-0 flex list-none flex-col divide-y divide-divider p-0">
             {requests.map((request) => {
-                const period = formatPeriod(request.startDate, request.endDate, i18n.language);
+                const period = formatPeriod(request.startsAt, request.endsAt, i18n.language);
                 const type = t(`types.${request.type}`);
                 return (
                     <li key={request.id} className="flex flex-col gap-3 px-4 py-3">

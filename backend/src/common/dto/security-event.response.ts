@@ -30,7 +30,7 @@ export const SecurityEventSchema = z
         /** As the browser sent it; the client turns it into "Chrome on macOS". */
         userAgent: z.string().nullable(),
         /** A sign-in from a device the user had not signed in from before. */
-        newDevice: z.boolean(),
+        isNewDevice: z.boolean(),
     })
     .meta({ id: 'SecurityEvent' });
 
@@ -46,7 +46,7 @@ export const toSecurityEventPage = (page: {
         action: string;
         ipAddress: string | null;
         userAgent: string | null;
-        newDevice: boolean;
+        isNewDevice: boolean;
     }[];
     totalElements: number;
 }): SecurityEventPageBody => ({
@@ -59,7 +59,7 @@ export const toSecurityEventPage = (page: {
                       occurredAt: event.occurredAt.toISOString(),
                       ip: event.ipAddress,
                       userAgent: event.userAgent,
-                      newDevice: event.newDevice,
+                      isNewDevice: event.isNewDevice,
                   },
               ]
             : [],

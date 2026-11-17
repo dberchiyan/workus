@@ -50,7 +50,7 @@ ALTER TABLE "users" DROP CONSTRAINT "ck_users_role";
 ALTER TABLE "users"
     ADD CONSTRAINT "ck_users_role" CHECK ("role" IN ('ADMIN', 'MANAGER', 'EMPLOYEE'));
 
-CREATE UNIQUE INDEX "uq_company_holidays_date" ON "company_holidays"("date");
+CREATE UNIQUE INDEX "uq_company_holidays_held_at" ON "company_holidays"("held_at");
 CREATE UNIQUE INDEX "uq_employees_user_id" ON "employees"("user_id");
 CREATE INDEX "idx_time_off_requests_status_created_at" ON "time_off_requests"("status", "created_at");
 

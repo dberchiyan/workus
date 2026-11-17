@@ -9,14 +9,14 @@ import { settingsPath } from '@/shared/lib/paths';
 export function BillingBanner() {
     const { t, i18n } = useTranslation('billing');
     const can = useAccess();
-    const { pastDueUntil } = usePlan();
-    if (!pastDueUntil || !can('billing.banner')) {
+    const { graceEndsAt } = usePlan();
+    if (!graceEndsAt || !can('billing.banner')) {
         return null;
     }
     const date = new Intl.DateTimeFormat(i18n.language, {
         dateStyle: 'long',
         timeZone: 'UTC',
-    }).format(new Date(pastDueUntil));
+    }).format(new Date(graceEndsAt));
     return (
         <Alert
             severity="warning"

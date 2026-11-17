@@ -22,14 +22,14 @@ const emptyValues = (): CreateEmployeeFormValues => ({
     lastName: '',
     email: '',
     positionId: '',
-    startDate: todayIso(),
+    startsAt: todayIso(),
     startingSalary: '',
     mobile: '',
     personalEmail: '',
     linkedinUrl: '',
     telegram: '',
     address: '',
-    dateOfBirth: '',
+    bornAt: '',
     responsibleUserIds: [],
 });
 
@@ -45,14 +45,14 @@ const toRequest = (values: CreateEmployeeFormOutput): CreateEmployeeRequest => {
         lastName: values.lastName,
         email: values.email,
         positionId: values.positionId,
-        startDate: values.startDate,
+        startsAt: values.startsAt,
         startingSalary: values.startingSalary,
         ...(optional(values.mobile) ? { mobile: values.mobile } : {}),
         ...(optional(values.personalEmail) ? { personalEmail: values.personalEmail } : {}),
         ...(optional(values.linkedinUrl) ? { linkedinUrl: values.linkedinUrl } : {}),
         ...(optional(values.telegram) ? { telegram: values.telegram } : {}),
         ...(optional(values.address) ? { address: values.address } : {}),
-        ...(optional(values.dateOfBirth) ? { dateOfBirth: values.dateOfBirth } : {}),
+        ...(optional(values.bornAt) ? { bornAt: values.bornAt } : {}),
         responsibleUserIds: values.responsibleUserIds,
     };
 };

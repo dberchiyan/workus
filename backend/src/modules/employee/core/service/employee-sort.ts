@@ -1,7 +1,7 @@
 import { pageableOptions } from '../../../../common/dto/pageable';
 
 export const EMPLOYEE_PAGEABLE = pageableOptions({
-    sortable: ['name', 'startDate'] as const,
+    sortable: ['name', 'startsAt'] as const,
     defaultSort: 'name,asc',
 });
 

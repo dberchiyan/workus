@@ -72,7 +72,7 @@ export function ProfileTabs({ employee, mock }: ProfileTabsProps) {
                         <UpgradePrompt
                             reason={{ kind: 'feature', feature: 'reviews' }}
                             requiredPlan={reviews.requiredPlan}
-                            canManage={reviews.canManage}
+                            hasBillingAccount={reviews.hasBillingAccount}
                         />
                     ) : (
                         <ReviewTab employeeId={employee.id} />

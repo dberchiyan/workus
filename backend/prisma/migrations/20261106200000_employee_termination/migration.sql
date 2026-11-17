@@ -6,15 +6,15 @@ ALTER TABLE "employees"
 -- Terminations recorded before reasons existed (development data only).
 UPDATE "employees"
 SET "termination_reason" = 'OTHER', "termination_comment" = 'Recorded before termination reasons existed'
-WHERE "terminated_on" IS NOT NULL;
+WHERE "terminated_at" IS NOT NULL;
 
 ALTER TABLE "employees"
     ADD CONSTRAINT "ck_employees_termination_reason"
         CHECK ("termination_reason" IN ('RESIGNATION', 'DISMISSAL', 'END_OF_CONTRACT', 'LAYOFF', 'OTHER')),
     ADD CONSTRAINT "ck_employees_termination_reason_with_date"
-        CHECK (("terminated_on" IS NULL) = ("termination_reason" IS NULL)),
+        CHECK (("terminated_at" IS NULL) = ("termination_reason" IS NULL)),
     ADD CONSTRAINT "ck_employees_termination_comment_with_date"
-        CHECK ("termination_comment" IS NULL OR "terminated_on" IS NOT NULL),
+        CHECK ("termination_comment" IS NULL OR "terminated_at" IS NOT NULL),
     ADD CONSTRAINT "ck_employees_termination_other_comment"
         CHECK ("termination_reason" IS DISTINCT FROM 'OTHER' OR "termination_comment" IS NOT NULL);
 

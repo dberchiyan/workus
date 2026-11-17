@@ -3,8 +3,8 @@ CREATE TABLE "time_off_requests" (
     "id" UUID NOT NULL DEFAULT uuidv7(),
     "employee_id" UUID NOT NULL,
     "type" VARCHAR(16) NOT NULL,
-    "start_date" DATE NOT NULL,
-    "end_date" DATE NOT NULL,
+    "starts_at" DATE NOT NULL,
+    "ends_at" DATE NOT NULL,
     "days" INTEGER NOT NULL,
     "status" VARCHAR(16) NOT NULL,
     "note" VARCHAR(500),
@@ -29,7 +29,7 @@ CREATE TABLE "time_off_request_responsibles" (
     CONSTRAINT "pk_time_off_request_responsibles" PRIMARY KEY ("request_id","responsible_user_id")
 );
 
-CREATE INDEX "idx_time_off_requests_employee_id_start_date" ON "time_off_requests"("employee_id", "start_date");
+CREATE INDEX "idx_time_off_requests_employee_id_starts_at" ON "time_off_requests"("employee_id", "starts_at");
 
 CREATE INDEX "idx_time_off_requests_decided_by" ON "time_off_requests"("decided_by");
 
@@ -48,7 +48,7 @@ ALTER TABLE "time_off_request_responsibles" ADD CONSTRAINT "fk_time_off_request_
 ALTER TABLE "time_off_requests"
     ADD CONSTRAINT "ck_time_off_requests_type" CHECK ("type" IN ('VACATION', 'SICK_DAY', 'DAY_OFF')),
     ADD CONSTRAINT "ck_time_off_requests_status" CHECK ("status" IN ('PENDING', 'APPROVED', 'REJECTED', 'CANCELED')),
-    ADD CONSTRAINT "ck_time_off_requests_period" CHECK ("end_date" >= "start_date"),
+    ADD CONSTRAINT "ck_time_off_requests_period" CHECK ("ends_at" >= "starts_at"),
     ADD CONSTRAINT "ck_time_off_requests_days_positive" CHECK ("days" > 0),
     ADD CONSTRAINT "ck_time_off_requests_decision" CHECK (("decided_by" IS NULL) = ("decided_at" IS NULL));
 

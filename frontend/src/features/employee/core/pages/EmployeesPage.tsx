@@ -64,7 +64,7 @@ export default function EmployeesPage() {
                     compact
                     reason={{ kind: 'limit', ...limitReached }}
                     requiredPlan={plan.plan === 'STARTER' ? 'TEAM' : 'BUSINESS'}
-                    canManage={can('settings.billing')}
+                    hasBillingAccount={can('settings.billing')}
                 />
             )}
             <EmployeeStatsCards />

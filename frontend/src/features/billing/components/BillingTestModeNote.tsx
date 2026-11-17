@@ -7,7 +7,7 @@ import { useBillingInfo } from '../hooks/useBillingQueries';
 export function BillingTestModeNote() {
     const { t } = useTranslation('billing');
     const info = useBillingInfo();
-    if (!info.data?.testMode) {
+    if (!info.data?.isTestMode) {
         return null;
     }
     return (

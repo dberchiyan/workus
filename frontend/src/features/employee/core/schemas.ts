@@ -70,7 +70,7 @@ export const createEmployeeSchema = z.object({
         .max(EMPLOYEE_LIMITS.email, MESSAGES.emailTooLong)
         .pipe(z.email(MESSAGES.emailInvalid)),
     positionId: z.uuid(MESSAGES.positionRequired),
-    startDate: z.iso.date(MESSAGES.startDateInvalid),
+    startsAt: z.iso.date(MESSAGES.startDateInvalid),
     /** Monthly USD, a decimal string with up to two places — never a number (data.md → Money). */
     startingSalary: z
         .string()
@@ -87,8 +87,8 @@ export const createEmployeeSchema = z.object({
     ),
     telegram: optionalMatching(EMPLOYEE_LIMITS.telegram, /^@?[A-Za-z0-9_]{5,32}$/, MESSAGES.telegramInvalid),
     address: z.string().trim().max(EMPLOYEE_LIMITS.address, MESSAGES.addressTooLong),
-    /** Optional `YYYY-MM-DD`; blank is fine. The server checks "not in the future" by its own date. */
-    dateOfBirth: z
+    /** Optional `YYYY-MM-DD`; blank is fine. The server checks "not in the future" by its own terminatedAt. */
+    bornAt: z
         .string()
         .refine(
             (value) => value === '' || (/^\d{4}-\d{2}-\d{2}$/.test(value) && value >= '1900-01-01'),
@@ -117,7 +117,7 @@ export const TERMINATION_COMMENT_MAX = 500;
 /** Mirrors backend TerminateEmployeeRequest. */
 export const terminateEmployeeSchema = z
     .object({
-        date: z.iso.date('validation:terminationDate.invalid'),
+        terminatedAt: z.iso.date('validation:terminationDate.invalid'),
         reason: z.string().min(1, 'validation:terminationReason.required'),
         comment: z.string().trim().max(TERMINATION_COMMENT_MAX, 'validation:terminationComment.tooLong'),
     })
@@ -138,14 +138,14 @@ export const DETAILS_FIELDS = [
     'lastName',
     'email',
     'positionId',
-    'startDate',
+    'startsAt',
     'startingSalary',
     'mobile',
     'personalEmail',
     'linkedinUrl',
     'telegram',
     'address',
-    'dateOfBirth',
+    'bornAt',
 ] as const satisfies readonly (keyof CreateEmployeeFormValues)[];
 
 export const TERMINATION_REASONS = [

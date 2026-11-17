@@ -34,17 +34,17 @@ const DAY_MS = 86_400_000;
 export const createTimeOffSchema = z
     .object({
         type: z.enum(TIME_OFF_TYPES, { error: MESSAGES.typeRequired }),
-        startDate: z.iso.date(MESSAGES.startRequired),
-        endDate: z.iso.date(MESSAGES.endRequired),
+        startsAt: z.iso.date(MESSAGES.startRequired),
+        endsAt: z.iso.date(MESSAGES.endRequired),
         note: z.string().trim().max(TIME_OFF_LIMITS.note, MESSAGES.noteTooLong),
     })
     .superRefine((values, context) => {
         const days =
-            (Date.parse(`${values.endDate}T00:00:00Z`) - Date.parse(`${values.startDate}T00:00:00Z`)) / DAY_MS + 1;
+            (Date.parse(`${values.endsAt}T00:00:00Z`) - Date.parse(`${values.startsAt}T00:00:00Z`)) / DAY_MS + 1;
         if (days < 1) {
-            context.addIssue({ code: 'custom', path: ['endDate'], message: MESSAGES.order });
+            context.addIssue({ code: 'custom', path: ['endsAt'], message: MESSAGES.order });
         } else if (days > TIME_OFF_LIMITS.periodDays) {
-            context.addIssue({ code: 'custom', path: ['endDate'], message: MESSAGES.tooLong });
+            context.addIssue({ code: 'custom', path: ['endsAt'], message: MESSAGES.tooLong });
         }
     });
 
@@ -60,13 +60,13 @@ export type CommentFormOutput = z.output<typeof commentSchema>;
 
 /** Mirrors backend CreateHolidayRequest / UpdateHolidayRequest. */
 export const holidaySchema = z.object({
-    date: z.iso.date(MESSAGES.holidayDate),
+    heldAt: z.iso.date(MESSAGES.holidayDate),
     name: z
         .string()
         .trim()
         .min(1, MESSAGES.holidayNameRequired)
         .max(TIME_OFF_LIMITS.holidayName, MESSAGES.holidayNameTooLong),
-    recurring: z.boolean(),
+    isRecurring: z.boolean(),
 });
 export type HolidayFormValues = z.input<typeof holidaySchema>;
 export type HolidayFormOutput = z.output<typeof holidaySchema>;

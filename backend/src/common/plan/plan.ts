@@ -82,4 +82,4 @@ export const lowestPlanWith = (feature: Feature): Plan =>
  */
 export const GRACE_PERIOD_DAYS = 7;
 const DAY_MS = 86_400_000;
-export const graceEndsAt = (pastDueSince: Date): Date => new Date(pastDueSince.getTime() + GRACE_PERIOD_DAYS * DAY_MS);
+export const graceEndsAt = (pastDueAt: Date): Date => new Date(pastDueAt.getTime() + GRACE_PERIOD_DAYS * DAY_MS);

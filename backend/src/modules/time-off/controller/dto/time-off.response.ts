@@ -19,9 +19,9 @@ export class LeaveBalancesResponse extends createZodDto(
         content: z.array(
             z.object({
                 type: TimeOffTypeSchema,
-                cycleStart: z.iso.date(),
+                cycleStartsAt: z.iso.date(),
                 /** Last day of the cycle (inclusive). */
-                cycleEnd: z.iso.date(),
+                cycleEndsAt: z.iso.date(),
                 /** Working days per cycle; null = no limit. */
                 allowance: z.number().int().nullable(),
                 used: z.number().int(),
@@ -49,9 +49,9 @@ export const TimeOffCommentSchema = z
 const requestShape = {
     id: z.uuid(),
     type: TimeOffTypeSchema,
-    startDate: z.iso.date(),
+    startsAt: z.iso.date(),
     /** Inclusive. */
-    endDate: z.iso.date(),
+    endsAt: z.iso.date(),
     /** Working days. */
     days: z.number().int(),
     status: TimeOffStatusSchema,
@@ -119,9 +119,9 @@ export const TimeOffCalendarRowSchema = z
             firstName: z.string(),
             lastName: z.string(),
             positionTitle: z.string(),
-            startDate: z.iso.date(),
+            startsAt: z.iso.date(),
             /** First day without work; null while employed. */
-            terminatedOn: z.iso.date().nullable(),
+            terminatedAt: z.iso.date().nullable(),
         }),
         /** Approved and pending requests touching the month, by start date. */
         requests: z.array(
@@ -129,8 +129,8 @@ export const TimeOffCalendarRowSchema = z
                 id: z.uuid(),
                 type: TimeOffTypeSchema,
                 status: TimeOffStatusSchema,
-                startDate: z.iso.date(),
-                endDate: z.iso.date(),
+                startsAt: z.iso.date(),
+                endsAt: z.iso.date(),
                 days: z.number().int(),
             }),
         ),
@@ -143,6 +143,6 @@ export class TimeOffCalendarResponse extends createZodDto(
         from: z.iso.date(),
         to: z.iso.date(),
         /** Company holidays in the month, by date. */
-        holidays: z.array(z.object({ date: z.iso.date(), name: z.string() })).max(31),
+        holidays: z.array(z.object({ heldAt: z.iso.date(), name: z.string() })).max(31),
     }),
 ) {}

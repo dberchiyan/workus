@@ -19,20 +19,20 @@ ALTER TABLE "audit_events" ADD CONSTRAINT "ck_audit_events_action"
 
 DROP TABLE "billing_events";
 
-DROP INDEX "idx_organisations_subscription_status_past_due_since";
+DROP INDEX "idx_organisations_subscription_status_past_due_at";
 DROP INDEX "uq_organisations_billing_subscription_id";
 DROP INDEX "uq_organisations_billing_customer_id";
 ALTER TABLE "organisations"
     DROP CONSTRAINT "ck_organisations_billing_subscription_id",
-    DROP CONSTRAINT "ck_organisations_past_due_since",
+    DROP CONSTRAINT "ck_organisations_past_due_at",
     DROP CONSTRAINT "ck_organisations_subscription_status",
     DROP CONSTRAINT "ck_organisations_scheduled_plan",
     DROP CONSTRAINT "ck_organisations_plan";
 ALTER TABLE "organisations"
     DROP COLUMN "billing_subscription_id",
     DROP COLUMN "billing_customer_id",
-    DROP COLUMN "past_due_since",
-    DROP COLUMN "current_period_end",
+    DROP COLUMN "past_due_at",
+    DROP COLUMN "period_ends_at",
     DROP COLUMN "scheduled_plan",
     DROP COLUMN "subscription_status",
     DROP COLUMN "plan";

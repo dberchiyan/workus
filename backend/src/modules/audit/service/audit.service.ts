@@ -98,7 +98,7 @@ export class AuditService {
                               action: record.action,
                               ipAddress: record.ipAddress,
                               userAgent: record.userAgent,
-                              newDevice: newDevices.has(record.id),
+                              isNewDevice: newDevices.has(record.id),
                           },
                       ]
                     : [],
@@ -134,7 +134,7 @@ export class AuditService {
                           action: record.action,
                           ipAddress: record.ipAddress,
                           userAgent: record.userAgent,
-                          newDevice: newDevices.has(record.id),
+                          isNewDevice: newDevices.has(record.id),
                       },
                   ]
                 : [],

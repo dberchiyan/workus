@@ -55,7 +55,7 @@ export function ExportButton({ employeeId, kind }: ExportButtonProps) {
                     <UpgradePrompt
                         reason={{ kind: 'feature', feature: 'exports' }}
                         requiredPlan={upgrade.requiredPlan}
-                        canManage={upgrade.canManage}
+                        hasBillingAccount={upgrade.hasBillingAccount}
                         className="py-4"
                     />
                 </DialogContent>

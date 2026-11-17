@@ -187,7 +187,7 @@ export function AdminOverview() {
                                                 ? 'admin.movements.starts'
                                                 : 'admin.movements.leaves',
                                             {
-                                                date: day(next.date),
+                                                date: day(next.movedAt),
                                             },
                                         )}
                                     </span>

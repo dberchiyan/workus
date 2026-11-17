@@ -58,7 +58,7 @@ export const ACCESS = {
 export type AccessPart = keyof typeof ACCESS;
 
 /**
- * Turned off for the demo's shared showcase accounts (`demoRestricted` from the server, which
+ * Turned off for the demo's shared showcase accounts (`isDemoRestricted` from the server, which
  * refuses them too): each would lock other visitors out. A company a visitor created keeps them.
  */
 const DEMO_RESTRICTED: ReadonlySet<AccessPart> = new Set<AccessPart>([
@@ -69,7 +69,7 @@ const DEMO_RESTRICTED: ReadonlySet<AccessPart> = new Set<AccessPart>([
 ]);
 
 /** Does this role use that part (and is it open to a demo showcase account)? No user → no. */
-export const canAccess = (role: UserRole | undefined, part: AccessPart, demoRestricted = false): boolean =>
+export const canAccess = (role: UserRole | undefined, part: AccessPart, isDemoRestricted = false): boolean =>
     role !== undefined &&
     (ACCESS[part] as readonly UserRole[]).includes(role) &&
-    !(demoRestricted && DEMO_RESTRICTED.has(part));
+    !(isDemoRestricted && DEMO_RESTRICTED.has(part));

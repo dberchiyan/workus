@@ -37,9 +37,8 @@ const asDate = (iso: string): Date => new Date(`${iso}T00:00:00Z`);
 const OUT_TODAY_SHOWN = 5;
 
 /** A pending request, or an approved one that has not started, can still be canceled. */
-const isCancelable = (request: { status: string; startDate: Date }, today: Date): boolean =>
-    request.status === TimeOffStatus.PENDING ||
-    (request.status === TimeOffStatus.APPROVED && request.startDate > today);
+const isCancelable = (request: { status: string; startsAt: Date }, today: Date): boolean =>
+    request.status === TimeOffStatus.PENDING || (request.status === TimeOffStatus.APPROVED && request.startsAt > today);
 
 @Injectable()
 export class TimeOffService {
@@ -108,8 +107,8 @@ export class TimeOffService {
             // Guarded by ck_time_off_requests_type.
             type: isTimeOffType(request.type) ? request.type : TimeOffType.DAY_OFF,
             days: workingDaysBetween(
-                request.startDate > from ? request.startDate : from,
-                request.endDate < to ? request.endDate : to,
+                request.startsAt > from ? request.startsAt : from,
+                request.endsAt < to ? request.endsAt : to,
                 holidays,
             ),
         }));
@@ -132,8 +131,8 @@ export class TimeOffService {
                 // Guarded by ck_time_off_requests_type / _status.
                 type: isTimeOffType(request.type) ? request.type : TimeOffType.DAY_OFF,
                 status: isTimeOffStatus(request.status) ? request.status : TimeOffStatus.PENDING,
-                startDate: request.startDate,
-                endDate: request.endDate,
+                startsAt: request.startsAt,
+                endsAt: request.endsAt,
                 days: request.days,
                 createdAt: request.createdAt,
                 employee: {
@@ -172,7 +171,7 @@ export class TimeOffService {
         const offToday = new Map<string, AbsentPerson>();
         const offLater = new Set<string>();
         for (const absence of absences) {
-            if (absence.startDate <= today && absence.endDate >= today) {
+            if (absence.startsAt <= today && absence.endsAt >= today) {
                 offToday.set(absence.employeeId, absence.employee.user);
             } else {
                 offLater.add(absence.employeeId);
@@ -218,33 +217,33 @@ export class TimeOffService {
     @Transactional()
     async create(organisationId: string, userId: string, command: CreateTimeOffCommand): Promise<TimeOffRequestView> {
         const employee = await this.requireSelf(userId);
-        const startDate = asDate(command.startDate);
-        const endDate = asDate(command.endDate);
-        if (startDate < employee.startDate) {
-            throw new BusinessRuleException('errors.timeOff.beforeStart', {}, 'startDate');
+        const startsAt = asDate(command.startsAt);
+        const endsAt = asDate(command.endsAt);
+        if (startsAt < employee.startsAt) {
+            throw new BusinessRuleException('errors.timeOff.beforeStart', {}, 'startsAt');
         }
-        if (employee.terminatedOn && endDate >= employee.terminatedOn) {
-            throw new BusinessRuleException('errors.timeOff.afterTermination', {}, 'endDate');
+        if (employee.terminatedAt && endsAt >= employee.terminatedAt) {
+            throw new BusinessRuleException('errors.timeOff.afterTermination', {}, 'endsAt');
         }
         const days = workingDaysBetween(
-            startDate,
-            endDate,
-            await this.holidayService.datesBetween(organisationId, startDate, endDate),
+            startsAt,
+            endsAt,
+            await this.holidayService.datesBetween(organisationId, startsAt, endsAt),
         );
         if (days === 0) {
-            throw new BusinessRuleException('errors.timeOff.noWorkingDays', {}, 'endDate');
+            throw new BusinessRuleException('errors.timeOff.noWorkingDays', {}, 'endsAt');
         }
-        if (await this.requestRepository.existsHeldOverlapping(organisationId, employee.id, startDate, endDate)) {
-            throw new BusinessRuleException('errors.timeOff.overlaps', {}, 'startDate');
+        if (await this.requestRepository.existsHeldOverlapping(organisationId, employee.id, startsAt, endsAt)) {
+            throw new BusinessRuleException('errors.timeOff.overlaps', {}, 'startsAt');
         }
-        const balance = (await this.balancesOf(organisationId, employee, startDate)).find(
+        const balance = (await this.balancesOf(organisationId, employee, startsAt)).find(
             (item) => item.type === command.type,
         );
         if (balance?.available !== null && balance !== undefined && days > balance.available) {
             throw new BusinessRuleException(
                 'errors.timeOff.notEnoughDays',
                 { available: balance.available, requested: days },
-                'endDate',
+                'endsAt',
             );
         }
         if (employee.responsibleUserIds.length === 0) {
@@ -254,8 +253,8 @@ export class TimeOffService {
             organisationId,
             employeeId: employee.id,
             type: command.type,
-            startDate,
-            endDate,
+            startsAt,
+            endsAt,
             days,
             note: command.note ?? null,
             responsibleUserIds: employee.responsibleUserIds,
@@ -271,8 +270,8 @@ export class TimeOffService {
             },
             changes: [
                 ...changeOf(AuditField.TIME_OFF_TYPE, null, auditValue.timeOffType(request.type)),
-                ...changeOf(AuditField.PERIOD_START, null, auditValue.date(request.startDate)),
-                ...changeOf(AuditField.PERIOD_END, null, auditValue.date(request.endDate)),
+                ...changeOf(AuditField.PERIOD_STARTS_AT, null, auditValue.date(request.startsAt)),
+                ...changeOf(AuditField.PERIOD_ENDS_AT, null, auditValue.date(request.endsAt)),
                 ...changeOf(AuditField.DAYS, null, auditValue.number(request.days)),
                 ...(request.note ? changeOf(AuditField.NOTE, null, auditValue.text(request.note)) : []),
             ],
@@ -375,14 +374,14 @@ export class TimeOffService {
     ): Promise<LeaveBalance[]> {
         const cycles = TIME_OFF_TYPES.map((type) => ({
             type,
-            ...cycleOf(employee.startDate, LEAVE_POLICY[type].cycleMonths, date),
+            ...cycleOf(employee.startsAt, LEAVE_POLICY[type].cycleMonths, date),
         }));
         const from = new Date(Math.min(...cycles.map((cycle) => cycle.start.getTime())));
         const to = new Date(Math.max(...cycles.map((cycle) => cycle.end.getTime())));
         const held = await this.requestRepository.findHeldStartingBetween(organisationId, employee.id, from, to);
         return cycles.map(({ type, start, end }) => {
             const inCycle = held.filter(
-                (request) => request.type === type && request.startDate >= start && request.startDate <= end,
+                (request) => request.type === type && request.startsAt >= start && request.startsAt <= end,
             );
             const sum = (status: TimeOffStatus) =>
                 inCycle
@@ -393,8 +392,8 @@ export class TimeOffService {
             const { allowance } = LEAVE_POLICY[type];
             return {
                 type,
-                cycleStart: start,
-                cycleEnd: end,
+                cycleStartsAt: start,
+                cycleEndsAt: end,
                 allowance,
                 used,
                 pending,

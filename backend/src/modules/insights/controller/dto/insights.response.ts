@@ -41,7 +41,7 @@ const TenureSchema = z.object({
     groups: z.array(TenureFigureSchema.extend({ items: z.array(TenureFigureSchema) })),
 });
 
-const MovementSchema = PersonSchema.extend({ date: z.iso.date() });
+const MovementSchema = PersonSchema.extend({ movedAt: z.iso.date() });
 
 const TurnoverSchema = z.object({
     months: z.array(

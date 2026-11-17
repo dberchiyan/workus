@@ -76,7 +76,7 @@ export function CancelRequestDialog({ request, open, onClose, onCanceled, onExit
                     {request &&
                         t('cancel.description', {
                             type: t(`types.${request.type}`),
-                            period: formatPeriod(request.startDate, request.endDate, i18n.language),
+                            period: formatPeriod(request.startsAt, request.endsAt, i18n.language),
                         })}
                 </DialogContentText>
             </DialogContent>

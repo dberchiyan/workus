@@ -19,14 +19,14 @@ import type { Holiday } from '../types';
 export interface HolidayDialogProps {
     /** Undefined: a new holiday. */
     holiday: Holiday | undefined;
-    /** The date a new holiday starts with (in the year shown). */
+    /** The heldAt a new holiday starts with (in the year shown). */
     defaultDate: string;
     open: boolean;
     onClose: () => void;
     onExited: () => void;
 }
 
-/** Add or change a holiday: date, name and whether it repeats every year. */
+/** Add or change a holiday: heldAt, name and whether it repeats every year. */
 export function HolidayDialog({ holiday, defaultDate, open, onClose, onExited }: HolidayDialogProps) {
     const { t } = useTranslation(['timeOff', 'errors']);
     const titleId = useId();
@@ -37,7 +37,7 @@ export function HolidayDialog({ holiday, defaultDate, open, onClose, onExited }:
 
     useEffect(() => {
         requestAnimationFrame(() => {
-            form.setFocus('date');
+            form.setFocus('heldAt');
         });
     }, [form]);
 
@@ -62,12 +62,12 @@ export function HolidayDialog({ holiday, defaultDate, open, onClose, onExited }:
                 </DialogTitle>
                 <DialogContent className="flex flex-col gap-2">
                     <TextField
-                        {...form.register('date')}
+                        {...form.register('heldAt')}
                         type="date"
                         required
                         label={t('holidays.dialog.date')}
-                        error={Boolean(errors.date)}
-                        helperText={message(errors.date)}
+                        error={Boolean(errors.heldAt)}
+                        helperText={message(errors.heldAt)}
                         className="mt-2"
                         slotProps={{ inputLabel: { shrink: true } }}
                     />
@@ -81,7 +81,7 @@ export function HolidayDialog({ holiday, defaultDate, open, onClose, onExited }:
                     />
                     <Controller
                         control={form.control}
-                        name="recurring"
+                        name="isRecurring"
                         render={({ field }) => (
                             <FormControlLabel
                                 className="m-0"
@@ -104,9 +104,9 @@ export function HolidayDialog({ holiday, defaultDate, open, onClose, onExited }:
                     <FormHelperText id={recurringHintId} className="mx-0 mt-0">
                         {t('holidays.dialog.recurringHint')}
                     </FormHelperText>
-                    {holiday?.carriedOver && (
+                    {holiday?.isCarriedOver && (
                         <Alert severity="info" variant="outlined">
-                            {t('holidays.dialog.copyMade', { year: Number(holiday.date.slice(0, 4)) + 1 })}
+                            {t('holidays.dialog.copyMade', { year: Number(holiday.heldAt.slice(0, 4)) + 1 })}
                         </Alert>
                     )}
                 </DialogContent>

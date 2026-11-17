@@ -2,14 +2,14 @@ import { toMoney } from '../../../../common/persistence/money';
 import type { Insights, Salary, Turnover } from '../../service/insights.types';
 import type { InsightsResponse } from '../dto/insights.response';
 
-const isoDate = (date: Date): string => date.toISOString().slice(0, 10);
+const isoDate = (movedAt: Date): string => movedAt.toISOString().slice(0, 10);
 
 const toTurnover = (turnover: Turnover): InsightsResponse['turnover'] => ({
     ...turnover,
     months: turnover.months.map((month) => ({
         month: month.month,
-        hired: month.hired.map((person) => ({ ...person, date: isoDate(person.date) })),
-        left: month.left.map((person) => ({ ...person, date: isoDate(person.date) })),
+        hired: month.hired.map((person) => ({ ...person, movedAt: isoDate(person.movedAt) })),
+        left: month.left.map((person) => ({ ...person, movedAt: isoDate(person.movedAt) })),
     })),
 });
 

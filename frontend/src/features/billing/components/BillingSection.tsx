@@ -29,26 +29,24 @@ function CurrentPlan({ billing, onKeep }: { billing: Billing; onKeep: () => void
         if (billing.status === 'PAST_DUE') {
             return null;
         }
-        if (billing.granted) {
+        if (billing.isGrantedPlan) {
             return t('billing:current.granted');
         }
         if (billing.status === 'NONE') {
             return t('billing:current.free');
         }
-        if (billing.scheduledPlan && billing.currentPeriodEnd) {
+        if (billing.scheduledPlan && billing.periodEndsAt) {
             return billing.scheduledPlan === 'STARTER'
-                ? t('billing:current.endsOn', { date: date(billing.currentPeriodEnd) })
+                ? t('billing:current.endsOn', { date: date(billing.periodEndsAt) })
                 : t('billing:current.switchesOn', {
                       plan: t(`billing:planNames.${billing.scheduledPlan}`),
-                      date: date(billing.currentPeriodEnd),
+                      date: date(billing.periodEndsAt),
                   });
         }
-        return billing.currentPeriodEnd
-            ? t('billing:current.nextCharge', { date: date(billing.currentPeriodEnd) })
-            : null;
+        return billing.periodEndsAt ? t('billing:current.nextCharge', { date: date(billing.periodEndsAt) }) : null;
     })();
-    // A granted paid plan is in force like a paid one: it reads "Included", never "no plan".
-    const statusKey = billing.granted ? 'GRANTED' : billing.status;
+    // A isGrantedPlan paid plan is in force like a paid one: it reads "Included", never "no plan".
+    const statusKey = billing.isGrantedPlan ? 'GRANTED' : billing.status;
     const tone = statusKey === 'PAST_DUE' ? 'danger' : statusKey === 'NONE' ? 'neutral' : 'success';
     return (
         <div className="flex flex-col gap-4">
@@ -73,7 +71,7 @@ function CurrentPlan({ billing, onKeep }: { billing: Billing; onKeep: () => void
                     </Button>
                 </div>
             )}
-            {billing.canManage && (
+            {billing.hasBillingAccount && (
                 <div className="flex flex-col gap-2">
                     <div>
                         <Button
@@ -172,7 +170,7 @@ export function BillingSection() {
         }
         const names = {
             plan: t(`billing:planNames.${change.kind === 'keep' ? change.current : change.target}`),
-            date: change.periodEnd ? formatBillingDate(change.periodEnd, i18n.language) : '',
+            date: change.periodEndsAt ? formatBillingDate(change.periodEndsAt, i18n.language) : '',
         };
         changePlan.mutate(
             { plan: change.kind === 'keep' ? change.current : change.target },
@@ -190,7 +188,7 @@ export function BillingSection() {
         const isCurrent = offer.plan === data.plan;
         const hasSubscription = data.status !== 'NONE';
         const open = (kind: PlanChange['kind']) => () => {
-            review({ kind, target: offer.plan, current: data.plan, periodEnd: data.currentPeriodEnd });
+            review({ kind, target: offer.plan, current: data.plan, periodEndsAt: data.periodEndsAt });
         };
         const pending = (plan: Plan) =>
             changePlan.isPending && change !== null && change.target === plan && change.kind !== 'keep';
@@ -199,7 +197,7 @@ export function BillingSection() {
         }
         if (!hasSubscription) {
             if (offer.plan === 'STARTER') {
-                // A granted paid plan can be given up for Starter at once.
+                // A isGrantedPlan paid plan can be given up for Starter at once.
                 return {
                     label: t('billing:plans.switchToStarter'),
                     onClick: open('giveUp'),
@@ -267,7 +265,7 @@ export function BillingSection() {
                                     kind: 'keep',
                                     target: data.plan,
                                     current: data.plan,
-                                    periodEnd: data.currentPeriodEnd,
+                                    periodEndsAt: data.periodEndsAt,
                                 });
                             }}
                         />
@@ -292,7 +290,7 @@ export function BillingSection() {
                                 : t('billing:plans.descriptionSubscribed')}
                         </Typography>
                     </div>
-                    {data.testMode && (
+                    {data.isTestMode && (
                         <Alert severity="info">
                             <Typography variant="subtitle2" component="span">
                                 {t('billing:testMode.title')}

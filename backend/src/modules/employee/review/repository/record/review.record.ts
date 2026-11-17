@@ -8,7 +8,7 @@ export const reviewSelect = {
     id: true,
     kind: true,
     title: true,
-    reviewDate: true,
+    reviewedAt: true,
     status: true,
     salaryAmount: true,
     salaryCurrency: true,
@@ -30,7 +30,7 @@ export type ReviewRecord = Prisma.EmployeeReviewGetPayload<{ select: typeof revi
 export const dashboardReviewSelect = {
     id: true,
     title: true,
-    reviewDate: true,
+    reviewedAt: true,
     status: true,
     employee: {
         select: {

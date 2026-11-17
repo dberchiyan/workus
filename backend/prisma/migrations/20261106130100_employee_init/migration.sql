@@ -2,8 +2,8 @@ CREATE TABLE "employees" (
     "id" UUID NOT NULL DEFAULT uuidv7(),
     "user_id" UUID NOT NULL,
     "position_id" UUID NOT NULL,
-    "start_date" DATE NOT NULL,
-    "terminated_on" DATE,
+    "starts_at" DATE NOT NULL,
+    "terminated_at" DATE,
     "created_at" TIMESTAMPTZ(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMPTZ(3) NOT NULL,
     "created_by" UUID,
@@ -11,13 +11,13 @@ CREATE TABLE "employees" (
     "version" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "pk_employees" PRIMARY KEY ("id"),
-    CONSTRAINT "ck_employees_terminated_on_after_start" CHECK ("terminated_on" IS NULL OR "terminated_on" >= "start_date")
+    CONSTRAINT "ck_employees_terminated_at_after_start" CHECK ("terminated_at" IS NULL OR "terminated_at" >= "starts_at")
 );
 
 CREATE UNIQUE INDEX "uq_employees_user_id" ON "employees"("user_id");
 CREATE INDEX "idx_employees_position_id" ON "employees"("position_id");
-CREATE INDEX "idx_employees_start_date" ON "employees"("start_date");
-CREATE INDEX "idx_employees_terminated_on" ON "employees"("terminated_on");
+CREATE INDEX "idx_employees_starts_at" ON "employees"("starts_at");
+CREATE INDEX "idx_employees_terminated_at" ON "employees"("terminated_at");
 
 ALTER TABLE "employees" ADD CONSTRAINT "fk_employees_user_id" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "employees" ADD CONSTRAINT "fk_employees_position_id" FOREIGN KEY ("position_id") REFERENCES "positions"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

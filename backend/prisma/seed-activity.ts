@@ -38,8 +38,8 @@ export const seedActivity = async (
         where: { organisationId, auditEvents: { none: {} } },
         select: {
             id: true,
-            startDate: true,
-            terminatedOn: true,
+            startsAt: true,
+            terminatedAt: true,
             terminationReason: true,
             terminationComment: true,
             user: { select: { firstName: true, lastName: true } },
@@ -53,7 +53,7 @@ export const seedActivity = async (
                     id: true,
                     kind: true,
                     title: true,
-                    reviewDate: true,
+                    reviewedAt: true,
                     status: true,
                     salaryAmount: true,
                     salaryCurrency: true,
@@ -66,11 +66,11 @@ export const seedActivity = async (
                         take: 10,
                     },
                 },
-                orderBy: { reviewDate: 'asc' },
+                orderBy: { reviewedAt: 'asc' },
                 take: 100,
             },
         },
-        orderBy: { startDate: 'asc' },
+        orderBy: { startsAt: 'asc' },
     });
 
     const events: Prisma.AuditEventCreateManyInput[] = [];
@@ -100,7 +100,7 @@ export const seedActivity = async (
 
     for (const [index, employee] of employees.entries()) {
         const responsibles = employee.responsibles.map(({ responsible }) => person(responsible));
-        const hiredAt = past(shift(employee.startDate, -14), now);
+        const hiredAt = past(shift(employee.startsAt, -14), now);
         event(
             index,
             hiredAt,
@@ -113,7 +113,7 @@ export const seedActivity = async (
             },
             [
                 { field: AuditField.POSITION, from: null, to: auditValue.text(employee.position.title) },
-                { field: AuditField.START_DATE, from: null, to: auditValue.date(employee.startDate) },
+                { field: AuditField.STARTS_AT, from: null, to: auditValue.date(employee.startsAt) },
                 ...(responsibles.length > 0
                     ? [{ field: AuditField.RESPONSIBLES, from: null, to: auditValue.people(responsibles) }]
                     : []),
@@ -128,7 +128,7 @@ export const seedActivity = async (
                 // Added with the employee, in the same step (a millisecond later, so it sorts above).
                 event(index, new Date(hiredAt.getTime() + 1), AuditAction.REVIEW_CREATED, employee.id, target, [
                     { field: AuditField.TITLE, from: null, to: auditValue.text(review.title) },
-                    { field: AuditField.DATE, from: null, to: auditValue.date(review.reviewDate) },
+                    { field: AuditField.REVIEWED_AT, from: null, to: auditValue.date(review.reviewedAt) },
                     { field: AuditField.STATUS, from: null, to: auditValue.reviewStatus('COMPLETED') },
                     {
                         field: AuditField.SALARY,
@@ -140,14 +140,14 @@ export const seedActivity = async (
                 continue;
             }
             const scheduled = auditValue.reviewStatus('SCHEDULED');
-            event(n, past(shift(review.reviewDate, -30), now), AuditAction.REVIEW_CREATED, employee.id, target, [
+            event(n, past(shift(review.reviewedAt, -30), now), AuditAction.REVIEW_CREATED, employee.id, target, [
                 { field: AuditField.TITLE, from: null, to: auditValue.text(review.title) },
-                { field: AuditField.DATE, from: null, to: auditValue.date(review.reviewDate) },
+                { field: AuditField.REVIEWED_AT, from: null, to: auditValue.date(review.reviewedAt) },
                 { field: AuditField.STATUS, from: null, to: scheduled },
                 { field: AuditField.RESPONSIBLES, from: null, to: people },
             ]);
             if (review.status === 'COMPLETED' && review.salaryAmount && review.salaryCurrency) {
-                event(n + 1, past(shift(review.reviewDate, 1), now), AuditAction.REVIEW_UPDATED, employee.id, target, [
+                event(n + 1, past(shift(review.reviewedAt, 1), now), AuditAction.REVIEW_UPDATED, employee.id, target, [
                     { field: AuditField.STATUS, from: scheduled, to: auditValue.reviewStatus('COMPLETED') },
                     {
                         field: AuditField.SALARY,
@@ -159,17 +159,17 @@ export const seedActivity = async (
                     ),
                 ]);
             } else if (review.status === 'CANCELED') {
-                event(n + 1, past(shift(review.reviewDate, -5), now), AuditAction.REVIEW_UPDATED, employee.id, target, [
+                event(n + 1, past(shift(review.reviewedAt, -5), now), AuditAction.REVIEW_UPDATED, employee.id, target, [
                     { field: AuditField.STATUS, from: scheduled, to: auditValue.reviewStatus('CANCELED') },
                 ]);
             }
         }
 
-        if (employee.terminatedOn && employee.terminationReason) {
+        if (employee.terminatedAt && employee.terminationReason) {
             // Recorded two weeks before the last day (or a few hours ago when that is in the future).
             event(
                 index + 1,
-                past(shift(employee.terminatedOn, -14), now),
+                past(shift(employee.terminatedAt, -14), now),
                 AuditAction.EMPLOYEE_TERMINATED,
                 employee.id,
                 {
@@ -179,9 +179,9 @@ export const seedActivity = async (
                 },
                 [
                     {
-                        field: AuditField.TERMINATION_DATE,
+                        field: AuditField.TERMINATED_AT,
                         from: null,
-                        to: auditValue.date(employee.terminatedOn),
+                        to: auditValue.date(employee.terminatedAt),
                     },
                     {
                         field: AuditField.TERMINATION_REASON,
@@ -202,11 +202,11 @@ export const seedActivity = async (
         }
 
         if (index % 7 === 3) {
-            const checkInDate = shift(employee.startDate, 90);
+            const checkInDate = shift(employee.startsAt, 90);
             const target = { type: AuditTargetType.REVIEW, id: crypto.randomUUID(), label: 'Check-in' };
             const values: AuditChange[] = [
                 { field: AuditField.TITLE, from: null, to: auditValue.text('Check-in') },
-                { field: AuditField.DATE, from: null, to: auditValue.date(checkInDate) },
+                { field: AuditField.REVIEWED_AT, from: null, to: auditValue.date(checkInDate) },
                 { field: AuditField.STATUS, from: null, to: auditValue.reviewStatus('SCHEDULED') },
             ];
             event(index, past(shift(checkInDate, -20), now), AuditAction.REVIEW_CREATED, employee.id, target, values);

@@ -48,9 +48,9 @@ model Employee {
   user               User                  @relation("EmployeeUser", fields: [organisationId, userId], references: [organisationId, id], onDelete: Restrict, map: "fk_employees_user_id")
   positionId         String                @map("position_id") @db.Uuid
   position           Position              @relation(fields: [organisationId, positionId], references: [organisationId, id], onDelete: Restrict, map: "fk_employees_position_id")
-  startDate          DateTime              @map("start_date") @db.Date
-  terminatedOn       DateTime?             @map("terminated_on") @db.Date // set → terminated from that day
-  /// Set together with terminated_on: RESIGNATION | DISMISSAL | END_OF_CONTRACT | LAYOFF | OTHER — CHECK in migration.
+  startsAt          DateTime              @map("starts_at") @db.Date
+  terminatedAt       DateTime?             @map("terminated_at") @db.Date // set → terminated from that day
+  /// Set together with terminated_at: RESIGNATION | DISMISSAL | END_OF_CONTRACT | LAYOFF | OTHER — CHECK in migration.
   terminationReason  String?               @map("termination_reason") @db.VarChar(32)
   /// Optional note; required for OTHER — CHECK.
   terminationComment String?               @map("termination_comment") @db.VarChar(500)
@@ -60,7 +60,7 @@ model Employee {
   telegram           String?               @db.VarChar(33) // "@handle"
   address            String?               @db.VarChar(500)
   /// Optional; on or after 1900-01-01 — CHECK in migration. Personal data: the audit log records only that it changed.
-  dateOfBirth        DateTime?             @map("date_of_birth") @db.Date
+  bornAt        DateTime?             @map("born_at") @db.Date
   createdAt          DateTime              @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt          DateTime              @updatedAt @map("updated_at") @db.Timestamptz(3)
   createdBy          String?               @map("created_by") @db.Uuid
@@ -75,8 +75,8 @@ model Employee {
   @@unique([organisationId, userId], map: "uq_employees_organisation_id_user_id")
   @@unique([organisationId, id], map: "uq_employees_organisation_id_id")
   @@index([organisationId, positionId], map: "idx_employees_organisation_id_position_id")
-  @@index([startDate], map: "idx_employees_start_date")
-  @@index([terminatedOn], map: "idx_employees_terminated_on")
+  @@index([startsAt], map: "idx_employees_starts_at")
+  @@index([terminatedAt], map: "idx_employees_terminated_at")
   @@map("employees")
 }
 

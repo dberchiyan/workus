@@ -20,12 +20,12 @@ export const toEmployeeProfileResponse = (employee: EmployeeProfileRecord, today
         title: employee.position.title,
         category: { id: employee.position.category.id, name: employee.position.category.name },
     },
-    startDate: toIsoDate(employee.startDate),
-    dateOfBirth: employee.dateOfBirth ? toIsoDate(employee.dateOfBirth) : null,
-    terminatedOn: employee.terminatedOn ? toIsoDate(employee.terminatedOn) : null,
+    startsAt: toIsoDate(employee.startsAt),
+    bornAt: employee.bornAt ? toIsoDate(employee.bornAt) : null,
+    terminatedAt: employee.terminatedAt ? toIsoDate(employee.terminatedAt) : null,
     // Guarded by ck_employees_termination_reason and ck_employees_termination_reason_with_date.
     termination:
-        employee.terminatedOn && employee.terminationReason
+        employee.terminatedAt && employee.terminationReason
             ? {
                   reason: isTerminationReason(employee.terminationReason)
                       ? employee.terminationReason
@@ -33,7 +33,7 @@ export const toEmployeeProfileResponse = (employee: EmployeeProfileRecord, today
                   comment: employee.terminationComment,
               }
             : null,
-    status: statusOn(employee.terminatedOn, today),
+    status: statusOn(employee.terminatedAt, today),
     contacts: {
         mobile: employee.mobile,
         personalEmail: employee.personalEmail,

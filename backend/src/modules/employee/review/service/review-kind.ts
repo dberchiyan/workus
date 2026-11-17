@@ -1,4 +1,4 @@
-/** STARTING = the salary agreed at hire: one per employee, dated the start date, always completed. */
+/** STARTING = the salary agreed at hire: one per employee, dated the start reviewedAt, always completed. */
 export const ReviewKind = {
     STARTING: 'STARTING',
     REGULAR: 'REGULAR',

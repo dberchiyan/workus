@@ -34,7 +34,7 @@ const salaryOverview = (reviews: ReviewRecord[]): SalaryOverview => {
             review.salaryAmount && review.salaryCurrency
                 ? [
                       {
-                          date: review.reviewDate,
+                          reviewedAt: review.reviewedAt,
                           amount: review.salaryAmount,
                           currency: review.salaryCurrency,
                       },
@@ -60,7 +60,7 @@ const optionalDoc = (doc: RichTextDoc | null | undefined): RichTextDoc | null =>
 /** Command → stored columns (explicit mapping, never the DTO itself). */
 const toColumns = (command: CreateReviewCommand) => ({
     title: command.title,
-    reviewDate: new Date(`${command.date}T00:00:00Z`),
+    reviewedAt: new Date(`${command.reviewedAt}T00:00:00Z`),
     status: command.status,
     salaryAmount: command.salary ? toDecimal(command.salary) : null,
     salaryCurrency: command.salary ? Currency.USD : null,
@@ -70,10 +70,10 @@ const toColumns = (command: CreateReviewCommand) => ({
     feedbackClient: optionalDoc(command.feedback.client),
 });
 
-/** A starting review keeps the start date and stays completed; salary and the rest are editable. */
+/** A starting review keeps the start reviewedAt and stays completed; salary and the rest are editable. */
 const lockStarting = (review: ReviewRecord, command: UpdateReviewCommand): void => {
-    if (command.date !== review.reviewDate.toISOString().slice(0, 10)) {
-        throw new BusinessRuleException('errors.review.startingDateLocked', {}, 'date');
+    if (command.reviewedAt !== review.reviewedAt.toISOString().slice(0, 10)) {
+        throw new BusinessRuleException('errors.review.startingDateLocked', {}, 'reviewedAt');
     }
     if (command.status !== ReviewStatus.COMPLETED) {
         throw new BusinessRuleException('errors.review.startingStatusLocked', {}, 'status');
@@ -139,7 +139,7 @@ export class ReviewService {
             content: page.content.map((review) => ({
                 id: review.id,
                 title: review.title,
-                reviewDate: review.reviewDate,
+                reviewedAt: review.reviewedAt,
                 status: review.status,
                 employee: {
                     id: review.employee.id,
@@ -175,7 +175,7 @@ export class ReviewService {
 
     /**
      * For other modules (employment): the employee's salary at hire, as a completed review dated the
-     * start date. Part of the caller's transaction.
+     * start reviewedAt. Part of the caller's transaction.
      */
     @Transactional()
     async createStarting(
@@ -191,7 +191,7 @@ export class ReviewService {
             ReviewKind.STARTING,
             {
                 title: STARTING_REVIEW_TITLE,
-                date: command.startDate,
+                reviewedAt: command.startsAt,
                 status: ReviewStatus.COMPLETED,
                 salary: command.salary,
                 responsibleUserIds: command.responsibleUserIds,
@@ -202,44 +202,48 @@ export class ReviewService {
     }
 
     /**
-     * For other modules (employment): the start date changed — the starting salary moves with it.
-     * Refused when another review is dated before the new start date. Part of the caller's
+     * For other modules (employment): the start reviewedAt changed — the starting salary moves with it.
+     * Refused when another review is dated before the new start reviewedAt. Part of the caller's
      * transaction.
      */
     @Transactional()
-    async moveStarting(organisationId: string, employeeId: string, startDate: string, actorId: string): Promise<void> {
-        const date = new Date(`${startDate}T00:00:00Z`);
-        if (await this.reviewRepository.existsRegularBefore(organisationId, employeeId, date)) {
-            throw new BusinessRuleException('errors.review.reviewsBeforeStart', {}, 'startDate');
+    async moveStarting(organisationId: string, employeeId: string, startsAt: string, actorId: string): Promise<void> {
+        const reviewedAt = new Date(`${startsAt}T00:00:00Z`);
+        if (await this.reviewRepository.existsRegularBefore(organisationId, employeeId, reviewedAt)) {
+            throw new BusinessRuleException('errors.review.reviewsBeforeStart', {}, 'startsAt');
         }
         const starting = await this.reviewRepository.findStarting(organisationId, employeeId);
-        if (!starting || starting.reviewDate.getTime() === date.getTime()) {
+        if (!starting || starting.reviewedAt.getTime() === reviewedAt.getTime()) {
             return;
         }
-        await this.reviewRepository.moveDate(organisationId, starting.id, date, actorId);
+        await this.reviewRepository.moveDate(organisationId, starting.id, reviewedAt, actorId);
         await this.auditService.record({
             action: AuditAction.REVIEW_UPDATED,
             employeeId,
             target: { type: AuditTargetType.REVIEW, id: starting.id, label: starting.title },
-            changes: changeOf(AuditField.DATE, auditValue.date(starting.reviewDate), auditValue.date(date)),
+            changes: changeOf(
+                AuditField.REVIEWED_AT,
+                auditValue.date(starting.reviewedAt),
+                auditValue.date(reviewedAt),
+            ),
         });
     }
 
     /**
-     * For other modules (employment): the employee leaves on `date` — reviews still scheduled after
+     * For other modules (employment): the employee leaves on `terminatedAt` — reviews still scheduled after
      * it are canceled (each recorded). Part of the caller's transaction. Returns how many.
      */
     @Transactional()
     async cancelScheduledAfter(
         organisationId: string,
         employeeId: string,
-        date: string,
+        terminatedAt: string,
         actorId: string,
     ): Promise<number> {
         const reviews = await this.reviewRepository.findScheduledAfter(
             organisationId,
             employeeId,
-            new Date(`${date}T00:00:00Z`),
+            new Date(`${terminatedAt}T00:00:00Z`),
         );
         if (reviews.length === 0) {
             return 0;

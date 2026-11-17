@@ -15,7 +15,7 @@ const toInputAmount = (amount: string): string => amount.replace(/(\.\d*?)0+$/, 
 
 const valuesFor = (review: Review | null): CreateReviewFormValues => ({
     title: review?.title ?? '',
-    date: review?.date ?? todayIso(),
+    reviewedAt: review?.reviewedAt ?? todayIso(),
     status: review?.status ?? '',
     salary: review?.salary ? toInputAmount(review.salary.amount) : '',
     responsibleUserIds: review?.responsibles.map((person) => person.id) ?? [],
@@ -38,7 +38,7 @@ const SERVER_FIELDS: Readonly<Record<string, keyof CreateReviewFormValues>> = {
 const toRequest = (values: CreateReviewFormOutput): CreateReviewRequest => {
     return {
         title: values.title,
-        date: values.date,
+        reviewedAt: values.reviewedAt,
         status: values.status,
         ...(values.salary === '' ? {} : { salary: values.salary }),
         responsibleUserIds: values.responsibleUserIds,

@@ -22,7 +22,7 @@ export interface PlanChange {
     target: Plan;
     current: Plan;
     /** The period end (ISO instant), when the change applies then. */
-    periodEnd: string | null;
+    periodEndsAt: string | null;
 }
 
 export interface PlanChangeDialogProps {
@@ -88,9 +88,9 @@ export function PlanChangeDialog({
         plan: t(`billing:planNames.${target}`),
         current: t(`billing:planNames.${change.current}`),
     };
-    const date = change.periodEnd
+    const date = change.periodEndsAt
         ? new Intl.DateTimeFormat(i18n.language, { dateStyle: 'medium', timeZone: 'UTC' }).format(
-              new Date(change.periodEnd),
+              new Date(change.periodEndsAt),
           )
         : null;
     // When it applies: now (an upgrade, giving a plan up), or at the period end.

@@ -51,7 +51,7 @@ export function RequestSummary({ request, viewerId }: RequestSummaryProps) {
                         {t(`types.${request.type}`)}
                     </Typography>
                     <Typography variant="body2" color="textSecondary" className="app-tabular">
-                        {formatPeriod(request.startDate, request.endDate, locale)}
+                        {formatPeriod(request.startsAt, request.endsAt, locale)}
                     </Typography>
                 </div>
             </div>

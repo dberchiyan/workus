@@ -63,7 +63,7 @@ const seedOrganisation = async (
         select: { id: true },
     });
     // The plan is seed data while nobody pays: OSDB exists before the seed (the tenancy
-    // migration creates it), so a re-run realigns a granted plan but never a live subscription.
+    // migration creates it), so a re-run realigns a isGrantedPlan plan but never a live subscription.
     await prisma.organisation.updateMany({
         where: { id: organisationId, subscriptionStatus: 'NONE' },
         data: { plan: organisation.plan },
@@ -126,8 +126,8 @@ const seedOrganisation = async (
             organisationId,
             userId: idOf(userIdByEmail, employee.email),
             positionId: idOf(positionIdByTitle, employee.position),
-            startDate: daysAgo(employee.startedDaysAgo),
-            terminatedOn: employee.terminatedDaysAgo === undefined ? null : daysAgo(employee.terminatedDaysAgo),
+            startsAt: daysAgo(employee.startedDaysAgo),
+            terminatedAt: employee.terminatedDaysAgo === undefined ? null : daysAgo(employee.terminatedDaysAgo),
             terminationReason: employee.terminationReason ?? null,
             terminationComment: employee.terminationComment ?? null,
         })),
@@ -206,8 +206,8 @@ const seedOrganisation = async (
                   ? [today.getUTCMonth(), 1 + ((index * 5) % lastDay)]
                   : [(index * 5) % 12, 1 + ((index * 11) % 28)];
         const { count } = await prisma.employee.updateMany({
-            where: { organisationId, userId: idOf(userIdByEmail, employee.email), dateOfBirth: null },
-            data: { dateOfBirth: new Date(Date.UTC(year, month, day)) },
+            where: { organisationId, userId: idOf(userIdByEmail, employee.email), bornAt: null },
+            data: { bornAt: new Date(Date.UTC(year, month, day)) },
         });
         birthDates += count;
     }
@@ -219,20 +219,20 @@ const seedOrganisation = async (
         },
         select: {
             id: true,
-            startDate: true,
-            terminatedOn: true,
+            startsAt: true,
+            terminatedAt: true,
             position: { select: { category: { select: { name: true } } } },
             responsibles: { select: { responsibleUserId: true }, take: 10 },
         },
-        orderBy: { startDate: 'asc' },
+        orderBy: { startsAt: 'asc' },
     });
     const reviews = await seedReviews(
         prisma,
         organisationId,
         seededEmployees.map((employee) => ({
             id: employee.id,
-            startDate: employee.startDate,
-            terminatedOn: employee.terminatedOn,
+            startsAt: employee.startsAt,
+            terminatedAt: employee.terminatedAt,
             categoryName: employee.position.category.name,
             responsibleUserIds: employee.responsibles.map((r) => r.responsibleUserId),
         })),

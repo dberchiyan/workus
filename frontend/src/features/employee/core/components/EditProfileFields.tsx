@@ -9,7 +9,7 @@ import { usePositionOptions } from '../hooks/useEmployeeQueries';
 import { useFieldMessage } from '../hooks/useFieldMessage';
 import { EMPLOYEE_LIMITS, type UpdateEmployeeFormOutput, type UpdateEmployeeFormValues } from '../schemas';
 
-type TextFieldName = Exclude<keyof UpdateEmployeeFormValues, 'positionId' | 'startDate' | 'dateOfBirth'>;
+type TextFieldName = Exclude<keyof UpdateEmployeeFormValues, 'positionId' | 'startsAt' | 'bornAt'>;
 
 export interface EditProfileFieldsProps {
     form: UseFormReturn<UpdateEmployeeFormValues, unknown, UpdateEmployeeFormOutput>;
@@ -104,12 +104,12 @@ export function EditProfileFields({ form }: EditProfileFieldsProps) {
                     )}
                 />
                 <TextField
-                    {...register('startDate')}
+                    {...register('startsAt')}
                     type="date"
                     required
                     label={t('add.fields.startDate')}
-                    error={Boolean(errors.startDate)}
-                    helperText={message(errors.startDate, undefined, t('edit.hints.startDate'))}
+                    error={Boolean(errors.startsAt)}
+                    helperText={message(errors.startsAt, undefined, t('edit.hints.startDate'))}
                     slotProps={{ inputLabel: { shrink: true } }}
                 />
             </fieldset>
@@ -118,12 +118,12 @@ export function EditProfileFields({ form }: EditProfileFieldsProps) {
                     {t('add.sections.contact')}
                 </Typography>
                 <TextField
-                    {...register('dateOfBirth')}
+                    {...register('bornAt')}
                     type="date"
                     label={t('add.fields.dateOfBirth')}
                     autoComplete="bday"
-                    error={Boolean(errors.dateOfBirth)}
-                    helperText={message(errors.dateOfBirth)}
+                    error={Boolean(errors.bornAt)}
+                    helperText={message(errors.bornAt)}
                     slotProps={{ inputLabel: { shrink: true } }}
                 />
                 {text('mobile', { max: EMPLOYEE_LIMITS.mobile, type: 'tel', inputMode: 'tel' })}

@@ -25,7 +25,7 @@ export interface ClaimRequest {
 
 /**
  * The idempotency ledger. Uses the root client on purpose: a claim must commit before the
- * handler's own transaction starts, so a concurrent duplicate sees it.
+ * handler's own transaction starts, so a concurrent isDuplicate sees it.
  */
 @Injectable()
 export class IdempotencyKeyStore {

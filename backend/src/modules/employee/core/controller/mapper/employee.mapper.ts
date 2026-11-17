@@ -27,9 +27,9 @@ export const toEmployeeListItem = (employee: EmployeeListItemRecord, today: Date
         lastName: responsible.lastName,
     })),
     responsibleCount: employee._count.responsibles,
-    startDate: toIsoDate(employee.startDate),
-    terminatedOn: employee.terminatedOn ? toIsoDate(employee.terminatedOn) : null,
-    status: statusOn(employee.terminatedOn, today),
+    startsAt: toIsoDate(employee.startsAt),
+    terminatedAt: employee.terminatedAt ? toIsoDate(employee.terminatedAt) : null,
+    status: statusOn(employee.terminatedAt, today),
 });
 
 export const toEmployeePageResponse = (page: EmployeePage): EmployeePageResponse => ({

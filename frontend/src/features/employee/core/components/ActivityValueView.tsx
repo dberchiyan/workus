@@ -48,7 +48,7 @@ export function ActivityValueView({ value }: { value: ActivityValue }) {
         case 'date':
             return (
                 <Typography variant="body2" component="span" className="app-tabular">
-                    {formatCalendarDate(value.date, i18n.language)}
+                    {formatCalendarDate(value.at, i18n.language)}
                 </Typography>
             );
         case 'money':

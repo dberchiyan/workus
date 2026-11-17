@@ -5,8 +5,8 @@ ALTER TABLE "organisations"
     ADD COLUMN "plan" VARCHAR(16) NOT NULL DEFAULT 'STARTER',
     ADD COLUMN "subscription_status" VARCHAR(16) NOT NULL DEFAULT 'NONE',
     ADD COLUMN "scheduled_plan" VARCHAR(16),
-    ADD COLUMN "current_period_end" TIMESTAMPTZ(3),
-    ADD COLUMN "past_due_since" TIMESTAMPTZ(3),
+    ADD COLUMN "period_ends_at" TIMESTAMPTZ(3),
+    ADD COLUMN "past_due_at" TIMESTAMPTZ(3),
     ADD COLUMN "billing_customer_id" VARCHAR(64),
     ADD COLUMN "billing_subscription_id" VARCHAR(64);
 
@@ -20,8 +20,8 @@ ALTER TABLE "organisations"
     CHECK ("subscription_status" IN ('NONE', 'ACTIVE', 'PAST_DUE'));
 -- A failed payment is dated (the grace period counts from it); nothing else is.
 ALTER TABLE "organisations"
-    ADD CONSTRAINT "ck_organisations_past_due_since"
-    CHECK (("subscription_status" = 'PAST_DUE') = ("past_due_since" IS NOT NULL));
+    ADD CONSTRAINT "ck_organisations_past_due_at"
+    CHECK (("subscription_status" = 'PAST_DUE') = ("past_due_at" IS NOT NULL));
 -- A subscription id exists exactly while there is a subscription.
 ALTER TABLE "organisations"
     ADD CONSTRAINT "ck_organisations_billing_subscription_id"
@@ -29,8 +29,8 @@ ALTER TABLE "organisations"
 
 CREATE UNIQUE INDEX "uq_organisations_billing_customer_id" ON "organisations"("billing_customer_id");
 CREATE UNIQUE INDEX "uq_organisations_billing_subscription_id" ON "organisations"("billing_subscription_id");
-CREATE INDEX "idx_organisations_subscription_status_past_due_since"
-    ON "organisations"("subscription_status", "past_due_since");
+CREATE INDEX "idx_organisations_subscription_status_past_due_at"
+    ON "organisations"("subscription_status", "past_due_at");
 
 CREATE TABLE "billing_events" (
     "id" UUID NOT NULL DEFAULT uuidv7(),

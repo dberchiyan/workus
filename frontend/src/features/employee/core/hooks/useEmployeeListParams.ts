@@ -17,14 +17,14 @@ const urlSchema = z.object({
         .number()
         .refine((size) => (PAGE_SIZES as readonly number[]).includes(size))
         .catch(DEFAULT_SIZE),
-    sort: z.enum(['name,asc', 'name,desc', 'startDate,asc', 'startDate,desc']).catch('name,asc'),
+    sort: z.enum(['name,asc', 'name,desc', 'startsAt,asc', 'startsAt,desc']).catch('name,asc'),
 });
 
 const SORTS = {
     'name,asc': { sortField: 'name', sortDirection: 'asc' },
     'name,desc': { sortField: 'name', sortDirection: 'desc' },
-    'startDate,asc': { sortField: 'startDate', sortDirection: 'asc' },
-    'startDate,desc': { sortField: 'startDate', sortDirection: 'desc' },
+    'startsAt,asc': { sortField: 'startsAt', sortDirection: 'asc' },
+    'startsAt,desc': { sortField: 'startsAt', sortDirection: 'desc' },
 } as const satisfies Record<string, Pick<EmployeeListParams, 'sortField' | 'sortDirection'>>;
 
 type ListChange = Partial<Omit<EmployeeListParams, 'page'>> & { page?: number };

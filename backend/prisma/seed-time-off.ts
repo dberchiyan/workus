@@ -123,11 +123,11 @@ export const seedTimeOff = async (
         select: {
             id: true,
             userId: true,
-            startDate: true,
-            terminatedOn: true,
+            startsAt: true,
+            terminatedAt: true,
             responsibles: { select: { responsibleUserId: true }, take: 10 },
         },
-        orderBy: { startDate: 'asc' },
+        orderBy: { startsAt: 'asc' },
     });
     let created = 0;
     for (const [index, employee] of employees.entries()) {
@@ -136,8 +136,8 @@ export const seedTimeOff = async (
                 ? employee.responsibles.map((r) => r.responsibleUserId)
                 : [fallbackResponsibleId];
         const decider = responsibleUserIds[0] ?? fallbackResponsibleId;
-        const vacationCycle = cycleOf(employee.startDate, LEAVE_POLICY.VACATION.cycleMonths, today);
-        const lastDay = employee.terminatedOn ? plusDays(employee.terminatedOn, -1) : null;
+        const vacationCycle = cycleOf(employee.startsAt, LEAVE_POLICY.VACATION.cycleMonths, today);
+        const lastDay = employee.terminatedAt ? plusDays(employee.terminatedAt, -1) : null;
         const taken: { start: Date; end: Date }[] = [];
         const events: Prisma.AuditEventCreateManyInput[] = [];
 
@@ -146,7 +146,7 @@ export const seedTimeOff = async (
             const start = weekday(plusDays(base, plan.offset));
             const end = plusWorkingDays(start, plan.length);
             const days = workingDaysBetween(start, end);
-            const outsideEmployment = start < employee.startDate || (lastDay !== null && end > lastDay);
+            const outsideEmployment = start < employee.startsAt || (lastDay !== null && end > lastDay);
             const overlaps = taken.some((t) => start <= t.end && end >= t.start);
             // Terminated people have nothing pending.
             if (outsideEmployment || overlaps) {
@@ -175,8 +175,8 @@ export const seedTimeOff = async (
                     organisationId,
                     employeeId: employee.id,
                     type: plan.type,
-                    startDate: start,
-                    endDate: end,
+                    startsAt: start,
+                    endsAt: end,
                     days,
                     status: plan.status,
                     note: plan.note ?? null,
@@ -199,15 +199,15 @@ export const seedTimeOff = async (
                 organisationId,
                 targetType: AuditTargetType.TIME_OFF_REQUEST,
                 targetId: request.id,
-                targetLabel: timeOffLabel({ type: plan.type, startDate: start, endDate: end }),
+                targetLabel: timeOffLabel({ type: plan.type, startsAt: start, endsAt: end }),
                 employeeId: employee.id,
                 ipAddress: '127.0.0.1',
                 userAgent: 'seed',
             };
             const createdChanges: AuditChange[] = [
                 { field: AuditField.TIME_OFF_TYPE, from: null, to: auditValue.timeOffType(plan.type) },
-                { field: AuditField.PERIOD_START, from: null, to: auditValue.date(start) },
-                { field: AuditField.PERIOD_END, from: null, to: auditValue.date(end) },
+                { field: AuditField.PERIOD_STARTS_AT, from: null, to: auditValue.date(start) },
+                { field: AuditField.PERIOD_ENDS_AT, from: null, to: auditValue.date(end) },
                 { field: AuditField.DAYS, from: null, to: auditValue.number(days) },
                 ...(plan.note ? [{ field: AuditField.NOTE, from: null, to: auditValue.text(plan.note) }] : []),
             ];
@@ -295,7 +295,7 @@ const pendingSlot = (
 
 const decisionEvent = (
     organisationId: string,
-    request: { id: string; employeeId: string; type: string; startDate: Date; endDate: Date },
+    request: { id: string; employeeId: string; type: string; startsAt: Date; endsAt: Date },
     status: 'APPROVED' | 'REJECTED',
     actorUserId: string | null,
     occurredAt: Date,
@@ -337,8 +337,8 @@ export const seedPendingRequests = async (
             id: true,
             employeeId: true,
             type: true,
-            startDate: true,
-            endDate: true,
+            startsAt: true,
+            endsAt: true,
             createdAt: true,
             responsibles: { select: { responsibleUserId: true }, take: 1 },
         },
@@ -381,24 +381,24 @@ export const seedPendingRequests = async (
         await prisma.employee.findMany({
             where: {
                 organisationId,
-                startDate: { lte: plusDays(today, -30) },
-                OR: [{ terminatedOn: null }, { terminatedOn: { gt: plusDays(today, 60) } }],
+                startsAt: { lte: plusDays(today, -30) },
+                OR: [{ terminatedAt: null }, { terminatedAt: { gt: plusDays(today, 60) } }],
             },
             select: {
                 id: true,
                 userId: true,
-                startDate: true,
+                startsAt: true,
                 responsibles: { select: { responsibleUserId: true }, take: 10 },
                 timeOffRequests: {
                     where: {
                         status: { in: ['PENDING', 'APPROVED'] },
-                        endDate: { gte: plusDays(today, -400) },
+                        endsAt: { gte: plusDays(today, -400) },
                     },
-                    select: { type: true, startDate: true, endDate: true, days: true },
+                    select: { type: true, startsAt: true, endsAt: true, days: true },
                     take: 50,
                 },
             },
-            orderBy: [{ startDate: 'asc' }, { id: 'asc' }],
+            orderBy: [{ startsAt: 'asc' }, { id: 'asc' }],
         })
     ).filter((employee) => !busy.has(employee.id));
 
@@ -412,15 +412,15 @@ export const seedPendingRequests = async (
             const policy = LEAVE_POLICY[type];
             const at = candidates.findIndex((employee, offset) => {
                 const candidate = candidates[(next + offset) % candidates.length] ?? employee;
-                if (candidate.startDate > slot.start) {
+                if (candidate.startsAt > slot.start) {
                     return false;
                 }
                 const overlaps = candidate.timeOffRequests.some(
-                    (r) => slot.start <= r.endDate && slot.end >= r.startDate,
+                    (r) => slot.start <= r.endsAt && slot.end >= r.startsAt,
                 );
-                const cycle = cycleOf(candidate.startDate, policy.cycleMonths, slot.start);
+                const cycle = cycleOf(candidate.startsAt, policy.cycleMonths, slot.start);
                 const used = candidate.timeOffRequests
-                    .filter((r) => r.type === type && r.startDate >= cycle.start && r.startDate <= cycle.end)
+                    .filter((r) => r.type === type && r.startsAt >= cycle.start && r.startsAt <= cycle.end)
                     .reduce((sum, r) => sum + r.days, 0);
                 return !overlaps && (policy.allowance === null || used + days <= policy.allowance);
             });
@@ -442,8 +442,8 @@ export const seedPendingRequests = async (
                     organisationId,
                     employeeId: employee.id,
                     type,
-                    startDate: slot.start,
-                    endDate: slot.end,
+                    startsAt: slot.start,
+                    endsAt: slot.end,
                     days,
                     status: 'PENDING',
                     note: slot.note,
@@ -462,7 +462,7 @@ export const seedPendingRequests = async (
                 organisationId,
                 targetType: AuditTargetType.TIME_OFF_REQUEST,
                 targetId: request.id,
-                targetLabel: timeOffLabel({ type, startDate: slot.start, endDate: slot.end }),
+                targetLabel: timeOffLabel({ type, startsAt: slot.start, endsAt: slot.end }),
                 employeeId: employee.id,
                 ipAddress: '127.0.0.1',
                 userAgent: 'seed',
@@ -471,8 +471,8 @@ export const seedPendingRequests = async (
                 actorUserId: employee.userId,
                 changes: [
                     { field: AuditField.TIME_OFF_TYPE, from: null, to: auditValue.timeOffType(type) },
-                    { field: AuditField.PERIOD_START, from: null, to: auditValue.date(slot.start) },
-                    { field: AuditField.PERIOD_END, from: null, to: auditValue.date(slot.end) },
+                    { field: AuditField.PERIOD_STARTS_AT, from: null, to: auditValue.date(slot.start) },
+                    { field: AuditField.PERIOD_ENDS_AT, from: null, to: auditValue.date(slot.end) },
                     { field: AuditField.DAYS, from: null, to: auditValue.number(days) },
                     ...(slot.note ? [{ field: AuditField.NOTE, from: null, to: auditValue.text(slot.note) }] : []),
                 ] satisfies AuditChange[],

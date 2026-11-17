@@ -19,7 +19,7 @@ export interface UpgradePromptProps {
     /** The cheapest plan that lifts the lock (named in the text). */
     requiredPlan: Plan;
     /** Owners get the button to Settings → Billing; everyone else is told to ask an owner. */
-    canManage: boolean;
+    hasBillingAccount: boolean;
     /** One line with the action beside it (page notices) instead of the centred block. */
     compact?: boolean;
     className?: string;
@@ -29,7 +29,13 @@ export interface UpgradePromptProps {
  * Shown where a plan's limit or a locked feature is hit (reviews, insights, structure,
  * exports, the employee limit). The API refuses the action too — this only says what to do.
  */
-export function UpgradePrompt({ reason, requiredPlan, canManage, compact = false, className }: UpgradePromptProps) {
+export function UpgradePrompt({
+    reason,
+    requiredPlan,
+    hasBillingAccount,
+    compact = false,
+    className,
+}: UpgradePromptProps) {
     const { t, i18n } = useTranslation();
     const planName = t(`plans.${requiredPlan}`);
     const number = new Intl.NumberFormat(i18n.language);
@@ -46,7 +52,7 @@ export function UpgradePrompt({ reason, requiredPlan, canManage, compact = false
                   limit: number.format(reason.limit),
                   plan: planName,
               });
-    const action = canManage ? (
+    const action = hasBillingAccount ? (
         <Button
             component={RouterLink}
             to={settingsPath('billing')}

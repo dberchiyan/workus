@@ -25,7 +25,7 @@ export const companySelect = (today: Date) =>
         _count: {
             select: {
                 users: { where: { role: 'ADMIN' } },
-                employees: { where: { OR: [{ terminatedOn: null }, { terminatedOn: { gt: today } }] } },
+                employees: { where: { OR: [{ terminatedAt: null }, { terminatedAt: { gt: today } }] } },
             },
         },
     }) satisfies Prisma.OrganisationSelect;
@@ -41,6 +41,6 @@ export const companyUserSelect = {
     email: true,
     role: true,
     createdAt: true,
-    employee: { select: { terminatedOn: true } },
+    employee: { select: { terminatedAt: true } },
 } satisfies Prisma.UserSelect;
 export type CompanyUserRecord = Prisma.UserGetPayload<{ select: typeof companyUserSelect }>;

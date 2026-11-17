@@ -9,7 +9,7 @@ export const toStructurePositionResponse = (position: StructurePosition): Struct
     id: position.id,
     title: position.title,
     employeeCount: position.employeeCount,
-    removable: position.removable,
+    isRemovable: position.isRemovable,
     version: position.version,
 });
 

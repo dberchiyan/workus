@@ -4,7 +4,7 @@ import type { ReviewStatus } from './review-status';
 import type { RichTextDoc } from './rich-text';
 
 export interface SalaryPoint {
-    date: Date;
+    reviewedAt: Date;
     amount: Decimal;
     currency: string;
 }
@@ -25,7 +25,7 @@ export interface EmployeeReviews {
 
 export interface CreateReviewCommand {
     title: string;
-    date: string;
+    reviewedAt: string;
     status: ReviewStatus;
     /** Validated decimal string, USD per month. */
     salary: string | undefined;
@@ -42,8 +42,8 @@ export type UpdateReviewCommand = CreateReviewCommand & { version: number };
 
 /** The salary agreed at hire, recorded as the employee's starting review. */
 export interface StartingReviewCommand {
-    /** The employee's start date (YYYY-MM-DD). */
-    startDate: string;
+    /** The employee's start reviewedAt (YYYY-MM-DD). */
+    startsAt: string;
     /** Validated decimal string, USD per month. */
     salary: string;
     responsibleUserIds: string[];
@@ -53,7 +53,7 @@ export interface StartingReviewCommand {
 export interface DashboardReview {
     id: string;
     title: string;
-    reviewDate: Date;
+    reviewedAt: Date;
     status: string;
     employee: {
         id: string;

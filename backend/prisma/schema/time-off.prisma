@@ -8,8 +8,8 @@ model TimeOffRequest {
   employeeId      String                      @map("employee_id") @db.Uuid
   employee        Employee                    @relation(fields: [organisationId, employeeId], references: [organisationId, id], onDelete: Restrict, map: "fk_time_off_requests_employee_id")
   type            String                      @db.VarChar(16) // VACATION | SICK_DAY | DAY_OFF — CHECK in migration
-  startDate       DateTime                    @map("start_date") @db.Date
-  endDate         DateTime                    @map("end_date") @db.Date // inclusive; >= start_date — CHECK
+  startsAt       DateTime                    @map("starts_at") @db.Date
+  endsAt         DateTime                    @map("ends_at") @db.Date // inclusive; >= starts_at — CHECK
   /// Working days (Mon–Fri, not company holidays) in the range: > 0 when made — CHECK >= 0, a
   /// holiday added later may take the last one; kept in step with holidays.
   days            Int
@@ -30,7 +30,7 @@ model TimeOffRequest {
   comments        TimeOffRequestComment[]
 
   @@unique([organisationId, id], map: "uq_time_off_requests_organisation_id_id")
-  @@index([employeeId, startDate], map: "idx_time_off_requests_employee_id_start_date")
+  @@index([employeeId, startsAt], map: "idx_time_off_requests_employee_id_starts_at")
   @@index([organisationId, status, createdAt], map: "idx_time_off_requests_organisation_id_status_created_at")
   @@index([decidedBy], map: "idx_time_off_requests_decided_by")
   @@map("time_off_requests")
@@ -76,25 +76,25 @@ model TimeOffRequestComment {
 }
 
 /// A company holiday: a non-working day for everyone, so time off on it takes no working day.
-/// One row per date and year. A recurring holiday is copied to the next year once (then
-/// `carried_over`); each year's copy is edited on its own.
+/// One row per date and year. A isRecurring holiday is copied to the next year once (then
+/// `is_carried_over`); each year's copy is edited on its own.
 model CompanyHoliday {
   id             String       @id(map: "pk_company_holidays") @default(dbgenerated("uuidv7()")) @db.Uuid
   organisationId String       @map("organisation_id") @db.Uuid
   organisation   Organisation @relation(fields: [organisationId], references: [id], onDelete: Restrict, map: "fk_company_holidays_organisation_id")
-  date           DateTime     @db.Date
+  heldAt           DateTime     @map("held_at") @db.Date
   name           String       @db.VarChar(100)
   /// Repeats every year: copied to the same day of the next year.
-  recurring      Boolean      @default(false)
+  isRecurring    Boolean      @default(false) @map("is_recurring")
   /// Set when its copy for the next year was made (never copied twice, even if that copy is deleted).
-  carriedOver    Boolean      @default(false) @map("carried_over")
+  isCarriedOver    Boolean      @default(false) @map("is_carried_over")
   createdAt      DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
   updatedAt      DateTime     @updatedAt @map("updated_at") @db.Timestamptz(3)
   createdBy      String?      @map("created_by") @db.Uuid
   updatedBy      String?      @map("updated_by") @db.Uuid
   version        Int          @default(0)
 
-  @@unique([organisationId, date], map: "uq_company_holidays_organisation_id_date")
-  @@index([recurring, carriedOver], map: "idx_company_holidays_recurring_carried_over")
+  @@unique([organisationId, heldAt], map: "uq_company_holidays_organisation_id_held_at")
+  @@index([isRecurring, isCarriedOver], map: "idx_company_holidays_is_recurring_is_carried_over")
   @@map("company_holidays")
 }

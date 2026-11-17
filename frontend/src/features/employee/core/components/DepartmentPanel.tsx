@@ -233,7 +233,7 @@ export function DepartmentPanel({
                                     <ActionButton
                                         label={t('structure.removePosition', { title: position.title })}
                                         reason={
-                                            position.removable
+                                            position.isRemovable
                                                 ? undefined
                                                 : position.employeeCount > 0
                                                   ? t('structure.positionHeld')

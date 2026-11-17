@@ -32,7 +32,7 @@ export function EmployeeCardList({ employees }: EmployeeCardListProps) {
                             {t('table.startDate')}
                         </Typography>
                         <Typography variant="body2" component="dd" className="app-tabular">
-                            {formatCalendarDate(employee.startDate, i18n.language)}
+                            {formatCalendarDate(employee.startsAt, i18n.language)}
                         </Typography>
                         <Typography variant="caption" component="dt" color="textSecondary">
                             {t('table.responsible')}

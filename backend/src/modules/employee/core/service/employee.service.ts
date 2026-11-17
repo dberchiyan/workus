@@ -159,13 +159,13 @@ export class EmployeeService {
             organisationId,
             userId,
             positionId: command.positionId,
-            startDate: new Date(`${command.startDate}T00:00:00Z`),
+            startsAt: new Date(`${command.startsAt}T00:00:00Z`),
             mobile: command.mobile,
             personalEmail: command.personalEmail?.toLowerCase(),
             linkedinUrl: command.linkedinUrl,
             telegram: command.telegram ? `@${command.telegram.replace(/^@/, '')}` : undefined,
             address: command.address,
-            dateOfBirth: command.dateOfBirth ? new Date(`${command.dateOfBirth}T00:00:00Z`) : undefined,
+            bornAt: command.bornAt ? new Date(`${command.bornAt}T00:00:00Z`) : undefined,
             responsibleUserIds,
             createdBy: actorId,
         });
@@ -187,7 +187,7 @@ export class EmployeeService {
             // Contacts are personal data — the log names only the work facts.
             changes: [
                 ...changeOf(AuditField.POSITION, null, auditValue.text(profile.position.title)),
-                ...changeOf(AuditField.START_DATE, null, auditValue.date(profile.startDate)),
+                ...changeOf(AuditField.STARTS_AT, null, auditValue.date(profile.startsAt)),
                 ...(profile.responsibles.length > 0
                     ? changeOf(
                           AuditField.RESPONSIBLES,
@@ -266,8 +266,8 @@ export class EmployeeService {
     }
 
     /**
-     * Name, work email, position, start date and contacts. For the employment module, which moves
-     * the starting salary along with the start date in the same transaction. Records what changed
+     * Name, work email, position, start terminatedAt and contacts. For the employment module, which moves
+     * the starting salary along with the start terminatedAt in the same transaction. Records what changed
      * (contacts as "changed" only); a save without changes writes nothing.
      */
     @Transactional()
@@ -285,19 +285,19 @@ export class EmployeeService {
         if (!(await this.employeeRepository.positionExists(organisationId, command.positionId))) {
             throw new BusinessRuleException('errors.employee.positionNotFound', {}, 'positionId');
         }
-        const startDate = new Date(`${command.startDate}T00:00:00Z`);
-        if (before.terminatedOn && startDate > before.terminatedOn) {
-            throw new BusinessRuleException('errors.employee.startAfterTermination', {}, 'startDate');
+        const startsAt = new Date(`${command.startsAt}T00:00:00Z`);
+        if (before.terminatedAt && startsAt > before.terminatedAt) {
+            throw new BusinessRuleException('errors.employee.startAfterTermination', {}, 'startsAt');
         }
         const details = {
             positionId: command.positionId,
-            startDate,
+            startsAt,
             mobile: command.mobile ?? null,
             personalEmail: command.personalEmail?.toLowerCase() ?? null,
             linkedinUrl: command.linkedinUrl ?? null,
             telegram: command.telegram ? `@${command.telegram.replace(/^@/, '')}` : null,
             address: command.address ?? null,
-            dateOfBirth: command.dateOfBirth ? new Date(`${command.dateOfBirth}T00:00:00Z`) : null,
+            bornAt: command.bornAt ? new Date(`${command.bornAt}T00:00:00Z`) : null,
         };
         const contactChanges: AuditChange[] = CONTACT_FIELDS.flatMap(([column, field]) =>
             before[column] === details[column]
@@ -310,13 +310,13 @@ export class EmployeeService {
                       },
                   ],
         );
-        // Personal data like the contacts: the log says that it changed, never the date.
-        const dateOfBirthChanged = (before.dateOfBirth?.getTime() ?? null) !== (details.dateOfBirth?.getTime() ?? null);
+        // Personal data like the contacts: the log says that it changed, never the terminatedAt.
+        const dateOfBirthChanged = (before.bornAt?.getTime() ?? null) !== (details.bornAt?.getTime() ?? null);
         if (dateOfBirthChanged) {
             contactChanges.push({
-                field: AuditField.DATE_OF_BIRTH,
-                from: before.dateOfBirth === null ? null : auditValue.redacted(),
-                to: details.dateOfBirth === null ? null : auditValue.redacted(),
+                field: AuditField.BORN_AT,
+                from: before.bornAt === null ? null : auditValue.redacted(),
+                to: details.bornAt === null ? null : auditValue.redacted(),
             });
         }
         const identityChanged =
@@ -325,7 +325,7 @@ export class EmployeeService {
             before.user.email !== email;
         const detailsChanged =
             before.position.id !== details.positionId ||
-            before.startDate.getTime() !== startDate.getTime() ||
+            before.startsAt.getTime() !== startsAt.getTime() ||
             contactChanges.length > 0;
         if (!identityChanged && !detailsChanged) {
             return { before, after: before };
@@ -370,7 +370,7 @@ export class EmployeeService {
                     auditValue.text(before.position.title),
                     auditValue.text(after.position.title),
                 ),
-                ...changeOf(AuditField.START_DATE, auditValue.date(before.startDate), auditValue.date(after.startDate)),
+                ...changeOf(AuditField.STARTS_AT, auditValue.date(before.startsAt), auditValue.date(after.startsAt)),
                 ...contactChanges,
             ],
         });
@@ -378,9 +378,9 @@ export class EmployeeService {
     }
 
     /**
-     * Terminates the employee from `date` (today, past or future — a future date is a planned
+     * Terminates the employee from `terminatedAt` (today, past or future — a future terminatedAt is a planned
      * leave), or changes an existing termination. For the employment module, which cancels the
-     * reviews scheduled after that date in the same transaction.
+     * reviews scheduled after that terminatedAt in the same transaction.
      */
     @Transactional()
     async terminate(
@@ -390,9 +390,9 @@ export class EmployeeService {
         actorId: string,
     ): Promise<{ before: EmployeeProfileRecord; after: EmployeeProfileRecord }> {
         const before = await this.requireProfile(organisationId, employeeId, command.version);
-        const terminatedOn = new Date(`${command.date}T00:00:00Z`);
-        if (terminatedOn < before.startDate) {
-            throw new BusinessRuleException('errors.employee.terminationBeforeStart', {}, 'date');
+        const terminatedAt = new Date(`${command.terminatedAt}T00:00:00Z`);
+        if (terminatedAt < before.startsAt) {
+            throw new BusinessRuleException('errors.employee.terminationBeforeStart', {}, 'terminatedAt');
         }
         if (!isTerminationReason(command.reason)) {
             throw new BusinessRuleException('errors.employee.terminationReasonInvalid', {}, 'reason');
@@ -400,9 +400,9 @@ export class EmployeeService {
         const comment = command.comment ?? null;
         const changes = [
             ...changeOf(
-                AuditField.TERMINATION_DATE,
-                before.terminatedOn ? auditValue.date(before.terminatedOn) : null,
-                auditValue.date(terminatedOn),
+                AuditField.TERMINATED_AT,
+                before.terminatedAt ? auditValue.date(before.terminatedAt) : null,
+                auditValue.date(terminatedAt),
             ),
             ...changeOf(
                 AuditField.TERMINATION_REASON,
@@ -423,7 +423,7 @@ export class EmployeeService {
                 organisationId,
                 employeeId,
                 command.version,
-                { terminatedOn, reason: command.reason, comment },
+                { terminatedAt, reason: command.reason, comment },
                 actorId,
             ))
         ) {
@@ -448,7 +448,7 @@ export class EmployeeService {
         actorId: string,
     ): Promise<EmployeeProfileRecord> {
         const before = await this.requireProfile(organisationId, employeeId, version);
-        if (!before.terminatedOn) {
+        if (!before.terminatedAt) {
             return before;
         }
         if (!(await this.employeeRepository.updateTermination(organisationId, employeeId, version, null, actorId))) {
@@ -459,7 +459,7 @@ export class EmployeeService {
             employeeId,
             target: { type: AuditTargetType.EMPLOYEE, id: employeeId, label: nameOf(before) },
             changes: [
-                ...changeOf(AuditField.TERMINATION_DATE, auditValue.date(before.terminatedOn), null),
+                ...changeOf(AuditField.TERMINATED_AT, auditValue.date(before.terminatedAt), null),
                 ...(before.terminationReason
                     ? changeOf(
                           AuditField.TERMINATION_REASON,
@@ -572,7 +572,7 @@ export class EmployeeService {
      */
     async hasAccessEnded(userId: string): Promise<boolean> {
         const employee = await this.employeeRepository.findTimeOffByUserId(userId);
-        return employee?.terminatedOn != null && employee.terminatedOn <= todayUtc();
+        return employee?.terminatedAt != null && employee.terminatedAt <= todayUtc();
     }
 
     /**
@@ -610,8 +610,8 @@ export class EmployeeService {
                 firstName: employee.user.firstName,
                 lastName: employee.user.lastName,
                 positionTitle: employee.position.title,
-                startDate: employee.startDate,
-                terminatedOn: employee.terminatedOn,
+                startsAt: employee.startsAt,
+                terminatedAt: employee.terminatedAt,
             })),
             totalElements: page.totalElements,
         };
@@ -660,8 +660,8 @@ export class EmployeeService {
             userId: row.user.id,
             firstName: row.user.firstName,
             lastName: row.user.lastName,
-            startDate: row.startDate,
-            terminatedOn: row.terminatedOn,
+            startsAt: row.startsAt,
+            terminatedAt: row.terminatedAt,
             position: { id: row.position.id, title: row.position.title },
             category: row.position.category,
         }));
@@ -675,11 +675,11 @@ export class EmployeeService {
             this.employeeRepository.findLeavingBetween(organisationId, today, until),
         ]);
         const events: EmployeeMovement[] = [
-            ...joining.map((employee) => movementOf('JOINING', employee.startDate, employee)),
+            ...joining.map((employee) => movementOf('JOINING', employee.startsAt, employee)),
             ...leaving.flatMap((employee) =>
-                employee.terminatedOn ? [movementOf('LEAVING', employee.terminatedOn, employee)] : [],
+                employee.terminatedAt ? [movementOf('LEAVING', employee.terminatedAt, employee)] : [],
             ),
-        ].sort((left, right) => left.date.getTime() - right.date.getTime());
+        ].sort((left, right) => left.movedAt.getTime() - right.movedAt.getTime());
         return { joining: joining.length, leaving: leaving.length, next: events[0] ?? null };
     }
 
@@ -731,18 +731,18 @@ const peopleOf = (employee: EmployeeProfileRecord) => {
 
 const toTimeOff = (employee: EmployeeTimeOffRecord): EmployeeForTimeOff => ({
     id: employee.id,
-    startDate: employee.startDate,
-    terminatedOn: employee.terminatedOn,
+    startsAt: employee.startsAt,
+    terminatedAt: employee.terminatedAt,
     responsibleUserIds: employee.responsibles.map(({ responsibleUserId }) => responsibleUserId),
 });
 
 const movementOf = (
     kind: EmployeeMovement['kind'],
-    date: Date,
+    movedAt: Date,
     employee: EmployeeMovementRecord,
 ): EmployeeMovement => ({
     kind,
-    date,
+    movedAt,
     employeeId: employee.id,
     userId: employee.user.id,
     firstName: employee.user.firstName,

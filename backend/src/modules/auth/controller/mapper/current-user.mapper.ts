@@ -5,7 +5,7 @@ import type { CurrentUserResponse } from '../dto/current-user.response';
 export const toCurrentUserResponse = (
     user: UserProfile,
     idleTimeoutMinutes: number,
-    demoRestricted: boolean,
+    isDemoRestricted: boolean,
 ): CurrentUserResponse => ({
     id: user.id,
     email: user.email,
@@ -21,11 +21,9 @@ export const toCurrentUserResponse = (
             plan: user.organisation.plan,
             features: [...PLAN_CATALOGUE[user.organisation.plan].features],
             maxEmployees: PLAN_CATALOGUE[user.organisation.plan].maxEmployees,
-            pastDueUntil: user.organisation.pastDueSince
-                ? graceEndsAt(user.organisation.pastDueSince).toISOString()
-                : null,
+            graceEndsAt: user.organisation.pastDueAt ? graceEndsAt(user.organisation.pastDueAt).toISOString() : null,
         },
     },
     idleTimeoutMinutes,
-    demoRestricted,
+    isDemoRestricted,
 });

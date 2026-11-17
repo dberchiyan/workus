@@ -57,7 +57,7 @@ export default function InsightsPage() {
                     <UpgradePrompt
                         reason={{ kind: 'feature', feature: 'insights' }}
                         requiredPlan={upgrade.requiredPlan}
-                        canManage={upgrade.canManage}
+                        hasBillingAccount={upgrade.hasBillingAccount}
                     />
                 </Card>
             </div>

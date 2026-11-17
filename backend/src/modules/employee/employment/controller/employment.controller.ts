@@ -51,14 +51,14 @@ export class EmploymentController {
                 lastName: request.lastName,
                 email: request.email,
                 positionId: request.positionId,
-                startDate: request.startDate,
+                startsAt: request.startsAt,
                 startingSalary: request.startingSalary,
                 mobile: request.mobile,
                 personalEmail: request.personalEmail,
                 linkedinUrl: request.linkedinUrl,
                 telegram: request.telegram,
                 address: request.address,
-                dateOfBirth: request.dateOfBirth,
+                bornAt: request.bornAt,
                 responsibleUserIds: request.responsibleUserIds,
             },
             principal.userId,
@@ -69,7 +69,8 @@ export class EmploymentController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @Authorize(can.manageEmployee)
     @ApiOperation({
-        summary: 'Edit name, work email, position, start date and contacts; the version must match the one read',
+        summary:
+            'Edit name, work email, position, start terminatedAt and contacts; the version must match the one read',
     })
     @ApiErrors(
         'VALIDATION_FAILED',
@@ -96,13 +97,13 @@ export class EmploymentController {
                 lastName: request.lastName,
                 email: request.email,
                 positionId: request.positionId,
-                startDate: request.startDate,
+                startsAt: request.startsAt,
                 mobile: request.mobile,
                 personalEmail: request.personalEmail,
                 linkedinUrl: request.linkedinUrl,
                 telegram: request.telegram,
                 address: request.address,
-                dateOfBirth: request.dateOfBirth,
+                bornAt: request.bornAt,
                 version: request.version,
             },
             principal.userId,
@@ -113,7 +114,8 @@ export class EmploymentController {
     @HttpCode(HttpStatus.NO_CONTENT)
     @Authorize(can.manageEmployee)
     @ApiOperation({
-        summary: 'Terminate the employee from a date (or change the termination); later scheduled reviews are canceled',
+        summary:
+            'Terminate the employee from a terminatedAt (or change the termination); later scheduled reviews are canceled',
     })
     @ApiErrors(
         'VALIDATION_FAILED',
@@ -135,7 +137,7 @@ export class EmploymentController {
             principal.organisationId,
             employeeId,
             {
-                date: request.date,
+                terminatedAt: request.terminatedAt,
                 reason: request.reason,
                 comment: request.comment,
                 version: request.version,

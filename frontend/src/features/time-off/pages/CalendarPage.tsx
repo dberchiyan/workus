@@ -42,7 +42,7 @@ export default function CalendarPage() {
     const data = calendar.data;
     // A month or filter change keeps the old grid until the new one arrives.
     const rows = calendar.isPlaceholderData && data?.from.slice(0, 7) !== params.month ? undefined : data?.content;
-    const holidays = new Map((rows ? (data?.holidays ?? []) : []).map((day) => [day.date, day.name]));
+    const holidays = new Map((rows ? (data?.holidays ?? []) : []).map((day) => [day.heldAt, day.name]));
 
     return (
         <div className="flex flex-col gap-6">
