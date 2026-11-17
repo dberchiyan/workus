@@ -160,6 +160,7 @@ export function BillingSection(): ReactElement {
     /** Opens the review step for a change of plan. */
     const review = (next: PlanChange): void => {
         changePlan.reset();
+        sync.reset();
         setChangeNotice(null);
         setChange(next);
         setChangeOpen(true);
