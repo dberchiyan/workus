@@ -18,23 +18,23 @@ import { BillingService } from './service/billing.service';
  * configuration names: Stripe with its keys, or the in-memory fake for local work.
  */
 @Module({
-  imports: [AuditModule, UserModule, ObservabilityModule],
-  controllers: [BillingController, BillingWebhookController],
-  providers: [
-    BillingService,
-    BillingRepository,
-    {
-      provide: BillingGateway,
-      inject: [AppConfigService, MetricsService, PinoLogger],
-      useFactory: (config: AppConfigService, metrics: MetricsService, logger: PinoLogger) => {
-        if (config.get('BILLING_PROVIDER') === 'stripe') {
-          logger.setContext(StripeBillingGateway.name);
-          return new StripeBillingGateway(config, metrics, logger);
-        }
-        return new FakeBillingGateway();
-      },
-    },
-  ],
-  exports: [BillingService],
+    imports: [AuditModule, UserModule, ObservabilityModule],
+    controllers: [BillingController, BillingWebhookController],
+    providers: [
+        BillingService,
+        BillingRepository,
+        {
+            provide: BillingGateway,
+            inject: [AppConfigService, MetricsService, PinoLogger],
+            useFactory: (config: AppConfigService, metrics: MetricsService, logger: PinoLogger) => {
+                if (config.get('BILLING_PROVIDER') === 'stripe') {
+                    logger.setContext(StripeBillingGateway.name);
+                    return new StripeBillingGateway(config, metrics, logger);
+                }
+                return new FakeBillingGateway();
+            },
+        },
+    ],
+    exports: [BillingService],
 })
 export class BillingModule {}

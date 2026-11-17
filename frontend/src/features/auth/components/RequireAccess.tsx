@@ -4,7 +4,7 @@ import type { AccessPart } from '../access';
 import { useAccess } from '../hooks/useAccess';
 
 export interface RequireAccessProps {
-  part: AccessPart;
+    part: AccessPart;
 }
 
 /**
@@ -12,9 +12,9 @@ export interface RequireAccessProps {
  * Companies for platform admins.
  */
 export function RequireAccess({ part }: RequireAccessProps) {
-  const can = useAccess();
-  if (can(part)) {
-    return <Outlet />;
-  }
-  return <Navigate to={can('section.dashboard') ? PATHS.dashboard : PATHS.platform} replace />;
+    const can = useAccess();
+    if (can(part)) {
+        return <Outlet />;
+    }
+    return <Navigate to={can('section.dashboard') ? PATHS.dashboard : PATHS.platform} replace />;
 }

@@ -6,8 +6,8 @@ import { InsightsController } from './controller/insights.controller';
 import { InsightsService } from './service/insights.service';
 
 @Module({
-  imports: [EmployeeModule, ReviewModule, TimeOffModule],
-  controllers: [InsightsController],
-  providers: [InsightsService],
+    imports: [EmployeeModule, ReviewModule, TimeOffModule],
+    controllers: [InsightsController],
+    providers: [InsightsService],
 })
 export class InsightsModule {}

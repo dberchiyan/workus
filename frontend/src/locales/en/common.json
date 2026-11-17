@@ -1,98 +1,98 @@
 {
-  "app": {
-    "name": "Workus",
-    "tagline": "Your day-to-day HR solution",
-    "home": "Workus home page",
-    "about": "About Workus"
-  },
-  "a11y": {
-    "skipToContent": "Skip to content"
-  },
-  "theme": {
-    "switchToDark": "Switch to dark theme",
-    "switchToLight": "Switch to light theme",
-    "system": "System",
-    "light": "Light",
-    "dark": "Dark"
-  },
-  "status": {
-    "loading": "Loading…"
-  },
-  "errorBoundary": {
-    "title": "Something went wrong",
-    "description": "This page failed to load. Try again — if it keeps happening, contact support.",
-    "retry": "Try again"
-  },
-  "password": {
-    "show": "Show password",
-    "hide": "Hide password",
-    "rules": {
-      "title": "Your password needs",
-      "length": "{{min}} to {{max}} characters",
-      "uppercase": "An upper-case letter (A–Z)",
-      "lowercase": "A lower-case letter (a–z)",
-      "digit": "A digit (0–9)",
-      "symbol": "A symbol, such as ! # % or -",
-      "met": "— done",
-      "notMet": "— not yet"
-    }
-  },
-  "credentials": {
-    "onceTitle": "The only time you see this password",
-    "onceText": "Copy it now and pass it to {{name}} in a safe way. Workus does not keep it, so it can never be shown again.",
-    "alreadyShown": "This employee was already created and their password was shown then; it cannot be shown again.",
-    "email": "Email",
-    "password": "Password",
-    "show": "Show password",
-    "hide": "Hide password",
-    "hidden": "hidden",
-    "copyEmail": "Copy email",
-    "copyPassword": "Copy password",
-    "copyBoth": "Copy sign-in details",
-    "copiedBoth": "Copied",
-    "copied": "Copied to the clipboard",
-    "clipboard": "Workus sign-in for {{name}}\nEmail: {{email}}\nPassword: {{password}}",
-    "copyFailed": "Could not copy — select the text and copy it yourself.",
-    "saved": "I have saved the password",
-    "doneHint": "Copy the password or confirm you saved it to finish.",
-    "done": "Done"
-  },
-  "people": {
-    "responsible": "Responsible: {{names}}",
-    "more": "+{{count}}",
-    "andMore": "{{count}} more"
-  },
-  "plans": {
-    "STARTER": "Starter",
-    "TEAM": "Team",
-    "BUSINESS": "Business"
-  },
-  "upgrade": {
-    "plan": "Available on the {{plan}} plan and above",
-    "seePlans": "See plans",
-    "askOwner": "Ask an owner of your company to upgrade the plan.",
-    "limit": {
-      "title": "Your plan allows up to {{limit}} employees",
-      "description_one": "You have {{people}} active employee. Move to the {{plan}} plan to add more — nothing is removed meanwhile.",
-      "description_other": "You have {{people}} active employees. Move to the {{plan}} plan to add more — nothing is removed meanwhile."
+    "app": {
+        "name": "Workus",
+        "tagline": "Your day-to-day HR solution",
+        "home": "Workus home page",
+        "about": "About Workus"
     },
-    "features": {
-      "reviews": {
-        "title": "Reviews and salary history",
-        "description": "Record reviews with the agreed salary, see how pay changed over time and keep feedback from HR, team leads, the team and clients — on the {{plan}} plan."
-      },
-      "structure": {
-        "title": "Departments and positions",
-        "description": "Shape your own departments and positions, rename them and see who holds what — on the {{plan}} plan."
-      },
-      "insights": {
-        "title": "Yearly insights",
-        "description": "Headcount, turnover, tenure, absence and average salary for any year, for the company or one department — on the {{plan}} plan."
-      },
-      "exports": {
-        "title": "Export of change history and security log",
-        "description": "Download an employee’s whole change history and security log as CSV — on the {{plan}} plan."
-      }
+    "a11y": {
+        "skipToContent": "Skip to content"
+    },
+    "theme": {
+        "switchToDark": "Switch to dark theme",
+        "switchToLight": "Switch to light theme",
+        "system": "System",
+        "light": "Light",
+        "dark": "Dark"
+    },
+    "status": {
+        "loading": "Loading…"
+    },
+    "errorBoundary": {
+        "title": "Something went wrong",
+        "description": "This page failed to load. Try again — if it keeps happening, contact support.",
+        "retry": "Try again"
+    },
+    "password": {
+        "show": "Show password",
+        "hide": "Hide password",
+        "rules": {
+            "title": "Your password needs",
+            "length": "{{min}} to {{max}} characters",
+            "uppercase": "An upper-case letter (A–Z)",
+            "lowercase": "A lower-case letter (a–z)",
+            "digit": "A digit (0–9)",
+            "symbol": "A symbol, such as ! # % or -",
+            "met": "— done",
+            "notMet": "— not yet"
+        }
+    },
+    "credentials": {
+        "onceTitle": "The only time you see this password",
+        "onceText": "Copy it now and pass it to {{name}} in a safe way. Workus does not keep it, so it can never be shown again.",
+        "alreadyShown": "This employee was already created and their password was shown then; it cannot be shown again.",
+        "email": "Email",
+        "password": "Password",
+        "show": "Show password",
+        "hide": "Hide password",
+        "hidden": "hidden",
+        "copyEmail": "Copy email",
+        "copyPassword": "Copy password",
+        "copyBoth": "Copy sign-in details",
+        "copiedBoth": "Copied",
+        "copied": "Copied to the clipboard",
+        "clipboard": "Workus sign-in for {{name}}\nEmail: {{email}}\nPassword: {{password}}",
+        "copyFailed": "Could not copy — select the text and copy it yourself.",
+        "saved": "I have saved the password",
+        "doneHint": "Copy the password or confirm you saved it to finish.",
+        "done": "Done"
+    },
+    "people": {
+        "responsible": "Responsible: {{names}}",
+        "more": "+{{count}}",
+        "andMore": "{{count}} more"
+    },
+    "plans": {
+        "STARTER": "Starter",
+        "TEAM": "Team",
+        "BUSINESS": "Business"
+    },
+    "upgrade": {
+        "plan": "Available on the {{plan}} plan and above",
+        "seePlans": "See plans",
+        "askOwner": "Ask an owner of your company to upgrade the plan.",
+        "limit": {
+            "title": "Your plan allows up to {{limit}} employees",
+            "description_one": "You have {{people}} active employee. Move to the {{plan}} plan to add more — nothing is removed meanwhile.",
+            "description_other": "You have {{people}} active employees. Move to the {{plan}} plan to add more — nothing is removed meanwhile."
+        },
+        "features": {
+            "reviews": {
+                "title": "Reviews and salary history",
+                "description": "Record reviews with the agreed salary, see how pay changed over time and keep feedback from HR, team leads, the team and clients — on the {{plan}} plan."
+            },
+            "structure": {
+                "title": "Departments and positions",
+                "description": "Shape your own departments and positions, rename them and see who holds what — on the {{plan}} plan."
+            },
+            "insights": {
+                "title": "Yearly insights",
+                "description": "Headcount, turnover, tenure, absence and average salary for any year, for the company or one department — on the {{plan}} plan."
+            },
+            "exports": {
+                "title": "Export of change history and security log",
+                "description": "Download an employee’s whole change history and security log as CSV — on the {{plan}} plan."
+            }
+        }
     }
-  }
 }

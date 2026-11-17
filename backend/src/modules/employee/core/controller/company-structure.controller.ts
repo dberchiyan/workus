@@ -14,21 +14,21 @@ import { Authorize } from '../../../../common/security/security.decorators';
 import { CompanyStructureService } from '../service/company-structure.service';
 import { EMPLOYEE_PAGEABLE, type EmployeeSortField } from '../service/employee-sort';
 import {
-  CreateDepartmentRequest,
-  CreatePositionRequest,
-  RenameDepartmentRequest,
-  RenamePositionRequest,
+    CreateDepartmentRequest,
+    CreatePositionRequest,
+    RenameDepartmentRequest,
+    RenamePositionRequest,
 } from './dto/company-structure.request';
 import {
-  CompanyStructureResponse,
-  DepartmentResponse,
-  StructurePositionResponse,
+    CompanyStructureResponse,
+    DepartmentResponse,
+    StructurePositionResponse,
 } from './dto/company-structure.response';
 import { EmployeePageResponse } from './dto/employee.response';
 import {
-  toCompanyStructureResponse,
-  toDepartmentResponse,
-  toStructurePositionResponse,
+    toCompanyStructureResponse,
+    toDepartmentResponse,
+    toStructurePositionResponse,
 } from './mapper/company-structure.mapper';
 import { toEmployeePageResponse } from './mapper/employee.mapper';
 
@@ -38,182 +38,160 @@ const READ_ERRORS = ['UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN'] as const;
 @ApiTags('Company structure')
 @Controller('api/v1/structure')
 export class CompanyStructureController {
-  constructor(private readonly structureService: CompanyStructureService) {}
+    constructor(private readonly structureService: CompanyStructureService) {}
 
-  @Get()
-  @Authorize(can.manageStructure)
-  @ApiOperation({ summary: 'Departments in their order, each with its positions and head counts' })
-  @ZodResponse({ status: HttpStatus.OK, type: CompanyStructureResponse })
-  @ApiErrors(...READ_ERRORS)
-  async find(@CurrentPrincipal() principal: Principal): Promise<CompanyStructureResponse> {
-    return toCompanyStructureResponse(
-      await this.structureService.findAll(principal.organisationId),
-    );
-  }
+    @Get()
+    @Authorize(can.manageStructure)
+    @ApiOperation({ summary: 'Departments in their order, each with its positions and head counts' })
+    @ZodResponse({ status: HttpStatus.OK, type: CompanyStructureResponse })
+    @ApiErrors(...READ_ERRORS)
+    async find(@CurrentPrincipal() principal: Principal): Promise<CompanyStructureResponse> {
+        return toCompanyStructureResponse(await this.structureService.findAll(principal.organisationId));
+    }
 
-  @Post('departments')
-  @HttpCode(HttpStatus.OK)
-  @Authorize(can.manageStructure)
-  @RequiresFeature(Feature.STRUCTURE)
-  @Idempotent()
-  @ApiOperation({ summary: 'Add a department (at the end)' })
-  @ZodResponse({ status: HttpStatus.OK, type: DepartmentResponse })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    ...READ_ERRORS,
-    'CONFLICT',
-    'BUSINESS_RULE_VIOLATION',
-    'PLAN_UPGRADE_REQUIRED',
-  )
-  async createDepartment(
-    @CurrentPrincipal() principal: Principal,
-    @Body() request: CreateDepartmentRequest,
-  ): Promise<DepartmentResponse> {
-    return toDepartmentResponse(
-      await this.structureService.createDepartment(
-        principal.organisationId,
-        request.name,
-        principal.userId,
-      ),
-    );
-  }
+    @Post('departments')
+    @HttpCode(HttpStatus.OK)
+    @Authorize(can.manageStructure)
+    @RequiresFeature(Feature.STRUCTURE)
+    @Idempotent()
+    @ApiOperation({ summary: 'Add a department (at the end)' })
+    @ZodResponse({ status: HttpStatus.OK, type: DepartmentResponse })
+    @ApiErrors('VALIDATION_FAILED', ...READ_ERRORS, 'CONFLICT', 'BUSINESS_RULE_VIOLATION', 'PLAN_UPGRADE_REQUIRED')
+    async createDepartment(
+        @CurrentPrincipal() principal: Principal,
+        @Body() request: CreateDepartmentRequest,
+    ): Promise<DepartmentResponse> {
+        return toDepartmentResponse(
+            await this.structureService.createDepartment(principal.organisationId, request.name, principal.userId),
+        );
+    }
 
-  @Put('departments/:departmentId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.manageDepartment)
-  @RequiresFeature(Feature.STRUCTURE)
-  @ApiOperation({ summary: 'Rename a department' })
-  @ApiErrors(
-    'PLAN_UPGRADE_REQUIRED',
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    ...READ_ERRORS,
-    'RESOURCE_NOT_FOUND',
-    'CONFLICT',
-    'CONCURRENT_MODIFICATION',
-  )
-  async renameDepartment(
-    @CurrentPrincipal() principal: Principal,
-    @UuidParam('departmentId') departmentId: string,
-    @Body() request: RenameDepartmentRequest,
-  ): Promise<void> {
-    await this.structureService.renameDepartment(
-      principal.organisationId,
-      departmentId,
-      request,
-      principal.userId,
-    );
-  }
+    @Put('departments/:departmentId')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Authorize(can.manageDepartment)
+    @RequiresFeature(Feature.STRUCTURE)
+    @ApiOperation({ summary: 'Rename a department' })
+    @ApiErrors(
+        'PLAN_UPGRADE_REQUIRED',
+        'VALIDATION_FAILED',
+        'INVALID_PARAMETER',
+        ...READ_ERRORS,
+        'RESOURCE_NOT_FOUND',
+        'CONFLICT',
+        'CONCURRENT_MODIFICATION',
+    )
+    async renameDepartment(
+        @CurrentPrincipal() principal: Principal,
+        @UuidParam('departmentId') departmentId: string,
+        @Body() request: RenameDepartmentRequest,
+    ): Promise<void> {
+        await this.structureService.renameDepartment(principal.organisationId, departmentId, request, principal.userId);
+    }
 
-  @Delete('departments/:departmentId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.manageDepartment)
-  @RequiresFeature(Feature.STRUCTURE)
-  @ApiOperation({ summary: 'Remove a department that has no positions' })
-  @ApiErrors(
-    'INVALID_PARAMETER',
-    ...READ_ERRORS,
-    'RESOURCE_NOT_FOUND',
-    'BUSINESS_RULE_VIOLATION',
-    'PLAN_UPGRADE_REQUIRED',
-  )
-  async removeDepartment(
-    @CurrentPrincipal() principal: Principal,
-    @UuidParam('departmentId') departmentId: string,
-  ): Promise<void> {
-    await this.structureService.removeDepartment(principal.organisationId, departmentId);
-  }
+    @Delete('departments/:departmentId')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Authorize(can.manageDepartment)
+    @RequiresFeature(Feature.STRUCTURE)
+    @ApiOperation({ summary: 'Remove a department that has no positions' })
+    @ApiErrors(
+        'INVALID_PARAMETER',
+        ...READ_ERRORS,
+        'RESOURCE_NOT_FOUND',
+        'BUSINESS_RULE_VIOLATION',
+        'PLAN_UPGRADE_REQUIRED',
+    )
+    async removeDepartment(
+        @CurrentPrincipal() principal: Principal,
+        @UuidParam('departmentId') departmentId: string,
+    ): Promise<void> {
+        await this.structureService.removeDepartment(principal.organisationId, departmentId);
+    }
 
-  @Post('departments/:departmentId/positions')
-  @HttpCode(HttpStatus.OK)
-  @Authorize(can.manageDepartment)
-  @RequiresFeature(Feature.STRUCTURE)
-  @Idempotent()
-  @ApiOperation({ summary: 'Add a position to a department' })
-  @ZodResponse({ status: HttpStatus.OK, type: StructurePositionResponse })
-  @ApiErrors(
-    'PLAN_UPGRADE_REQUIRED',
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    ...READ_ERRORS,
-    'RESOURCE_NOT_FOUND',
-    'CONFLICT',
-    'BUSINESS_RULE_VIOLATION',
-  )
-  async createPosition(
-    @CurrentPrincipal() principal: Principal,
-    @UuidParam('departmentId') departmentId: string,
-    @Body() request: CreatePositionRequest,
-  ): Promise<StructurePositionResponse> {
-    return toStructurePositionResponse(
-      await this.structureService.createPosition(
-        principal.organisationId,
-        departmentId,
-        request.title,
-        principal.userId,
-      ),
-    );
-  }
+    @Post('departments/:departmentId/positions')
+    @HttpCode(HttpStatus.OK)
+    @Authorize(can.manageDepartment)
+    @RequiresFeature(Feature.STRUCTURE)
+    @Idempotent()
+    @ApiOperation({ summary: 'Add a position to a department' })
+    @ZodResponse({ status: HttpStatus.OK, type: StructurePositionResponse })
+    @ApiErrors(
+        'PLAN_UPGRADE_REQUIRED',
+        'VALIDATION_FAILED',
+        'INVALID_PARAMETER',
+        ...READ_ERRORS,
+        'RESOURCE_NOT_FOUND',
+        'CONFLICT',
+        'BUSINESS_RULE_VIOLATION',
+    )
+    async createPosition(
+        @CurrentPrincipal() principal: Principal,
+        @UuidParam('departmentId') departmentId: string,
+        @Body() request: CreatePositionRequest,
+    ): Promise<StructurePositionResponse> {
+        return toStructurePositionResponse(
+            await this.structureService.createPosition(
+                principal.organisationId,
+                departmentId,
+                request.title,
+                principal.userId,
+            ),
+        );
+    }
 
-  @Get('positions/:positionId/employees')
-  @Authorize(can.managePosition)
-  @ApiOperation({ summary: 'Active employees holding the position, a page at a time' })
-  @ApiPageable(EMPLOYEE_PAGEABLE)
-  @ZodResponse({ status: HttpStatus.OK, type: EmployeePageResponse })
-  @ApiErrors('INVALID_PARAMETER', ...READ_ERRORS, 'RESOURCE_NOT_FOUND')
-  async findHolders(
-    @CurrentPrincipal() principal: Principal,
-    @UuidParam('positionId') positionId: string,
-    @PageableQuery(EMPLOYEE_PAGEABLE) pageable: Pageable<EmployeeSortField>,
-  ): Promise<EmployeePageResponse> {
-    return toEmployeePageResponse(
-      await this.structureService.findHolders(principal.organisationId, positionId, pageable),
-    );
-  }
+    @Get('positions/:positionId/employees')
+    @Authorize(can.managePosition)
+    @ApiOperation({ summary: 'Active employees holding the position, a page at a time' })
+    @ApiPageable(EMPLOYEE_PAGEABLE)
+    @ZodResponse({ status: HttpStatus.OK, type: EmployeePageResponse })
+    @ApiErrors('INVALID_PARAMETER', ...READ_ERRORS, 'RESOURCE_NOT_FOUND')
+    async findHolders(
+        @CurrentPrincipal() principal: Principal,
+        @UuidParam('positionId') positionId: string,
+        @PageableQuery(EMPLOYEE_PAGEABLE) pageable: Pageable<EmployeeSortField>,
+    ): Promise<EmployeePageResponse> {
+        return toEmployeePageResponse(
+            await this.structureService.findHolders(principal.organisationId, positionId, pageable),
+        );
+    }
 
-  @Put('positions/:positionId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.managePosition)
-  @RequiresFeature(Feature.STRUCTURE)
-  @ApiOperation({ summary: 'Rename a position (everyone holding it shows the new title)' })
-  @ApiErrors(
-    'PLAN_UPGRADE_REQUIRED',
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    ...READ_ERRORS,
-    'RESOURCE_NOT_FOUND',
-    'CONFLICT',
-    'CONCURRENT_MODIFICATION',
-  )
-  async renamePosition(
-    @CurrentPrincipal() principal: Principal,
-    @UuidParam('positionId') positionId: string,
-    @Body() request: RenamePositionRequest,
-  ): Promise<void> {
-    await this.structureService.renamePosition(
-      principal.organisationId,
-      positionId,
-      request,
-      principal.userId,
-    );
-  }
+    @Put('positions/:positionId')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Authorize(can.managePosition)
+    @RequiresFeature(Feature.STRUCTURE)
+    @ApiOperation({ summary: 'Rename a position (everyone holding it shows the new title)' })
+    @ApiErrors(
+        'PLAN_UPGRADE_REQUIRED',
+        'VALIDATION_FAILED',
+        'INVALID_PARAMETER',
+        ...READ_ERRORS,
+        'RESOURCE_NOT_FOUND',
+        'CONFLICT',
+        'CONCURRENT_MODIFICATION',
+    )
+    async renamePosition(
+        @CurrentPrincipal() principal: Principal,
+        @UuidParam('positionId') positionId: string,
+        @Body() request: RenamePositionRequest,
+    ): Promise<void> {
+        await this.structureService.renamePosition(principal.organisationId, positionId, request, principal.userId);
+    }
 
-  @Delete('positions/:positionId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.managePosition)
-  @RequiresFeature(Feature.STRUCTURE)
-  @ApiOperation({ summary: 'Remove a position nobody holds (current or former employees)' })
-  @ApiErrors(
-    'INVALID_PARAMETER',
-    ...READ_ERRORS,
-    'RESOURCE_NOT_FOUND',
-    'BUSINESS_RULE_VIOLATION',
-    'PLAN_UPGRADE_REQUIRED',
-  )
-  async removePosition(
-    @CurrentPrincipal() principal: Principal,
-    @UuidParam('positionId') positionId: string,
-  ): Promise<void> {
-    await this.structureService.removePosition(principal.organisationId, positionId);
-  }
+    @Delete('positions/:positionId')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Authorize(can.managePosition)
+    @RequiresFeature(Feature.STRUCTURE)
+    @ApiOperation({ summary: 'Remove a position nobody holds (current or former employees)' })
+    @ApiErrors(
+        'INVALID_PARAMETER',
+        ...READ_ERRORS,
+        'RESOURCE_NOT_FOUND',
+        'BUSINESS_RULE_VIOLATION',
+        'PLAN_UPGRADE_REQUIRED',
+    )
+    async removePosition(
+        @CurrentPrincipal() principal: Principal,
+        @UuidParam('positionId') positionId: string,
+    ): Promise<void> {
+        await this.structureService.removePosition(principal.organisationId, positionId);
+    }
 }

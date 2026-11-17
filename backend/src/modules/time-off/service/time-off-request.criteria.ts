@@ -7,12 +7,12 @@ export const REQUEST_STATES = Object.values(RequestState) as [RequestState, ...R
 
 /** Filters of the admin request lists. */
 export interface TimeOffRequestCriteria {
-  state: RequestState;
-  /** Closed list only: one of the closed statuses. */
-  status: Exclude<TimeOffStatus, 'PENDING'> | undefined;
-  type: TimeOffType | undefined;
-  /** Only requests this user may decide. */
-  responsibleUserId: string | undefined;
-  /** Every term matches the employee's first or last name. */
-  searchTerms: string[];
+    state: RequestState;
+    /** Closed list only: one of the closed statuses. */
+    status: Exclude<TimeOffStatus, 'PENDING'> | undefined;
+    type: TimeOffType | undefined;
+    /** Only requests this user may decide. */
+    responsibleUserId: string | undefined;
+    /** Every term matches the employee's first or last name. */
+    searchTerms: string[];
 }

@@ -6,9 +6,9 @@ import type { Principal } from './principal';
 
 /** The principal of an `@Authorize`d handler. */
 export const CurrentPrincipal = createParamDecorator((): Principal => {
-  const principal = ClsServiceManager.getClsService<RequestContext>().get('principal');
-  if (!principal) {
-    throw new NotAuthenticatedException();
-  }
-  return principal;
+    const principal = ClsServiceManager.getClsService<RequestContext>().get('principal');
+    if (!principal) {
+        throw new NotAuthenticatedException();
+    }
+    return principal;
 });

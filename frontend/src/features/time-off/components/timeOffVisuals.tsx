@@ -9,24 +9,24 @@ import type { TimeOffType } from '../types';
  * the same tone, light, behind a coloured icon (calendar bars).
  */
 export const TYPE_VISUALS = {
-  VACATION: {
-    icon: BeachAccessOutlined,
-    tone: 'bg-avatar-c2',
-    text: 'text-avatar-c2',
-    tint: 'bg-avatar-c2/15 dark:bg-avatar-c2/40',
-  },
-  SICK_DAY: {
-    icon: LocalHospitalOutlined,
-    tone: 'bg-avatar-c4',
-    text: 'text-avatar-c4',
-    tint: 'bg-avatar-c4/15 dark:bg-avatar-c4/40',
-  },
-  DAY_OFF: {
-    icon: EventBusyOutlined,
-    tone: 'bg-avatar-c5',
-    text: 'text-avatar-c5',
-    tint: 'bg-avatar-c5/15 dark:bg-avatar-c5/40',
-  },
+    VACATION: {
+        icon: BeachAccessOutlined,
+        tone: 'bg-avatar-c2',
+        text: 'text-avatar-c2',
+        tint: 'bg-avatar-c2/15 dark:bg-avatar-c2/40',
+    },
+    SICK_DAY: {
+        icon: LocalHospitalOutlined,
+        tone: 'bg-avatar-c4',
+        text: 'text-avatar-c4',
+        tint: 'bg-avatar-c4/15 dark:bg-avatar-c4/40',
+    },
+    DAY_OFF: {
+        icon: EventBusyOutlined,
+        tone: 'bg-avatar-c5',
+        text: 'text-avatar-c5',
+        tint: 'bg-avatar-c5/15 dark:bg-avatar-c5/40',
+    },
 } as const satisfies Record<TimeOffType, unknown>;
 
 /**
@@ -34,4 +34,4 @@ export const TYPE_VISUALS = {
  * thin divider-coloured diagonals 6px apart.
  */
 export const NOT_EMPLOYED_PATTERN =
-  'bg-[repeating-linear-gradient(135deg,var(--color-divider)_0_1px,transparent_1px_6px)]';
+    'bg-[repeating-linear-gradient(135deg,var(--color-divider)_0_1px,transparent_1px_6px)]';

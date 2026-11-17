@@ -1,16 +1,4 @@
-import {
-  Body,
-  Controller,
-  Delete,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Put,
-  Query,
-  Req,
-  Res,
-} from '@nestjs/common';
+import { Body, Controller, Delete, Get, HttpCode, HttpStatus, Post, Put, Query, Req, Res } from '@nestjs/common';
 import { ApiOkResponse, ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request, Response } from 'express';
 import { ZodResponse } from 'nestjs-zod';
@@ -34,11 +22,7 @@ import { CurrentUserResponse } from './dto/current-user.response';
 import { ChangePasswordRequest } from './dto/change-password.request';
 import { UpdateOwnNameRequest } from './dto/update-own-name.request';
 import { LoginRequest } from './dto/login.request';
-import {
-  SESSIONS_PAGEABLE,
-  type SessionSortField,
-  SessionsResponse,
-} from './dto/sessions.response';
+import { SESSIONS_PAGEABLE, type SessionSortField, SessionsResponse } from './dto/sessions.response';
 import { SecurityLogResponse } from './dto/security-log.response';
 import { toCurrentUserResponse } from './mapper/current-user.mapper';
 import { toSessionsResponse } from './mapper/session.mapper';
@@ -47,182 +31,179 @@ import { SessionCookies } from '../../../common/security/session-cookies';
 @ApiTags('Auth')
 @Controller('api/v1/auth')
 export class AuthController {
-  constructor(
-    private readonly authService: AuthService,
-    private readonly sessionService: SessionService,
-    private readonly sessionCookies: SessionCookies,
-    private readonly config: AppConfigService,
-  ) {}
+    constructor(
+        private readonly authService: AuthService,
+        private readonly sessionService: SessionService,
+        private readonly sessionCookies: SessionCookies,
+        private readonly config: AppConfigService,
+    ) {}
 
-  @Post('login')
-  @HttpCode(HttpStatus.OK)
-  @Public()
-  @IdempotencyExempt('No session yet; a repeat only replaces the session')
-  @RateLimit(RateLimitName.LOGIN)
-  @ApiOperation({ summary: 'Sign in with email and password and start a session' })
-  @ZodResponse({ status: HttpStatus.OK, type: CurrentUserResponse })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    'MALFORMED_REQUEST',
-    'INVALID_CREDENTIALS',
-    'ACCESS_ENDED',
-    'FORBIDDEN',
-    'RATE_LIMIT_EXCEEDED',
-  )
-  async login(
-    @Body() request: LoginRequest,
-    @Req() httpRequest: Request,
-    @Res({ passthrough: true }) response: Response,
-  ): Promise<CurrentUserResponse> {
-    const { user, session } = await this.authService.login({
-      email: request.email,
-      password: request.password,
-      ip: clientIp(httpRequest),
-      userAgent: clientUserAgent(httpRequest),
-      presentedToken: readCookie(httpRequest, this.config.get('SESSION_COOKIE_NAME')),
-    });
-    this.sessionCookies.write(response, session);
-    return toCurrentUserResponse(
-      user,
-      this.config.get('SESSION_IDLE_TIMEOUT_MINUTES'),
-      this.config.isDemoProtected(user.email),
-    );
-  }
-
-  @Post('logout')
-  @HttpCode(HttpStatus.OK)
-  @Authorize(can.ownAccount)
-  @IdempotencyExempt('Deleting the session is idempotent by nature')
-  @ApiOperation({ summary: 'End the current session' })
-  @ApiOkResponse({ description: 'Session ended; cookies cleared' })
-  @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
-  async logout(
-    @CurrentPrincipal() principal: Principal,
-    @Res({ passthrough: true }) response: Response,
-  ): Promise<void> {
-    await this.authService.logout(principal);
-    this.sessionCookies.clear(response);
-  }
-
-  @Get('me')
-  @Authorize(can.ownAccount)
-  @ApiOperation({ summary: 'Return the signed-in user' })
-  @ZodResponse({ status: HttpStatus.OK, type: CurrentUserResponse })
-  @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED')
-  async me(@CurrentPrincipal() principal: Principal): Promise<CurrentUserResponse> {
-    const user = await this.authService.currentUser(principal.userId);
-    return toCurrentUserResponse(
-      user,
-      this.config.get('SESSION_IDLE_TIMEOUT_MINUTES'),
-      this.config.isDemoProtected(user.email),
-    );
-  }
-
-  @Put('password')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.ownAccount)
-  @DemoRestricted()
-  @RateLimit(RateLimitName.PASSWORD_CHANGE)
-  @ApiOperation({
-    summary: 'Change own password; every session ends and this browser gets a new one',
-  })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-    'BUSINESS_RULE_VIOLATION',
-    'RATE_LIMIT_EXCEEDED',
-    'DEMO_RESTRICTED',
-  )
-  async changePassword(
-    @Body() request: ChangePasswordRequest,
-    @CurrentPrincipal() principal: Principal,
-    @Req() httpRequest: Request,
-    @Res({ passthrough: true }) response: Response,
-  ): Promise<void> {
-    const session = await this.authService.changePassword({
-      userId: principal.userId,
-      currentPassword: request.currentPassword,
-      newPassword: request.newPassword,
-      ip: clientIp(httpRequest),
-      userAgent: clientUserAgent(httpRequest),
-    });
-    this.sessionCookies.write(response, session);
-  }
-
-  @Put('profile')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.renameSelf)
-  @ApiOperation({ summary: 'Change own first and last name (admins and owners)' })
-  @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
-  async updateOwnName(
-    @Body() request: UpdateOwnNameRequest,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<void> {
-    await this.authService.updateOwnName(principal, request);
-  }
-
-  @Get('sessions')
-  @Authorize(can.ownAccount)
-  @ApiOperation({
-    summary: "The caller's current session and a page of their other live sessions",
-  })
-  @ApiPageable(SESSIONS_PAGEABLE)
-  @ZodResponse({ status: HttpStatus.OK, type: SessionsResponse })
-  @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED')
-  async sessions(
-    @CurrentPrincipal() principal: Principal,
-    @PageableQuery(SESSIONS_PAGEABLE) pageable: Pageable<SessionSortField>,
-  ): Promise<SessionsResponse> {
-    return toSessionsResponse(
-      await this.sessionService.listForUser(principal.userId, principal.sessionId, pageable),
-    );
-  }
-
-  @Delete('sessions')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.ownAccount)
-  @DemoRestricted()
-  @ApiOperation({ summary: 'Sign out everywhere except this session' })
-  @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN', 'DEMO_RESTRICTED')
-  async endOtherSessions(@CurrentPrincipal() principal: Principal): Promise<void> {
-    await this.authService.endOtherSessions(principal);
-  }
-
-  @Delete('sessions/:sessionId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.endOwnSession)
-  @DemoRestricted()
-  @ApiOperation({ summary: 'End one of own sessions (this one signs out here)' })
-  @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN', 'DEMO_RESTRICTED')
-  async endSession(
-    @UuidParam('sessionId') sessionId: string,
-    @CurrentPrincipal() principal: Principal,
-    @Res({ passthrough: true }) response: Response,
-  ): Promise<void> {
-    await this.authService.endSession(principal, sessionId);
-    if (sessionId === principal.sessionId) {
-      this.sessionCookies.clear(response);
+    @Post('login')
+    @HttpCode(HttpStatus.OK)
+    @Public()
+    @IdempotencyExempt('No session yet; a repeat only replaces the session')
+    @RateLimit(RateLimitName.LOGIN)
+    @ApiOperation({ summary: 'Sign in with email and password and start a session' })
+    @ZodResponse({ status: HttpStatus.OK, type: CurrentUserResponse })
+    @ApiErrors(
+        'VALIDATION_FAILED',
+        'MALFORMED_REQUEST',
+        'INVALID_CREDENTIALS',
+        'ACCESS_ENDED',
+        'FORBIDDEN',
+        'RATE_LIMIT_EXCEEDED',
+    )
+    async login(
+        @Body() request: LoginRequest,
+        @Req() httpRequest: Request,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<CurrentUserResponse> {
+        const { user, session } = await this.authService.login({
+            email: request.email,
+            password: request.password,
+            ip: clientIp(httpRequest),
+            userAgent: clientUserAgent(httpRequest),
+            presentedToken: readCookie(httpRequest, this.config.get('SESSION_COOKIE_NAME')),
+        });
+        this.sessionCookies.write(response, session);
+        return toCurrentUserResponse(
+            user,
+            this.config.get('SESSION_IDLE_TIMEOUT_MINUTES'),
+            this.config.isDemoProtected(user.email),
+        );
     }
-  }
 
-  @Get('security-log')
-  @Authorize(can.ownAccount)
-  @ApiOperation({
-    summary:
-      "The caller's security log: sign-ins, failed sign-ins, password changes, ended sessions",
-  })
-  @ApiPageable(AUDIT_EVENT_PAGEABLE)
-  @ZodResponse({ status: HttpStatus.OK, type: SecurityLogResponse })
-  @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED')
-  async securityLog(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: SecurityLogQuery,
-    @PageableQuery(AUDIT_EVENT_PAGEABLE) pageable: Pageable<AuditEventSortField>,
-  ): Promise<SecurityLogResponse> {
-    return toSecurityEventPage(
-      await this.authService.securityLog(principal, query.category ?? null, pageable),
-    );
-  }
+    @Post('logout')
+    @HttpCode(HttpStatus.OK)
+    @Authorize(can.ownAccount)
+    @IdempotencyExempt('Deleting the session is idempotent by nature')
+    @ApiOperation({ summary: 'End the current session' })
+    @ApiOkResponse({ description: 'Session ended; cookies cleared' })
+    @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+    async logout(
+        @CurrentPrincipal() principal: Principal,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<void> {
+        await this.authService.logout(principal);
+        this.sessionCookies.clear(response);
+    }
+
+    @Get('me')
+    @Authorize(can.ownAccount)
+    @ApiOperation({ summary: 'Return the signed-in user' })
+    @ZodResponse({ status: HttpStatus.OK, type: CurrentUserResponse })
+    @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED')
+    async me(@CurrentPrincipal() principal: Principal): Promise<CurrentUserResponse> {
+        const user = await this.authService.currentUser(principal.userId);
+        return toCurrentUserResponse(
+            user,
+            this.config.get('SESSION_IDLE_TIMEOUT_MINUTES'),
+            this.config.isDemoProtected(user.email),
+        );
+    }
+
+    @Put('password')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Authorize(can.ownAccount)
+    @DemoRestricted()
+    @RateLimit(RateLimitName.PASSWORD_CHANGE)
+    @ApiOperation({
+        summary: 'Change own password; every session ends and this browser gets a new one',
+    })
+    @ApiErrors(
+        'VALIDATION_FAILED',
+        'UNAUTHORIZED',
+        'SESSION_EXPIRED',
+        'FORBIDDEN',
+        'BUSINESS_RULE_VIOLATION',
+        'RATE_LIMIT_EXCEEDED',
+        'DEMO_RESTRICTED',
+    )
+    async changePassword(
+        @Body() request: ChangePasswordRequest,
+        @CurrentPrincipal() principal: Principal,
+        @Req() httpRequest: Request,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<void> {
+        const session = await this.authService.changePassword({
+            userId: principal.userId,
+            currentPassword: request.currentPassword,
+            newPassword: request.newPassword,
+            ip: clientIp(httpRequest),
+            userAgent: clientUserAgent(httpRequest),
+        });
+        this.sessionCookies.write(response, session);
+    }
+
+    @Put('profile')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Authorize(can.renameSelf)
+    @ApiOperation({ summary: 'Change own first and last name (admins and owners)' })
+    @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+    async updateOwnName(
+        @Body() request: UpdateOwnNameRequest,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<void> {
+        await this.authService.updateOwnName(principal, request);
+    }
+
+    @Get('sessions')
+    @Authorize(can.ownAccount)
+    @ApiOperation({
+        summary: "The caller's current session and a page of their other live sessions",
+    })
+    @ApiPageable(SESSIONS_PAGEABLE)
+    @ZodResponse({ status: HttpStatus.OK, type: SessionsResponse })
+    @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED')
+    async sessions(
+        @CurrentPrincipal() principal: Principal,
+        @PageableQuery(SESSIONS_PAGEABLE) pageable: Pageable<SessionSortField>,
+    ): Promise<SessionsResponse> {
+        return toSessionsResponse(
+            await this.sessionService.listForUser(principal.userId, principal.sessionId, pageable),
+        );
+    }
+
+    @Delete('sessions')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Authorize(can.ownAccount)
+    @DemoRestricted()
+    @ApiOperation({ summary: 'Sign out everywhere except this session' })
+    @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN', 'DEMO_RESTRICTED')
+    async endOtherSessions(@CurrentPrincipal() principal: Principal): Promise<void> {
+        await this.authService.endOtherSessions(principal);
+    }
+
+    @Delete('sessions/:sessionId')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Authorize(can.endOwnSession)
+    @DemoRestricted()
+    @ApiOperation({ summary: 'End one of own sessions (this one signs out here)' })
+    @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN', 'DEMO_RESTRICTED')
+    async endSession(
+        @UuidParam('sessionId') sessionId: string,
+        @CurrentPrincipal() principal: Principal,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<void> {
+        await this.authService.endSession(principal, sessionId);
+        if (sessionId === principal.sessionId) {
+            this.sessionCookies.clear(response);
+        }
+    }
+
+    @Get('security-log')
+    @Authorize(can.ownAccount)
+    @ApiOperation({
+        summary: "The caller's security log: sign-ins, failed sign-ins, password changes, ended sessions",
+    })
+    @ApiPageable(AUDIT_EVENT_PAGEABLE)
+    @ZodResponse({ status: HttpStatus.OK, type: SecurityLogResponse })
+    @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED')
+    async securityLog(
+        @CurrentPrincipal() principal: Principal,
+        @Query() query: SecurityLogQuery,
+        @PageableQuery(AUDIT_EVENT_PAGEABLE) pageable: Pageable<AuditEventSortField>,
+    ): Promise<SecurityLogResponse> {
+        return toSecurityEventPage(await this.authService.securityLog(principal, query.category ?? null, pageable));
+    }
 }

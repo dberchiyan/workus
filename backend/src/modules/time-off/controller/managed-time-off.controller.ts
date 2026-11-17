@@ -1,14 +1,4 @@
-import {
-  Body,
-  Controller,
-  Get,
-  HttpCode,
-  HttpStatus,
-  Post,
-  Put,
-  Query,
-  Delete,
-} from '@nestjs/common';
+import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query, Delete } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import { ZodResponse } from 'nestjs-zod';
 import { ApiPageable, type Pageable, PageableQuery } from '../../../common/dto/pageable';
@@ -28,154 +18,17 @@ import { RejectTimeOffRequestRequest } from './dto/reject-time-off-request.reque
 import { UpdateRequestResponsiblesRequest } from './dto/update-request-responsibles.request';
 import { ManagedTimeOffRequestFilterQuery } from './dto/managed-time-off-request-filter.query';
 import {
-  ManagedTimeOffRequestPageResponse,
-  ManagedTimeOffRequestResponse,
-  TimeOffCommentResponse,
+    ManagedTimeOffRequestPageResponse,
+    ManagedTimeOffRequestResponse,
+    TimeOffCommentResponse,
 } from './dto/time-off.response';
 import {
-  toManagedTimeOffRequestPageResponse,
-  toManagedTimeOffRequestResponse,
-  toTimeOffCommentResponse,
+    toManagedTimeOffRequestPageResponse,
+    toManagedTimeOffRequestResponse,
+    toTimeOffCommentResponse,
 } from './mapper/time-off.mapper';
 
 const DECISION_ERRORS = [
-  'INVALID_PARAMETER',
-  'UNAUTHORIZED',
-  'SESSION_EXPIRED',
-  'FORBIDDEN',
-  'RESOURCE_NOT_FOUND',
-  'CONCURRENT_MODIFICATION',
-  'BUSINESS_RULE_VIOLATION',
-] as const;
-
-/** Every employee's time-off requests (admin): lists, decisions, comments. */
-@ApiTags('Time off')
-@Controller('api/v1/time-off-requests')
-export class ManagedTimeOffController {
-  constructor(
-    private readonly decisionService: TimeOffDecisionService,
-    private readonly commentService: TimeOffCommentService,
-  ) {}
-
-  @Get()
-  @Authorize(can.viewTimeOffRequests)
-  @ApiOperation({
-    summary: 'Pending or closed time-off requests of every employee, with their history',
-  })
-  @ApiPageable(MANAGED_REQUEST_PAGEABLE)
-  @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestPageResponse })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-  )
-  async list(
-    @Query() query: ManagedTimeOffRequestFilterQuery,
-    @CurrentPrincipal() principal: Principal,
-    @PageableQuery(MANAGED_REQUEST_PAGEABLE) pageable: Pageable<ManagedRequestSortField>,
-  ): Promise<ManagedTimeOffRequestPageResponse> {
-    return toManagedTimeOffRequestPageResponse(
-      await this.decisionService.findPage(
-        principal.organisationId,
-        {
-          state: query.state,
-          status: query.state === 'CLOSED' ? query.status : undefined,
-          type: query.type,
-          responsibleUserId: query.mine ? principal.userId : undefined,
-          searchTerms: toSearchTerms(query.search),
-        },
-        pageable,
-        principal.userId,
-      ),
-    );
-  }
-
-  @Get(':requestId')
-  @Authorize(can.viewTimeOffRequest)
-  @ApiOperation({ summary: 'One time-off request with its history and comments' })
-  @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestResponse })
-  @ApiErrors(
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-    'RESOURCE_NOT_FOUND',
-  )
-  async findOne(
-    @UuidParam('requestId') requestId: string,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<ManagedTimeOffRequestResponse> {
-    return toManagedTimeOffRequestResponse(
-      await this.decisionService.findOne(principal.organisationId, requestId, principal.userId),
-    );
-  }
-
-  @Post(':requestId/approval')
-  @HttpCode(HttpStatus.OK)
-  @Authorize(can.decideTimeOffRequest)
-  @IdempotencyExempt('Approving an approved request changes nothing')
-  @ApiOperation({ summary: 'Approve a pending request (its responsible people only)' })
-  @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestResponse })
-  @ApiErrors(...DECISION_ERRORS)
-  approve(
-    @UuidParam('requestId') requestId: string,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<ManagedTimeOffRequestResponse> {
-    return this.decide(requestId, 'approve', principal);
-  }
-
-  @Post(':requestId/rejection')
-  @HttpCode(HttpStatus.OK)
-  @Authorize(can.decideTimeOffRequest)
-  @IdempotencyExempt('Rejecting a rejected request changes nothing')
-  @ApiOperation({
-    summary: 'Reject a pending request, optionally saying why (its responsible people only)',
-  })
-  @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestResponse })
-  @ApiErrors(...DECISION_ERRORS)
-  async reject(
-    @UuidParam('requestId') requestId: string,
-    @Body() request: RejectTimeOffRequestRequest,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<ManagedTimeOffRequestResponse> {
-    return toManagedTimeOffRequestResponse(
-      await this.decisionService.decide(
-        principal.organisationId,
-        requestId,
-        'reject',
-        principal.userId,
-        request.comment,
-      ),
-    );
-  }
-
-  @Post(':requestId/cancellation')
-  @HttpCode(HttpStatus.OK)
-  @Authorize(can.decideTimeOffRequest)
-  @IdempotencyExempt('Canceling a canceled request changes nothing')
-  @ApiOperation({
-    summary:
-      'Cancel a pending or approved request, even a started one (its responsible people only)',
-  })
-  @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestResponse })
-  @ApiErrors(...DECISION_ERRORS)
-  cancel(
-    @UuidParam('requestId') requestId: string,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<ManagedTimeOffRequestResponse> {
-    return this.decide(requestId, 'cancel', principal);
-  }
-
-  @Put(':requestId/responsibles')
-  @Authorize(can.manageTimeOffRequest)
-  @ApiOperation({
-    summary: 'Replace who decides a pending request (admins only); any admin may do it',
-  })
-  @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestResponse })
-  @ApiErrors(
-    'VALIDATION_FAILED',
     'INVALID_PARAMETER',
     'UNAUTHORIZED',
     'SESSION_EXPIRED',
@@ -183,117 +36,220 @@ export class ManagedTimeOffController {
     'RESOURCE_NOT_FOUND',
     'CONCURRENT_MODIFICATION',
     'BUSINESS_RULE_VIOLATION',
-  )
-  async updateResponsibles(
-    @UuidParam('requestId') requestId: string,
-    @Body() request: UpdateRequestResponsiblesRequest,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<ManagedTimeOffRequestResponse> {
-    return toManagedTimeOffRequestResponse(
-      await this.decisionService.updateResponsibles(
-        principal.organisationId,
-        requestId,
-        request.responsibleUserIds,
-        principal.userId,
-      ),
-    );
-  }
+] as const;
 
-  @Post(':requestId/comments')
-  @HttpCode(HttpStatus.OK)
-  @Authorize(can.commentTimeOffRequest)
-  @Idempotent()
-  @ApiOperation({ summary: 'Comment on a request; every admin and the employee see it' })
-  @ZodResponse({ status: HttpStatus.OK, type: TimeOffCommentResponse })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-    'RESOURCE_NOT_FOUND',
-    'IDEMPOTENCY_KEY_REUSED',
-  )
-  async comment(
-    @UuidParam('requestId') requestId: string,
-    @Body() request: AddTimeOffCommentRequest,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<TimeOffCommentResponse> {
-    return toTimeOffCommentResponse(
-      await this.commentService.add(
-        principal.organisationId,
-        requestId,
-        request.body,
-        principal.userId,
-      ),
-    );
-  }
+/** Every employee's time-off requests (admin): lists, decisions, comments. */
+@ApiTags('Time off')
+@Controller('api/v1/time-off-requests')
+export class ManagedTimeOffController {
+    constructor(
+        private readonly decisionService: TimeOffDecisionService,
+        private readonly commentService: TimeOffCommentService,
+    ) {}
 
-  @Put(':requestId/comments/:commentId')
-  @Authorize(can.editTimeOffComment)
-  @ApiOperation({ summary: 'Edit own comment on a request (its author only)' })
-  @ZodResponse({ status: HttpStatus.OK, type: TimeOffCommentResponse })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-    'RESOURCE_NOT_FOUND',
-  )
-  async editComment(
-    @UuidParam('requestId') requestId: string,
-    @UuidParam('commentId') commentId: string,
-    @Body() request: AddTimeOffCommentRequest,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<TimeOffCommentResponse> {
-    return toTimeOffCommentResponse(
-      await this.commentService.edit(
-        principal.organisationId,
-        requestId,
-        commentId,
-        request.body,
-        principal.userId,
-      ),
-    );
-  }
+    @Get()
+    @Authorize(can.viewTimeOffRequests)
+    @ApiOperation({
+        summary: 'Pending or closed time-off requests of every employee, with their history',
+    })
+    @ApiPageable(MANAGED_REQUEST_PAGEABLE)
+    @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestPageResponse })
+    @ApiErrors('VALIDATION_FAILED', 'INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+    async list(
+        @Query() query: ManagedTimeOffRequestFilterQuery,
+        @CurrentPrincipal() principal: Principal,
+        @PageableQuery(MANAGED_REQUEST_PAGEABLE) pageable: Pageable<ManagedRequestSortField>,
+    ): Promise<ManagedTimeOffRequestPageResponse> {
+        return toManagedTimeOffRequestPageResponse(
+            await this.decisionService.findPage(
+                principal.organisationId,
+                {
+                    state: query.state,
+                    status: query.state === 'CLOSED' ? query.status : undefined,
+                    type: query.type,
+                    responsibleUserId: query.mine ? principal.userId : undefined,
+                    searchTerms: toSearchTerms(query.search),
+                },
+                pageable,
+                principal.userId,
+            ),
+        );
+    }
 
-  @Delete(':requestId/comments/:commentId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.editTimeOffComment)
-  @ApiOperation({ summary: 'Delete own comment on a request (its author only)' })
-  @ApiErrors(
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-    'RESOURCE_NOT_FOUND',
-  )
-  async deleteComment(
-    @UuidParam('requestId') requestId: string,
-    @UuidParam('commentId') commentId: string,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<void> {
-    await this.commentService.remove(
-      principal.organisationId,
-      requestId,
-      commentId,
-      principal.userId,
-    );
-  }
+    @Get(':requestId')
+    @Authorize(can.viewTimeOffRequest)
+    @ApiOperation({ summary: 'One time-off request with its history and comments' })
+    @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestResponse })
+    @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN', 'RESOURCE_NOT_FOUND')
+    async findOne(
+        @UuidParam('requestId') requestId: string,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<ManagedTimeOffRequestResponse> {
+        return toManagedTimeOffRequestResponse(
+            await this.decisionService.findOne(principal.organisationId, requestId, principal.userId),
+        );
+    }
 
-  private async decide(
-    requestId: string,
-    decision: TimeOffDecision,
-    principal: Principal,
-  ): Promise<ManagedTimeOffRequestResponse> {
-    return toManagedTimeOffRequestResponse(
-      await this.decisionService.decide(
-        principal.organisationId,
-        requestId,
-        decision,
-        principal.userId,
-      ),
-    );
-  }
+    @Post(':requestId/approval')
+    @HttpCode(HttpStatus.OK)
+    @Authorize(can.decideTimeOffRequest)
+    @IdempotencyExempt('Approving an approved request changes nothing')
+    @ApiOperation({ summary: 'Approve a pending request (its responsible people only)' })
+    @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestResponse })
+    @ApiErrors(...DECISION_ERRORS)
+    approve(
+        @UuidParam('requestId') requestId: string,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<ManagedTimeOffRequestResponse> {
+        return this.decide(requestId, 'approve', principal);
+    }
+
+    @Post(':requestId/rejection')
+    @HttpCode(HttpStatus.OK)
+    @Authorize(can.decideTimeOffRequest)
+    @IdempotencyExempt('Rejecting a rejected request changes nothing')
+    @ApiOperation({
+        summary: 'Reject a pending request, optionally saying why (its responsible people only)',
+    })
+    @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestResponse })
+    @ApiErrors(...DECISION_ERRORS)
+    async reject(
+        @UuidParam('requestId') requestId: string,
+        @Body() request: RejectTimeOffRequestRequest,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<ManagedTimeOffRequestResponse> {
+        return toManagedTimeOffRequestResponse(
+            await this.decisionService.decide(
+                principal.organisationId,
+                requestId,
+                'reject',
+                principal.userId,
+                request.comment,
+            ),
+        );
+    }
+
+    @Post(':requestId/cancellation')
+    @HttpCode(HttpStatus.OK)
+    @Authorize(can.decideTimeOffRequest)
+    @IdempotencyExempt('Canceling a canceled request changes nothing')
+    @ApiOperation({
+        summary: 'Cancel a pending or approved request, even a started one (its responsible people only)',
+    })
+    @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestResponse })
+    @ApiErrors(...DECISION_ERRORS)
+    cancel(
+        @UuidParam('requestId') requestId: string,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<ManagedTimeOffRequestResponse> {
+        return this.decide(requestId, 'cancel', principal);
+    }
+
+    @Put(':requestId/responsibles')
+    @Authorize(can.manageTimeOffRequest)
+    @ApiOperation({
+        summary: 'Replace who decides a pending request (admins only); any admin may do it',
+    })
+    @ZodResponse({ status: HttpStatus.OK, type: ManagedTimeOffRequestResponse })
+    @ApiErrors(
+        'VALIDATION_FAILED',
+        'INVALID_PARAMETER',
+        'UNAUTHORIZED',
+        'SESSION_EXPIRED',
+        'FORBIDDEN',
+        'RESOURCE_NOT_FOUND',
+        'CONCURRENT_MODIFICATION',
+        'BUSINESS_RULE_VIOLATION',
+    )
+    async updateResponsibles(
+        @UuidParam('requestId') requestId: string,
+        @Body() request: UpdateRequestResponsiblesRequest,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<ManagedTimeOffRequestResponse> {
+        return toManagedTimeOffRequestResponse(
+            await this.decisionService.updateResponsibles(
+                principal.organisationId,
+                requestId,
+                request.responsibleUserIds,
+                principal.userId,
+            ),
+        );
+    }
+
+    @Post(':requestId/comments')
+    @HttpCode(HttpStatus.OK)
+    @Authorize(can.commentTimeOffRequest)
+    @Idempotent()
+    @ApiOperation({ summary: 'Comment on a request; every admin and the employee see it' })
+    @ZodResponse({ status: HttpStatus.OK, type: TimeOffCommentResponse })
+    @ApiErrors(
+        'VALIDATION_FAILED',
+        'INVALID_PARAMETER',
+        'UNAUTHORIZED',
+        'SESSION_EXPIRED',
+        'FORBIDDEN',
+        'RESOURCE_NOT_FOUND',
+        'IDEMPOTENCY_KEY_REUSED',
+    )
+    async comment(
+        @UuidParam('requestId') requestId: string,
+        @Body() request: AddTimeOffCommentRequest,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<TimeOffCommentResponse> {
+        return toTimeOffCommentResponse(
+            await this.commentService.add(principal.organisationId, requestId, request.body, principal.userId),
+        );
+    }
+
+    @Put(':requestId/comments/:commentId')
+    @Authorize(can.editTimeOffComment)
+    @ApiOperation({ summary: 'Edit own comment on a request (its author only)' })
+    @ZodResponse({ status: HttpStatus.OK, type: TimeOffCommentResponse })
+    @ApiErrors(
+        'VALIDATION_FAILED',
+        'INVALID_PARAMETER',
+        'UNAUTHORIZED',
+        'SESSION_EXPIRED',
+        'FORBIDDEN',
+        'RESOURCE_NOT_FOUND',
+    )
+    async editComment(
+        @UuidParam('requestId') requestId: string,
+        @UuidParam('commentId') commentId: string,
+        @Body() request: AddTimeOffCommentRequest,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<TimeOffCommentResponse> {
+        return toTimeOffCommentResponse(
+            await this.commentService.edit(
+                principal.organisationId,
+                requestId,
+                commentId,
+                request.body,
+                principal.userId,
+            ),
+        );
+    }
+
+    @Delete(':requestId/comments/:commentId')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Authorize(can.editTimeOffComment)
+    @ApiOperation({ summary: 'Delete own comment on a request (its author only)' })
+    @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN', 'RESOURCE_NOT_FOUND')
+    async deleteComment(
+        @UuidParam('requestId') requestId: string,
+        @UuidParam('commentId') commentId: string,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<void> {
+        await this.commentService.remove(principal.organisationId, requestId, commentId, principal.userId);
+    }
+
+    private async decide(
+        requestId: string,
+        decision: TimeOffDecision,
+        principal: Principal,
+    ): Promise<ManagedTimeOffRequestResponse> {
+        return toManagedTimeOffRequestResponse(
+            await this.decisionService.decide(principal.organisationId, requestId, decision, principal.userId),
+        );
+    }
 }

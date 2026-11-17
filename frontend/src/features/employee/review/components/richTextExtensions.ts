@@ -6,15 +6,15 @@ import StarterKit from '@tiptap/starter-kit';
  * Everything else in StarterKit is switched off (no links, headings, code, quotes, rules).
  */
 export const richTextExtensions = (placeholder?: string) => [
-  StarterKit.configure({
-    heading: false,
-    blockquote: false,
-    code: false,
-    codeBlock: false,
-    horizontalRule: false,
-    strike: false,
-    link: false,
-    underline: false,
-  }),
-  ...(placeholder ? [Placeholder.configure({ placeholder })] : []),
+    StarterKit.configure({
+        heading: false,
+        blockquote: false,
+        code: false,
+        codeBlock: false,
+        horizontalRule: false,
+        strike: false,
+        link: false,
+        underline: false,
+    }),
+    ...(placeholder ? [Placeholder.configure({ placeholder })] : []),
 ];

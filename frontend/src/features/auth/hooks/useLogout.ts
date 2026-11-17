@@ -8,12 +8,12 @@ import { authApi } from '../api/authApi';
  * there is no landing — local Vite — the app shows sign-in, as before).
  */
 export const useLogout = () => {
-  const queryClient = useQueryClient();
-  return useMutation({
-    mutationFn: authApi.logout,
-    onSettled: () => {
-      queryClient.clear();
-      window.location.replace(PATHS.dashboard);
-    },
-  });
+    const queryClient = useQueryClient();
+    return useMutation({
+        mutationFn: authApi.logout,
+        onSettled: () => {
+            queryClient.clear();
+            window.location.replace(PATHS.dashboard);
+        },
+    });
 };

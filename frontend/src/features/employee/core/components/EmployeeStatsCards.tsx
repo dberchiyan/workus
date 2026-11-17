@@ -11,81 +11,72 @@ import { StatCard } from '@/shared/components/StatCard';
 
 const TERMINATION_WINDOW_DAYS = 90;
 
-const daysAgoIso = (days: number): string =>
-  new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
+const daysAgoIso = (days: number): string => new Date(Date.now() - days * 86_400_000).toISOString().slice(0, 10);
 
-function Hint({
-  icon,
-  children,
-  isPositive = false,
-}: {
-  icon: ReactNode;
-  children: ReactNode;
-  isPositive?: boolean;
-}) {
-  return (
-    <Typography
-      variant="body2"
-      color={isPositive ? undefined : 'textSecondary'}
-      // items-start: in a narrow (two-column phone) card the text wraps beside the icon.
-      className={isPositive ? 'flex items-start gap-1 text-success' : 'flex items-start gap-1'}
-    >
-      {icon}
-      {children}
-    </Typography>
-  );
+function Hint({ icon, children, isPositive = false }: { icon: ReactNode; children: ReactNode; isPositive?: boolean }) {
+    return (
+        <Typography
+            variant="body2"
+            color={isPositive ? undefined : 'textSecondary'}
+            // items-start: in a narrow (two-column phone) card the text wraps beside the icon.
+            className={isPositive ? 'flex items-start gap-1 text-success' : 'flex items-start gap-1'}
+        >
+            {icon}
+            {children}
+        </Typography>
+    );
 }
 
 /** One row of four on desktop; two columns on tablets, one on phones. */
 export function EmployeeStatsCards() {
-  const { t, i18n } = useTranslation('employee');
-  const { data, isPending, isError } = useEmployeeSummary();
-  const locale = i18n.language;
-  const show = (format: (summary: NonNullable<typeof data>) => string): string | undefined =>
-    isPending ? undefined : isError ? '—' : format(data);
+    const { t, i18n } = useTranslation('employee');
+    const { data, isPending, isError } = useEmployeeSummary();
+    const locale = i18n.language;
+    const show = (format: (summary: NonNullable<typeof data>) => string): string | undefined =>
+        isPending ? undefined : isError ? '—' : format(data);
 
-  return (
-    <section aria-busy={isPending} className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
-      <StatCard
-        title={t('stats.total')}
-        value={show((s) => formatCount(s.totalActive, locale))}
-        hint={
-          data && (
-            <Hint isPositive icon={<TrendingUpOutlined aria-hidden fontSize="small" />}>
-              {t('stats.growth', { count: data.newLast30Days })}
-            </Hint>
-          )
-        }
-      />
-      <StatCard
-        title={t('stats.terminated')}
-        value={show((s) => formatCount(s.terminatedLast90Days, locale))}
-        hint={
-          <Hint icon={<PersonRemoveOutlined aria-hidden fontSize="small" />}>
-            {t('stats.terminatedHint', {
-              date: formatCalendarDate(daysAgoIso(TERMINATION_WINDOW_DAYS), locale),
-            })}
-          </Hint>
-        }
-      />
-      <StatCard
-        title={t('stats.averageTenure')}
-        value={show((s) => formatTenure(s.averageTenureDays, locale))}
-        hint={
-          <Hint icon={<WorkHistoryOutlined aria-hidden fontSize="small" />}>
-            {t('stats.averageTenureHint')}
-          </Hint>
-        }
-      />
-      <StatCard
-        title={t('stats.withoutResponsible')}
-        value={show((s) => formatCount(s.withoutResponsible, locale))}
-        hint={
-          <Hint icon={<PersonOffOutlined aria-hidden fontSize="small" />}>
-            {t('stats.withoutResponsibleHint')}
-          </Hint>
-        }
-      />
-    </section>
-  );
+    return (
+        <section aria-busy={isPending} className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4">
+            <StatCard
+                title={t('stats.total')}
+                value={show((s) => formatCount(s.totalActive, locale))}
+                hint={
+                    data && (
+                        <Hint isPositive icon={<TrendingUpOutlined aria-hidden fontSize="small" />}>
+                            {t('stats.growth', { count: data.newLast30Days })}
+                        </Hint>
+                    )
+                }
+            />
+            <StatCard
+                title={t('stats.terminated')}
+                value={show((s) => formatCount(s.terminatedLast90Days, locale))}
+                hint={
+                    <Hint icon={<PersonRemoveOutlined aria-hidden fontSize="small" />}>
+                        {t('stats.terminatedHint', {
+                            date: formatCalendarDate(daysAgoIso(TERMINATION_WINDOW_DAYS), locale),
+                        })}
+                    </Hint>
+                }
+            />
+            <StatCard
+                title={t('stats.averageTenure')}
+                value={show((s) => formatTenure(s.averageTenureDays, locale))}
+                hint={
+                    <Hint icon={<WorkHistoryOutlined aria-hidden fontSize="small" />}>
+                        {t('stats.averageTenureHint')}
+                    </Hint>
+                }
+            />
+            <StatCard
+                title={t('stats.withoutResponsible')}
+                value={show((s) => formatCount(s.withoutResponsible, locale))}
+                hint={
+                    <Hint icon={<PersonOffOutlined aria-hidden fontSize="small" />}>
+                        {t('stats.withoutResponsibleHint')}
+                    </Hint>
+                }
+            />
+        </section>
+    );
 }

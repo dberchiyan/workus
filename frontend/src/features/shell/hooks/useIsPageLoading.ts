@@ -5,4 +5,4 @@ import { useIsFetching } from '@tanstack/react-query';
  * Background refreshes (polling, refetch on focus) already have data and don't count.
  */
 export const useIsPageLoading = (): boolean =>
-  useIsFetching({ predicate: (query) => query.state.status === 'pending' }) > 0;
+    useIsFetching({ predicate: (query) => query.state.status === 'pending' }) > 0;

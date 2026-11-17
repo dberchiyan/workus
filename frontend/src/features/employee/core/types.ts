@@ -11,13 +11,13 @@ export type SortDirection = 'asc' | 'desc';
 
 /** List state as it lives in the URL (page is 1-based there, 0-based in the API). */
 export interface EmployeeListParams {
-  categoryId: string | undefined;
-  status: EmployeeStatus;
-  search: string;
-  page: number;
-  size: number;
-  sortField: EmployeeSortField;
-  sortDirection: SortDirection;
+    categoryId: string | undefined;
+    status: EmployeeStatus;
+    search: string;
+    page: number;
+    size: number;
+    sortField: EmployeeSortField;
+    sortDirection: SortDirection;
 }
 
 export type EmployeeFilters = Pick<EmployeeListParams, 'status' | 'search'>;
@@ -26,8 +26,7 @@ export type CreateEmployeeRequest = Schemas['CreateEmployeeRequest'];
 export type CreatedEmployee = Schemas['HiredEmployeeResponse_Output'];
 export type PasswordReset = Schemas['PasswordResetResponse_Output'];
 export type PositionOption = Schemas['PositionOptionsResponse_Output']['content'][number];
-export type ResponsibleCandidate =
-  Schemas['ResponsibleCandidatesResponse_Output']['content'][number];
+export type ResponsibleCandidate = Schemas['ResponsibleCandidatesResponse_Output']['content'][number];
 
 export type EmployeeProfile = Schemas['EmployeeProfileResponse_Output'];
 

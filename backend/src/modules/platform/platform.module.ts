@@ -6,8 +6,8 @@ import { CompanyService } from './service/company.service';
 
 /** Workus platform administration (platform admins only): companies and their approval. */
 @Module({
-  imports: [AuditModule],
-  controllers: [CompanyController],
-  providers: [CompanyService, CompanyRepository],
+    imports: [AuditModule],
+    controllers: [CompanyController],
+    providers: [CompanyService, CompanyRepository],
 })
 export class PlatformModule {}

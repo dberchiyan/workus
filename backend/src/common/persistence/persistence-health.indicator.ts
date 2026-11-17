@@ -4,18 +4,18 @@ import { PrismaService } from './prisma.service';
 
 @Injectable()
 export class PersistenceHealthIndicator {
-  constructor(
-    private readonly prisma: PrismaService,
-    private readonly healthIndicatorService: HealthIndicatorService,
-  ) {}
+    constructor(
+        private readonly prisma: PrismaService,
+        private readonly healthIndicatorService: HealthIndicatorService,
+    ) {}
 
-  async isHealthy(key: string): Promise<HealthIndicatorResult> {
-    const indicator = this.healthIndicatorService.check(key);
-    try {
-      await this.prisma.$queryRaw`SELECT 1`;
-      return indicator.up();
-    } catch {
-      return indicator.down();
+    async isHealthy(key: string): Promise<HealthIndicatorResult> {
+        const indicator = this.healthIndicatorService.check(key);
+        try {
+            await this.prisma.$queryRaw`SELECT 1`;
+            return indicator.up();
+        } catch {
+            return indicator.down();
+        }
     }
-  }
 }

@@ -9,8 +9,8 @@ import { OrganisationRepository } from './repository/organisation.repository';
 import { OrganisationService } from './service/organisation.service';
 
 @Module({
-  imports: [AuthModule, UserModule, AuditModule, EmployeeModule],
-  controllers: [RegistrationController, OrganisationController],
-  providers: [OrganisationService, OrganisationRepository],
+    imports: [AuthModule, UserModule, AuditModule, EmployeeModule],
+    controllers: [RegistrationController, OrganisationController],
+    providers: [OrganisationService, OrganisationRepository],
 })
 export class OrganisationModule {}

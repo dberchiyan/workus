@@ -5,8 +5,8 @@ import { MetricsService } from './metrics.service';
 
 @Global()
 @Module({
-  controllers: [HealthController, MetricsController],
-  providers: [MetricsService],
-  exports: [MetricsService],
+    controllers: [HealthController, MetricsController],
+    providers: [MetricsService],
+    exports: [MetricsService],
 })
 export class ObservabilityModule {}

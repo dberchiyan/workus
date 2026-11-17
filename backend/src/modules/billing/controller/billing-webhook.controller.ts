@@ -1,12 +1,4 @@
-import {
-  Controller,
-  Headers,
-  HttpCode,
-  HttpStatus,
-  Post,
-  type RawBodyRequest,
-  Req,
-} from '@nestjs/common';
+import { Controller, Headers, HttpCode, HttpStatus, Post, type RawBodyRequest, Req } from '@nestjs/common';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
 import type { Request } from 'express';
 import { ZodResponse } from 'nestjs-zod';
@@ -26,26 +18,26 @@ const SIGNATURE_HEADER = 'stripe-signature';
 @ApiTags('Webhooks')
 @Controller('api/v1/webhooks')
 export class BillingWebhookController {
-  constructor(private readonly billingService: BillingService) {}
+    constructor(private readonly billingService: BillingService) {}
 
-  @Post('stripe')
-  @HttpCode(HttpStatus.OK)
-  @Public()
-  @IdempotencyExempt('The provider event id is the key: a repeated delivery is stored once')
-  @ApiOperation({
-    summary: 'Receive a Stripe event: verified by its signature, stored once, then applied',
-  })
-  @ZodResponse({ status: HttpStatus.OK, type: WebhookReceiptResponse })
-  @ApiErrors('UNAUTHORIZED', 'MALFORMED_REQUEST', 'UNSUPPORTED_MEDIA_TYPE')
-  async receive(
-    @Req() request: RawBodyRequest<Request>,
-    @Headers(SIGNATURE_HEADER) signature: string | undefined,
-  ): Promise<WebhookReceiptResponse> {
-    if (!request.rawBody) {
-      // Nothing to verify a signature over.
-      throw new WebhookSignatureException();
+    @Post('stripe')
+    @HttpCode(HttpStatus.OK)
+    @Public()
+    @IdempotencyExempt('The provider event id is the key: a repeated delivery is stored once')
+    @ApiOperation({
+        summary: 'Receive a Stripe event: verified by its signature, stored once, then applied',
+    })
+    @ZodResponse({ status: HttpStatus.OK, type: WebhookReceiptResponse })
+    @ApiErrors('UNAUTHORIZED', 'MALFORMED_REQUEST', 'UNSUPPORTED_MEDIA_TYPE')
+    async receive(
+        @Req() request: RawBodyRequest<Request>,
+        @Headers(SIGNATURE_HEADER) signature: string | undefined,
+    ): Promise<WebhookReceiptResponse> {
+        if (!request.rawBody) {
+            // Nothing to verify a signature over.
+            throw new WebhookSignatureException();
+        }
+        const { duplicate } = await this.billingService.receiveWebhook(request.rawBody, signature);
+        return { received: true, duplicate };
     }
-    const { duplicate } = await this.billingService.receiveWebhook(request.rawBody, signature);
-    return { received: true, duplicate };
-  }
 }

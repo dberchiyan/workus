@@ -5,12 +5,9 @@
  * load, and Motion would add ~45 KB to it.
  */
 export function TopProgressBar() {
-  return (
-    <div
-      aria-hidden
-      className="app-progress pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 overflow-hidden"
-    >
-      <div className="app-progress-bar h-full w-1/3 bg-primary" />
-    </div>
-  );
+    return (
+        <div aria-hidden className="app-progress pointer-events-none fixed inset-x-0 top-0 z-50 h-0.5 overflow-hidden">
+            <div className="app-progress-bar h-full w-1/3 bg-primary" />
+        </div>
+    );
 }

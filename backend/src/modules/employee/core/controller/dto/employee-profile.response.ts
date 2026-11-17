@@ -5,49 +5,49 @@ import { TerminationReasonSchema } from '../../service/termination-reason';
 import { EmployeeStatusSchema } from './employee-filter.query';
 
 export class EmployeeProfileResponse extends createZodDto(
-  z.object({
-    id: z.uuid(),
-    userId: z.uuid(),
-    firstName: z.string(),
-    lastName: z.string(),
-    email: z.string(),
-    role: z.enum(USER_ROLES),
-    position: z.object({
-      id: z.uuid(),
-      title: z.string(),
-      category: z.object({ id: z.uuid(), name: z.string() }),
-    }),
-    startDate: z.iso.date(),
-    /** Null when not recorded. */
-    dateOfBirth: z.iso.date().nullable(),
-    terminatedOn: z.iso.date().nullable(),
-    /** Set together with terminatedOn. */
-    termination: z
-      .object({
-        reason: TerminationReasonSchema,
-        comment: z.string().nullable(),
-      })
-      .nullable(),
-    status: EmployeeStatusSchema,
-    contacts: z.object({
-      mobile: z.string().nullable(),
-      personalEmail: z.string().nullable(),
-      linkedinUrl: z.string().nullable(),
-      telegram: z.string().nullable(),
-      address: z.string().nullable(),
-    }),
-    responsibles: z.array(
-      z.object({
+    z.object({
         id: z.uuid(),
+        userId: z.uuid(),
         firstName: z.string(),
         lastName: z.string(),
         email: z.string(),
         role: z.enum(USER_ROLES),
-        positionTitle: z.string().nullable(),
-      }),
-    ),
-    createdAt: z.iso.datetime(),
-    /** Send back on update (optimistic locking). */
-    version: z.number().int().min(0),
-  }),
+        position: z.object({
+            id: z.uuid(),
+            title: z.string(),
+            category: z.object({ id: z.uuid(), name: z.string() }),
+        }),
+        startDate: z.iso.date(),
+        /** Null when not recorded. */
+        dateOfBirth: z.iso.date().nullable(),
+        terminatedOn: z.iso.date().nullable(),
+        /** Set together with terminatedOn. */
+        termination: z
+            .object({
+                reason: TerminationReasonSchema,
+                comment: z.string().nullable(),
+            })
+            .nullable(),
+        status: EmployeeStatusSchema,
+        contacts: z.object({
+            mobile: z.string().nullable(),
+            personalEmail: z.string().nullable(),
+            linkedinUrl: z.string().nullable(),
+            telegram: z.string().nullable(),
+            address: z.string().nullable(),
+        }),
+        responsibles: z.array(
+            z.object({
+                id: z.uuid(),
+                firstName: z.string(),
+                lastName: z.string(),
+                email: z.string(),
+                role: z.enum(USER_ROLES),
+                positionTitle: z.string().nullable(),
+            }),
+        ),
+        createdAt: z.iso.datetime(),
+        /** Send back on update (optimistic locking). */
+        version: z.number().int().min(0),
+    }),
 ) {}

@@ -11,22 +11,22 @@ import { authKeys } from './queryKeys';
  * is no landing — local Vite — the reload finds no cookie and goes to sign-in as usual).
  */
 export const useCurrentUser = () =>
-  useQuery<CurrentUser | null>({
-    queryKey: authKeys.me(),
-    queryFn: async () => {
-      try {
-        return await authApi.me();
-      } catch (error) {
-        if (isApiError(error) && error.status === 401) {
-          if (error.code === 'SESSION_EXPIRED' && window.location.pathname === PATHS.dashboard) {
-            window.location.replace(PATHS.dashboard);
-            // The page is being replaced; stay pending so sign-in does not flash first.
-            return new Promise<never>(() => undefined);
-          }
-          return null;
-        }
-        throw error;
-      }
-    },
-    staleTime: 5 * 60_000,
-  });
+    useQuery<CurrentUser | null>({
+        queryKey: authKeys.me(),
+        queryFn: async () => {
+            try {
+                return await authApi.me();
+            } catch (error) {
+                if (isApiError(error) && error.status === 401) {
+                    if (error.code === 'SESSION_EXPIRED' && window.location.pathname === PATHS.dashboard) {
+                        window.location.replace(PATHS.dashboard);
+                        // The page is being replaced; stay pending so sign-in does not flash first.
+                        return new Promise<never>(() => undefined);
+                    }
+                    return null;
+                }
+                throw error;
+            }
+        },
+        staleTime: 5 * 60_000,
+    });

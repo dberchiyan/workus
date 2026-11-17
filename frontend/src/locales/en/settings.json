@@ -1,94 +1,94 @@
 {
-  "pageTitle": "Settings · Workus",
-  "title": "Settings",
-  "subtitle": "Your account and where you are signed in.",
-  "menu": "Settings sections",
-  "sections": {
-    "account": "Account",
-    "sessions": "Sessions",
-    "security": "Security log",
-    "holidays": "Holidays",
-    "structure": "Company structure",
-    "organisation": "Company details",
-    "administrators": "Administrators",
-    "billing": "Billing"
-  },
-  "groups": {
-    "you": "You",
-    "company": "Company"
-  },
-  "nav": {
-    "account": "Account",
-    "sessions": "Sessions",
-    "security": "Security log",
-    "organisation": "General",
-    "structure": "Structure",
-    "holidays": "Holidays",
-    "administrators": "Administrators",
-    "billing": "Billing"
-  },
-  "account": {
-    "profile": {
-      "title": "Profile",
-      "description": "Your administrator changes your name and email.",
-      "descriptionEditable": "Your name is shown to everyone in the company. Your email is your sign-in.",
-      "name": "Name",
-      "email": "Email",
-      "role": "Role",
-      "firstName": "First name",
-      "lastName": "Last name",
-      "edit": "Edit name",
-      "dialog": {
-        "title": "Edit your name",
-        "description": "Your name is shown to everyone in the company.",
-        "cancel": "Cancel",
-        "submit": "Save"
-      }
+    "pageTitle": "Settings · Workus",
+    "title": "Settings",
+    "subtitle": "Your account and where you are signed in.",
+    "menu": "Settings sections",
+    "sections": {
+        "account": "Account",
+        "sessions": "Sessions",
+        "security": "Security log",
+        "holidays": "Holidays",
+        "structure": "Company structure",
+        "organisation": "Company details",
+        "administrators": "Administrators",
+        "billing": "Billing"
     },
-    "password": {
-      "title": "Password",
-      "description": "Changing it signs you out on every other device.",
-      "current": "Current password",
-      "new": "New password",
-      "confirm": "Repeat the new password",
-      "submit": "Change password",
-      "done": "Password changed. You were signed out on your other devices.",
-      "rules": {
-        "different": "To differ from the current password",
-        "match": "The same in both new-password fields"
-      }
+    "groups": {
+        "you": "You",
+        "company": "Company"
+    },
+    "nav": {
+        "account": "Account",
+        "sessions": "Sessions",
+        "security": "Security log",
+        "organisation": "General",
+        "structure": "Structure",
+        "holidays": "Holidays",
+        "administrators": "Administrators",
+        "billing": "Billing"
+    },
+    "account": {
+        "profile": {
+            "title": "Profile",
+            "description": "Your administrator changes your name and email.",
+            "descriptionEditable": "Your name is shown to everyone in the company. Your email is your sign-in.",
+            "name": "Name",
+            "email": "Email",
+            "role": "Role",
+            "firstName": "First name",
+            "lastName": "Last name",
+            "edit": "Edit name",
+            "dialog": {
+                "title": "Edit your name",
+                "description": "Your name is shown to everyone in the company.",
+                "cancel": "Cancel",
+                "submit": "Save"
+            }
+        },
+        "password": {
+            "title": "Password",
+            "description": "Changing it signs you out on every other device.",
+            "current": "Current password",
+            "new": "New password",
+            "confirm": "Repeat the new password",
+            "submit": "Change password",
+            "done": "Password changed. You were signed out on your other devices.",
+            "rules": {
+                "different": "To differ from the current password",
+                "match": "The same in both new-password fields"
+            }
+        }
+    },
+    "sessions": {
+        "title": "Sessions",
+        "description": "Where you are signed in. End a session you don’t recognise.",
+        "device": "{{browser}} on {{os}}",
+        "unknownDevice": "Unknown device",
+        "current": "This device",
+        "signedIn": "signed in {{date}}",
+        "lastActive": "last active {{date}}",
+        "endOne": "Sign out",
+        "endOneLabel": "Sign out {{device}}",
+        "endOthers": "Sign out of other sessions",
+        "onlyThis": "Only this device is signed in.",
+        "error": "Couldn’t load your sessions",
+        "retry": "Try again",
+        "confirmTitle": "Sign out of other sessions?",
+        "confirmText_one": "The other device is signed out at once and needs your password to come back.",
+        "confirmText_other": "The {{count}} other devices are signed out at once and need your password to come back.",
+        "keep": "Keep them",
+        "confirm_one": "Sign out 1 session",
+        "confirm_other": "Sign out {{count}} sessions",
+        "others_one": "Other session · {{count}}",
+        "others_other": "Other sessions · {{count}}",
+        "range": "{{from}}–{{to}} of {{count}}",
+        "pages": "Session pages"
+    },
+    "security": {
+        "title": "Security log",
+        "description": "Sign-ins, failed attempts, password changes and signed-out sessions on your account. If you don’t recognise something, change your password."
+    },
+    "demo": {
+        "passwordOff": "Password changes are turned off for this demo account — other visitors use it too."
     }
-  },
-  "sessions": {
-    "title": "Sessions",
-    "description": "Where you are signed in. End a session you don’t recognise.",
-    "device": "{{browser}} on {{os}}",
-    "unknownDevice": "Unknown device",
-    "current": "This device",
-    "signedIn": "signed in {{date}}",
-    "lastActive": "last active {{date}}",
-    "endOne": "Sign out",
-    "endOneLabel": "Sign out {{device}}",
-    "endOthers": "Sign out of other sessions",
-    "onlyThis": "Only this device is signed in.",
-    "error": "Couldn’t load your sessions",
-    "retry": "Try again",
-    "confirmTitle": "Sign out of other sessions?",
-    "confirmText_one": "The other device is signed out at once and needs your password to come back.",
-    "confirmText_other": "The {{count}} other devices are signed out at once and need your password to come back.",
-    "keep": "Keep them",
-    "confirm_one": "Sign out 1 session",
-    "confirm_other": "Sign out {{count}} sessions",
-    "others_one": "Other session · {{count}}",
-    "others_other": "Other sessions · {{count}}",
-    "range": "{{from}}–{{to}} of {{count}}",
-    "pages": "Session pages"
-  },
-  "security": {
-    "title": "Security log",
-    "description": "Sign-ins, failed attempts, password changes and signed-out sessions on your account. If you don’t recognise something, change your password."
-  },
-  "demo": {
-    "passwordOff": "Password changes are turned off for this demo account — other visitors use it too."
-  }
 }

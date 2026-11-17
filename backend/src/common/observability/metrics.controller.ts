@@ -7,12 +7,12 @@ import { MetricsService } from './metrics.service';
 @ApiExcludeController()
 @Controller('metrics')
 export class MetricsController {
-  constructor(private readonly metrics: MetricsService) {}
+    constructor(private readonly metrics: MetricsService) {}
 
-  @Get()
-  @Authorize(can.admin)
-  @Header('Content-Type', 'text/plain; version=0.0.4')
-  scrape(): Promise<string> {
-    return this.metrics.registry.metrics();
-  }
+    @Get()
+    @Authorize(can.admin)
+    @Header('Content-Type', 'text/plain; version=0.0.4')
+    scrape(): Promise<string> {
+        return this.metrics.registry.metrics();
+    }
 }

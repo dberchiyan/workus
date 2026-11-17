@@ -10,15 +10,15 @@ export type DashboardBirthdays = Schemas['DashboardBirthdaysResponse_Output'];
 
 /** Today (UTC): its date and the instants it starts and ends. */
 export interface LocalDay {
-  date: string;
-  from: string;
-  to: string;
+    date: string;
+    from: string;
+    to: string;
 }
 
 /** Calendar dates in one month: a day (from = to) or the whole month. */
 export interface DateRange {
-  from: string;
-  to: string;
+    from: string;
+    to: string;
 }
 
 /** Event cards show five rows a page. */

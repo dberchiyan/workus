@@ -22,28 +22,19 @@ export type UpdateHolidayRequest = Schemas['UpdateHolidayRequest'];
 export type CalendarRow = TimeOffCalendar['content'][number];
 export type CalendarRequest = CalendarRow['requests'][number];
 /** An admin who can decide requests (the people picker's options). */
-export type ResponsibleCandidate =
-  Schemas['ResponsibleCandidatesResponse_Output']['content'][number];
+export type ResponsibleCandidate = Schemas['ResponsibleCandidatesResponse_Output']['content'][number];
 export type TimeOffDecision = 'approve' | 'reject' | 'cancel';
 export type ClosedStatus = Exclude<TimeOffStatus, 'PENDING'>;
-export const CLOSED_STATUSES = [
-  'APPROVED',
-  'REJECTED',
-  'CANCELED',
-] as const satisfies readonly ClosedStatus[];
+export const CLOSED_STATUSES = ['APPROVED', 'REJECTED', 'CANCELED'] as const satisfies readonly ClosedStatus[];
 
 /** Card order: as on the profile and the dashboard. */
-export const TIME_OFF_TYPES = [
-  'VACATION',
-  'SICK_DAY',
-  'DAY_OFF',
-] as const satisfies readonly TimeOffType[];
+export const TIME_OFF_TYPES = ['VACATION', 'SICK_DAY', 'DAY_OFF'] as const satisfies readonly TimeOffType[];
 
 export const TIME_OFF_STATUSES = [
-  'PENDING',
-  'APPROVED',
-  'REJECTED',
-  'CANCELED',
+    'PENDING',
+    'APPROVED',
+    'REJECTED',
+    'CANCELED',
 ] as const satisfies readonly TimeOffStatus[];
 
 const TYPE_SET: ReadonlySet<string> = new Set(TIME_OFF_TYPES);

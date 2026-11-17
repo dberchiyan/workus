@@ -18,22 +18,18 @@ const MAX_TOKEN_LENGTH = 128;
  */
 @Injectable()
 export class CsrfGuard implements CanActivate {
-  constructor(private readonly cls: ClsService<RequestContext>) {}
+    constructor(private readonly cls: ClsService<RequestContext>) {}
 
-  canActivate(context: ExecutionContext): boolean {
-    const request = context.switchToHttp().getRequest<Request>();
-    const principal = this.cls.get('principal');
-    if (!principal || SAFE_METHODS.has(request.method)) {
-      return true;
+    canActivate(context: ExecutionContext): boolean {
+        const request = context.switchToHttp().getRequest<Request>();
+        const principal = this.cls.get('principal');
+        if (!principal || SAFE_METHODS.has(request.method)) {
+            return true;
+        }
+        const token = request.get(CSRF_HEADER_NAME);
+        if (!token || token.length > MAX_TOKEN_LENGTH || !tokenMatchesHash(token, principal.csrfTokenHash)) {
+            throw new AccessDeniedException();
+        }
+        return true;
     }
-    const token = request.get(CSRF_HEADER_NAME);
-    if (
-      !token ||
-      token.length > MAX_TOKEN_LENGTH ||
-      !tokenMatchesHash(token, principal.csrfTokenHash)
-    ) {
-      throw new AccessDeniedException();
-    }
-    return true;
-  }
 }

@@ -13,73 +13,55 @@ import { TimeOffNotifier } from './time-off-notifier';
  */
 @Injectable()
 export class TimeOffCommentService {
-  constructor(
-    private readonly requestRepository: TimeOffRequestRepository,
-    private readonly notifier: TimeOffNotifier,
-  ) {}
+    constructor(
+        private readonly requestRepository: TimeOffRequestRepository,
+        private readonly notifier: TimeOffNotifier,
+    ) {}
 
-  @Transactional()
-  async add(
-    organisationId: string,
-    requestId: string,
-    body: string,
-    authorId: string,
-  ): Promise<TimeOffCommentRecord> {
-    if (!(await this.requestRepository.findStateById(organisationId, requestId))) {
-      throw new ResourceNotFoundException();
+    @Transactional()
+    async add(
+        organisationId: string,
+        requestId: string,
+        body: string,
+        authorId: string,
+    ): Promise<TimeOffCommentRecord> {
+        if (!(await this.requestRepository.findStateById(organisationId, requestId))) {
+            throw new ResourceNotFoundException();
+        }
+        const comment = await this.requestRepository.addComment(organisationId, requestId, authorId, body);
+        await this.requestRepository.touch(organisationId, requestId, authorId);
+        // The employee and the responsible people hear of it; edits and deletions are quiet.
+        await this.notifier.notify(
+            organisationId,
+            requestId,
+            NotificationType.TIME_OFF_COMMENTED,
+            authorId,
+            'everyone',
+        );
+        return comment;
     }
-    const comment = await this.requestRepository.addComment(
-      organisationId,
-      requestId,
-      authorId,
-      body,
-    );
-    await this.requestRepository.touch(organisationId, requestId, authorId);
-    // The employee and the responsible people hear of it; edits and deletions are quiet.
-    await this.notifier.notify(
-      organisationId,
-      requestId,
-      NotificationType.TIME_OFF_COMMENTED,
-      authorId,
-      'everyone',
-    );
-    return comment;
-  }
 
-  @Transactional()
-  async edit(
-    organisationId: string,
-    requestId: string,
-    commentId: string,
-    body: string,
-    authorId: string,
-  ): Promise<TimeOffCommentRecord> {
-    const comment = await this.requestRepository.editComment(
-      organisationId,
-      commentId,
-      requestId,
-      authorId,
-      body,
-    );
-    if (!comment) {
-      throw new ResourceNotFoundException();
+    @Transactional()
+    async edit(
+        organisationId: string,
+        requestId: string,
+        commentId: string,
+        body: string,
+        authorId: string,
+    ): Promise<TimeOffCommentRecord> {
+        const comment = await this.requestRepository.editComment(organisationId, commentId, requestId, authorId, body);
+        if (!comment) {
+            throw new ResourceNotFoundException();
+        }
+        await this.requestRepository.touch(organisationId, requestId, authorId);
+        return comment;
     }
-    await this.requestRepository.touch(organisationId, requestId, authorId);
-    return comment;
-  }
 
-  @Transactional()
-  async remove(
-    organisationId: string,
-    requestId: string,
-    commentId: string,
-    authorId: string,
-  ): Promise<void> {
-    if (
-      !(await this.requestRepository.deleteComment(organisationId, commentId, requestId, authorId))
-    ) {
-      throw new ResourceNotFoundException();
+    @Transactional()
+    async remove(organisationId: string, requestId: string, commentId: string, authorId: string): Promise<void> {
+        if (!(await this.requestRepository.deleteComment(organisationId, commentId, requestId, authorId))) {
+            throw new ResourceNotFoundException();
+        }
+        await this.requestRepository.touch(organisationId, requestId, authorId);
     }
-    await this.requestRepository.touch(organisationId, requestId, authorId);
-  }
 }

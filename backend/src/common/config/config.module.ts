@@ -5,8 +5,8 @@ import { validateEnv } from './env.schema';
 
 @Global()
 @Module({
-  imports: [ConfigModule.forRoot({ isGlobal: true, cache: true, validate: validateEnv })],
-  providers: [AppConfigService],
-  exports: [AppConfigService],
+    imports: [ConfigModule.forRoot({ isGlobal: true, cache: true, validate: validateEnv })],
+    providers: [AppConfigService],
+    exports: [AppConfigService],
 })
 export class AppConfigModule {}

@@ -9,19 +9,19 @@ import { PrismaService } from './prisma.service';
 
 @Global()
 @Module({
-  imports: [TerminusModule],
-  providers: [
-    { provide: PG_POOL, inject: [AppConfigService], useFactory: createPgPool },
-    PrismaService,
-    PersistenceHealthIndicator,
-    IdempotencyKeyStore,
-  ],
-  exports: [PG_POOL, PrismaService, PersistenceHealthIndicator, IdempotencyKeyStore],
+    imports: [TerminusModule],
+    providers: [
+        { provide: PG_POOL, inject: [AppConfigService], useFactory: createPgPool },
+        PrismaService,
+        PersistenceHealthIndicator,
+        IdempotencyKeyStore,
+    ],
+    exports: [PG_POOL, PrismaService, PersistenceHealthIndicator, IdempotencyKeyStore],
 })
 export class PersistenceModule implements OnApplicationShutdown {
-  constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
+    constructor(@Inject(PG_POOL) private readonly pool: Pool) {}
 
-  async onApplicationShutdown(): Promise<void> {
-    await this.pool.end();
-  }
+    async onApplicationShutdown(): Promise<void> {
+        await this.pool.end();
+    }
 }

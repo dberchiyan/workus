@@ -17,40 +17,38 @@ import { toOrganisationResponse } from './mapper/organisation.mapper';
 @ApiTags('Organisation')
 @Controller('api/v1/registrations')
 export class RegistrationController {
-  constructor(
-    private readonly organisationService: OrganisationService,
-    private readonly sessionCookies: SessionCookies,
-    private readonly config: AppConfigService,
-  ) {}
+    constructor(
+        private readonly organisationService: OrganisationService,
+        private readonly sessionCookies: SessionCookies,
+        private readonly config: AppConfigService,
+    ) {}
 
-  @Post()
-  @HttpCode(HttpStatus.OK)
-  @Public()
-  @IdempotencyExempt(
-    'No session yet; a repeat is refused on the taken email (409), never creates twice',
-  )
-  @RateLimit(RateLimitName.REGISTRATION)
-  @ApiOperation({
-    summary: 'Register a company: create the organisation and its owner, and sign the owner in',
-  })
-  @ZodResponse({ status: HttpStatus.OK, type: OrganisationResponse })
-  @ApiErrors('VALIDATION_FAILED', 'MALFORMED_REQUEST', 'CONFLICT', 'RATE_LIMIT_EXCEEDED')
-  async register(
-    @Body() request: RegistrationRequest,
-    @Req() httpRequest: Request,
-    @Res({ passthrough: true }) response: Response,
-  ): Promise<OrganisationResponse> {
-    const { organisation, session } = await this.organisationService.register({
-      organisationName: request.organisationName,
-      firstName: request.firstName,
-      lastName: request.lastName,
-      email: request.email,
-      password: request.password,
-      ip: clientIp(httpRequest),
-      userAgent: clientUserAgent(httpRequest),
-      presentedToken: readCookie(httpRequest, this.config.get('SESSION_COOKIE_NAME')),
-    });
-    this.sessionCookies.write(response, session);
-    return toOrganisationResponse(organisation);
-  }
+    @Post()
+    @HttpCode(HttpStatus.OK)
+    @Public()
+    @IdempotencyExempt('No session yet; a repeat is refused on the taken email (409), never creates twice')
+    @RateLimit(RateLimitName.REGISTRATION)
+    @ApiOperation({
+        summary: 'Register a company: create the organisation and its owner, and sign the owner in',
+    })
+    @ZodResponse({ status: HttpStatus.OK, type: OrganisationResponse })
+    @ApiErrors('VALIDATION_FAILED', 'MALFORMED_REQUEST', 'CONFLICT', 'RATE_LIMIT_EXCEEDED')
+    async register(
+        @Body() request: RegistrationRequest,
+        @Req() httpRequest: Request,
+        @Res({ passthrough: true }) response: Response,
+    ): Promise<OrganisationResponse> {
+        const { organisation, session } = await this.organisationService.register({
+            organisationName: request.organisationName,
+            firstName: request.firstName,
+            lastName: request.lastName,
+            email: request.email,
+            password: request.password,
+            ip: clientIp(httpRequest),
+            userAgent: clientUserAgent(httpRequest),
+            presentedToken: readCookie(httpRequest, this.config.get('SESSION_COOKIE_NAME')),
+        });
+        this.sessionCookies.write(response, session);
+        return toOrganisationResponse(organisation);
+    }
 }

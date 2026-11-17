@@ -13,48 +13,48 @@ import { SignupForm } from '../components/SignupForm';
 
 /** Register a company: its first account becomes the owner. Signed-in people go to the app. */
 export default function SignupPage() {
-  const { t } = useTranslation('organisation');
-  useDocumentTitle(t('signup.pageTitle'));
-  const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
-  const { data: user, isPending } = useCurrentUser();
+    const { t } = useTranslation('organisation');
+    useDocumentTitle(t('signup.pageTitle'));
+    const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
+    const { data: user, isPending } = useCurrentUser();
 
-  if (isPending) {
-    return <PageLoader />;
-  }
-  if (user) {
-    return <Navigate to={PATHS.dashboard} replace />;
-  }
+    if (isPending) {
+        return <PageLoader />;
+    }
+    if (user) {
+        return <Navigate to={PATHS.dashboard} replace />;
+    }
 
-  return (
-    <PageShell homeLink className="items-center justify-center px-4 py-8 md:px-8">
-      <div className="flex w-full max-w-md flex-col gap-8">
-        <BrandLogo linkHome />
-        <Card variant="outlined">
-          <CardContent className="flex flex-col gap-6 p-6 sm:p-8">
-            <div className="flex flex-col gap-1">
-              <Typography
-                ref={headingRef}
-                tabIndex={-1}
-                variant="h4"
-                component="h1"
-                className="outline-none"
-              >
-                {t('signup.title')}
-              </Typography>
-              <Typography variant="body2" color="textSecondary">
-                {t('signup.subtitle')}
-              </Typography>
+    return (
+        <PageShell homeLink className="items-center justify-center px-4 py-8 md:px-8">
+            <div className="flex w-full max-w-md flex-col gap-8">
+                <BrandLogo linkHome />
+                <Card variant="outlined">
+                    <CardContent className="flex flex-col gap-6 p-6 sm:p-8">
+                        <div className="flex flex-col gap-1">
+                            <Typography
+                                ref={headingRef}
+                                tabIndex={-1}
+                                variant="h4"
+                                component="h1"
+                                className="outline-none"
+                            >
+                                {t('signup.title')}
+                            </Typography>
+                            <Typography variant="body2" color="textSecondary">
+                                {t('signup.subtitle')}
+                            </Typography>
+                        </div>
+                        <SignupForm />
+                    </CardContent>
+                </Card>
+                <Typography variant="body2" color="textSecondary" className="text-center">
+                    {t('signup.haveAccount')}{' '}
+                    <Link component={RouterLink} to={PATHS.login}>
+                        {t('signup.signIn')}
+                    </Link>
+                </Typography>
             </div>
-            <SignupForm />
-          </CardContent>
-        </Card>
-        <Typography variant="body2" color="textSecondary" className="text-center">
-          {t('signup.haveAccount')}{' '}
-          <Link component={RouterLink} to={PATHS.login}>
-            {t('signup.signIn')}
-          </Link>
-        </Typography>
-      </div>
-    </PageShell>
-  );
+        </PageShell>
+    );
 }

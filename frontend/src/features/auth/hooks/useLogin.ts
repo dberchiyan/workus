@@ -5,11 +5,11 @@ import type { CurrentUser, LoginRequest } from '../types';
 import { authKeys } from './queryKeys';
 
 export const useLogin = () => {
-  const queryClient = useQueryClient();
-  return useMutation<CurrentUser, ApiError, LoginRequest>({
-    mutationFn: authApi.login,
-    onSuccess: (user) => {
-      queryClient.setQueryData(authKeys.me(), user);
-    },
-  });
+    const queryClient = useQueryClient();
+    return useMutation<CurrentUser, ApiError, LoginRequest>({
+        mutationFn: authApi.login,
+        onSuccess: (user) => {
+            queryClient.setQueryData(authKeys.me(), user);
+        },
+    });
 };

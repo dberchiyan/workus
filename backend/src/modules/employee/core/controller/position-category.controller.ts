@@ -13,21 +13,17 @@ import { PositionCategoryCountsResponse } from './dto/employee.response';
 @ApiTags('Employees')
 @Controller('api/v1/position-categories')
 export class PositionCategoryController {
-  constructor(private readonly positionCategoryService: PositionCategoryService) {}
+    constructor(private readonly positionCategoryService: PositionCategoryService) {}
 
-  @Get()
-  @Authorize(can.viewEmployees)
-  @ApiOperation({ summary: 'List position categories with matching employee counts' })
-  @ZodResponse({ status: HttpStatus.OK, type: PositionCategoryCountsResponse })
-  @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
-  list(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: PositionCategoryFilterQuery,
-  ): Promise<PositionCategoryCountsResponse> {
-    return this.positionCategoryService.countEmployees(
-      principal.organisationId,
-      query.search,
-      query.status,
-    );
-  }
+    @Get()
+    @Authorize(can.viewEmployees)
+    @ApiOperation({ summary: 'List position categories with matching employee counts' })
+    @ZodResponse({ status: HttpStatus.OK, type: PositionCategoryCountsResponse })
+    @ApiErrors('VALIDATION_FAILED', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+    list(
+        @CurrentPrincipal() principal: Principal,
+        @Query() query: PositionCategoryFilterQuery,
+    ): Promise<PositionCategoryCountsResponse> {
+        return this.positionCategoryService.countEmployees(principal.organisationId, query.search, query.status);
+    }
 }

@@ -15,25 +15,17 @@ import { toLeaveBalancesResponse } from './mapper/time-off.mapper';
 @ApiTags('Time off')
 @Controller('api/v1/employees/:employeeId/time-off')
 export class EmployeeTimeOffController {
-  constructor(private readonly timeOffService: TimeOffService) {}
+    constructor(private readonly timeOffService: TimeOffService) {}
 
-  @Get('balances')
-  @Authorize(can.viewEmployee)
-  @ApiOperation({ summary: "An employee's leave balances in the current cycles" })
-  @ZodResponse({ status: HttpStatus.OK, type: LeaveBalancesResponse })
-  @ApiErrors(
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-    'RESOURCE_NOT_FOUND',
-  )
-  async balances(
-    @CurrentPrincipal() principal: Principal,
-    @UuidParam('employeeId') employeeId: string,
-  ): Promise<LeaveBalancesResponse> {
-    return toLeaveBalancesResponse(
-      await this.timeOffService.findBalances(principal.organisationId, employeeId),
-    );
-  }
+    @Get('balances')
+    @Authorize(can.viewEmployee)
+    @ApiOperation({ summary: "An employee's leave balances in the current cycles" })
+    @ZodResponse({ status: HttpStatus.OK, type: LeaveBalancesResponse })
+    @ApiErrors('INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN', 'RESOURCE_NOT_FOUND')
+    async balances(
+        @CurrentPrincipal() principal: Principal,
+        @UuidParam('employeeId') employeeId: string,
+    ): Promise<LeaveBalancesResponse> {
+        return toLeaveBalancesResponse(await this.timeOffService.findBalances(principal.organisationId, employeeId));
+    }
 }

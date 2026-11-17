@@ -14,35 +14,34 @@ export type SettingsGroup = (typeof SETTINGS_GROUPS)[number];
 
 /** Settings sections, in menu order; each has its own URL (/settings/<section>). */
 export const SETTINGS_SECTIONS = [
-  { key: 'account', group: 'you', icon: PersonOutlineOutlined },
-  { key: 'sessions', group: 'you', icon: DevicesOutlined },
-  { key: 'security', group: 'you', icon: ShieldOutlined },
-  /** Owners only (ACCESS 'settings.organisation'). */
-  { key: 'organisation', group: 'company', icon: BusinessOutlined },
-  /** Owners only (ACCESS 'settings.billing'). */
-  { key: 'billing', group: 'company', icon: CreditCardOutlined },
-  /** Admins and owners (ACCESS 'settings.structure'). */
-  { key: 'structure', group: 'company', icon: AccountTreeOutlined },
-  /** Admins only (ACCESS 'settings.holidays'). */
-  { key: 'holidays', group: 'company', icon: CelebrationOutlined },
-  /** Admins and owners (ACCESS 'settings.administrators'). */
-  { key: 'administrators', group: 'company', icon: AdminPanelSettingsOutlined },
+    { key: 'account', group: 'you', icon: PersonOutlineOutlined },
+    { key: 'sessions', group: 'you', icon: DevicesOutlined },
+    { key: 'security', group: 'you', icon: ShieldOutlined },
+    /** Owners only (ACCESS 'settings.organisation'). */
+    { key: 'organisation', group: 'company', icon: BusinessOutlined },
+    /** Owners only (ACCESS 'settings.billing'). */
+    { key: 'billing', group: 'company', icon: CreditCardOutlined },
+    /** Admins and owners (ACCESS 'settings.structure'). */
+    { key: 'structure', group: 'company', icon: AccountTreeOutlined },
+    /** Admins only (ACCESS 'settings.holidays'). */
+    { key: 'holidays', group: 'company', icon: CelebrationOutlined },
+    /** Admins and owners (ACCESS 'settings.administrators'). */
+    { key: 'administrators', group: 'company', icon: AdminPanelSettingsOutlined },
 ] as const satisfies readonly { key: string; group: SettingsGroup; icon: unknown }[];
 
 /** Sections only some roles use, and the part of ACCESS that decides. */
 const SECTION_ACCESS: Partial<Record<SettingsSection, AccessPart>> = {
-  holidays: 'settings.holidays',
-  structure: 'settings.structure',
-  organisation: 'settings.organisation',
-  billing: 'settings.billing',
-  administrators: 'settings.administrators',
+    holidays: 'settings.holidays',
+    structure: 'settings.structure',
+    organisation: 'settings.organisation',
+    billing: 'settings.billing',
+    administrators: 'settings.administrators',
 };
 
 /** The ACCESS part a section needs; none → everyone signed in. */
-export const sectionAccessPart = (section: SettingsSection): AccessPart | undefined =>
-  SECTION_ACCESS[section];
+export const sectionAccessPart = (section: SettingsSection): AccessPart | undefined => SECTION_ACCESS[section];
 
 export type SettingsSection = (typeof SETTINGS_SECTIONS)[number]['key'];
 
 export const isSettingsSection = (value: string | undefined): value is SettingsSection =>
-  SETTINGS_SECTIONS.some((section) => section.key === value);
+    SETTINGS_SECTIONS.some((section) => section.key === value);

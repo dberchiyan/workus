@@ -20,13 +20,13 @@ import { ReviewViewDialog } from './ReviewViewDialog';
 import { SalaryOverview } from './SalaryOverview';
 
 type DialogState =
-  | { kind: 'none' }
-  | { kind: 'form'; review: Review | null }
-  | { kind: 'view'; review: Review }
-  | { kind: 'delete'; review: Review };
+    | { kind: 'none' }
+    | { kind: 'form'; review: Review | null }
+    | { kind: 'view'; review: Review }
+    | { kind: 'delete'; review: Review };
 
 export interface ReviewTabProps {
-  employeeId: string;
+    employeeId: string;
 }
 
 /** Reviews shown a page at a time (the list comes whole — the salary history needs all of it). */
@@ -34,222 +34,222 @@ const REVIEWS_PAGE_SIZE = 10;
 
 /** Salary overview on top, then the reviews (newest first, ten a page); add, view, edit and delete. */
 export function ReviewTab({ employeeId }: ReviewTabProps) {
-  const { t, i18n } = useTranslation(['review', 'errors']);
-  const { data, isPending, isError, error, refetch } = useEmployeeReviews(employeeId);
-  const [page, setPage] = useState(0);
-  const [dialog, setDialog] = useState<DialogState>({ kind: 'none' });
-  // The last shown review stays mounted during the closing transition.
-  const [lastReview, setLastReview] = useState<Review | null>(null);
-  const [notice, setNotice] = useState<string | null>(null);
-  // A fresh form (values, Idempotency-Key, errors) for every opening.
-  const [formKey, setFormKey] = useState(0);
-  // Kept through the closing transition, so the title doesn't flip from Edit to Add.
-  const [formReview, setFormReview] = useState<Review | null>(null);
-  const addButtonRef = useRef<HTMLButtonElement>(null);
-  const triggerRef = useRef<HTMLElement | null>(null);
+    const { t, i18n } = useTranslation(['review', 'errors']);
+    const { data, isPending, isError, error, refetch } = useEmployeeReviews(employeeId);
+    const [page, setPage] = useState(0);
+    const [dialog, setDialog] = useState<DialogState>({ kind: 'none' });
+    // The last shown review stays mounted during the closing transition.
+    const [lastReview, setLastReview] = useState<Review | null>(null);
+    const [notice, setNotice] = useState<string | null>(null);
+    // A fresh form (values, Idempotency-Key, errors) for every opening.
+    const [formKey, setFormKey] = useState(0);
+    // Kept through the closing transition, so the title doesn't flip from Edit to Add.
+    const [formReview, setFormReview] = useState<Review | null>(null);
+    const addButtonRef = useRef<HTMLButtonElement>(null);
+    const triggerRef = useRef<HTMLElement | null>(null);
 
-  const open = (next: DialogState, trigger: HTMLElement | null): void => {
-    if (next.kind !== 'none' && next.review) {
-      setLastReview(next.review);
-    }
-    if (trigger) {
-      triggerRef.current = trigger;
-    }
-    setNotice(null);
-    if (next.kind === 'form') {
-      setFormKey((key) => key + 1);
-      setFormReview(next.review);
-    }
-    setDialog(next);
-  };
-  const close = (): void => {
-    setDialog({ kind: 'none' });
-  };
-  // Dialog closed → focus back to what opened it (ux.md → Focus moves with the UI).
-  const restoreFocus = (): void => {
-    const trigger = triggerRef.current;
-    (trigger?.isConnected ? trigger : addButtonRef.current)?.focus();
-  };
-  const onAction = (action: ReviewAction, review: Review, trigger: HTMLElement | null): void => {
-    open(
-      action === 'view'
-        ? { kind: 'view', review }
-        : action === 'edit'
-          ? { kind: 'form', review }
-          : { kind: 'delete', review },
-      trigger,
-    );
-  };
-
-  if (isPending) {
-    return (
-      <div role="status" aria-busy="true" className="flex flex-col gap-3 p-4 sm:p-6">
-        <span className="sr-only">{t('tab.loading')}</span>
-        <Skeleton variant="rounded" className="h-24" />
-        <Skeleton variant="rounded" className="h-16" />
-        <Skeleton variant="rounded" className="h-16" />
-      </div>
-    );
-  }
-  if (isError) {
-    return (
-      <div className="p-4 sm:p-6">
-        <Alert
-          severity="error"
-          role="alert"
-          action={
-            <Button color="inherit" size="small" onClick={() => void refetch()}>
-              {t('list.retry')}
-            </Button>
-          }
-        >
-          {t(`errors:${isApiError(error) ? error.code : 'INTERNAL_ERROR'}`)}
-        </Alert>
-      </div>
-    );
-  }
-
-  const pages = Math.ceil(data.content.length / REVIEWS_PAGE_SIZE);
-  // A delete can empty the last page: stay on the last one that exists.
-  const current = Math.max(0, Math.min(page, pages - 1));
-  const shown = data.content.slice(current * REVIEWS_PAGE_SIZE, (current + 1) * REVIEWS_PAGE_SIZE);
-  const number = (value: number) => new Intl.NumberFormat(i18n.language).format(value);
-
-  return (
-    <div className="flex flex-col">
-      <SalaryOverview salary={data.salary} />
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-divider px-4 py-3 sm:px-6">
-        <Typography variant="h6" component="h3">
-          {t('list.title')}
-        </Typography>
-        <Button
-          ref={addButtonRef}
-          variant="outlined"
-          startIcon={<AddOutlined aria-hidden />}
-          onClick={(event) => {
-            open({ kind: 'form', review: null }, event.currentTarget);
-          }}
-        >
-          {t('add.open')}
-        </Button>
-      </div>
-      {data.content.length === 0 ? (
-        <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
-          <RateReviewOutlined aria-hidden fontSize="large" className="text-text-disabled" />
-          <Typography variant="h6" component="p">
-            {t('list.empty')}
-          </Typography>
-          <Typography variant="body2" color="textSecondary">
-            {t('list.emptyHint')}
-          </Typography>
-        </div>
-      ) : (
-        // The tab card's own width decides (container query), not the viewport: the card is
-        // narrower on a 1200 px desktop with the side column than on a 1024 px tablet without it.
-        // 44rem: the narrowest width where the fixed Date/Status/Salary columns plus room for
-        // Title and Responsible fit.
-        <div className="@container">
-          <div className="hidden @[44rem]:block">
-            <ReviewTable reviews={shown} onAction={onAction} />
-          </div>
-          <div className="@[44rem]:hidden">
-            <ReviewCardList reviews={shown} onAction={onAction} />
-          </div>
-        </div>
-      )}
-      {pages > 1 && (
-        <div className="flex flex-wrap items-center justify-between gap-2 border-t border-divider px-4 py-3 sm:px-6">
-          <Typography variant="caption" color="textSecondary" className="app-tabular">
-            {t('list.range', {
-              from: number(current * REVIEWS_PAGE_SIZE + 1),
-              to: number(current * REVIEWS_PAGE_SIZE + shown.length),
-              count: number(data.content.length),
-            })}
-          </Typography>
-          <Pagination
-            shape="rounded"
-            color="primary"
-            count={pages}
-            page={current + 1}
-            siblingCount={0}
-            aria-label={t('list.pages')}
-            onChange={(_event, value) => {
-              setPage(value - 1);
-            }}
-          />
-        </div>
-      )}
-      <ReviewFormDialog
-        key={formKey}
-        employeeId={employeeId}
-        review={formReview}
-        open={dialog.kind === 'form'}
-        onClose={close}
-        onSaved={(review) => {
-          close();
-          // A new review is the newest: show the first page, where it lands.
-          if (!formReview) {
-            setPage(0);
-          }
-          setNotice(
-            formReview
-              ? t('edit.saved', { title: review.title })
-              : t('add.created', { title: review.title }),
-          );
-        }}
-        onExited={restoreFocus}
-      />
-      <ReviewViewDialog
-        review={dialog.kind === 'view' ? dialog.review : lastReview}
-        open={dialog.kind === 'view'}
-        onClose={close}
-        onEdit={(review) => {
-          open({ kind: 'form', review }, null);
-        }}
-        onDelete={(review) => {
-          open({ kind: 'delete', review }, null);
-        }}
-        onExited={() => {
-          if (dialog.kind === 'none') {
-            restoreFocus();
-          }
-        }}
-      />
-      <DeleteReviewDialog
-        employeeId={employeeId}
-        review={dialog.kind === 'delete' ? dialog.review : lastReview}
-        open={dialog.kind === 'delete'}
-        onClose={close}
-        onDeleted={(review) => {
-          close();
-          setNotice(t('delete.deleted', { title: review.title }));
-          // The deleted row's menu button is gone; focus goes to "Add review".
-          triggerRef.current = addButtonRef.current;
-        }}
-        onExited={restoreFocus}
-      />
-      <Snackbar
-        open={notice !== null}
-        onClose={(_event, reason) => {
-          if (reason !== 'clickaway') {
-            setNotice(null);
-          }
-        }}
-        message={notice ?? ''}
-        action={
-          <Button
-            color="inherit"
-            size="small"
-            onClick={() => {
-              setNotice(null);
-            }}
-          >
-            {t('add.dismiss')}
-          </Button>
+    const open = (next: DialogState, trigger: HTMLElement | null): void => {
+        if (next.kind !== 'none' && next.review) {
+            setLastReview(next.review);
         }
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-        slotProps={{ content: { role: 'status' } }}
-      />
-    </div>
-  );
+        if (trigger) {
+            triggerRef.current = trigger;
+        }
+        setNotice(null);
+        if (next.kind === 'form') {
+            setFormKey((key) => key + 1);
+            setFormReview(next.review);
+        }
+        setDialog(next);
+    };
+    const close = (): void => {
+        setDialog({ kind: 'none' });
+    };
+    // Dialog closed → focus back to what opened it (ux.md → Focus moves with the UI).
+    const restoreFocus = (): void => {
+        const trigger = triggerRef.current;
+        (trigger?.isConnected ? trigger : addButtonRef.current)?.focus();
+    };
+    const onAction = (action: ReviewAction, review: Review, trigger: HTMLElement | null): void => {
+        open(
+            action === 'view'
+                ? { kind: 'view', review }
+                : action === 'edit'
+                  ? { kind: 'form', review }
+                  : { kind: 'delete', review },
+            trigger,
+        );
+    };
+
+    if (isPending) {
+        return (
+            <div role="status" aria-busy="true" className="flex flex-col gap-3 p-4 sm:p-6">
+                <span className="sr-only">{t('tab.loading')}</span>
+                <Skeleton variant="rounded" className="h-24" />
+                <Skeleton variant="rounded" className="h-16" />
+                <Skeleton variant="rounded" className="h-16" />
+            </div>
+        );
+    }
+    if (isError) {
+        return (
+            <div className="p-4 sm:p-6">
+                <Alert
+                    severity="error"
+                    role="alert"
+                    action={
+                        <Button color="inherit" size="small" onClick={() => void refetch()}>
+                            {t('list.retry')}
+                        </Button>
+                    }
+                >
+                    {t(`errors:${isApiError(error) ? error.code : 'INTERNAL_ERROR'}`)}
+                </Alert>
+            </div>
+        );
+    }
+
+    const pages = Math.ceil(data.content.length / REVIEWS_PAGE_SIZE);
+    // A delete can empty the last page: stay on the last one that exists.
+    const current = Math.max(0, Math.min(page, pages - 1));
+    const shown = data.content.slice(current * REVIEWS_PAGE_SIZE, (current + 1) * REVIEWS_PAGE_SIZE);
+    const number = (value: number) => new Intl.NumberFormat(i18n.language).format(value);
+
+    return (
+        <div className="flex flex-col">
+            <SalaryOverview salary={data.salary} />
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-divider px-4 py-3 sm:px-6">
+                <Typography variant="h6" component="h3">
+                    {t('list.title')}
+                </Typography>
+                <Button
+                    ref={addButtonRef}
+                    variant="outlined"
+                    startIcon={<AddOutlined aria-hidden />}
+                    onClick={(event) => {
+                        open({ kind: 'form', review: null }, event.currentTarget);
+                    }}
+                >
+                    {t('add.open')}
+                </Button>
+            </div>
+            {data.content.length === 0 ? (
+                <div className="flex flex-col items-center gap-2 px-4 py-10 text-center">
+                    <RateReviewOutlined aria-hidden fontSize="large" className="text-text-disabled" />
+                    <Typography variant="h6" component="p">
+                        {t('list.empty')}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary">
+                        {t('list.emptyHint')}
+                    </Typography>
+                </div>
+            ) : (
+                // The tab card's own width decides (container query), not the viewport: the card is
+                // narrower on a 1200 px desktop with the side column than on a 1024 px tablet without it.
+                // 44rem: the narrowest width where the fixed Date/Status/Salary columns plus room for
+                // Title and Responsible fit.
+                <div className="@container">
+                    <div className="hidden @[44rem]:block">
+                        <ReviewTable reviews={shown} onAction={onAction} />
+                    </div>
+                    <div className="@[44rem]:hidden">
+                        <ReviewCardList reviews={shown} onAction={onAction} />
+                    </div>
+                </div>
+            )}
+            {pages > 1 && (
+                <div className="flex flex-wrap items-center justify-between gap-2 border-t border-divider px-4 py-3 sm:px-6">
+                    <Typography variant="caption" color="textSecondary" className="app-tabular">
+                        {t('list.range', {
+                            from: number(current * REVIEWS_PAGE_SIZE + 1),
+                            to: number(current * REVIEWS_PAGE_SIZE + shown.length),
+                            count: number(data.content.length),
+                        })}
+                    </Typography>
+                    <Pagination
+                        shape="rounded"
+                        color="primary"
+                        count={pages}
+                        page={current + 1}
+                        siblingCount={0}
+                        aria-label={t('list.pages')}
+                        onChange={(_event, value) => {
+                            setPage(value - 1);
+                        }}
+                    />
+                </div>
+            )}
+            <ReviewFormDialog
+                key={formKey}
+                employeeId={employeeId}
+                review={formReview}
+                open={dialog.kind === 'form'}
+                onClose={close}
+                onSaved={(review) => {
+                    close();
+                    // A new review is the newest: show the first page, where it lands.
+                    if (!formReview) {
+                        setPage(0);
+                    }
+                    setNotice(
+                        formReview
+                            ? t('edit.saved', { title: review.title })
+                            : t('add.created', { title: review.title }),
+                    );
+                }}
+                onExited={restoreFocus}
+            />
+            <ReviewViewDialog
+                review={dialog.kind === 'view' ? dialog.review : lastReview}
+                open={dialog.kind === 'view'}
+                onClose={close}
+                onEdit={(review) => {
+                    open({ kind: 'form', review }, null);
+                }}
+                onDelete={(review) => {
+                    open({ kind: 'delete', review }, null);
+                }}
+                onExited={() => {
+                    if (dialog.kind === 'none') {
+                        restoreFocus();
+                    }
+                }}
+            />
+            <DeleteReviewDialog
+                employeeId={employeeId}
+                review={dialog.kind === 'delete' ? dialog.review : lastReview}
+                open={dialog.kind === 'delete'}
+                onClose={close}
+                onDeleted={(review) => {
+                    close();
+                    setNotice(t('delete.deleted', { title: review.title }));
+                    // The deleted row's menu button is gone; focus goes to "Add review".
+                    triggerRef.current = addButtonRef.current;
+                }}
+                onExited={restoreFocus}
+            />
+            <Snackbar
+                open={notice !== null}
+                onClose={(_event, reason) => {
+                    if (reason !== 'clickaway') {
+                        setNotice(null);
+                    }
+                }}
+                message={notice ?? ''}
+                action={
+                    <Button
+                        color="inherit"
+                        size="small"
+                        onClick={() => {
+                            setNotice(null);
+                        }}
+                    >
+                        {t('add.dismiss')}
+                    </Button>
+                }
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+                slotProps={{ content: { role: 'status' } }}
+            />
+        </div>
+    );
 }

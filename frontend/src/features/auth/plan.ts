@@ -9,8 +9,8 @@ export type PlanFeature = CurrentUser['organisation']['billing']['features'][num
  * mirrored — the billing page reads them from the API.
  */
 export const PLAN_FOR_FEATURE: Record<PlanFeature, Plan> = {
-  reviews: 'TEAM',
-  structure: 'TEAM',
-  insights: 'BUSINESS',
-  exports: 'BUSINESS',
+    reviews: 'TEAM',
+    structure: 'TEAM',
+    insights: 'BUSINESS',
+    exports: 'BUSINESS',
 };

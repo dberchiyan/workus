@@ -13,36 +13,36 @@ import { usePageHeadingFocus } from '@/shared/hooks/usePageHeadingFocus';
  * Employees and managers: their time off (balances and requests).
  */
 export default function DashboardPage() {
-  const { t } = useTranslation('dashboard');
-  useDocumentTitle(t('pageTitle'));
-  const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
-  // RequireAuth renders this route only with a loaded user.
-  const { data: user } = useCurrentUser();
-  const can = useAccess();
+    const { t } = useTranslation('dashboard');
+    useDocumentTitle(t('pageTitle'));
+    const headingRef = usePageHeadingFocus<HTMLHeadingElement>();
+    // RequireAuth renders this route only with a loaded user.
+    const { data: user } = useCurrentUser();
+    const can = useAccess();
 
-  if (!user) {
-    return null;
-  }
+    if (!user) {
+        return null;
+    }
 
-  return (
-    <div className="flex flex-col gap-6">
-      <Typography
-        ref={headingRef}
-        tabIndex={-1}
-        variant="h4"
-        component="h1"
-        // No visible greeting (product decision); the page keeps its h1 for focus and screen readers.
-        className="sr-only"
-      >
-        {t('title')}
-      </Typography>
-      {can('dashboard.companyOverview') && (
-        <>
-          <AdminOverview />
-          <AdminEvents />
-        </>
-      )}
-      {can('dashboard.ownTimeOff') && <MyTimeOff />}
-    </div>
-  );
+    return (
+        <div className="flex flex-col gap-6">
+            <Typography
+                ref={headingRef}
+                tabIndex={-1}
+                variant="h4"
+                component="h1"
+                // No visible greeting (product decision); the page keeps its h1 for focus and screen readers.
+                className="sr-only"
+            >
+                {t('title')}
+            </Typography>
+            {can('dashboard.companyOverview') && (
+                <>
+                    <AdminOverview />
+                    <AdminEvents />
+                </>
+            )}
+            {can('dashboard.ownTimeOff') && <MyTimeOff />}
+        </div>
+    );
 }

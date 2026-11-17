@@ -15,23 +15,23 @@ import { EmployeeService } from './service/employee.service';
 import { PositionCategoryService } from './service/position-category.service';
 
 @Module({
-  imports: [UserModule, AuditModule],
-  controllers: [
-    EmployeeController,
-    EmployeeActivityController,
-    EmployeeSecurityLogController,
-    PositionCategoryController,
-    EmployeeOptionController,
-    CompanyStructureController,
-  ],
-  exports: [EmployeeService, CompanyStructureService],
-  providers: [
-    EmployeeService,
-    PositionCategoryService,
-    EmployeeRepository,
-    PositionCategoryRepository,
-    CompanyStructureService,
-    CompanyStructureRepository,
-  ],
+    imports: [UserModule, AuditModule],
+    controllers: [
+        EmployeeController,
+        EmployeeActivityController,
+        EmployeeSecurityLogController,
+        PositionCategoryController,
+        EmployeeOptionController,
+        CompanyStructureController,
+    ],
+    exports: [EmployeeService, CompanyStructureService],
+    providers: [
+        EmployeeService,
+        PositionCategoryService,
+        EmployeeRepository,
+        PositionCategoryRepository,
+        CompanyStructureService,
+        CompanyStructureRepository,
+    ],
 })
 export class EmployeeModule {}

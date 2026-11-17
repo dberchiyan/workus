@@ -16,23 +16,23 @@ import { TimeOffNotifier } from './service/time-off-notifier';
 import { TimeOffService } from './service/time-off.service';
 
 @Module({
-  imports: [EmployeeModule, AuditModule, NotificationModule],
-  controllers: [
-    TimeOffController,
-    TimeOffCalendarController,
-    EmployeeTimeOffController,
-    ManagedTimeOffController,
-    HolidayController,
-  ],
-  exports: [TimeOffService],
-  providers: [
-    TimeOffService,
-    TimeOffDecisionService,
-    TimeOffCommentService,
-    TimeOffNotifier,
-    TimeOffRequestRepository,
-    HolidayService,
-    HolidayRepository,
-  ],
+    imports: [EmployeeModule, AuditModule, NotificationModule],
+    controllers: [
+        TimeOffController,
+        TimeOffCalendarController,
+        EmployeeTimeOffController,
+        ManagedTimeOffController,
+        HolidayController,
+    ],
+    exports: [TimeOffService],
+    providers: [
+        TimeOffService,
+        TimeOffDecisionService,
+        TimeOffCommentService,
+        TimeOffNotifier,
+        TimeOffRequestRepository,
+        HolidayService,
+        HolidayRepository,
+    ],
 })
 export class TimeOffModule {}

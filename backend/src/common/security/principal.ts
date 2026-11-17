@@ -1,8 +1,8 @@
 import type { Plan } from '../plan/plan';
 
 export const ClientType = {
-  WEB: 'web',
-  MOBILE: 'mobile',
+    WEB: 'web',
+    MOBILE: 'mobile',
 } as const;
 export type ClientType = (typeof ClientType)[keyof typeof ClientType];
 
@@ -11,22 +11,22 @@ export type ClientType = (typeof ClientType)[keyof typeof ClientType];
  * caller's tenant (a user belongs to one organisation): every query is scoped by it.
  */
 export class Principal {
-  constructor(
-    readonly userId: string,
-    /** Sign-in email (lower-case) — the demo's showcase accounts are told apart by it. */
-    readonly email: string,
-    readonly organisationId: string,
-    /** The organisation is approved (ACTIVE): its data is reachable. */
-    readonly isOrganisationActive: boolean,
-    /** The organisation's plan in effect — what PlanGuard checks (a snapshot per request). */
-    readonly plan: Plan,
-    readonly sessionId: string,
-    readonly authorities: readonly string[],
-    readonly clientType: ClientType,
-    readonly csrfTokenHash: string,
-  ) {}
+    constructor(
+        readonly userId: string,
+        /** Sign-in email (lower-case) — the demo's showcase accounts are told apart by it. */
+        readonly email: string,
+        readonly organisationId: string,
+        /** The organisation is approved (ACTIVE): its data is reachable. */
+        readonly isOrganisationActive: boolean,
+        /** The organisation's plan in effect — what PlanGuard checks (a snapshot per request). */
+        readonly plan: Plan,
+        readonly sessionId: string,
+        readonly authorities: readonly string[],
+        readonly clientType: ClientType,
+        readonly csrfTokenHash: string,
+    ) {}
 
-  hasAuthority(authority: string): boolean {
-    return this.authorities.includes(authority);
-  }
+    hasAuthority(authority: string): boolean {
+        return this.authorities.includes(authority);
+    }
 }

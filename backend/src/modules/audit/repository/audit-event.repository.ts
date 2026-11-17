@@ -9,130 +9,124 @@ import { Prisma } from '../../../generated/prisma/client';
 import type { AuditEventSortField } from '../service/audit-sort';
 import { AuditAction, AuditTargetType } from '../service/audit-action';
 import {
-  auditEventSelect,
-  type AuditEventRecord,
-  type SecurityEventRecord,
-  securityEventSelect,
+    auditEventSelect,
+    type AuditEventRecord,
+    type SecurityEventRecord,
+    securityEventSelect,
 } from './record/audit-event.record';
 
 export interface NewAuditEventRow {
-  organisationId: string;
-  action: string;
-  actorUserId: string | null;
-  employeeId: string | null;
-  targetType: string;
-  targetId: string;
-  targetLabel: string;
-  changes: Prisma.InputJsonValue;
-  ipAddress: string | null;
-  userAgent: string | null;
-  traceId: string | null;
+    organisationId: string;
+    action: string;
+    actorUserId: string | null;
+    employeeId: string | null;
+    targetType: string;
+    targetId: string;
+    targetLabel: string;
+    changes: Prisma.InputJsonValue;
+    ipAddress: string | null;
+    userAgent: string | null;
+    traceId: string | null;
 }
 
 const orderByFor = (
-  _field: AuditEventSortField,
-  direction: Prisma.SortOrder,
+    _field: AuditEventSortField,
+    direction: Prisma.SortOrder,
 ): Prisma.AuditEventOrderByWithRelationInput[] => [{ occurredAt: direction }];
 
 @Injectable()
 export class AuditEventRepository {
-  constructor(
-    private readonly txHost: TransactionHost<TransactionalAdapterPrisma<PrismaService>>,
-  ) {}
+    constructor(private readonly txHost: TransactionHost<TransactionalAdapterPrisma<PrismaService>>) {}
 
-  /** Joins the caller's transaction: the event commits (or rolls back) with the change. */
-  async create(row: NewAuditEventRow): Promise<void> {
-    await this.txHost.tx.auditEvent.create({ data: row, select: { id: true } });
-  }
-
-  /** One statement for several events (e.g. reviews canceled by a termination). */
-  async createMany(rows: NewAuditEventRow[]): Promise<void> {
-    if (rows.length > 0) {
-      await this.txHost.tx.auditEvent.createMany({ data: rows });
+    /** Joins the caller's transaction: the event commits (or rolls back) with the change. */
+    async create(row: NewAuditEventRow): Promise<void> {
+        await this.txHost.tx.auditEvent.create({ data: row, select: { id: true } });
     }
-  }
 
-  async findPageByEmployee(
-    organisationId: string,
-    employeeId: string,
-    pageable: Pageable<AuditEventSortField>,
-  ): Promise<{ content: AuditEventRecord[]; totalElements: number }> {
-    const where = { organisationId, employeeId } satisfies Prisma.AuditEventWhereInput;
-    const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
-    // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
-    const [totalElements, content] = await Promise.all([
-      this.txHost.tx.auditEvent.count({ where }),
-      this.txHost.tx.auditEvent.findMany({ where, select: auditEventSelect, ...page }),
-    ]);
-    return { content, totalElements };
-  }
-
-  /** The whole history of an employee, newest first, bounded (exports). */
-  findByEmployee(
-    organisationId: string,
-    employeeId: string,
-    take: number,
-  ): Promise<AuditEventRecord[]> {
-    return this.txHost.tx.auditEvent.findMany({
-      where: { organisationId, employeeId },
-      select: auditEventSelect,
-      orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
-      take,
-    });
-  }
-
-  /** The whole security log of a user, newest first, bounded (exports). */
-  findSecurity(
-    organisationId: string,
-    userId: string,
-    actions: readonly string[],
-    take: number,
-  ): Promise<SecurityEventRecord[]> {
-    return this.txHost.tx.auditEvent.findMany({
-      where: {
-        organisationId,
-        targetType: AuditTargetType.USER,
-        targetId: userId,
-        action: { in: [...actions] },
-      },
-      select: securityEventSelect,
-      orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
-      take,
-    });
-  }
-
-  /** A user's security log, newest first: events about the account with one of `actions`. */
-  async findSecurityPage(
-    organisationId: string,
-    userId: string,
-    actions: readonly string[],
-    pageable: Pageable<AuditEventSortField>,
-  ): Promise<{ content: SecurityEventRecord[]; totalElements: number }> {
-    const where = {
-      organisationId,
-      targetType: AuditTargetType.USER,
-      targetId: userId,
-      action: { in: [...actions] },
-    } satisfies Prisma.AuditEventWhereInput;
-    const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
-    // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
-    const [totalElements, content] = await Promise.all([
-      this.txHost.tx.auditEvent.count({ where }),
-      this.txHost.tx.auditEvent.findMany({ where, select: securityEventSelect, ...page }),
-    ]);
-    return { content, totalElements };
-  }
-
-  /**
-   * Of these events, the sign-ins from a device the user had not signed in from before: no
-   * earlier sign-in with the same browser string, version numbers ignored (an update is not a
-   * new device). Raw SQL — Prisma cannot compare a column with a function of another row.
-   */
-  async findNewDeviceSignIns(userId: string, eventIds: readonly string[]): Promise<Set<string>> {
-    if (eventIds.length === 0) {
-      return new Set();
+    /** One statement for several events (e.g. reviews canceled by a termination). */
+    async createMany(rows: NewAuditEventRow[]): Promise<void> {
+        if (rows.length > 0) {
+            await this.txHost.tx.auditEvent.createMany({ data: rows });
+        }
     }
-    const rows = await this.txHost.tx.$queryRaw<unknown[]>`
+
+    async findPageByEmployee(
+        organisationId: string,
+        employeeId: string,
+        pageable: Pageable<AuditEventSortField>,
+    ): Promise<{ content: AuditEventRecord[]; totalElements: number }> {
+        const where = { organisationId, employeeId } satisfies Prisma.AuditEventWhereInput;
+        const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
+        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
+        const [totalElements, content] = await Promise.all([
+            this.txHost.tx.auditEvent.count({ where }),
+            this.txHost.tx.auditEvent.findMany({ where, select: auditEventSelect, ...page }),
+        ]);
+        return { content, totalElements };
+    }
+
+    /** The whole history of an employee, newest first, bounded (exports). */
+    findByEmployee(organisationId: string, employeeId: string, take: number): Promise<AuditEventRecord[]> {
+        return this.txHost.tx.auditEvent.findMany({
+            where: { organisationId, employeeId },
+            select: auditEventSelect,
+            orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+            take,
+        });
+    }
+
+    /** The whole security log of a user, newest first, bounded (exports). */
+    findSecurity(
+        organisationId: string,
+        userId: string,
+        actions: readonly string[],
+        take: number,
+    ): Promise<SecurityEventRecord[]> {
+        return this.txHost.tx.auditEvent.findMany({
+            where: {
+                organisationId,
+                targetType: AuditTargetType.USER,
+                targetId: userId,
+                action: { in: [...actions] },
+            },
+            select: securityEventSelect,
+            orderBy: [{ occurredAt: 'desc' }, { id: 'desc' }],
+            take,
+        });
+    }
+
+    /** A user's security log, newest first: events about the account with one of `actions`. */
+    async findSecurityPage(
+        organisationId: string,
+        userId: string,
+        actions: readonly string[],
+        pageable: Pageable<AuditEventSortField>,
+    ): Promise<{ content: SecurityEventRecord[]; totalElements: number }> {
+        const where = {
+            organisationId,
+            targetType: AuditTargetType.USER,
+            targetId: userId,
+            action: { in: [...actions] },
+        } satisfies Prisma.AuditEventWhereInput;
+        const page = toPrismaPage(pageable, orderByFor, (direction) => ({ id: direction }));
+        // In parallel (api.md → Pagination): a concurrent write may make them differ by a row.
+        const [totalElements, content] = await Promise.all([
+            this.txHost.tx.auditEvent.count({ where }),
+            this.txHost.tx.auditEvent.findMany({ where, select: securityEventSelect, ...page }),
+        ]);
+        return { content, totalElements };
+    }
+
+    /**
+     * Of these events, the sign-ins from a device the user had not signed in from before: no
+     * earlier sign-in with the same browser string, version numbers ignored (an update is not a
+     * new device). Raw SQL — Prisma cannot compare a column with a function of another row.
+     */
+    async findNewDeviceSignIns(userId: string, eventIds: readonly string[]): Promise<Set<string>> {
+        if (eventIds.length === 0) {
+            return new Set();
+        }
+        const rows = await this.txHost.tx.$queryRaw<unknown[]>`
       SELECT e.id FROM audit_events e
       WHERE e.id = ANY(${[...eventIds]}::uuid[])
         AND e.target_type = ${AuditTargetType.USER} AND e.target_id = ${userId}::uuid
@@ -144,18 +138,18 @@ export class AuditEventRepository {
             AND (p.occurred_at, p.id) < (e.occurred_at, e.id)
             AND regexp_replace(p.user_agent, '[0-9]+', '', 'g')
               = regexp_replace(e.user_agent, '[0-9]+', '', 'g'))`;
-    return new Set(idRowsSchema.parse(rows).map((row) => row.id));
-  }
+        return new Set(idRowsSchema.parse(rows).map((row) => row.id));
+    }
 
-  /** Oldest first; bounded (a request has a handful of events). */
-  findByTargets(organisationId: string, targetIds: string[]): Promise<AuditEventRecord[]> {
-    return this.txHost.tx.auditEvent.findMany({
-      where: { organisationId, targetId: { in: targetIds } },
-      select: auditEventSelect,
-      orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
-      take: targetIds.length * MAX_EVENTS_PER_TARGET,
-    });
-  }
+    /** Oldest first; bounded (a request has a handful of events). */
+    findByTargets(organisationId: string, targetIds: string[]): Promise<AuditEventRecord[]> {
+        return this.txHost.tx.auditEvent.findMany({
+            where: { organisationId, targetId: { in: targetIds } },
+            select: auditEventSelect,
+            orderBy: [{ occurredAt: 'asc' }, { id: 'asc' }],
+            take: targetIds.length * MAX_EVENTS_PER_TARGET,
+        });
+    }
 }
 
 const MAX_EVENTS_PER_TARGET = 20;

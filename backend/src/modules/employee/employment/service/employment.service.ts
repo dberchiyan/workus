@@ -11,10 +11,10 @@ import { todayUtc } from '../../core/service/calendar-date';
 import { EmployeeService } from '../../core/service/employee.service';
 import { ReviewService } from '../../review/service/review.service';
 import type {
-  HiredEmployee,
-  HireEmployeeCommand,
-  TerminateEmployeeCommand,
-  UpdateEmployeeCommand,
+    HiredEmployee,
+    HireEmployeeCommand,
+    TerminateEmployeeCommand,
+    UpdateEmployeeCommand,
 } from './employment.types';
 
 /**
@@ -25,167 +25,140 @@ import type {
  */
 @Injectable()
 export class EmploymentService {
-  constructor(
-    private readonly employeeService: EmployeeService,
-    private readonly reviewService: ReviewService,
-    private readonly sessionService: SessionService,
-    private readonly passwordHasher: PasswordHasher,
-    private readonly authService: AuthService,
-    private readonly config: AppConfigService,
-    private readonly billingService: BillingService,
-  ) {}
+    constructor(
+        private readonly employeeService: EmployeeService,
+        private readonly reviewService: ReviewService,
+        private readonly sessionService: SessionService,
+        private readonly passwordHasher: PasswordHasher,
+        private readonly authService: AuthService,
+        private readonly config: AppConfigService,
+        private readonly billingService: BillingService,
+    ) {}
 
-  /**
-   * Hires with a generated password, returned once for the admin to hand over (only its hash is
-   * stored). Hashing is CPU work, done before the transaction opens.
-   */
-  async hire(
-    organisationId: string,
-    command: HireEmployeeCommand,
-    actorId: string,
-  ): Promise<HiredEmployee> {
-    const temporaryPassword = this.passwordHasher.generateTemporary();
-    const passwordHash = await this.passwordHasher.hash(temporaryPassword);
-    const employee = await this.hireWithPassword(organisationId, command, passwordHash, actorId);
-    return { ...employee, temporaryPassword };
-  }
-
-  /** One transaction: the employee never exists without a starting salary. */
-  @Transactional()
-  private async hireWithPassword(
-    organisationId: string,
-    command: HireEmployeeCommand,
-    passwordHash: string,
-    actorId: string,
-  ): Promise<Omit<HiredEmployee, 'temporaryPassword'>> {
-    await this.requireRoomOnPlan(organisationId);
-    const { startingSalary, ...employeeCommand } = command;
-    const employee = await this.employeeService.create(
-      organisationId,
-      employeeCommand,
-      passwordHash,
-      actorId,
-    );
-    const responsibleUserIds = [...new Set(command.responsibleUserIds)];
-    await this.reviewService.createStarting(
-      organisationId,
-      employee.id,
-      {
-        startDate: command.startDate,
-        salary: startingSalary,
-        // A review needs someone responsible: the employee's people, otherwise whoever hired.
-        responsibleUserIds: responsibleUserIds.length > 0 ? responsibleUserIds : [actorId],
-      },
-      actorId,
-    );
-    return {
-      id: employee.id,
-      firstName: employee.user.firstName,
-      lastName: employee.user.lastName,
-    };
-  }
-
-  /**
-   * The plan's employee limit, enforced here (not only hidden in the UI): the 11th active
-   * employee on Starter is refused with the upgrade hint. Not serialised — two hires at the
-   * limit at once could both pass (accepted, as with time-off balances).
-   */
-  private async requireRoomOnPlan(organisationId: string): Promise<void> {
-    const { plan, maxEmployees } = await this.billingService.findEmployeeLimit(organisationId);
-    if (
-      maxEmployees !== null &&
-      (await this.employeeService.countActive(organisationId)) >= maxEmployees
-    ) {
-      throw new PlanLimitReachedException(plan, maxEmployees);
+    /**
+     * Hires with a generated password, returned once for the admin to hand over (only its hash is
+     * stored). Hashing is CPU work, done before the transaction opens.
+     */
+    async hire(organisationId: string, command: HireEmployeeCommand, actorId: string): Promise<HiredEmployee> {
+        const temporaryPassword = this.passwordHasher.generateTemporary();
+        const passwordHash = await this.passwordHasher.hash(temporaryPassword);
+        const employee = await this.hireWithPassword(organisationId, command, passwordHash, actorId);
+        return { ...employee, temporaryPassword };
     }
-  }
 
-  /** Edit the profile; a changed start date moves the starting salary with it. */
-  @Transactional()
-  async update(
-    organisationId: string,
-    employeeId: string,
-    command: UpdateEmployeeCommand,
-    actorId: string,
-  ): Promise<void> {
-    await this.refuseDemoAccount(organisationId, employeeId);
-    const { before, after } = await this.employeeService.update(
-      organisationId,
-      employeeId,
-      command,
-      actorId,
-    );
-    if (before.startDate.getTime() !== after.startDate.getTime()) {
-      await this.reviewService.moveStarting(organisationId, employeeId, command.startDate, actorId);
+    /** One transaction: the employee never exists without a starting salary. */
+    @Transactional()
+    private async hireWithPassword(
+        organisationId: string,
+        command: HireEmployeeCommand,
+        passwordHash: string,
+        actorId: string,
+    ): Promise<Omit<HiredEmployee, 'temporaryPassword'>> {
+        await this.requireRoomOnPlan(organisationId);
+        const { startingSalary, ...employeeCommand } = command;
+        const employee = await this.employeeService.create(organisationId, employeeCommand, passwordHash, actorId);
+        const responsibleUserIds = [...new Set(command.responsibleUserIds)];
+        await this.reviewService.createStarting(
+            organisationId,
+            employee.id,
+            {
+                startDate: command.startDate,
+                salary: startingSalary,
+                // A review needs someone responsible: the employee's people, otherwise whoever hired.
+                responsibleUserIds: responsibleUserIds.length > 0 ? responsibleUserIds : [actorId],
+            },
+            actorId,
+        );
+        return {
+            id: employee.id,
+            firstName: employee.user.firstName,
+            lastName: employee.user.lastName,
+        };
     }
-  }
 
-  /** Terminate (or change the termination); reviews scheduled after that day are canceled. */
-  @Transactional()
-  async terminate(
-    organisationId: string,
-    employeeId: string,
-    command: TerminateEmployeeCommand,
-    actorId: string,
-  ): Promise<void> {
-    await this.refuseDemoAccount(organisationId, employeeId);
-    const { after } = await this.employeeService.terminate(
-      organisationId,
-      employeeId,
-      command,
-      actorId,
-    );
-    await this.reviewService.cancelScheduledAfter(
-      organisationId,
-      employeeId,
-      command.date,
-      actorId,
-    );
-    // Effective today or earlier: signed out now (a later date is handled on its day).
-    if (after.terminatedOn && after.terminatedOn <= todayUtc()) {
-      await this.sessionService.endForTermination([{ userId: after.user.id, organisationId }]);
+    /**
+     * The plan's employee limit, enforced here (not only hidden in the UI): the 11th active
+     * employee on Starter is refused with the upgrade hint. Not serialised — two hires at the
+     * limit at once could both pass (accepted, as with time-off balances).
+     */
+    private async requireRoomOnPlan(organisationId: string): Promise<void> {
+        const { plan, maxEmployees } = await this.billingService.findEmployeeLimit(organisationId);
+        if (maxEmployees !== null && (await this.employeeService.countActive(organisationId)) >= maxEmployees) {
+            throw new PlanLimitReachedException(plan, maxEmployees);
+        }
     }
-  }
 
-  /**
-   * A new generated password for the employee, returned once for the admin to hand over (only
-   * its hash is stored); the old one stops working and the employee is signed out everywhere.
-   */
-  async resetPassword(
-    organisationId: string,
-    employeeId: string,
-    actorId: string,
-  ): Promise<{ temporaryPassword: string }> {
-    await this.refuseDemoAccount(organisationId, employeeId);
-    const userId = await this.employeeService.findUserId(organisationId, employeeId);
-    const temporaryPassword = this.passwordHasher.generateTemporary();
-    const passwordHash = await this.passwordHasher.hash(temporaryPassword);
-    await this.authService.resetPassword({ id: userId, organisationId }, passwordHash, actorId);
-    return { temporaryPassword };
-  }
-
-  /** The employee is active again; reviews canceled by the termination stay canceled. */
-  @Transactional()
-  async cancelTermination(
-    organisationId: string,
-    employeeId: string,
-    version: number,
-    actorId: string,
-  ): Promise<void> {
-    await this.employeeService.cancelTermination(organisationId, employeeId, version, actorId);
-  }
-
-  /**
-   * The demo's showcase accounts stay signable-in: no edits, no termination, no password reset
-   * (DEMO_MODE only).
-   */
-  private async refuseDemoAccount(organisationId: string, employeeId: string): Promise<void> {
-    if (!this.config.isDemo) {
-      return;
+    /** Edit the profile; a changed start date moves the starting salary with it. */
+    @Transactional()
+    async update(
+        organisationId: string,
+        employeeId: string,
+        command: UpdateEmployeeCommand,
+        actorId: string,
+    ): Promise<void> {
+        await this.refuseDemoAccount(organisationId, employeeId);
+        const { before, after } = await this.employeeService.update(organisationId, employeeId, command, actorId);
+        if (before.startDate.getTime() !== after.startDate.getTime()) {
+            await this.reviewService.moveStarting(organisationId, employeeId, command.startDate, actorId);
+        }
     }
-    const email = await this.employeeService.findEmail(organisationId, employeeId);
-    if (this.config.isDemoProtected(email)) {
-      throw new DemoRestrictedException();
+
+    /** Terminate (or change the termination); reviews scheduled after that day are canceled. */
+    @Transactional()
+    async terminate(
+        organisationId: string,
+        employeeId: string,
+        command: TerminateEmployeeCommand,
+        actorId: string,
+    ): Promise<void> {
+        await this.refuseDemoAccount(organisationId, employeeId);
+        const { after } = await this.employeeService.terminate(organisationId, employeeId, command, actorId);
+        await this.reviewService.cancelScheduledAfter(organisationId, employeeId, command.date, actorId);
+        // Effective today or earlier: signed out now (a later date is handled on its day).
+        if (after.terminatedOn && after.terminatedOn <= todayUtc()) {
+            await this.sessionService.endForTermination([{ userId: after.user.id, organisationId }]);
+        }
     }
-  }
+
+    /**
+     * A new generated password for the employee, returned once for the admin to hand over (only
+     * its hash is stored); the old one stops working and the employee is signed out everywhere.
+     */
+    async resetPassword(
+        organisationId: string,
+        employeeId: string,
+        actorId: string,
+    ): Promise<{ temporaryPassword: string }> {
+        await this.refuseDemoAccount(organisationId, employeeId);
+        const userId = await this.employeeService.findUserId(organisationId, employeeId);
+        const temporaryPassword = this.passwordHasher.generateTemporary();
+        const passwordHash = await this.passwordHasher.hash(temporaryPassword);
+        await this.authService.resetPassword({ id: userId, organisationId }, passwordHash, actorId);
+        return { temporaryPassword };
+    }
+
+    /** The employee is active again; reviews canceled by the termination stay canceled. */
+    @Transactional()
+    async cancelTermination(
+        organisationId: string,
+        employeeId: string,
+        version: number,
+        actorId: string,
+    ): Promise<void> {
+        await this.employeeService.cancelTermination(organisationId, employeeId, version, actorId);
+    }
+
+    /**
+     * The demo's showcase accounts stay signable-in: no edits, no termination, no password reset
+     * (DEMO_MODE only).
+     */
+    private async refuseDemoAccount(organisationId: string, employeeId: string): Promise<void> {
+        if (!this.config.isDemo) {
+            return;
+        }
+        const email = await this.employeeService.findEmail(organisationId, employeeId);
+        if (this.config.isDemoProtected(email)) {
+            throw new DemoRestrictedException();
+        }
+    }
 }

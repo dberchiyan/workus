@@ -6,8 +6,8 @@ import { DashboardController } from './controller/dashboard.controller';
 import { DashboardService } from './service/dashboard.service';
 
 @Module({
-  imports: [EmployeeModule, ReviewModule, TimeOffModule],
-  controllers: [DashboardController],
-  providers: [DashboardService],
+    imports: [EmployeeModule, ReviewModule, TimeOffModule],
+    controllers: [DashboardController],
+    providers: [DashboardService],
 })
 export class DashboardModule {}

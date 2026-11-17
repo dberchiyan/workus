@@ -11,4 +11,4 @@ export const Public = (): MethodDecorator => SetMetadata(PUBLIC_KEY, true);
 
 /** Requires a session and a passing policy. */
 export const Authorize = (requiredPolicy: Policy): MethodDecorator =>
-  applyDecorators(SetMetadata(POLICY_KEY, requiredPolicy), ApiCookieAuth(SESSION_COOKIE_SECURITY));
+    applyDecorators(SetMetadata(POLICY_KEY, requiredPolicy), ApiCookieAuth(SESSION_COOKIE_SECURITY));

@@ -13,28 +13,28 @@ import { generateTraceId, TRACE_ID_HEADER } from './trace-id';
  * trace id too.
  */
 export const CLS_MIDDLEWARE_OPTIONS: Omit<ClsMiddlewareOptions, 'mount'> = {
-  generateId: true,
-  idGenerator: generateTraceId,
-  useEnterWith: true,
-  setup: (cls, req: Request, res: Response) => {
-    res.setHeader(TRACE_ID_HEADER, cls.getId());
-    cls.set('clientIp', clientIp(req));
-    cls.set('userAgent', clientUserAgent(req));
-  },
+    generateId: true,
+    idGenerator: generateTraceId,
+    useEnterWith: true,
+    setup: (cls, req: Request, res: Response) => {
+        res.setHeader(TRACE_ID_HEADER, cls.getId());
+        cls.set('clientIp', clientIp(req));
+        cls.set('userAgent', clientUserAgent(req));
+    },
 };
 
 @Module({
-  imports: [
-    ClsModule.forRoot({
-      global: true,
-      middleware: { mount: false },
-      plugins: [
-        new ClsPluginTransactional({
-          imports: [PersistenceModule],
-          adapter: new TransactionalAdapterPrisma({ prismaInjectionToken: PrismaService }),
+    imports: [
+        ClsModule.forRoot({
+            global: true,
+            middleware: { mount: false },
+            plugins: [
+                new ClsPluginTransactional({
+                    imports: [PersistenceModule],
+                    adapter: new TransactionalAdapterPrisma({ prismaInjectionToken: PrismaService }),
+                }),
+            ],
         }),
-      ],
-    }),
-  ],
+    ],
 })
 export class ContextModule {}

@@ -8,163 +8,163 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 const RESTRICTED_SYNTAX = [
-  { selector: 'TSEnumDeclaration', message: 'Use an `as const` object.' },
-  {
-    selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
-    message: 'Forbidden (architecture.md).',
-  },
-  {
-    // MUI 9 Typography silently ignores "text.secondary"; the value is "textSecondary".
-    selector: "JSXAttribute[name.name='color'] Literal[value=/^text[.]/]",
-    message: 'Use color="textSecondary" / "textPrimary" / "textDisabled".',
-  },
-  {
-    // What a role may use is decided once, in features/auth/access.ts.
-    selector: "BinaryExpression[operator=/^[!=]==$/] > MemberExpression[property.name='role']",
-    message: 'Decide by role through ACCESS / useAccess() (features/auth/access.ts).',
-  },
+    { selector: 'TSEnumDeclaration', message: 'Use an `as const` object.' },
+    {
+        selector: "JSXAttribute[name.name='dangerouslySetInnerHTML']",
+        message: 'Forbidden (architecture.md).',
+    },
+    {
+        // MUI 9 Typography silently ignores "text.secondary"; the value is "textSecondary".
+        selector: "JSXAttribute[name.name='color'] Literal[value=/^text[.]/]",
+        message: 'Use color="textSecondary" / "textPrimary" / "textDisabled".',
+    },
+    {
+        // What a role may use is decided once, in features/auth/access.ts.
+        selector: "BinaryExpression[operator=/^[!=]==$/] > MemberExpression[property.name='role']",
+        message: 'Decide by role through ACCESS / useAccess() (features/auth/access.ts).',
+    },
 ];
 
 /** Configuration is read once, checked, from `@/shared/config/env`. */
 const IMPORT_META_ENV = {
-  selector: "MemberExpression[object.type='MetaProperty'][property.name='env']",
-  message: 'Read configuration from `@/shared/config/env` (checked against a schema).',
+    selector: "MemberExpression[object.type='MetaProperty'][property.name='env']",
+    message: 'Read configuration from `@/shared/config/env` (checked against a schema).',
 };
 
 export default tseslint.config(
-  {
-    ignores: [
-      'dist/**',
-      'node_modules/**',
-      'src/shared/types/api.ts',
-      'src/shared/api/schemas.generated.ts',
-      'eslint.config.js',
-    ],
-  },
-  eslint.configs.recommended,
-  ...tseslint.configs.strictTypeChecked,
-  jsxA11y.flatConfigs.strict,
-  reactHooks.configs.flat.recommended,
-  {
-    languageOptions: {
-      globals: { ...globals.browser },
-      parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
+    {
+        ignores: [
+            'dist/**',
+            'node_modules/**',
+            'src/shared/types/api.ts',
+            'src/shared/api/schemas.generated.ts',
+            'eslint.config.js',
+        ],
     },
-    plugins: { 'react-refresh': reactRefresh, boundaries },
-    settings: {
-      'import/resolver': { typescript: { project: './tsconfig.app.json' } },
-      'boundaries/include': ['src/**/*'],
-      'boundaries/elements': [
-        { type: 'app', pattern: 'src/app' },
-        // Features grouped like the backend modules (employee/core, employee/review) come first:
-        // the first matching element wins.
-        { type: 'feature', pattern: 'src/features/employee/*', capture: ['featureName'] },
-        { type: 'feature', pattern: 'src/features/*', capture: ['featureName'] },
-        { type: 'shared', pattern: 'src/shared' },
-        { type: 'theme', pattern: 'src/theme' },
-        { type: 'locales', pattern: 'src/locales' },
-      ],
-    },
-    rules: {
-      'no-console': 'error',
-      '@typescript-eslint/no-explicit-any': 'error',
-      '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
-      '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
-      'no-restricted-syntax': ['error', ...RESTRICTED_SYNTAX, IMPORT_META_ENV],
-      'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
-      'boundaries/dependencies': [
-        'error',
-        {
-          default: 'disallow',
-          policies: [
-            {
-              from: { element: { type: 'app' } },
-              allow: {
-                to: { element: { types: ['app', 'feature', 'shared', 'theme', 'locales'] } },
-              },
-            },
-            {
-              from: { element: { type: 'feature' } },
-              allow: { to: { element: { types: ['feature', 'shared', 'theme'] } } },
-            },
-            {
-              from: { element: { type: 'shared' } },
-              allow: { to: { element: { types: ['shared', 'theme'] } } },
-            },
-            { from: { element: { type: 'theme' } }, allow: { to: { element: { type: 'theme' } } } },
-          ],
+    eslint.configs.recommended,
+    ...tseslint.configs.strictTypeChecked,
+    jsxA11y.flatConfigs.strict,
+    reactHooks.configs.flat.recommended,
+    {
+        languageOptions: {
+            globals: { ...globals.browser },
+            parserOptions: { projectService: true, tsconfigRootDir: import.meta.dirname },
         },
-      ],
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [{ name: '@mui/icons-material', message: 'Import icons individually.' }],
-          patterns: [
-            {
-              // A grouped feature's index is @/features/<group>/<feature>; anything deeper is internal.
-              group: ['@/features/*/*', '!@/features/employee/*', '@/features/employee/*/*'],
-              message: 'Import a feature only through its index.ts.',
-            },
-            { group: ['../../*'], message: 'No ../../ chains — use the @/ alias.' },
-            { group: ['framer-motion'], message: 'Use motion/react.' },
-          ],
+        plugins: { 'react-refresh': reactRefresh, boundaries },
+        settings: {
+            'import/resolver': { typescript: { project: './tsconfig.app.json' } },
+            'boundaries/include': ['src/**/*'],
+            'boundaries/elements': [
+                { type: 'app', pattern: 'src/app' },
+                // Features grouped like the backend modules (employee/core, employee/review) come first:
+                // the first matching element wins.
+                { type: 'feature', pattern: 'src/features/employee/*', capture: ['featureName'] },
+                { type: 'feature', pattern: 'src/features/*', capture: ['featureName'] },
+                { type: 'shared', pattern: 'src/shared' },
+                { type: 'theme', pattern: 'src/theme' },
+                { type: 'locales', pattern: 'src/locales' },
+            ],
         },
-      ],
-    },
-  },
-  {
-    files: ['src/features/**/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [{ name: '@mui/icons-material', message: 'Import icons individually.' }],
-          patterns: [
-            {
-              // A grouped feature's index is @/features/<group>/<feature>; anything deeper is internal.
-              group: ['@/features/*/*', '!@/features/employee/*', '@/features/employee/*/*'],
-              message: 'Import a feature only through its index.ts.',
-            },
-            { group: ['@/app', '@/app/*'], message: 'Features never import app/.' },
-            {
-              group: ['../../*'],
-              message: 'Another feature is reached only through @/features/<name>.',
-            },
-          ],
+        rules: {
+            'no-console': 'error',
+            '@typescript-eslint/no-explicit-any': 'error',
+            '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'inline-type-imports' }],
+            '@typescript-eslint/restrict-template-expressions': ['error', { allowNumber: true }],
+            'no-restricted-syntax': ['error', ...RESTRICTED_SYNTAX, IMPORT_META_ENV],
+            'react-refresh/only-export-components': ['warn', { allowConstantExport: true }],
+            'boundaries/dependencies': [
+                'error',
+                {
+                    default: 'disallow',
+                    policies: [
+                        {
+                            from: { element: { type: 'app' } },
+                            allow: {
+                                to: { element: { types: ['app', 'feature', 'shared', 'theme', 'locales'] } },
+                            },
+                        },
+                        {
+                            from: { element: { type: 'feature' } },
+                            allow: { to: { element: { types: ['feature', 'shared', 'theme'] } } },
+                        },
+                        {
+                            from: { element: { type: 'shared' } },
+                            allow: { to: { element: { types: ['shared', 'theme'] } } },
+                        },
+                        { from: { element: { type: 'theme' } }, allow: { to: { element: { type: 'theme' } } } },
+                    ],
+                },
+            ],
+            'no-restricted-imports': [
+                'error',
+                {
+                    paths: [{ name: '@mui/icons-material', message: 'Import icons individually.' }],
+                    patterns: [
+                        {
+                            // A grouped feature's index is @/features/<group>/<feature>; anything deeper is internal.
+                            group: ['@/features/*/*', '!@/features/employee/*', '@/features/employee/*/*'],
+                            message: 'Import a feature only through its index.ts.',
+                        },
+                        { group: ['../../*'], message: 'No ../../ chains — use the @/ alias.' },
+                        { group: ['framer-motion'], message: 'Use motion/react.' },
+                    ],
+                },
+            ],
         },
-      ],
     },
-  },
-  {
-    // Files at the root of a grouped feature: a sibling feature is one level up, not two.
-    files: ['src/features/employee/*/*.{ts,tsx}'],
-    rules: {
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [{ name: '@mui/icons-material', message: 'Import icons individually.' }],
-          patterns: [
-            {
-              group: ['@/features/*/*', '!@/features/employee/*', '@/features/employee/*/*'],
-              message: 'Import a feature only through its index.ts.',
-            },
-            { group: ['@/app', '@/app/*'], message: 'Features never import app/.' },
-            {
-              group: ['../../*', '../*/**', '!../*/'],
-              message: 'Another feature is reached only through @/features/<group>/<name>.',
-            },
-          ],
+    {
+        files: ['src/features/**/*.{ts,tsx}'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    paths: [{ name: '@mui/icons-material', message: 'Import icons individually.' }],
+                    patterns: [
+                        {
+                            // A grouped feature's index is @/features/<group>/<feature>; anything deeper is internal.
+                            group: ['@/features/*/*', '!@/features/employee/*', '@/features/employee/*/*'],
+                            message: 'Import a feature only through its index.ts.',
+                        },
+                        { group: ['@/app', '@/app/*'], message: 'Features never import app/.' },
+                        {
+                            group: ['../../*'],
+                            message: 'Another feature is reached only through @/features/<name>.',
+                        },
+                    ],
+                },
+            ],
         },
-      ],
     },
-  },
-  {
-    files: ['vite.config.ts', 'scripts/**/*.ts'],
-    languageOptions: { globals: { ...globals.node } },
-  },
-  {
-    // The one place that reads the raw values.
-    files: ['src/shared/config/env.ts'],
-    rules: { 'no-restricted-syntax': ['error', ...RESTRICTED_SYNTAX] },
-  },
+    {
+        // Files at the root of a grouped feature: a sibling feature is one level up, not two.
+        files: ['src/features/employee/*/*.{ts,tsx}'],
+        rules: {
+            'no-restricted-imports': [
+                'error',
+                {
+                    paths: [{ name: '@mui/icons-material', message: 'Import icons individually.' }],
+                    patterns: [
+                        {
+                            group: ['@/features/*/*', '!@/features/employee/*', '@/features/employee/*/*'],
+                            message: 'Import a feature only through its index.ts.',
+                        },
+                        { group: ['@/app', '@/app/*'], message: 'Features never import app/.' },
+                        {
+                            group: ['../../*', '../*/**', '!../*/'],
+                            message: 'Another feature is reached only through @/features/<group>/<name>.',
+                        },
+                    ],
+                },
+            ],
+        },
+    },
+    {
+        files: ['vite.config.ts', 'scripts/**/*.ts'],
+        languageOptions: { globals: { ...globals.node } },
+    },
+    {
+        // The one place that reads the raw values.
+        files: ['src/shared/config/env.ts'],
+        rules: { 'no-restricted-syntax': ['error', ...RESTRICTED_SYNTAX] },
+    },
 );

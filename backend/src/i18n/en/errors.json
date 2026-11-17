@@ -1,84 +1,84 @@
 {
-  "VALIDATION_FAILED": "Some fields are invalid — check them and try again",
-  "MALFORMED_REQUEST": "The request could not be read — reload the page and try again",
-  "INVALID_PARAMETER": "Parameter “{parameter}” is invalid",
-  "UNAUTHORIZED": "Sign in to continue",
-  "INVALID_CREDENTIALS": "Invalid email or password",
-  "SESSION_EXPIRED": "Your session has expired — sign in again",
-  "ACCESS_ENDED": "Your access to Workus has ended — contact your administrator",
-  "ORGANISATION_NOT_ACTIVE": "Your company is not approved yet",
-  "DEMO_RESTRICTED": "Turned off for the shared demo accounts",
-  "PLAN_UPGRADE_REQUIRED": "This is part of the {plan} plan — upgrade in Settings → Billing",
-  "PLAN_LIMIT_REACHED": "The {plan} plan allows up to {limit} employees — upgrade in Settings → Billing to add more",
-  "FORBIDDEN": "You don't have access to this action",
-  "RESOURCE_NOT_FOUND": "The requested item was not found",
-  "CONFLICT": "This conflicts with existing data — reload and try again",
-  "CONCURRENT_MODIFICATION": "This record was changed by someone else — reload and try again",
-  "IDEMPOTENCY_KEY_REUSED": "This request was already sent with different data",
-  "BUSINESS_RULE_VIOLATION": "This action is not allowed",
-  "PAYLOAD_TOO_LARGE": "The request is too large",
-  "UNSUPPORTED_MEDIA_TYPE": "Only JSON requests are accepted",
-  "RATE_LIMIT_EXCEEDED": "Too many attempts — try again in {minutes} minutes",
-  "UPSTREAM_UNAVAILABLE": "A service we depend on is unavailable — try again later",
-  "INTERNAL_ERROR": "Something went wrong on our side — try again later",
-  "billing": {
-    "alreadySubscribed": "Your company already has a subscription — change the plan under Manage billing",
-    "invalidSignature": "The webhook signature could not be verified",
-    "noBillingAccount": "There is nothing to manage yet — choose a plan first",
-    "noSubscription": "There is no subscription to change — choose a paid plan to start one",
-    "notPurchasable": "Choose a paid plan — Starter is free",
-    "providerRejected": "The payment provider refused the request — try again or contact support",
-    "samePlan": "Your company is already on this plan"
-  },
-  "auth": {
-    "currentPasswordWrong": "The current password is not right",
-    "samePassword": "Choose a password different from the current one"
-  },
-  "employee": {
-    "emailTaken": "An account with the email “{email}” already exists",
-    "positionNotFound": "This position no longer exists — reload and choose another",
-    "responsibleNotFound": "One of the chosen responsible people is no longer active — choose again",
-    "selfResponsible": "An employee can’t be responsible for themselves — choose someone else",
-    "startAfterTermination": "The start date can’t be after the termination date",
-    "terminationBeforeStart": "The termination date can’t be before the start date",
-    "terminationReasonInvalid": "Choose a reason from the list"
-  },
-  "holiday": {
-    "dateTaken": "There is already a holiday on this date"
-  },
-  "organisation": {
-    "lastOwner": "The company needs at least one owner — make someone else an owner first",
-    "notAdministrator": "Only administrators can be owners"
-  },
-  "platform": {
-    "activeNotRejectable": "An approved company cannot be rejected"
-  },
-  "registration": {
-    "emailTaken": "An account with this email already exists — sign in instead"
-  },
-  "review": {
-    "responsibleNotFound": "One of the chosen responsible people is no longer active — choose again",
-    "startingNotDeletable": "The starting salary can’t be deleted — it starts the salary history. Edit it instead",
-    "startingDateLocked": "The starting salary is always dated the employee’s start date",
-    "startingStatusLocked": "The starting salary is always a completed review",
-    "reviewsBeforeStart": "Another review is dated before this start date — move or delete it first"
-  },
-  "timeOff": {
-    "beforeStart": "Time off can’t start before your start date",
-    "afterTermination": "Time off can’t reach past your last day",
-    "noWorkingDays": "These dates have no working days — they fall on weekends or company holidays",
-    "overlaps": "You already have a request for some of these days",
-    "notEnoughDays": "Only {available} days are left in this cycle; this request takes {requested}",
-    "noResponsible": "Nobody is responsible for you yet, so no one can approve the request — ask an admin",
-    "notCancelable": "This request can no longer be canceled",
-    "notPending": "This request has already been decided or canceled — reload to see its status"
-  },
-  "structure": {
-    "departmentNameTaken": "There is already a department called “{name}”",
-    "positionTitleTaken": "There is already a position called “{title}”",
-    "departmentNotEmpty": "Remove or move this department’s positions first",
-    "positionInUse": "People hold this position — give them another one first",
-    "tooManyDepartments": "A company can have at most {max} departments",
-    "tooManyPositions": "A company can have at most {max} positions"
-  }
+    "VALIDATION_FAILED": "Some fields are invalid — check them and try again",
+    "MALFORMED_REQUEST": "The request could not be read — reload the page and try again",
+    "INVALID_PARAMETER": "Parameter “{parameter}” is invalid",
+    "UNAUTHORIZED": "Sign in to continue",
+    "INVALID_CREDENTIALS": "Invalid email or password",
+    "SESSION_EXPIRED": "Your session has expired — sign in again",
+    "ACCESS_ENDED": "Your access to Workus has ended — contact your administrator",
+    "ORGANISATION_NOT_ACTIVE": "Your company is not approved yet",
+    "DEMO_RESTRICTED": "Turned off for the shared demo accounts",
+    "PLAN_UPGRADE_REQUIRED": "This is part of the {plan} plan — upgrade in Settings → Billing",
+    "PLAN_LIMIT_REACHED": "The {plan} plan allows up to {limit} employees — upgrade in Settings → Billing to add more",
+    "FORBIDDEN": "You don't have access to this action",
+    "RESOURCE_NOT_FOUND": "The requested item was not found",
+    "CONFLICT": "This conflicts with existing data — reload and try again",
+    "CONCURRENT_MODIFICATION": "This record was changed by someone else — reload and try again",
+    "IDEMPOTENCY_KEY_REUSED": "This request was already sent with different data",
+    "BUSINESS_RULE_VIOLATION": "This action is not allowed",
+    "PAYLOAD_TOO_LARGE": "The request is too large",
+    "UNSUPPORTED_MEDIA_TYPE": "Only JSON requests are accepted",
+    "RATE_LIMIT_EXCEEDED": "Too many attempts — try again in {minutes} minutes",
+    "UPSTREAM_UNAVAILABLE": "A service we depend on is unavailable — try again later",
+    "INTERNAL_ERROR": "Something went wrong on our side — try again later",
+    "billing": {
+        "alreadySubscribed": "Your company already has a subscription — change the plan under Manage billing",
+        "invalidSignature": "The webhook signature could not be verified",
+        "noBillingAccount": "There is nothing to manage yet — choose a plan first",
+        "noSubscription": "There is no subscription to change — choose a paid plan to start one",
+        "notPurchasable": "Choose a paid plan — Starter is free",
+        "providerRejected": "The payment provider refused the request — try again or contact support",
+        "samePlan": "Your company is already on this plan"
+    },
+    "auth": {
+        "currentPasswordWrong": "The current password is not right",
+        "samePassword": "Choose a password different from the current one"
+    },
+    "employee": {
+        "emailTaken": "An account with the email “{email}” already exists",
+        "positionNotFound": "This position no longer exists — reload and choose another",
+        "responsibleNotFound": "One of the chosen responsible people is no longer active — choose again",
+        "selfResponsible": "An employee can’t be responsible for themselves — choose someone else",
+        "startAfterTermination": "The start date can’t be after the termination date",
+        "terminationBeforeStart": "The termination date can’t be before the start date",
+        "terminationReasonInvalid": "Choose a reason from the list"
+    },
+    "holiday": {
+        "dateTaken": "There is already a holiday on this date"
+    },
+    "organisation": {
+        "lastOwner": "The company needs at least one owner — make someone else an owner first",
+        "notAdministrator": "Only administrators can be owners"
+    },
+    "platform": {
+        "activeNotRejectable": "An approved company cannot be rejected"
+    },
+    "registration": {
+        "emailTaken": "An account with this email already exists — sign in instead"
+    },
+    "review": {
+        "responsibleNotFound": "One of the chosen responsible people is no longer active — choose again",
+        "startingNotDeletable": "The starting salary can’t be deleted — it starts the salary history. Edit it instead",
+        "startingDateLocked": "The starting salary is always dated the employee’s start date",
+        "startingStatusLocked": "The starting salary is always a completed review",
+        "reviewsBeforeStart": "Another review is dated before this start date — move or delete it first"
+    },
+    "timeOff": {
+        "beforeStart": "Time off can’t start before your start date",
+        "afterTermination": "Time off can’t reach past your last day",
+        "noWorkingDays": "These dates have no working days — they fall on weekends or company holidays",
+        "overlaps": "You already have a request for some of these days",
+        "notEnoughDays": "Only {available} days are left in this cycle; this request takes {requested}",
+        "noResponsible": "Nobody is responsible for you yet, so no one can approve the request — ask an admin",
+        "notCancelable": "This request can no longer be canceled",
+        "notPending": "This request has already been decided or canceled — reload to see its status"
+    },
+    "structure": {
+        "departmentNameTaken": "There is already a department called “{name}”",
+        "positionTitleTaken": "There is already a position called “{title}”",
+        "departmentNotEmpty": "Remove or move this department’s positions first",
+        "positionInUse": "People hold this position — give them another one first",
+        "tooManyDepartments": "A company can have at most {max} departments",
+        "tooManyPositions": "A company can have at most {max} positions"
+    }
 }

@@ -35,49 +35,49 @@ import { PlatformModule } from './modules/platform/platform.module';
 import { BillingModule } from './modules/billing/billing.module';
 
 @Module({
-  imports: [
-    AppConfigModule,
-    LoggerModule.forRootAsync({
-      inject: [AppConfigService],
-      useFactory: (config: AppConfigService) => createLoggerOptions(config.isDev),
-    }),
-    ContextModule,
-    PersistenceModule,
-    AppI18nModule,
-    ObservabilityModule,
-    SecurityModule,
-    ScheduleModule.forRoot(),
-    UserModule,
-    NotificationModule,
-    AuthModule,
-    OrganisationModule,
-    BillingModule,
-    PlatformModule,
-    EmployeeModule,
-    ReviewModule,
-    EmploymentModule,
-    TimeOffModule,
-    DashboardModule,
-    InsightsModule,
-  ],
-  providers: [
-    // Guards run in registration order (security.md → Guards).
-    { provide: APP_GUARD, useClass: SessionGuard },
-    { provide: APP_GUARD, useClass: CsrfGuard },
-    { provide: APP_GUARD, useClass: RateLimitGuard },
-    { provide: APP_GUARD, useClass: AuthorizationGuard },
-    { provide: APP_GUARD, useClass: DemoGuard },
-    { provide: APP_GUARD, useClass: PlanGuard },
-    { provide: APP_PIPE, useClass: ZodValidationPipe },
-    // Outermost first: timing measures everything; idempotency stores the serialized response.
-    { provide: APP_INTERCEPTOR, useClass: TimingInterceptor },
-    { provide: APP_INTERCEPTOR, useClass: IdempotencyInterceptor },
-    { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
-    { provide: APP_FILTER, useClass: GlobalExceptionFilter },
-  ],
+    imports: [
+        AppConfigModule,
+        LoggerModule.forRootAsync({
+            inject: [AppConfigService],
+            useFactory: (config: AppConfigService) => createLoggerOptions(config.isDev),
+        }),
+        ContextModule,
+        PersistenceModule,
+        AppI18nModule,
+        ObservabilityModule,
+        SecurityModule,
+        ScheduleModule.forRoot(),
+        UserModule,
+        NotificationModule,
+        AuthModule,
+        OrganisationModule,
+        BillingModule,
+        PlatformModule,
+        EmployeeModule,
+        ReviewModule,
+        EmploymentModule,
+        TimeOffModule,
+        DashboardModule,
+        InsightsModule,
+    ],
+    providers: [
+        // Guards run in registration order (security.md → Guards).
+        { provide: APP_GUARD, useClass: SessionGuard },
+        { provide: APP_GUARD, useClass: CsrfGuard },
+        { provide: APP_GUARD, useClass: RateLimitGuard },
+        { provide: APP_GUARD, useClass: AuthorizationGuard },
+        { provide: APP_GUARD, useClass: DemoGuard },
+        { provide: APP_GUARD, useClass: PlanGuard },
+        { provide: APP_PIPE, useClass: ZodValidationPipe },
+        // Outermost first: timing measures everything; idempotency stores the serialized response.
+        { provide: APP_INTERCEPTOR, useClass: TimingInterceptor },
+        { provide: APP_INTERCEPTOR, useClass: IdempotencyInterceptor },
+        { provide: APP_INTERCEPTOR, useClass: ZodSerializerInterceptor },
+        { provide: APP_FILTER, useClass: GlobalExceptionFilter },
+    ],
 })
 export class AppModule implements NestModule {
-  configure(consumer: MiddlewareConsumer): void {
-    consumer.apply(JsonOnlyMiddleware).forRoutes('*path');
-  }
+    configure(consumer: MiddlewareConsumer): void {
+        consumer.apply(JsonOnlyMiddleware).forRoutes('*path');
+    }
 }

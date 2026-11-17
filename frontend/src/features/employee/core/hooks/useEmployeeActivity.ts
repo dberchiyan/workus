@@ -10,9 +10,9 @@ export const ACTIVITY_PAGE_SIZE = 10;
  * shows changes made a moment ago in the Review tab without coupling the review feature to this key.
  */
 export const useEmployeeActivity = (employeeId: string, page: number) =>
-  useQuery({
-    queryKey: employeeKeys.activityPage(employeeId, page),
-    queryFn: () => employeeApi.activity(employeeId, page, ACTIVITY_PAGE_SIZE),
-    placeholderData: keepPreviousData,
-    staleTime: 0,
-  });
+    useQuery({
+        queryKey: employeeKeys.activityPage(employeeId, page),
+        queryFn: () => employeeApi.activity(employeeId, page, ACTIVITY_PAGE_SIZE),
+        placeholderData: keepPreviousData,
+        staleTime: 0,
+    });

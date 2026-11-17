@@ -7,23 +7,23 @@ import { useTranslation } from 'react-i18next';
 
 /** Explicit light/dark choice; MUI persists it, initial mode follows the system. */
 export function ThemeModeToggle() {
-  const { t } = useTranslation();
-  const { mode, systemMode, setMode } = useColorScheme();
-  const resolved = mode === 'system' ? systemMode : mode;
-  const isDark = resolved === 'dark';
+    const { t } = useTranslation();
+    const { mode, systemMode, setMode } = useColorScheme();
+    const resolved = mode === 'system' ? systemMode : mode;
+    const isDark = resolved === 'dark';
 
-  const label = isDark ? t('theme.switchToLight') : t('theme.switchToDark');
+    const label = isDark ? t('theme.switchToLight') : t('theme.switchToDark');
 
-  return (
-    <Tooltip title={label}>
-      <IconButton
-        onClick={() => {
-          setMode(isDark ? 'light' : 'dark');
-        }}
-        aria-label={label}
-      >
-        {isDark ? <LightModeOutlined aria-hidden /> : <DarkModeOutlined aria-hidden />}
-      </IconButton>
-    </Tooltip>
-  );
+    return (
+        <Tooltip title={label}>
+            <IconButton
+                onClick={() => {
+                    setMode(isDark ? 'light' : 'dark');
+                }}
+                aria-label={label}
+            >
+                {isDark ? <LightModeOutlined aria-hidden /> : <DarkModeOutlined aria-hidden />}
+            </IconButton>
+        </Tooltip>
+    );
 }

@@ -9,117 +9,91 @@ import { can } from '../../../common/security/policies';
 import { Authorize } from '../../../common/security/security.decorators';
 import { DashboardService } from '../service/dashboard.service';
 import {
-  AdminDashboardResponse,
-  DashboardBirthdaysResponse,
-  DashboardRequestsResponse,
-  DashboardReviewsResponse,
+    AdminDashboardResponse,
+    DashboardBirthdaysResponse,
+    DashboardRequestsResponse,
+    DashboardReviewsResponse,
 } from './dto/admin-dashboard.response';
+import { DateRangeQuery, EVENTS_PAGEABLE, type EventsSortField, InstantRangeQuery } from './dto/dashboard-events.query';
 import {
-  DateRangeQuery,
-  EVENTS_PAGEABLE,
-  type EventsSortField,
-  InstantRangeQuery,
-} from './dto/dashboard-events.query';
-import {
-  toAdminDashboardResponse,
-  toDashboardBirthdaysResponse,
-  toDashboardRequestsResponse,
-  toDashboardReviewsResponse,
+    toAdminDashboardResponse,
+    toDashboardBirthdaysResponse,
+    toDashboardRequestsResponse,
+    toDashboardReviewsResponse,
 } from './mapper/admin-dashboard.mapper';
 
 @ApiTags('Dashboard')
 @Controller('api/v1/dashboard')
 export class DashboardController {
-  constructor(private readonly dashboardService: DashboardService) {}
+    constructor(private readonly dashboardService: DashboardService) {}
 
-  @Get('admin')
-  @Authorize(can.admin)
-  @ApiOperation({
-    summary:
-      'Admin dashboard: pending time-off requests, who is off today, reviews due and people starting / leaving',
-  })
-  @ZodResponse({ status: HttpStatus.OK, type: AdminDashboardResponse })
-  @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
-  async admin(@CurrentPrincipal() principal: Principal): Promise<AdminDashboardResponse> {
-    return toAdminDashboardResponse(
-      await this.dashboardService.adminDashboard(principal.organisationId),
-    );
-  }
+    @Get('admin')
+    @Authorize(can.admin)
+    @ApiOperation({
+        summary:
+            'Admin dashboard: pending time-off requests, who is off today, reviews due and people starting / leaving',
+    })
+    @ZodResponse({ status: HttpStatus.OK, type: AdminDashboardResponse })
+    @ApiErrors('UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+    async admin(@CurrentPrincipal() principal: Principal): Promise<AdminDashboardResponse> {
+        return toAdminDashboardResponse(await this.dashboardService.adminDashboard(principal.organisationId));
+    }
 
-  @Get('admin/requests')
-  @Authorize(can.admin)
-  @ApiOperation({
-    summary: 'Time-off requests made in a day (today, UTC) (any status, newest first, paged)',
-  })
-  @ApiPageable(EVENTS_PAGEABLE)
-  @ZodResponse({ status: HttpStatus.OK, type: DashboardRequestsResponse })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-  )
-  async requests(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: InstantRangeQuery,
-    @PageableQuery(EVENTS_PAGEABLE) pageable: Pageable<EventsSortField>,
-  ): Promise<DashboardRequestsResponse> {
-    return toDashboardRequestsResponse(
-      await this.dashboardService.requestsMadeBetween(
-        principal.organisationId,
-        { from: query.from, to: query.to },
-        pageable,
-      ),
-    );
-  }
+    @Get('admin/requests')
+    @Authorize(can.admin)
+    @ApiOperation({
+        summary: 'Time-off requests made in a day (today, UTC) (any status, newest first, paged)',
+    })
+    @ApiPageable(EVENTS_PAGEABLE)
+    @ZodResponse({ status: HttpStatus.OK, type: DashboardRequestsResponse })
+    @ApiErrors('VALIDATION_FAILED', 'INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+    async requests(
+        @CurrentPrincipal() principal: Principal,
+        @Query() query: InstantRangeQuery,
+        @PageableQuery(EVENTS_PAGEABLE) pageable: Pageable<EventsSortField>,
+    ): Promise<DashboardRequestsResponse> {
+        return toDashboardRequestsResponse(
+            await this.dashboardService.requestsMadeBetween(
+                principal.organisationId,
+                { from: query.from, to: query.to },
+                pageable,
+            ),
+        );
+    }
 
-  @Get('admin/reviews')
-  @Authorize(can.admin)
-  @ApiOperation({
-    summary: 'Scheduled and completed reviews dated in a day or month, by date then name (paged)',
-  })
-  @ApiPageable(EVENTS_PAGEABLE)
-  @ZodResponse({ status: HttpStatus.OK, type: DashboardReviewsResponse })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-  )
-  async reviews(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: DateRangeQuery,
-    @PageableQuery(EVENTS_PAGEABLE) pageable: Pageable<EventsSortField>,
-  ): Promise<DashboardReviewsResponse> {
-    return toDashboardReviewsResponse(
-      await this.dashboardService.reviews(principal.organisationId, query, pageable),
-    );
-  }
+    @Get('admin/reviews')
+    @Authorize(can.admin)
+    @ApiOperation({
+        summary: 'Scheduled and completed reviews dated in a day or month, by date then name (paged)',
+    })
+    @ApiPageable(EVENTS_PAGEABLE)
+    @ZodResponse({ status: HttpStatus.OK, type: DashboardReviewsResponse })
+    @ApiErrors('VALIDATION_FAILED', 'INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+    async reviews(
+        @CurrentPrincipal() principal: Principal,
+        @Query() query: DateRangeQuery,
+        @PageableQuery(EVENTS_PAGEABLE) pageable: Pageable<EventsSortField>,
+    ): Promise<DashboardReviewsResponse> {
+        return toDashboardReviewsResponse(
+            await this.dashboardService.reviews(principal.organisationId, query, pageable),
+        );
+    }
 
-  @Get('admin/birthdays')
-  @Authorize(can.admin)
-  @ApiOperation({
-    summary:
-      'Birthdays (day and month) in a day or month of people employed then, by day then name (paged)',
-  })
-  @ApiPageable(EVENTS_PAGEABLE)
-  @ZodResponse({ status: HttpStatus.OK, type: DashboardBirthdaysResponse })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-  )
-  async birthdays(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: DateRangeQuery,
-    @PageableQuery(EVENTS_PAGEABLE) pageable: Pageable<EventsSortField>,
-  ): Promise<DashboardBirthdaysResponse> {
-    return toDashboardBirthdaysResponse(
-      await this.dashboardService.birthdays(principal.organisationId, query, pageable),
-    );
-  }
+    @Get('admin/birthdays')
+    @Authorize(can.admin)
+    @ApiOperation({
+        summary: 'Birthdays (day and month) in a day or month of people employed then, by day then name (paged)',
+    })
+    @ApiPageable(EVENTS_PAGEABLE)
+    @ZodResponse({ status: HttpStatus.OK, type: DashboardBirthdaysResponse })
+    @ApiErrors('VALIDATION_FAILED', 'INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED', 'FORBIDDEN')
+    async birthdays(
+        @CurrentPrincipal() principal: Principal,
+        @Query() query: DateRangeQuery,
+        @PageableQuery(EVENTS_PAGEABLE) pageable: Pageable<EventsSortField>,
+    ): Promise<DashboardBirthdaysResponse> {
+        return toDashboardBirthdaysResponse(
+            await this.dashboardService.birthdays(principal.organisationId, query, pageable),
+        );
+    }
 }

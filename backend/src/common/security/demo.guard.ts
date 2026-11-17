@@ -17,22 +17,22 @@ export const DemoRestricted = (): MethodDecorator => SetMetadata(DEMO_RESTRICTED
 
 @Injectable()
 export class DemoGuard implements CanActivate {
-  constructor(
-    private readonly reflector: Reflector,
-    private readonly config: AppConfigService,
-  ) {}
+    constructor(
+        private readonly reflector: Reflector,
+        private readonly config: AppConfigService,
+    ) {}
 
-  canActivate(context: ExecutionContext): boolean {
-    if (
-      !this.config.isDemo ||
-      this.reflector.get<boolean | undefined>(DEMO_RESTRICTED_KEY, context.getHandler()) !== true
-    ) {
-      return true;
+    canActivate(context: ExecutionContext): boolean {
+        if (
+            !this.config.isDemo ||
+            this.reflector.get<boolean | undefined>(DEMO_RESTRICTED_KEY, context.getHandler()) !== true
+        ) {
+            return true;
+        }
+        const principal = ClsServiceManager.getClsService<RequestContext>().get('principal');
+        if (principal && this.config.isDemoProtected(principal.email)) {
+            throw new DemoRestrictedException();
+        }
+        return true;
     }
-    const principal = ClsServiceManager.getClsService<RequestContext>().get('principal');
-    if (principal && this.config.isDemoProtected(principal.email)) {
-      throw new DemoRestrictedException();
-    }
-    return true;
-  }
 }

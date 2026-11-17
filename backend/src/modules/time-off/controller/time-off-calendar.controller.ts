@@ -17,29 +17,29 @@ import { toTimeOffCalendarResponse } from './mapper/time-off.mapper';
 @ApiTags('Time off')
 @Controller('api/v1/time-off/calendar')
 export class TimeOffCalendarController {
-  constructor(private readonly timeOffService: TimeOffService) {}
+    constructor(private readonly timeOffService: TimeOffService) {}
 
-  @Get()
-  @Authorize(can.viewTimeOffCalendar)
-  @ApiOperation({
-    summary:
-      'One month: people employed in it, by name, with their approved and pending requests of the chosen types',
-  })
-  @ApiPageable(CALENDAR_PAGEABLE)
-  @ZodResponse({ status: HttpStatus.OK, type: TimeOffCalendarResponse })
-  @ApiErrors('VALIDATION_FAILED', 'INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED')
-  async calendar(
-    @CurrentPrincipal() principal: Principal,
-    @Query() query: TimeOffCalendarQuery,
-    @PageableQuery(CALENDAR_PAGEABLE) pageable: Pageable<CalendarSortField>,
-  ): Promise<TimeOffCalendarResponse> {
-    const [year = 0, month = 0] = query.month.split('-').map(Number);
-    return toTimeOffCalendarResponse(
-      await this.timeOffService.calendar(
-        principal.organisationId,
-        { year, month, types: query.types, search: query.search },
-        pageable,
-      ),
-    );
-  }
+    @Get()
+    @Authorize(can.viewTimeOffCalendar)
+    @ApiOperation({
+        summary:
+            'One month: people employed in it, by name, with their approved and pending requests of the chosen types',
+    })
+    @ApiPageable(CALENDAR_PAGEABLE)
+    @ZodResponse({ status: HttpStatus.OK, type: TimeOffCalendarResponse })
+    @ApiErrors('VALIDATION_FAILED', 'INVALID_PARAMETER', 'UNAUTHORIZED', 'SESSION_EXPIRED')
+    async calendar(
+        @CurrentPrincipal() principal: Principal,
+        @Query() query: TimeOffCalendarQuery,
+        @PageableQuery(CALENDAR_PAGEABLE) pageable: Pageable<CalendarSortField>,
+    ): Promise<TimeOffCalendarResponse> {
+        const [year = 0, month = 0] = query.month.split('-').map(Number);
+        return toTimeOffCalendarResponse(
+            await this.timeOffService.calendar(
+                principal.organisationId,
+                { year, month, types: query.types, search: query.search },
+                pageable,
+            ),
+        );
+    }
 }

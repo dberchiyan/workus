@@ -7,8 +7,8 @@ import { EmploymentController } from './controller/employment.controller';
 import { EmploymentService } from './service/employment.service';
 
 @Module({
-  imports: [EmployeeModule, ReviewModule, AuthModule, BillingModule],
-  controllers: [EmploymentController],
-  providers: [EmploymentService],
+    imports: [EmployeeModule, ReviewModule, AuthModule, BillingModule],
+    controllers: [EmploymentController],
+    providers: [EmploymentService],
 })
 export class EmploymentModule {}

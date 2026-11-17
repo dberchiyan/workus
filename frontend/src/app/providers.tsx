@@ -9,17 +9,17 @@ import { theme, typographyGlobalStyles } from '@/theme';
 import { queryClient } from './queryClient';
 
 export interface ProvidersProps {
-  children: ReactNode;
+    children: ReactNode;
 }
 
 export function Providers({ children }: ProvidersProps) {
-  return (
-    <StyledEngineProvider enableCssLayer>
-      <ThemeProvider theme={theme} defaultMode="system">
-        <CssBaseline enableColorScheme />
-        <GlobalStyles styles={typographyGlobalStyles} />
-        <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-      </ThemeProvider>
-    </StyledEngineProvider>
-  );
+    return (
+        <StyledEngineProvider enableCssLayer>
+            <ThemeProvider theme={theme} defaultMode="system">
+                <CssBaseline enableColorScheme />
+                <GlobalStyles styles={typographyGlobalStyles} />
+                <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+            </ThemeProvider>
+        </StyledEngineProvider>
+    );
 }

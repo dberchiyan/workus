@@ -12,7 +12,7 @@ export type InsightPerson = Schemas['InsightPerson_Output'];
 export type CategoryCounts = Schemas['PositionCategoryCountsResponse_Output'];
 
 export interface InsightsFilter {
-  year: number;
-  /** One position category; absent → the whole company. */
-  categoryId: string | undefined;
+    year: number;
+    /** One position category; absent → the whole company. */
+    categoryId: string | undefined;
 }

@@ -9,132 +9,120 @@ import { isUserRole, UserRole } from './user-role';
 import type { Administrator, NewOwner, NewUser, UserCredentials, UserProfile } from './user.types';
 
 const toRole = (role: string): UserRole => {
-  if (!isUserRole(role)) {
-    // Guarded by ck_users_role; reaching this means the schema and code disagree.
-    throw new Error('Unknown user role in database');
-  }
-  return role;
+    if (!isUserRole(role)) {
+        // Guarded by ck_users_role; reaching this means the schema and code disagree.
+        throw new Error('Unknown user role in database');
+    }
+    return role;
 };
 
 @Injectable()
 export class UserService {
-  constructor(private readonly userRepository: UserRepository) {}
+    constructor(private readonly userRepository: UserRepository) {}
 
-  async findCredentialsByEmail(email: string): Promise<UserCredentials | null> {
-    const user = await this.userRepository.findCredentialsByEmail(email);
-    return user ? { ...user, role: toRole(user.role) } : null;
-  }
+    async findCredentialsByEmail(email: string): Promise<UserCredentials | null> {
+        const user = await this.userRepository.findCredentialsByEmail(email);
+        return user ? { ...user, role: toRole(user.role) } : null;
+    }
 
-  async findCredentialsById(id: string): Promise<UserCredentials | null> {
-    const user = await this.userRepository.findCredentialsById(id);
-    return user ? { ...user, role: toRole(user.role) } : null;
-  }
+    async findCredentialsById(id: string): Promise<UserCredentials | null> {
+        const user = await this.userRepository.findCredentialsById(id);
+        return user ? { ...user, role: toRole(user.role) } : null;
+    }
 
-  async findProfileById(id: string): Promise<UserProfile | null> {
-    const user = await this.userRepository.findProfileById(id);
-    return user
-      ? {
-          ...user,
-          role: toRole(user.role),
-          organisation: {
-            ...user.organisation,
-            // Guarded by ck_organisations_status.
-            status: isOrganisationStatus(user.organisation.status)
-              ? user.organisation.status
-              : OrganisationStatus.PENDING,
-            // Guarded by ck_organisations_plan.
-            plan: isPlan(user.organisation.plan) ? user.organisation.plan : Plan.STARTER,
-          },
-        }
-      : null;
-  }
+    async findProfileById(id: string): Promise<UserProfile | null> {
+        const user = await this.userRepository.findProfileById(id);
+        return user
+            ? {
+                  ...user,
+                  role: toRole(user.role),
+                  organisation: {
+                      ...user.organisation,
+                      // Guarded by ck_organisations_status.
+                      status: isOrganisationStatus(user.organisation.status)
+                          ? user.organisation.status
+                          : OrganisationStatus.PENDING,
+                      // Guarded by ck_organisations_plan.
+                      plan: isPlan(user.organisation.plan) ? user.organisation.plan : Plan.STARTER,
+                  },
+              }
+            : null;
+    }
 
-  existsByEmail(email: string): Promise<boolean> {
-    return this.userRepository.existsByEmail(email.toLowerCase());
-  }
+    existsByEmail(email: string): Promise<boolean> {
+        return this.userRepository.existsByEmail(email.toLowerCase());
+    }
 
-  /** Is the email taken by another user? (Compared lower-case.) */
-  isEmailTakenByOther(email: string, userId: string): Promise<boolean> {
-    return this.userRepository.existsByEmailExcept(email.toLowerCase(), userId);
-  }
+    /** Is the email taken by another user? (Compared lower-case.) */
+    isEmailTakenByOther(email: string, userId: string): Promise<boolean> {
+        return this.userRepository.existsByEmailExcept(email.toLowerCase(), userId);
+    }
 
-  /** Name and sign-in email; the email is stored lower-case. */
-  updateIdentity(
-    id: string,
-    identity: { firstName: string; lastName: string; email: string },
-    updatedBy: string,
-  ): Promise<void> {
-    return this.userRepository.updateIdentity(
-      id,
-      { ...identity, email: identity.email.toLowerCase() },
-      updatedBy,
-    );
-  }
+    /** Name and sign-in email; the email is stored lower-case. */
+    updateIdentity(
+        id: string,
+        identity: { firstName: string; lastName: string; email: string },
+        updatedBy: string,
+    ): Promise<void> {
+        return this.userRepository.updateIdentity(id, { ...identity, email: identity.email.toLowerCase() }, updatedBy);
+    }
 
-  /** The person's own name (they are the one who changes it). */
-  updateName(
-    organisationId: string,
-    id: string,
-    name: { firstName: string; lastName: string },
-  ): Promise<void> {
-    return this.userRepository.updateName(organisationId, id, name);
-  }
+    /** The person's own name (they are the one who changes it). */
+    updateName(organisationId: string, id: string, name: { firstName: string; lastName: string }): Promise<void> {
+        return this.userRepository.updateName(organisationId, id, name);
+    }
 
-  /** Returns the new user's id. Email is stored lower-case. */
-  createWithPassword(user: NewUser): Promise<string> {
-    return this.userRepository.createWithPassword({ ...user, email: user.email.toLowerCase() });
-  }
+    /** Returns the new user's id. Email is stored lower-case. */
+    createWithPassword(user: NewUser): Promise<string> {
+        return this.userRepository.createWithPassword({ ...user, email: user.email.toLowerCase() });
+    }
 
-  updatePasswordHash(id: string, passwordHash: string, updatedBy: string = id): Promise<void> {
-    return this.userRepository.updatePasswordHash(id, passwordHash, updatedBy);
-  }
+    updatePasswordHash(id: string, passwordHash: string, updatedBy: string = id): Promise<void> {
+        return this.userRepository.updatePasswordHash(id, passwordHash, updatedBy);
+    }
 
-  /** Returns the new owner's id. Email is stored lower-case. */
-  createOwner(owner: NewOwner): Promise<string> {
-    return this.userRepository.createOwner({
-      ...owner,
-      email: owner.email.toLowerCase(),
-      role: UserRole.OWNER,
-    });
-  }
+    /** Returns the new owner's id. Email is stored lower-case. */
+    createOwner(owner: NewOwner): Promise<string> {
+        return this.userRepository.createOwner({
+            ...owner,
+            email: owner.email.toLowerCase(),
+            role: UserRole.OWNER,
+        });
+    }
 
-  /** Owners and admins of the organisation; `searchTerms` each match name or email. */
-  async findAdministratorPage(
-    organisationId: string,
-    searchTerms: string[],
-    pageable: Pageable<AdministratorSortField>,
-  ): Promise<{ content: Administrator[]; totalElements: number }> {
-    const page = await this.userRepository.findAdministratorPage(
-      organisationId,
-      searchTerms,
-      pageable,
-    );
-    return { content: page.content.map(toAdministrator), totalElements: page.totalElements };
-  }
+    /** Owners and admins of the organisation; `searchTerms` each match name or email. */
+    async findAdministratorPage(
+        organisationId: string,
+        searchTerms: string[],
+        pageable: Pageable<AdministratorSortField>,
+    ): Promise<{ content: Administrator[]; totalElements: number }> {
+        const page = await this.userRepository.findAdministratorPage(organisationId, searchTerms, pageable);
+        return { content: page.content.map(toAdministrator), totalElements: page.totalElements };
+    }
 
-  /** A user of the organisation with their role (any role); null when unknown there. */
-  async findAdministrator(organisationId: string, userId: string): Promise<Administrator | null> {
-    const user = await this.userRepository.findAdministrator(organisationId, userId);
-    return user ? toAdministrator(user) : null;
-  }
+    /** A user of the organisation with their role (any role); null when unknown there. */
+    async findAdministrator(organisationId: string, userId: string): Promise<Administrator | null> {
+        const user = await this.userRepository.findAdministrator(organisationId, userId);
+        return user ? toAdministrator(user) : null;
+    }
 
-  countOwners(organisationId: string): Promise<number> {
-    return this.userRepository.countByRole(organisationId, UserRole.OWNER);
-  }
+    countOwners(organisationId: string): Promise<number> {
+        return this.userRepository.countByRole(organisationId, UserRole.OWNER);
+    }
 
-  /** False when the version is stale. */
-  updateRole(
-    organisationId: string,
-    userId: string,
-    version: number,
-    role: UserRole,
-    updatedBy: string,
-  ): Promise<boolean> {
-    return this.userRepository.updateRole(organisationId, userId, version, role, updatedBy);
-  }
+    /** False when the version is stale. */
+    updateRole(
+        organisationId: string,
+        userId: string,
+        version: number,
+        role: UserRole,
+        updatedBy: string,
+    ): Promise<boolean> {
+        return this.userRepository.updateRole(organisationId, userId, version, role, updatedBy);
+    }
 }
 
 const toAdministrator = (user: AdministratorRecord): Administrator => ({
-  ...user,
-  role: toRole(user.role),
+    ...user,
+    role: toRole(user.role),
 });

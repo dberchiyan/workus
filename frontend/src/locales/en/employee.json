@@ -1,406 +1,406 @@
 {
-  "pageTitle": "Employees · Workus",
-  "title": "Employees",
-  "stats": {
-    "total": "Total employees",
-    "growth": "+{{count}} in the last 30 days",
-    "terminated": "Terminated in the last 90 days",
-    "terminatedHint": "Since {{date}}",
-    "averageTenure": "Average tenure",
-    "averageTenureHint": "Across active employees",
-    "withoutResponsible": "No responsible",
-    "withoutResponsibleHint": "Active, nobody assigned"
-  },
-  "tabs": {
-    "label": "Departments",
-    "all": "All"
-  },
-  "filters": {
-    "search": "Search by name or email",
-    "status": "Status",
-    "sort": "Sort by",
-    "sortOptions": {
-      "name,asc": "Name, A–Z",
-      "name,desc": "Name, Z–A",
-      "startDate,desc": "Start date, newest first",
-      "startDate,asc": "Start date, oldest first"
-    }
-  },
-  "status": {
-    "ACTIVE": "Active",
-    "TERMINATED": "Terminated"
-  },
-  "table": {
-    "caption": "Employees",
-    "name": "Name",
-    "position": "Position",
-    "responsible": "Responsible",
-    "startDate": "Start date",
-    "status": "Status"
-  },
-  "responsibles": {
-    "none": "Not assigned"
-  },
-  "empty": {
-    "title": "No employees found",
-    "description": "Try another search, status or department.",
-    "clear": "Clear search and filters"
-  },
-  "error": {
-    "retry": "Try again"
-  },
-  "pagination": {
-    "rowsPerPage": "Rows per page",
-    "displayed": "{{from}}–{{to}} of {{count}}"
-  },
-  "list": {
-    "count_one": "{{formatted}} employee",
-    "count_other": "{{formatted}} employees"
-  },
-  "add": {
-    "open": "Add employee",
-    "title": "Add employee",
-    "stepsLabel": "Steps",
-    "steps": {
-      "details": "Details",
-      "responsible": "Responsible",
-      "optional": "Optional",
-      "access": "Access"
+    "pageTitle": "Employees · Workus",
+    "title": "Employees",
+    "stats": {
+        "total": "Total employees",
+        "growth": "+{{count}} in the last 30 days",
+        "terminated": "Terminated in the last 90 days",
+        "terminatedHint": "Since {{date}}",
+        "averageTenure": "Average tenure",
+        "averageTenureHint": "Across active employees",
+        "withoutResponsible": "No responsible",
+        "withoutResponsibleHint": "Active, nobody assigned"
     },
-    "sections": {
-      "overall": "Overall info",
-      "contact": "Personal and contact info"
-    },
-    "fields": {
-      "firstName": "First name",
-      "lastName": "Last name",
-      "email": "Work email",
-      "positionId": "Position",
-      "startDate": "Start date",
-      "startingSalary": "Starting salary (USD per month)",
-      "mobile": "Mobile",
-      "personalEmail": "Personal email",
-      "linkedinUrl": "LinkedIn",
-      "telegram": "Telegram",
-      "address": "Address",
-      "dateOfBirth": "Date of birth"
-    },
-    "hints": {
-      "email": "Also used to sign in",
-      "startingSalary": "Starts the salary history"
-    },
-    "responsible": {
-      "intro": "Choose the administrators who look after this employee. You can skip this and assign people later.",
-      "label": "Responsible people",
-      "noOptions": "No one found",
-      "loading": "Searching…",
-      "roles": {
-        "OWNER": "Owner",
-        "ADMIN": "Administrator",
-        "MANAGER": "Manager",
-        "EMPLOYEE": "Employee",
-        "PLATFORM_ADMIN": "Platform admin"
-      }
-    },
-    "actions": {
-      "cancel": "Cancel",
-      "next": "Next",
-      "back": "Back",
-      "submit": "Create employee",
-      "submitting": "Creating…"
-    },
-    "created": "{{name}} was added",
-    "dismiss": "Dismiss",
-    "access": {
-      "title": "{{name}} can now sign in",
-      "description": "Give them these details. They sign in with their work email."
-    }
-  },
-  "profile": {
-    "pageTitle": "{{name}} · Workus",
-    "back": "Employees",
     "tabs": {
-      "label": "Profile sections",
-      "info": "Info",
-      "files": "Files ({{count}})",
-      "review": "Review",
-      "activity": "Activity",
-      "security": "Security"
+        "label": "Departments",
+        "all": "All"
     },
-    "sections": {
-      "overall": "Overall info",
-      "contact": "Contact info"
-    },
-    "fields": {
-      "position": "Position",
-      "category": "Department",
-      "level": "Level",
-      "workEmail": "Work email",
-      "dateOfBirth": "Date of birth",
-      "startDate": "Start date",
-      "terminatedOn": "Termination date",
-      "holidayEligibility": "Holiday eligibility from",
-      "laptopId": "Laptop ID",
-      "additionalInfo": "Additional info",
-      "systemRole": "System role",
-      "mobile": "Mobile",
-      "personalEmail": "Personal email",
-      "linkedin": "LinkedIn",
-      "telegram": "Telegram",
-      "address": "Address",
-      "terminationReason": "Termination reason"
-    },
-    "values": {
-      "notProvided": "Not provided",
-      "age": "{{date}} · {{count}} years old",
-      "tenure": "{{date}} · {{duration}} at Workus",
-      "years_one": "{{count}} year",
-      "years_other": "{{count}} years",
-      "months_one": "{{count}} month",
-      "months_other": "{{count}} months",
-      "opensInNewTab": "(opens in a new tab)",
-      "yearsAndMonths": "{{years}} {{months}}",
-      "lessThanMonth": "less than a month"
-    },
-    "roles": {
-      "OWNER": "Owner",
-      "ADMIN": "Administrator",
-      "MANAGER": "Manager",
-      "EMPLOYEE": "Employee",
-      "PLATFORM_ADMIN": "Platform admin"
-    },
-    "responsible": {
-      "title": "Responsible",
-      "none": "Nobody is assigned yet",
-      "edit": "Edit responsible people",
-      "dialogTitle": "Responsible people",
-      "intro": "Choose the administrators who look after {{name}}. Leave it empty if nobody is assigned yet.",
-      "save": "Save",
-      "saving": "Saving…",
-      "cancel": "Cancel"
-    },
-    "files": {
-      "empty": "No files yet",
-      "emptyHint": "Contracts, certificates and other documents will appear here."
-    },
-    "activity": {
-      "title": "Change history",
-      "summary_one": "{{count}} entry · newest first",
-      "summary_other": "{{count}} entries · newest first",
-      "loading": "Loading the change history…",
-      "empty": "No changes yet",
-      "emptyHint": "Reviews, salary and other changes made by admins will appear here.",
-      "retry": "Try again",
-      "range": "{{from}}–{{to}} of {{count}}",
-      "pages": "Change history pages",
-      "today": "Today",
-      "yesterday": "Yesterday",
-      "system": "System",
-      "headline": {
-        "employeeCreated": "<actor>{{actor}}</actor> added <target>{{target}}</target>",
-        "reviewCreated": "<actor>{{actor}}</actor> added the review <target>“{{target}}”</target>",
-        "reviewUpdated": "<actor>{{actor}}</actor> updated the review <target>“{{target}}”</target>",
-        "reviewDeleted": "<actor>{{actor}}</actor> deleted the review <target>“{{target}}”</target>",
-        "employeeUpdated": "<actor>{{actor}}</actor> updated <target>{{target}}</target>",
-        "employeeTerminated": "<actor>{{actor}}</actor> terminated <target>{{target}}</target>",
-        "employeeTerminationCanceled": "<actor>{{actor}}</actor> canceled the termination of <target>{{target}}</target>",
-        "timeOffCreated": "<actor>{{actor}}</actor> requested time off <target>{{target}}</target>",
-        "timeOffApproved": "<actor>{{actor}}</actor> approved the time off <target>{{target}}</target>",
-        "timeOffRejected": "<actor>{{actor}}</actor> rejected the time off <target>{{target}}</target>",
-        "timeOffCanceled": "<actor>{{actor}}</actor> canceled the time off <target>{{target}}</target>",
-        "timeOffUpdated": "<actor>{{actor}}</actor> changed who decides the time off <target>{{target}}</target>"
-      },
-      "fields": {
-        "title": "Title",
-        "date": "Date",
+    "filters": {
+        "search": "Search by name or email",
         "status": "Status",
-        "salary": "Salary",
-        "responsibles": "Responsible people",
-        "feedbackHr": "HR feedback",
-        "feedbackTeamLead": "Team Lead feedback",
-        "feedbackTeam": "Team feedback",
-        "feedbackClient": "Client feedback",
-        "position": "Position",
-        "startDate": "Start date",
-        "firstName": "First name",
-        "lastName": "Last name",
-        "email": "Work email",
-        "mobile": "Mobile",
-        "personalEmail": "Personal email",
-        "linkedinUrl": "LinkedIn",
-        "telegram": "Telegram",
-        "address": "Address",
-        "terminationDate": "Termination date",
-        "terminationReason": "Reason",
-        "terminationComment": "Comment",
-        "timeOffType": "Type",
-        "periodStart": "First day",
-        "periodEnd": "Last day",
-        "days": "Working days",
-        "note": "Note",
-        "decisionComment": "Reason",
-        "dateOfBirth": "Date of birth",
+        "sort": "Sort by",
+        "sortOptions": {
+            "name,asc": "Name, A–Z",
+            "name,desc": "Name, Z–A",
+            "startDate,desc": "Start date, newest first",
+            "startDate,asc": "Start date, oldest first"
+        }
+    },
+    "status": {
+        "ACTIVE": "Active",
+        "TERMINATED": "Terminated"
+    },
+    "table": {
+        "caption": "Employees",
         "name": "Name",
-        "recurring": "Repeats every year",
-        "role": "Role",
-        "plan": "Plan"
-      },
-      "previous": "Before:",
-      "current": "After:",
-      "nobody": "Nobody",
-      "peopleAdded": "Added {{names}}",
-      "peopleRemoved": "Removed {{names}}",
-      "salaryChange": "{{percent}} vs before",
-      "showAll": "Show all {{count}} changes",
-      "showFewer": "Show fewer",
-      "presence": {
-        "added": "Added",
-        "edited": "Edited",
-        "removed": "Removed"
-      },
-      "flag": {
-        "yes": "Yes",
-        "no": "No"
-      }
+        "position": "Position",
+        "responsible": "Responsible",
+        "startDate": "Start date",
+        "status": "Status"
     },
-    "notFound": {
-      "title": "Employee not found",
-      "description": "The employee may have been removed, or the link is wrong."
+    "responsibles": {
+        "none": "Not assigned"
     },
-    "actions": {
-      "edit": "Edit profile…",
-      "more": "More actions",
-      "moreFor": "More actions for {{name}}",
-      "terminate": "Terminate…",
-      "changeTermination": "Change termination…",
-      "cancelTermination": "Cancel termination…",
-      "resetPassword": "Reset password"
+    "empty": {
+        "title": "No employees found",
+        "description": "Try another search, status or department.",
+        "clear": "Clear search and filters"
+    },
+    "error": {
+        "retry": "Try again"
+    },
+    "pagination": {
+        "rowsPerPage": "Rows per page",
+        "displayed": "{{from}}–{{to}} of {{count}}"
+    },
+    "list": {
+        "count_one": "{{formatted}} employee",
+        "count_other": "{{formatted}} employees"
+    },
+    "add": {
+        "open": "Add employee",
+        "title": "Add employee",
+        "stepsLabel": "Steps",
+        "steps": {
+            "details": "Details",
+            "responsible": "Responsible",
+            "optional": "Optional",
+            "access": "Access"
+        },
+        "sections": {
+            "overall": "Overall info",
+            "contact": "Personal and contact info"
+        },
+        "fields": {
+            "firstName": "First name",
+            "lastName": "Last name",
+            "email": "Work email",
+            "positionId": "Position",
+            "startDate": "Start date",
+            "startingSalary": "Starting salary (USD per month)",
+            "mobile": "Mobile",
+            "personalEmail": "Personal email",
+            "linkedinUrl": "LinkedIn",
+            "telegram": "Telegram",
+            "address": "Address",
+            "dateOfBirth": "Date of birth"
+        },
+        "hints": {
+            "email": "Also used to sign in",
+            "startingSalary": "Starts the salary history"
+        },
+        "responsible": {
+            "intro": "Choose the administrators who look after this employee. You can skip this and assign people later.",
+            "label": "Responsible people",
+            "noOptions": "No one found",
+            "loading": "Searching…",
+            "roles": {
+                "OWNER": "Owner",
+                "ADMIN": "Administrator",
+                "MANAGER": "Manager",
+                "EMPLOYEE": "Employee",
+                "PLATFORM_ADMIN": "Platform admin"
+            }
+        },
+        "actions": {
+            "cancel": "Cancel",
+            "next": "Next",
+            "back": "Back",
+            "submit": "Create employee",
+            "submitting": "Creating…"
+        },
+        "created": "{{name}} was added",
+        "dismiss": "Dismiss",
+        "access": {
+            "title": "{{name}} can now sign in",
+            "description": "Give them these details. They sign in with their work email."
+        }
+    },
+    "profile": {
+        "pageTitle": "{{name}} · Workus",
+        "back": "Employees",
+        "tabs": {
+            "label": "Profile sections",
+            "info": "Info",
+            "files": "Files ({{count}})",
+            "review": "Review",
+            "activity": "Activity",
+            "security": "Security"
+        },
+        "sections": {
+            "overall": "Overall info",
+            "contact": "Contact info"
+        },
+        "fields": {
+            "position": "Position",
+            "category": "Department",
+            "level": "Level",
+            "workEmail": "Work email",
+            "dateOfBirth": "Date of birth",
+            "startDate": "Start date",
+            "terminatedOn": "Termination date",
+            "holidayEligibility": "Holiday eligibility from",
+            "laptopId": "Laptop ID",
+            "additionalInfo": "Additional info",
+            "systemRole": "System role",
+            "mobile": "Mobile",
+            "personalEmail": "Personal email",
+            "linkedin": "LinkedIn",
+            "telegram": "Telegram",
+            "address": "Address",
+            "terminationReason": "Termination reason"
+        },
+        "values": {
+            "notProvided": "Not provided",
+            "age": "{{date}} · {{count}} years old",
+            "tenure": "{{date}} · {{duration}} at Workus",
+            "years_one": "{{count}} year",
+            "years_other": "{{count}} years",
+            "months_one": "{{count}} month",
+            "months_other": "{{count}} months",
+            "opensInNewTab": "(opens in a new tab)",
+            "yearsAndMonths": "{{years}} {{months}}",
+            "lessThanMonth": "less than a month"
+        },
+        "roles": {
+            "OWNER": "Owner",
+            "ADMIN": "Administrator",
+            "MANAGER": "Manager",
+            "EMPLOYEE": "Employee",
+            "PLATFORM_ADMIN": "Platform admin"
+        },
+        "responsible": {
+            "title": "Responsible",
+            "none": "Nobody is assigned yet",
+            "edit": "Edit responsible people",
+            "dialogTitle": "Responsible people",
+            "intro": "Choose the administrators who look after {{name}}. Leave it empty if nobody is assigned yet.",
+            "save": "Save",
+            "saving": "Saving…",
+            "cancel": "Cancel"
+        },
+        "files": {
+            "empty": "No files yet",
+            "emptyHint": "Contracts, certificates and other documents will appear here."
+        },
+        "activity": {
+            "title": "Change history",
+            "summary_one": "{{count}} entry · newest first",
+            "summary_other": "{{count}} entries · newest first",
+            "loading": "Loading the change history…",
+            "empty": "No changes yet",
+            "emptyHint": "Reviews, salary and other changes made by admins will appear here.",
+            "retry": "Try again",
+            "range": "{{from}}–{{to}} of {{count}}",
+            "pages": "Change history pages",
+            "today": "Today",
+            "yesterday": "Yesterday",
+            "system": "System",
+            "headline": {
+                "employeeCreated": "<actor>{{actor}}</actor> added <target>{{target}}</target>",
+                "reviewCreated": "<actor>{{actor}}</actor> added the review <target>“{{target}}”</target>",
+                "reviewUpdated": "<actor>{{actor}}</actor> updated the review <target>“{{target}}”</target>",
+                "reviewDeleted": "<actor>{{actor}}</actor> deleted the review <target>“{{target}}”</target>",
+                "employeeUpdated": "<actor>{{actor}}</actor> updated <target>{{target}}</target>",
+                "employeeTerminated": "<actor>{{actor}}</actor> terminated <target>{{target}}</target>",
+                "employeeTerminationCanceled": "<actor>{{actor}}</actor> canceled the termination of <target>{{target}}</target>",
+                "timeOffCreated": "<actor>{{actor}}</actor> requested time off <target>{{target}}</target>",
+                "timeOffApproved": "<actor>{{actor}}</actor> approved the time off <target>{{target}}</target>",
+                "timeOffRejected": "<actor>{{actor}}</actor> rejected the time off <target>{{target}}</target>",
+                "timeOffCanceled": "<actor>{{actor}}</actor> canceled the time off <target>{{target}}</target>",
+                "timeOffUpdated": "<actor>{{actor}}</actor> changed who decides the time off <target>{{target}}</target>"
+            },
+            "fields": {
+                "title": "Title",
+                "date": "Date",
+                "status": "Status",
+                "salary": "Salary",
+                "responsibles": "Responsible people",
+                "feedbackHr": "HR feedback",
+                "feedbackTeamLead": "Team Lead feedback",
+                "feedbackTeam": "Team feedback",
+                "feedbackClient": "Client feedback",
+                "position": "Position",
+                "startDate": "Start date",
+                "firstName": "First name",
+                "lastName": "Last name",
+                "email": "Work email",
+                "mobile": "Mobile",
+                "personalEmail": "Personal email",
+                "linkedinUrl": "LinkedIn",
+                "telegram": "Telegram",
+                "address": "Address",
+                "terminationDate": "Termination date",
+                "terminationReason": "Reason",
+                "terminationComment": "Comment",
+                "timeOffType": "Type",
+                "periodStart": "First day",
+                "periodEnd": "Last day",
+                "days": "Working days",
+                "note": "Note",
+                "decisionComment": "Reason",
+                "dateOfBirth": "Date of birth",
+                "name": "Name",
+                "recurring": "Repeats every year",
+                "role": "Role",
+                "plan": "Plan"
+            },
+            "previous": "Before:",
+            "current": "After:",
+            "nobody": "Nobody",
+            "peopleAdded": "Added {{names}}",
+            "peopleRemoved": "Removed {{names}}",
+            "salaryChange": "{{percent}} vs before",
+            "showAll": "Show all {{count}} changes",
+            "showFewer": "Show fewer",
+            "presence": {
+                "added": "Added",
+                "edited": "Edited",
+                "removed": "Removed"
+            },
+            "flag": {
+                "yes": "Yes",
+                "no": "No"
+            }
+        },
+        "notFound": {
+            "title": "Employee not found",
+            "description": "The employee may have been removed, or the link is wrong."
+        },
+        "actions": {
+            "edit": "Edit profile…",
+            "more": "More actions",
+            "moreFor": "More actions for {{name}}",
+            "terminate": "Terminate…",
+            "changeTermination": "Change termination…",
+            "cancelTermination": "Cancel termination…",
+            "resetPassword": "Reset password"
+        },
+        "termination": {
+            "since": "Terminated on {{date}} · {{reason}}",
+            "leaves": "Leaves on {{date}} · {{reason}}"
+        },
+        "security": {
+            "title": "Security log",
+            "description": "Sign-ins, failed attempts, password changes and signed-out sessions of this person’s account."
+        },
+        "export": {
+            "activity": "Export CSV",
+            "security": "Export CSV",
+            "failed": "The export could not be downloaded — try again",
+            "close": "Close"
+        }
     },
     "termination": {
-      "since": "Terminated on {{date}} · {{reason}}",
-      "leaves": "Leaves on {{date}} · {{reason}}"
+        "reasons": {
+            "RESIGNATION": "Resignation",
+            "DISMISSAL": "Dismissal",
+            "END_OF_CONTRACT": "End of contract",
+            "LAYOFF": "Layoff",
+            "OTHER": "Other"
+        }
     },
-    "security": {
-      "title": "Security log",
-      "description": "Sign-ins, failed attempts, password changes and signed-out sessions of this person’s account."
+    "edit": {
+        "title": "Edit profile",
+        "save": "Save",
+        "saving": "Saving…",
+        "cancel": "Cancel",
+        "hints": {
+            "startDate": "The starting salary moves with it"
+        }
     },
-    "export": {
-      "activity": "Export CSV",
-      "security": "Export CSV",
-      "failed": "The export could not be downloaded — try again",
-      "close": "Close"
+    "terminate": {
+        "title": "Terminate {{name}}",
+        "changeTitle": "Change termination of {{name}}",
+        "fields": {
+            "date": "Termination date",
+            "reason": "Reason",
+            "comment": "Comment"
+        },
+        "consequence": {
+            "now": "{{name}} will be terminated right away and drop out of the active list.",
+            "future": "{{name}} stays active until {{date}}, then is terminated.",
+            "reviews": "Reviews scheduled after the termination date will be canceled."
+        },
+        "submit": "Terminate {{name}}",
+        "saveChange": "Save changes",
+        "saving": "Saving…",
+        "cancel": "Cancel"
+    },
+    "cancelTermination": {
+        "title": "Cancel termination?",
+        "description": "{{name}} will be active again (the termination on {{date}} is removed). Reviews canceled by the termination stay canceled.",
+        "confirm": "Cancel termination",
+        "keep": "Keep it",
+        "saving": "Saving…"
+    },
+    "resetPassword": {
+        "title": "Reset password",
+        "description": "{{name}} gets a new password. The current one stops working and they are signed out on every device.",
+        "cancel": "Cancel",
+        "confirm": "Reset password",
+        "doneTitle": "New password for {{name}}",
+        "doneDescription": "They were signed out everywhere and sign in again with this password."
+    },
+    "structure": {
+        "title": "Company structure",
+        "description": "Your departments and the positions in them. People get these positions when you add or edit them.",
+        "departments": "Departments",
+        "addDepartment": "Add department",
+        "addPosition": "Add position",
+        "departmentName": "Department name",
+        "positionTitle": "Position title",
+        "departmentSummary_one": "{{positions}} positions · {{people}} person",
+        "departmentSummary_other": "{{positions}} positions · {{people}} people",
+        "people_one": "{{people}} person",
+        "people_other": "{{people}} people",
+        "nobody": "No one yet",
+        "noPositions": "No positions yet. Add the first one below.",
+        "renameDepartment": "Rename {{name}}",
+        "removeDepartment": "Remove {{name}}",
+        "renamePosition": "Rename {{title}}",
+        "removePosition": "Remove {{title}}",
+        "departmentHasPositions": "Remove its positions first",
+        "positionHeld": "People hold this position. Give them another one first.",
+        "positionHeldBefore": "Former employees held this position, so it stays in their history.",
+        "save": "Save",
+        "cancel": "Cancel",
+        "empty": "No departments yet",
+        "emptyHint": "Add your first department, then the positions in it.",
+        "loading": "Loading the company structure…",
+        "error": "The company structure could not be loaded.",
+        "retry": "Try again",
+        "remove": {
+            "department": {
+                "title": "Remove department?",
+                "description": "“{{name}}” will be removed from your company structure."
+            },
+            "position": {
+                "title": "Remove position?",
+                "description": "“{{name}}” will be removed. Nobody holds it, so no one is affected."
+            },
+            "keep": "Keep",
+            "confirm": "Remove",
+            "removing": "Removing…"
+        },
+        "holders": {
+            "open_one": "{{people}} person holds {{title}} — show who",
+            "open_other": "{{people}} people hold {{title}} — show who",
+            "subtitle_one": "{{department}} · {{people}} person",
+            "subtitle_other": "{{department}} · {{people}} people",
+            "close": "Close",
+            "since": "Since {{date}}",
+            "starts": "Starts {{date}}",
+            "loading": "Loading the people in this position…",
+            "error": "The people in this position could not be loaded.",
+            "empty": "No one holds this position now.",
+            "range": "{{from}}–{{to}} of {{count}}",
+            "single": "{{index}} of {{count}}",
+            "pages": "Pages of people",
+            "page": "Go to page {{page}}",
+            "currentPage": "Page {{page}}, current",
+            "previous": "Previous page",
+            "next": "Next page"
+        }
     }
-  },
-  "termination": {
-    "reasons": {
-      "RESIGNATION": "Resignation",
-      "DISMISSAL": "Dismissal",
-      "END_OF_CONTRACT": "End of contract",
-      "LAYOFF": "Layoff",
-      "OTHER": "Other"
-    }
-  },
-  "edit": {
-    "title": "Edit profile",
-    "save": "Save",
-    "saving": "Saving…",
-    "cancel": "Cancel",
-    "hints": {
-      "startDate": "The starting salary moves with it"
-    }
-  },
-  "terminate": {
-    "title": "Terminate {{name}}",
-    "changeTitle": "Change termination of {{name}}",
-    "fields": {
-      "date": "Termination date",
-      "reason": "Reason",
-      "comment": "Comment"
-    },
-    "consequence": {
-      "now": "{{name}} will be terminated right away and drop out of the active list.",
-      "future": "{{name}} stays active until {{date}}, then is terminated.",
-      "reviews": "Reviews scheduled after the termination date will be canceled."
-    },
-    "submit": "Terminate {{name}}",
-    "saveChange": "Save changes",
-    "saving": "Saving…",
-    "cancel": "Cancel"
-  },
-  "cancelTermination": {
-    "title": "Cancel termination?",
-    "description": "{{name}} will be active again (the termination on {{date}} is removed). Reviews canceled by the termination stay canceled.",
-    "confirm": "Cancel termination",
-    "keep": "Keep it",
-    "saving": "Saving…"
-  },
-  "resetPassword": {
-    "title": "Reset password",
-    "description": "{{name}} gets a new password. The current one stops working and they are signed out on every device.",
-    "cancel": "Cancel",
-    "confirm": "Reset password",
-    "doneTitle": "New password for {{name}}",
-    "doneDescription": "They were signed out everywhere and sign in again with this password."
-  },
-  "structure": {
-    "title": "Company structure",
-    "description": "Your departments and the positions in them. People get these positions when you add or edit them.",
-    "departments": "Departments",
-    "addDepartment": "Add department",
-    "addPosition": "Add position",
-    "departmentName": "Department name",
-    "positionTitle": "Position title",
-    "departmentSummary_one": "{{positions}} positions · {{people}} person",
-    "departmentSummary_other": "{{positions}} positions · {{people}} people",
-    "people_one": "{{people}} person",
-    "people_other": "{{people}} people",
-    "nobody": "No one yet",
-    "noPositions": "No positions yet. Add the first one below.",
-    "renameDepartment": "Rename {{name}}",
-    "removeDepartment": "Remove {{name}}",
-    "renamePosition": "Rename {{title}}",
-    "removePosition": "Remove {{title}}",
-    "departmentHasPositions": "Remove its positions first",
-    "positionHeld": "People hold this position. Give them another one first.",
-    "positionHeldBefore": "Former employees held this position, so it stays in their history.",
-    "save": "Save",
-    "cancel": "Cancel",
-    "empty": "No departments yet",
-    "emptyHint": "Add your first department, then the positions in it.",
-    "loading": "Loading the company structure…",
-    "error": "The company structure could not be loaded.",
-    "retry": "Try again",
-    "remove": {
-      "department": {
-        "title": "Remove department?",
-        "description": "“{{name}}” will be removed from your company structure."
-      },
-      "position": {
-        "title": "Remove position?",
-        "description": "“{{name}}” will be removed. Nobody holds it, so no one is affected."
-      },
-      "keep": "Keep",
-      "confirm": "Remove",
-      "removing": "Removing…"
-    },
-    "holders": {
-      "open_one": "{{people}} person holds {{title}} — show who",
-      "open_other": "{{people}} people hold {{title}} — show who",
-      "subtitle_one": "{{department}} · {{people}} person",
-      "subtitle_other": "{{department}} · {{people}} people",
-      "close": "Close",
-      "since": "Since {{date}}",
-      "starts": "Starts {{date}}",
-      "loading": "Loading the people in this position…",
-      "error": "The people in this position could not be loaded.",
-      "empty": "No one holds this position now.",
-      "range": "{{from}}–{{to}} of {{count}}",
-      "single": "{{index}} of {{count}}",
-      "pages": "Pages of people",
-      "page": "Go to page {{page}}",
-      "currentPage": "Page {{page}}, current",
-      "previous": "Previous page",
-      "next": "Next page"
-    }
-  }
 }

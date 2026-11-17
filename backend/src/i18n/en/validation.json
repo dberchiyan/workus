@@ -1,138 +1,138 @@
 {
-  "invalid": "Invalid value",
-  "email": {
-    "required": "Enter your email",
-    "invalid": "Enter a valid email address",
-    "tooLong": "Email must be at most {max} characters"
-  },
-  "password": {
-    "required": "Enter your password",
-    "tooLong": "Password must be at most {max} characters"
-  },
-  "search": {
-    "tooLong": "Search must be at most {max} characters"
-  },
-  "firstName": {
-    "required": "Enter a first name",
-    "tooLong": "First name must be at most {max} characters"
-  },
-  "lastName": {
-    "required": "Enter a last name",
-    "tooLong": "Last name must be at most {max} characters"
-  },
-  "position": {
-    "required": "Choose a position"
-  },
-  "startDate": {
-    "invalid": "Enter a start date"
-  },
-  "mobile": {
-    "invalid": "Enter a phone number, e.g. +44 20 7946 0958"
-  },
-  "personalEmail": {
-    "invalid": "Enter a valid email address"
-  },
-  "linkedin": {
-    "invalid": "Enter a LinkedIn profile URL, e.g. https://www.linkedin.com/in/name"
-  },
-  "telegram": {
-    "invalid": "Enter a Telegram username, e.g. @username"
-  },
-  "address": {
-    "tooLong": "Address must be at most {max} characters"
-  },
-  "responsibles": {
-    "tooMany": "Choose at most {max} people",
-    "required": "Choose at least one responsible person"
-  },
-  "workEmail": {
-    "required": "Enter a work email"
-  },
-  "title": {
-    "required": "Enter a title",
-    "tooLong": "Title must be at most {max} characters"
-  },
-  "reviewDate": {
-    "invalid": "Enter a review date"
-  },
-  "reviewStatus": {
-    "required": "Choose a status"
-  },
-  "salary": {
-    "invalid": "Enter an amount like 4500 or 4500.50",
-    "requiredForCompleted": "Enter the salary agreed in this review"
-  },
-  "feedback": {
-    "tooLong": "Feedback must be at most {max} characters",
-    "textTooLong": "Feedback must be at most 2000 characters"
-  },
-  "startingSalary": {
-    "required": "Enter the starting salary"
-  },
-  "terminationReason": {
-    "required": "Choose a reason"
-  },
-  "terminationDate": {
-    "invalid": "Enter the termination date"
-  },
-  "terminationComment": {
-    "tooLong": "Comment must be at most {max} characters",
-    "requiredForOther": "Describe the reason"
-  },
-  "timeOffType": {
-    "required": "Choose a type"
-  },
-  "period": {
-    "start": "Enter the first day",
-    "end": "Enter the last day",
-    "order": "The last day can’t be before the first day",
-    "tooLong": "A request can cover at most {max} days"
-  },
-  "note": {
-    "tooLong": "Note must be at most {max} characters"
-  },
-  "timeOffComment": {
-    "required": "Write a comment",
-    "tooLong": "Comment must be at most {max} characters"
-  },
-  "dateOfBirth": {
-    "invalid": "Enter a valid date of birth",
-    "inFuture": "Date of birth cannot be in the future"
-  },
-  "decisionComment": {
-    "tooLong": "Comment must be at most {max} characters"
-  },
-  "currentPassword": {
-    "required": "Enter your current password"
-  },
-  "newPassword": {
-    "required": "Enter a new password",
-    "tooShort": "Use at least {min} characters",
-    "needsUppercase": "Add an upper-case letter",
-    "needsLowercase": "Add a lower-case letter",
-    "needsDigit": "Add a digit",
-    "needsSymbol": "Add a symbol, such as ! or #"
-  },
-  "holiday": {
-    "date": "Enter the date",
-    "nameRequired": "Enter a name",
-    "nameTooLong": "Name must be at most {max} characters"
-  },
-  "organisationName": {
-    "required": "Enter the company name",
-    "tooLong": "Company name must be at most {max} characters"
-  },
-  "role": {
-    "invalid": "Choose owner or admin"
-  },
-  "rejectionReason": {
-    "required": "Say why the company is not approved",
-    "tooLong": "Reason must be at most {max} characters"
-  },
-  "structure": {
-    "nameRequired": "Enter a name",
-    "nameTooLong": "Name must be at most {max} characters",
-    "titleRequired": "Enter a title",
-    "titleTooLong": "Title must be at most {max} characters"
-  }
+    "invalid": "Invalid value",
+    "email": {
+        "required": "Enter your email",
+        "invalid": "Enter a valid email address",
+        "tooLong": "Email must be at most {max} characters"
+    },
+    "password": {
+        "required": "Enter your password",
+        "tooLong": "Password must be at most {max} characters"
+    },
+    "search": {
+        "tooLong": "Search must be at most {max} characters"
+    },
+    "firstName": {
+        "required": "Enter a first name",
+        "tooLong": "First name must be at most {max} characters"
+    },
+    "lastName": {
+        "required": "Enter a last name",
+        "tooLong": "Last name must be at most {max} characters"
+    },
+    "position": {
+        "required": "Choose a position"
+    },
+    "startDate": {
+        "invalid": "Enter a start date"
+    },
+    "mobile": {
+        "invalid": "Enter a phone number, e.g. +44 20 7946 0958"
+    },
+    "personalEmail": {
+        "invalid": "Enter a valid email address"
+    },
+    "linkedin": {
+        "invalid": "Enter a LinkedIn profile URL, e.g. https://www.linkedin.com/in/name"
+    },
+    "telegram": {
+        "invalid": "Enter a Telegram username, e.g. @username"
+    },
+    "address": {
+        "tooLong": "Address must be at most {max} characters"
+    },
+    "responsibles": {
+        "tooMany": "Choose at most {max} people",
+        "required": "Choose at least one responsible person"
+    },
+    "workEmail": {
+        "required": "Enter a work email"
+    },
+    "title": {
+        "required": "Enter a title",
+        "tooLong": "Title must be at most {max} characters"
+    },
+    "reviewDate": {
+        "invalid": "Enter a review date"
+    },
+    "reviewStatus": {
+        "required": "Choose a status"
+    },
+    "salary": {
+        "invalid": "Enter an amount like 4500 or 4500.50",
+        "requiredForCompleted": "Enter the salary agreed in this review"
+    },
+    "feedback": {
+        "tooLong": "Feedback must be at most {max} characters",
+        "textTooLong": "Feedback must be at most 2000 characters"
+    },
+    "startingSalary": {
+        "required": "Enter the starting salary"
+    },
+    "terminationReason": {
+        "required": "Choose a reason"
+    },
+    "terminationDate": {
+        "invalid": "Enter the termination date"
+    },
+    "terminationComment": {
+        "tooLong": "Comment must be at most {max} characters",
+        "requiredForOther": "Describe the reason"
+    },
+    "timeOffType": {
+        "required": "Choose a type"
+    },
+    "period": {
+        "start": "Enter the first day",
+        "end": "Enter the last day",
+        "order": "The last day can’t be before the first day",
+        "tooLong": "A request can cover at most {max} days"
+    },
+    "note": {
+        "tooLong": "Note must be at most {max} characters"
+    },
+    "timeOffComment": {
+        "required": "Write a comment",
+        "tooLong": "Comment must be at most {max} characters"
+    },
+    "dateOfBirth": {
+        "invalid": "Enter a valid date of birth",
+        "inFuture": "Date of birth cannot be in the future"
+    },
+    "decisionComment": {
+        "tooLong": "Comment must be at most {max} characters"
+    },
+    "currentPassword": {
+        "required": "Enter your current password"
+    },
+    "newPassword": {
+        "required": "Enter a new password",
+        "tooShort": "Use at least {min} characters",
+        "needsUppercase": "Add an upper-case letter",
+        "needsLowercase": "Add a lower-case letter",
+        "needsDigit": "Add a digit",
+        "needsSymbol": "Add a symbol, such as ! or #"
+    },
+    "holiday": {
+        "date": "Enter the date",
+        "nameRequired": "Enter a name",
+        "nameTooLong": "Name must be at most {max} characters"
+    },
+    "organisationName": {
+        "required": "Enter the company name",
+        "tooLong": "Company name must be at most {max} characters"
+    },
+    "role": {
+        "invalid": "Choose owner or admin"
+    },
+    "rejectionReason": {
+        "required": "Say why the company is not approved",
+        "tooLong": "Reason must be at most {max} characters"
+    },
+    "structure": {
+        "nameRequired": "Enter a name",
+        "nameTooLong": "Name must be at most {max} characters",
+        "titleRequired": "Enter a title",
+        "titleTooLong": "Title must be at most {max} characters"
+    }
 }

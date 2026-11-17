@@ -7,45 +7,46 @@ import { forwardRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 export type PasswordFieldProps = Omit<TextFieldProps, 'type' | 'slotProps'> & {
-  autoComplete: 'current-password' | 'new-password';
-  /** Id of more help (e.g. the password rules), read with the field. */
-  describedBy?: string;
+    autoComplete: 'current-password' | 'new-password';
+    /** Id of more help (e.g. the password rules), read with the field. */
+    describedBy?: string;
 };
 
 /** A password input with a show / hide button. */
-export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(
-  function PasswordField({ autoComplete, describedBy, ...props }, ref) {
+export const PasswordField = forwardRef<HTMLInputElement, PasswordFieldProps>(function PasswordField(
+    { autoComplete, describedBy, ...props },
+    ref,
+) {
     const { t } = useTranslation('common');
     const [visible, setVisible] = useState(false);
     return (
-      <TextField
-        {...props}
-        inputRef={ref}
-        type={visible ? 'text' : 'password'}
-        slotProps={{
-          htmlInput: {
-            autoComplete,
-            spellCheck: false,
-            maxLength: 128,
-            ...(describedBy ? { 'aria-describedby': describedBy } : {}),
-          },
-          input: {
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label={visible ? t('password.hide') : t('password.show')}
-                  onClick={() => {
-                    setVisible((value) => !value);
-                  }}
-                  edge="end"
-                >
-                  {visible ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
-                </IconButton>
-              </InputAdornment>
-            ),
-          },
-        }}
-      />
+        <TextField
+            {...props}
+            inputRef={ref}
+            type={visible ? 'text' : 'password'}
+            slotProps={{
+                htmlInput: {
+                    autoComplete,
+                    spellCheck: false,
+                    maxLength: 128,
+                    ...(describedBy ? { 'aria-describedby': describedBy } : {}),
+                },
+                input: {
+                    endAdornment: (
+                        <InputAdornment position="end">
+                            <IconButton
+                                aria-label={visible ? t('password.hide') : t('password.show')}
+                                onClick={() => {
+                                    setVisible((value) => !value);
+                                }}
+                                edge="end"
+                            >
+                                {visible ? <VisibilityOffOutlined /> : <VisibilityOutlined />}
+                            </IconButton>
+                        </InputAdornment>
+                    ),
+                },
+            }}
+        />
     );
-  },
-);
+});

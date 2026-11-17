@@ -7,8 +7,8 @@ import { SessionCookies } from './session-cookies';
 
 @Global()
 @Module({
-  imports: [DiscoveryModule],
-  providers: [RateLimitService, RouteAuditService, PermissionService, SessionCookies],
-  exports: [RateLimitService, PermissionService, SessionCookies],
+    imports: [DiscoveryModule],
+    providers: [RateLimitService, RouteAuditService, PermissionService, SessionCookies],
+    exports: [RateLimitService, PermissionService, SessionCookies],
 })
 export class SecurityModule {}

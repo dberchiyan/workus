@@ -4,4 +4,4 @@
  * Unique per person; letters, digits and dashes only.
  */
 export const personAvatarTransition = (employeeId: string): string =>
-  `person-avatar-${employeeId.replace(/[^a-zA-Z0-9-]/g, '')}`;
+    `person-avatar-${employeeId.replace(/[^a-zA-Z0-9-]/g, '')}`;

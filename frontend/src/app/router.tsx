@@ -14,68 +14,68 @@ import { RouteErrorBoundary } from '@/shared/components/RouteErrorBoundary';
 import { PATHS } from '@/shared/lib/paths';
 
 const route = (element: ReactNode): ReactNode => (
-  <RouteErrorBoundary>
-    <Suspense fallback={<PageLoader />}>{element}</Suspense>
-  </RouteErrorBoundary>
+    <RouteErrorBoundary>
+        <Suspense fallback={<PageLoader />}>{element}</Suspense>
+    </RouteErrorBoundary>
 );
 
 export const router = createBrowserRouter([
-  { path: PATHS.login, element: route(<LoginPage />) },
-  { path: PATHS.signup, element: route(<SignupPage />) },
-  {
-    element: <RequireAuth />,
-    children: [
-      {
-        // A company waiting for approval (or rejected) sees only its status screen.
-        element: <OrganisationGate />,
+    { path: PATHS.login, element: route(<LoginPage />) },
+    { path: PATHS.signup, element: route(<SignupPage />) },
+    {
+        element: <RequireAuth />,
         children: [
-          {
-            element: <AppLayout />,
-            children: [
-              // Each section behind its part of ACCESS (features/auth/access.ts) — the same entry
-              // that shows or hides its menu item.
-              {
-                element: <RequireAccess part="section.dashboard" />,
-                children: [{ path: PATHS.dashboard, element: route(<DashboardPage />) }],
-              },
-              {
-                element: <RequireAccess part="section.companies" />,
+            {
+                // A company waiting for approval (or rejected) sees only its status screen.
+                element: <OrganisationGate />,
                 children: [
-                  { path: PATHS.platform, element: route(<CompaniesPage />) },
-                  { path: PATHS.platformCompany, element: route(<CompanyPage />) },
+                    {
+                        element: <AppLayout />,
+                        children: [
+                            // Each section behind its part of ACCESS (features/auth/access.ts) — the same entry
+                            // that shows or hides its menu item.
+                            {
+                                element: <RequireAccess part="section.dashboard" />,
+                                children: [{ path: PATHS.dashboard, element: route(<DashboardPage />) }],
+                            },
+                            {
+                                element: <RequireAccess part="section.companies" />,
+                                children: [
+                                    { path: PATHS.platform, element: route(<CompaniesPage />) },
+                                    { path: PATHS.platformCompany, element: route(<CompanyPage />) },
+                                ],
+                            },
+                            {
+                                element: <RequireAccess part="section.calendar" />,
+                                children: [{ path: PATHS.calendar, element: route(<CalendarPage />) }],
+                            },
+                            {
+                                element: <RequireAccess part="section.settings" />,
+                                children: [
+                                    { path: PATHS.settings, element: route(<SettingsPage />) },
+                                    { path: PATHS.settingsSection, element: route(<SettingsPage />) },
+                                ],
+                            },
+                            {
+                                element: <RequireAccess part="section.employees" />,
+                                children: [
+                                    { path: PATHS.employees, element: route(<EmployeesPage />) },
+                                    { path: PATHS.employeeProfile, element: route(<EmployeeProfilePage />) },
+                                ],
+                            },
+                            {
+                                element: <RequireAccess part="section.requests" />,
+                                children: [{ path: PATHS.requests, element: route(<RequestsPage />) }],
+                            },
+                            {
+                                element: <RequireAccess part="section.insights" />,
+                                children: [{ path: PATHS.insights, element: route(<InsightsPage />) }],
+                            },
+                        ],
+                    },
                 ],
-              },
-              {
-                element: <RequireAccess part="section.calendar" />,
-                children: [{ path: PATHS.calendar, element: route(<CalendarPage />) }],
-              },
-              {
-                element: <RequireAccess part="section.settings" />,
-                children: [
-                  { path: PATHS.settings, element: route(<SettingsPage />) },
-                  { path: PATHS.settingsSection, element: route(<SettingsPage />) },
-                ],
-              },
-              {
-                element: <RequireAccess part="section.employees" />,
-                children: [
-                  { path: PATHS.employees, element: route(<EmployeesPage />) },
-                  { path: PATHS.employeeProfile, element: route(<EmployeeProfilePage />) },
-                ],
-              },
-              {
-                element: <RequireAccess part="section.requests" />,
-                children: [{ path: PATHS.requests, element: route(<RequestsPage />) }],
-              },
-              {
-                element: <RequireAccess part="section.insights" />,
-                children: [{ path: PATHS.insights, element: route(<InsightsPage />) }],
-              },
-            ],
-          },
+            },
         ],
-      },
-    ],
-  },
-  { path: '*', element: <Navigate to={PATHS.dashboard} replace /> },
+    },
+    { path: '*', element: <Navigate to={PATHS.dashboard} replace /> },
 ]);

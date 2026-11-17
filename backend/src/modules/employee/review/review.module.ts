@@ -6,9 +6,9 @@ import { ReviewRepository } from './repository/review.repository';
 import { ReviewService } from './service/review.service';
 
 @Module({
-  imports: [EmployeeModule, AuditModule],
-  controllers: [ReviewController],
-  exports: [ReviewService],
-  providers: [ReviewService, ReviewRepository],
+    imports: [EmployeeModule, AuditModule],
+    controllers: [ReviewController],
+    exports: [ReviewService],
+    providers: [ReviewService, ReviewRepository],
 })
 export class ReviewModule {}

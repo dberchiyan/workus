@@ -7,13 +7,13 @@ export const SEARCH_MAX_LENGTH = 100;
 export const EmployeeStatusSchema = z.enum(EMPLOYEE_STATUSES).meta({ id: 'EmployeeStatus' });
 
 const filterFields = {
-  search: z.string().trim().max(SEARCH_MAX_LENGTH, 'validation.search.tooLong').optional(),
-  status: EmployeeStatusSchema.default(EmployeeStatus.ACTIVE),
+    search: z.string().trim().max(SEARCH_MAX_LENGTH, 'validation.search.tooLong').optional(),
+    status: EmployeeStatusSchema.default(EmployeeStatus.ACTIVE),
 };
 
 export const EmployeeFilterQuerySchema = z.object({
-  ...filterFields,
-  categoryId: z.uuid('validation.invalid').optional(),
+    ...filterFields,
+    categoryId: z.uuid('validation.invalid').optional(),
 });
 
 export class EmployeeFilterQuery extends createZodDto(EmployeeFilterQuerySchema) {}

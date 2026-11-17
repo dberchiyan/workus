@@ -1,307 +1,307 @@
 {
-  "balances": {
-    "title": "Available days",
-    "subtitle": "Your leave balances in the current cycles",
-    "cycle": "Current cycle: {{start}} – {{end}}",
-    "available": "Available",
-    "used": "Used",
-    "pending_one": "{{count}} day pending",
-    "pending_other": "{{count}} days pending",
-    "loading": "Loading balances…",
-    "error": "Couldn’t load the balances",
-    "retry": "Try again",
-    "noLimit": "No limit — days are counted"
-  },
-  "types": {
-    "VACATION": "Vacation",
-    "SICK_DAY": "Sick day",
-    "DAY_OFF": "Day off"
-  },
-  "cardTitles": {
-    "VACATION": "Vacation days",
-    "SICK_DAY": "Sick days",
-    "DAY_OFF": "Days off"
-  },
-  "status": {
-    "PENDING": "Pending",
-    "APPROVED": "Approved",
-    "REJECTED": "Rejected",
-    "CANCELED": "Canceled"
-  },
-  "requests": {
-    "title": "Your requests",
-    "subtitle": "Pending requests and anything that changed today",
-    "create": "Create request",
-    "caption": "Your pending requests and those changed today, newest first",
-    "loading": "Loading requests…",
-    "error": "Couldn’t load your requests",
-    "retry": "Try again",
-    "empty": "Nothing pending",
-    "emptyHint": "No requests are waiting for a decision and nothing changed today. Create a request for vacation, a sick day or a day off.",
-    "loadMore": "Show older requests",
-    "loadingMore": "Loading…",
-    "shown": "Showing {{shown}} of {{total}}",
-    "end": "That’s everything pending or changed today",
-    "columns": {
-      "type": "Request type",
-      "period": "Period",
-      "created": "Created",
-      "responsible": "Responsible",
-      "status": "Status",
-      "details": "Details"
+    "balances": {
+        "title": "Available days",
+        "subtitle": "Your leave balances in the current cycles",
+        "cycle": "Current cycle: {{start}} – {{end}}",
+        "available": "Available",
+        "used": "Used",
+        "pending_one": "{{count}} day pending",
+        "pending_other": "{{count}} days pending",
+        "loading": "Loading balances…",
+        "error": "Couldn’t load the balances",
+        "retry": "Try again",
+        "noLimit": "No limit — days are counted"
     },
-    "days_one": "{{count}} working day",
-    "days_other": "{{count}} working days",
-    "showDetails": "Show details of the {{type}} request, {{period}}",
-    "hideDetails": "Hide details of the {{type}} request, {{period}}"
-  },
-  "details": {
-    "responsible_one": "Responsible",
-    "responsible_other": "Responsible ({{count}})",
-    "status": "Request status",
-    "decidedBy": "Decided by {{name}} on {{date}}",
-    "waiting": "Waiting for a decision",
-    "history": "History",
-    "comments": "Comments",
-    "note": "Your note",
-    "decisionComment": "Reason from {{name}}",
-    "noComments": "No comments",
-    "cancel": "Cancel request",
-    "admin": "Administrator",
-    "actions": {
-      "CREATED": "Created the request",
-      "APPROVED": "Approved",
-      "REJECTED": "Rejected",
-      "CANCELED": "Canceled",
-      "RESPONSIBLES_CHANGED": "Changed who decides"
+    "types": {
+        "VACATION": "Vacation",
+        "SICK_DAY": "Sick day",
+        "DAY_OFF": "Day off"
     },
-    "commentBy": "{{name}} · {{date}}"
-  },
-  "create": {
-    "title": "Create new request",
-    "type": "Request type",
-    "startDate": "First day",
-    "endDate": "Last day",
-    "note": "Comment",
-    "noteHint": "Optional — context for your responsible people",
-    "summary_one": "{{count}} working day",
-    "summary_other": "{{count}} working days",
-    "summaryNone": "Pick dates with at least one working day",
-    "submit": "Send request",
-    "submitting": "Sending…",
-    "cancel": "Cancel",
-    "close": "Close",
-    "range": "Choose a date range",
-    "daysAvailable": "Days available",
-    "unlimited": "No limit",
-    "notePlaceholder": "Add a comment",
-    "overBalance": "more than available",
-    "holiday": "{{name}} (holiday)"
-  },
-  "cancel": {
-    "title": "Cancel this request?",
-    "description": "The {{type}} request for {{period}} will be canceled. This can’t be undone — create a new request if you change your mind.",
-    "confirm": "Cancel request",
-    "keep": "Keep it",
-    "canceling": "Canceling…"
-  },
-  "notice": {
-    "created": "Request sent",
-    "canceled": "Request canceled"
-  },
-  "calendar": {
-    "previous": "Previous month",
-    "next": "Next month",
-    "bar": "{{type}}, {{status}}: {{period}} · {{days}}",
-    "barDetails": "{{days}} · {{status}}",
-    "page": {
-      "title": "Calendar",
-      "subtitle": "Who is away and when: approved time off, and requests still waiting for a decision in grey.",
-      "caption": "Time off by person and day",
-      "previous": "Previous month",
-      "next": "Next month",
-      "today": "Today",
-      "types": "Request types",
-      "pendingKey": "Waiting for a decision",
-      "notEmployedKey": "Not employed",
-      "empty": "Nobody was employed in this month.",
-      "noMatches": "No one matches the search.",
-      "error": "The calendar could not be loaded.",
-      "retry": "Try again",
-      "rowsPerPage": "Rows per page",
-      "displayed": "{{from}}–{{to}} of {{count}}",
-      "holidayKey": "Company holiday",
-      "holiday": "Holiday: {{name}}"
+    "cardTitles": {
+        "VACATION": "Vacation days",
+        "SICK_DAY": "Sick days",
+        "DAY_OFF": "Days off"
     },
-    "notEmployed": {
-      "starts": "Not employed yet — starts on {{date}}",
-      "left": "No longer employed — from {{date}}"
-    }
-  },
-  "manage": {
-    "pageTitle": "Requests",
-    "title": "Requests",
-    "subtitle": "Time-off requests from every employee. Responsible people decide; any admin can comment.",
-    "loading": "Loading requests…",
-    "error": "Couldn’t load the requests",
-    "filters": {
-      "search": "Search by employee",
-      "type": "Request type",
-      "allTypes": "All types",
-      "mine": "Only requests I decide"
+    "status": {
+        "PENDING": "Pending",
+        "APPROVED": "Approved",
+        "REJECTED": "Rejected",
+        "CANCELED": "Canceled"
     },
-    "pending": {
-      "title": "Pending",
-      "subtitle": "Waiting for a decision — the longest waiting first",
-      "empty": "All caught up",
-      "emptyHint": "No requests are waiting for a decision.",
-      "more": "Show more ({{shown}} of {{total}})"
+    "requests": {
+        "title": "Your requests",
+        "subtitle": "Pending requests and anything that changed today",
+        "create": "Create request",
+        "caption": "Your pending requests and those changed today, newest first",
+        "loading": "Loading requests…",
+        "error": "Couldn’t load your requests",
+        "retry": "Try again",
+        "empty": "Nothing pending",
+        "emptyHint": "No requests are waiting for a decision and nothing changed today. Create a request for vacation, a sick day or a day off.",
+        "loadMore": "Show older requests",
+        "loadingMore": "Loading…",
+        "shown": "Showing {{shown}} of {{total}}",
+        "end": "That’s everything pending or changed today",
+        "columns": {
+            "type": "Request type",
+            "period": "Period",
+            "created": "Created",
+            "responsible": "Responsible",
+            "status": "Status",
+            "details": "Details"
+        },
+        "days_one": "{{count}} working day",
+        "days_other": "{{count}} working days",
+        "showDetails": "Show details of the {{type}} request, {{period}}",
+        "hideDetails": "Hide details of the {{type}} request, {{period}}"
     },
-    "closed": {
-      "title": "All other requests",
-      "subtitle": "Approved, rejected and canceled — the latest change first",
-      "caption": "Approved, rejected and canceled requests, the latest change first",
-      "statusFilter": "Status",
-      "allStatuses": "All",
-      "empty": "No requests match these filters",
-      "rowsPerPage": "Rows per page",
-      "displayed": "{{from}}–{{to}} of {{count}}",
-      "columns": {
-        "employee": "Employee",
+    "details": {
+        "responsible_one": "Responsible",
+        "responsible_other": "Responsible ({{count}})",
+        "status": "Request status",
+        "decidedBy": "Decided by {{name}} on {{date}}",
+        "waiting": "Waiting for a decision",
+        "history": "History",
+        "comments": "Comments",
+        "note": "Your note",
+        "decisionComment": "Reason from {{name}}",
+        "noComments": "No comments",
+        "cancel": "Cancel request",
+        "admin": "Administrator",
+        "actions": {
+            "CREATED": "Created the request",
+            "APPROVED": "Approved",
+            "REJECTED": "Rejected",
+            "CANCELED": "Canceled",
+            "RESPONSIBLES_CHANGED": "Changed who decides"
+        },
+        "commentBy": "{{name}} · {{date}}"
+    },
+    "create": {
+        "title": "Create new request",
         "type": "Request type",
-        "period": "Period",
-        "status": "Status",
-        "changed": "Last change",
-        "comments": "Comments"
-      }
+        "startDate": "First day",
+        "endDate": "Last day",
+        "note": "Comment",
+        "noteHint": "Optional — context for your responsible people",
+        "summary_one": "{{count}} working day",
+        "summary_other": "{{count}} working days",
+        "summaryNone": "Pick dates with at least one working day",
+        "submit": "Send request",
+        "submitting": "Sending…",
+        "cancel": "Cancel",
+        "close": "Close",
+        "range": "Choose a date range",
+        "daysAvailable": "Days available",
+        "unlimited": "No limit",
+        "notePlaceholder": "Add a comment",
+        "overBalance": "more than available",
+        "holiday": "{{name}} (holiday)"
     },
-    "open": "Open the {{type}} request of {{name}}, {{period}}",
-    "waited_one": "Waiting {{count}} day",
-    "waited_other": "Waiting {{count}} days",
-    "waitedToday": "Sent today",
-    "commentCount_one": "{{count}} comment",
-    "commentCount_other": "{{count}} comments",
-    "notYours": "Waiting for its responsible people",
-    "approve": "Approve",
-    "reject": "Reject",
-    "cancel": "Cancel request",
-    "approveFor": "Approve the {{type}} request of {{name}}, {{period}}",
-    "rejectFor": "Reject the {{type}} request of {{name}}, {{period}}",
-    "dialog": {
-      "title": "{{name}}’s request",
-      "loadingTitle": "Request",
-      "profile": "{{position}} · Open profile",
-      "error": "Couldn’t load this request — it may have been removed",
-      "days": "Working days",
-      "created": "Sent",
-      "available": "Available in the cycle",
-      "availableValue": "{{available}} of {{allowance}} days",
-      "used": "Used in the cycle",
-      "note": "Employee’s note",
-      "you": "You",
-      "activity": "History and comments",
-      "notYours": "Only the request’s responsible people can decide it",
-      "closed": "This request is closed",
-      "usedValue_one": "{{formatted}} day",
-      "usedValue_other": "{{formatted}} days"
-    },
-    "timeline": {
-      "CREATED": "{{name}} sent the request",
-      "APPROVED": "{{name}} approved it",
-      "REJECTED": "{{name}} rejected it",
-      "CANCELED": "{{name}} canceled it",
-      "RESPONSIBLES_CHANGED": "{{name}} changed who decides it"
-    },
-    "comment": {
-      "label": "Comment",
-      "placeholder": "Write a comment",
-      "hint": "Every admin and the employee will see it · Ctrl + Enter to send",
-      "send": "Send",
-      "sending": "Sending…"
-    },
-    "confirm": {
-      "keep": "Keep it",
-      "working": "Saving…",
-      "reject": {
-        "title": "Reject this request?",
-        "description": "{{name}}’s {{type}} request for {{period}} will be rejected and the days return to the balance. This can’t be undone — they can send a new request.",
-        "confirm": "Reject request",
-        "reason": "Reason (optional)",
-        "reasonHint": "The employee sees it with the decision · {{count}}/{{max}}"
-      },
-      "cancel": {
+    "cancel": {
         "title": "Cancel this request?",
-        "description": "{{name}}’s {{type}} request for {{period}} will be canceled and the days return to the balance. This can’t be undone — they can send a new request.",
-        "confirm": "Cancel request"
-      }
+        "description": "The {{type}} request for {{period}} will be canceled. This can’t be undone — create a new request if you change your mind.",
+        "confirm": "Cancel request",
+        "keep": "Keep it",
+        "canceling": "Canceling…"
     },
     "notice": {
-      "approve": "Approved: {{name}}, {{type}} {{period}}",
-      "reject": "Rejected: {{name}}, {{type}} {{period}}",
-      "cancel": "Canceled: {{name}}, {{type}} {{period}}"
+        "created": "Request sent",
+        "canceled": "Request canceled"
     },
-    "responsibles": {
-      "edit": "Change who decides this request",
-      "editShort": "Change",
-      "title": "Who decides this request",
-      "intro": "Choose the administrators who decide {{name}}’s request. Any admin can change this while the request is pending.",
-      "label": "Responsible administrators",
-      "hint": "1 to {{max}} administrators",
-      "noOptions": "No administrators found",
-      "loading": "Searching…",
-      "admin": "Administrator",
-      "cancel": "Cancel",
-      "save": "Save"
-    }
-  },
-  "comments": {
-    "edited": "edited",
-    "edit": "Edit comment",
-    "delete": "Delete comment",
-    "editLabel": "Edit your comment",
-    "cancel": "Cancel",
-    "save": "Save",
-    "deleteTitle": "Delete this comment?",
-    "deleteText": "Everyone who sees this request will no longer see it. This can’t be undone.",
-    "keep": "Keep it",
-    "deleteConfirm": "Delete comment"
-  },
-  "holidays": {
-    "title": "Company holidays",
-    "subtitle": "Days off for everyone. Time off never counts them as working days, and they show in red on the calendar.",
-    "add": "Add holiday",
-    "previousYear": "Previous year",
-    "nextYear": "Next year",
-    "count_one": "{{count}} holiday",
-    "count_other": "{{count}} holidays",
-    "loading": "Loading holidays…",
-    "error": "Couldn’t load the holidays.",
-    "retry": "Try again",
-    "empty": "No holidays in {{year}}",
-    "emptyHint": "Add the days the company is closed.",
-    "everyYear": "Every year",
-    "thisYearOnly": "This year only",
-    "onWeekend": "Falls on a weekend",
-    "edit": "Edit {{name}}",
-    "remove": "Remove {{name}}",
-    "dialog": {
-      "addTitle": "Add a holiday",
-      "editTitle": "Edit the holiday",
-      "date": "Date",
-      "name": "Name",
-      "recurring": "Repeats every year",
-      "recurringHint": "Copied to the same day next year; each year’s copy can then be changed on its own.",
-      "copyMade": "The {{year}} copy is already made — changes here don’t reach it.",
-      "cancel": "Cancel",
-      "add": "Add holiday",
-      "save": "Save"
+    "calendar": {
+        "previous": "Previous month",
+        "next": "Next month",
+        "bar": "{{type}}, {{status}}: {{period}} · {{days}}",
+        "barDetails": "{{days}} · {{status}}",
+        "page": {
+            "title": "Calendar",
+            "subtitle": "Who is away and when: approved time off, and requests still waiting for a decision in grey.",
+            "caption": "Time off by person and day",
+            "previous": "Previous month",
+            "next": "Next month",
+            "today": "Today",
+            "types": "Request types",
+            "pendingKey": "Waiting for a decision",
+            "notEmployedKey": "Not employed",
+            "empty": "Nobody was employed in this month.",
+            "noMatches": "No one matches the search.",
+            "error": "The calendar could not be loaded.",
+            "retry": "Try again",
+            "rowsPerPage": "Rows per page",
+            "displayed": "{{from}}–{{to}} of {{count}}",
+            "holidayKey": "Company holiday",
+            "holiday": "Holiday: {{name}}"
+        },
+        "notEmployed": {
+            "starts": "Not employed yet — starts on {{date}}",
+            "left": "No longer employed — from {{date}}"
+        }
     },
-    "delete": {
-      "title": "Remove this holiday?",
-      "body": "{{name}} on {{date}} becomes a working day: time-off requests covering it take that day again.",
-      "copyStays": "Its copy for next year stays.",
-      "keep": "Keep it",
-      "confirm": "Remove {{name}}"
+    "manage": {
+        "pageTitle": "Requests",
+        "title": "Requests",
+        "subtitle": "Time-off requests from every employee. Responsible people decide; any admin can comment.",
+        "loading": "Loading requests…",
+        "error": "Couldn’t load the requests",
+        "filters": {
+            "search": "Search by employee",
+            "type": "Request type",
+            "allTypes": "All types",
+            "mine": "Only requests I decide"
+        },
+        "pending": {
+            "title": "Pending",
+            "subtitle": "Waiting for a decision — the longest waiting first",
+            "empty": "All caught up",
+            "emptyHint": "No requests are waiting for a decision.",
+            "more": "Show more ({{shown}} of {{total}})"
+        },
+        "closed": {
+            "title": "All other requests",
+            "subtitle": "Approved, rejected and canceled — the latest change first",
+            "caption": "Approved, rejected and canceled requests, the latest change first",
+            "statusFilter": "Status",
+            "allStatuses": "All",
+            "empty": "No requests match these filters",
+            "rowsPerPage": "Rows per page",
+            "displayed": "{{from}}–{{to}} of {{count}}",
+            "columns": {
+                "employee": "Employee",
+                "type": "Request type",
+                "period": "Period",
+                "status": "Status",
+                "changed": "Last change",
+                "comments": "Comments"
+            }
+        },
+        "open": "Open the {{type}} request of {{name}}, {{period}}",
+        "waited_one": "Waiting {{count}} day",
+        "waited_other": "Waiting {{count}} days",
+        "waitedToday": "Sent today",
+        "commentCount_one": "{{count}} comment",
+        "commentCount_other": "{{count}} comments",
+        "notYours": "Waiting for its responsible people",
+        "approve": "Approve",
+        "reject": "Reject",
+        "cancel": "Cancel request",
+        "approveFor": "Approve the {{type}} request of {{name}}, {{period}}",
+        "rejectFor": "Reject the {{type}} request of {{name}}, {{period}}",
+        "dialog": {
+            "title": "{{name}}’s request",
+            "loadingTitle": "Request",
+            "profile": "{{position}} · Open profile",
+            "error": "Couldn’t load this request — it may have been removed",
+            "days": "Working days",
+            "created": "Sent",
+            "available": "Available in the cycle",
+            "availableValue": "{{available}} of {{allowance}} days",
+            "used": "Used in the cycle",
+            "note": "Employee’s note",
+            "you": "You",
+            "activity": "History and comments",
+            "notYours": "Only the request’s responsible people can decide it",
+            "closed": "This request is closed",
+            "usedValue_one": "{{formatted}} day",
+            "usedValue_other": "{{formatted}} days"
+        },
+        "timeline": {
+            "CREATED": "{{name}} sent the request",
+            "APPROVED": "{{name}} approved it",
+            "REJECTED": "{{name}} rejected it",
+            "CANCELED": "{{name}} canceled it",
+            "RESPONSIBLES_CHANGED": "{{name}} changed who decides it"
+        },
+        "comment": {
+            "label": "Comment",
+            "placeholder": "Write a comment",
+            "hint": "Every admin and the employee will see it · Ctrl + Enter to send",
+            "send": "Send",
+            "sending": "Sending…"
+        },
+        "confirm": {
+            "keep": "Keep it",
+            "working": "Saving…",
+            "reject": {
+                "title": "Reject this request?",
+                "description": "{{name}}’s {{type}} request for {{period}} will be rejected and the days return to the balance. This can’t be undone — they can send a new request.",
+                "confirm": "Reject request",
+                "reason": "Reason (optional)",
+                "reasonHint": "The employee sees it with the decision · {{count}}/{{max}}"
+            },
+            "cancel": {
+                "title": "Cancel this request?",
+                "description": "{{name}}’s {{type}} request for {{period}} will be canceled and the days return to the balance. This can’t be undone — they can send a new request.",
+                "confirm": "Cancel request"
+            }
+        },
+        "notice": {
+            "approve": "Approved: {{name}}, {{type}} {{period}}",
+            "reject": "Rejected: {{name}}, {{type}} {{period}}",
+            "cancel": "Canceled: {{name}}, {{type}} {{period}}"
+        },
+        "responsibles": {
+            "edit": "Change who decides this request",
+            "editShort": "Change",
+            "title": "Who decides this request",
+            "intro": "Choose the administrators who decide {{name}}’s request. Any admin can change this while the request is pending.",
+            "label": "Responsible administrators",
+            "hint": "1 to {{max}} administrators",
+            "noOptions": "No administrators found",
+            "loading": "Searching…",
+            "admin": "Administrator",
+            "cancel": "Cancel",
+            "save": "Save"
+        }
+    },
+    "comments": {
+        "edited": "edited",
+        "edit": "Edit comment",
+        "delete": "Delete comment",
+        "editLabel": "Edit your comment",
+        "cancel": "Cancel",
+        "save": "Save",
+        "deleteTitle": "Delete this comment?",
+        "deleteText": "Everyone who sees this request will no longer see it. This can’t be undone.",
+        "keep": "Keep it",
+        "deleteConfirm": "Delete comment"
+    },
+    "holidays": {
+        "title": "Company holidays",
+        "subtitle": "Days off for everyone. Time off never counts them as working days, and they show in red on the calendar.",
+        "add": "Add holiday",
+        "previousYear": "Previous year",
+        "nextYear": "Next year",
+        "count_one": "{{count}} holiday",
+        "count_other": "{{count}} holidays",
+        "loading": "Loading holidays…",
+        "error": "Couldn’t load the holidays.",
+        "retry": "Try again",
+        "empty": "No holidays in {{year}}",
+        "emptyHint": "Add the days the company is closed.",
+        "everyYear": "Every year",
+        "thisYearOnly": "This year only",
+        "onWeekend": "Falls on a weekend",
+        "edit": "Edit {{name}}",
+        "remove": "Remove {{name}}",
+        "dialog": {
+            "addTitle": "Add a holiday",
+            "editTitle": "Edit the holiday",
+            "date": "Date",
+            "name": "Name",
+            "recurring": "Repeats every year",
+            "recurringHint": "Copied to the same day next year; each year’s copy can then be changed on its own.",
+            "copyMade": "The {{year}} copy is already made — changes here don’t reach it.",
+            "cancel": "Cancel",
+            "add": "Add holiday",
+            "save": "Save"
+        },
+        "delete": {
+            "title": "Remove this holiday?",
+            "body": "{{name}} on {{date}} becomes a working day: time-off requests covering it take that day again.",
+            "copyStays": "Its copy for next year stays.",
+            "keep": "Keep it",
+            "confirm": "Remove {{name}}"
+        }
     }
-  }
 }

@@ -1,25 +1,15 @@
 import { Transactional } from '@nestjs-cls/transactional';
 import { Injectable } from '@nestjs/common';
 import {
-  BusinessConflictException,
-  BusinessRuleException,
-  ConcurrentModificationException,
-  ResourceNotFoundException,
+    BusinessConflictException,
+    BusinessRuleException,
+    ConcurrentModificationException,
+    ResourceNotFoundException,
 } from '../../../../common/exception/api.exception';
 import { AuditAction, AuditTargetType } from '../../../audit/service/audit-action';
-import {
-  type AuditChange,
-  AuditField,
-  auditValue,
-  changeOf,
-} from '../../../audit/service/audit-change';
+import { type AuditChange, AuditField, auditValue, changeOf } from '../../../audit/service/audit-change';
 import { AuditService } from '../../../audit/service/audit.service';
-import type {
-  AuditEvent,
-  AuditEventPage,
-  SecurityEvent,
-  SecurityEventPage,
-} from '../../../audit/service/audit.types';
+import type { AuditEvent, AuditEventPage, SecurityEvent, SecurityEventPage } from '../../../audit/service/audit.types';
 import type { AuditEventSortField } from '../../../audit/service/audit-sort';
 import type { SecurityCategory } from '../../../audit/service/security-category';
 import { UserService } from '../../../user/service/user.service';
@@ -27,35 +17,35 @@ import { UserRole } from '../../../user/service/user-role';
 import type { Pageable } from '../../../../common/dto/pageable';
 import { EmployeeRepository } from '../repository/employee.repository';
 import type {
-  EmployeeListItemRecord,
-  EmployeeMovementRecord,
-  EmployeeProfileRecord,
-  EmployeeTimeOffRecord,
+    EmployeeListItemRecord,
+    EmployeeMovementRecord,
+    EmployeeProfileRecord,
+    EmployeeTimeOffRecord,
 } from '../repository/record/employee.record';
 import { minusDays, todayUtc } from './calendar-date';
 import type { EmployeeSortField } from './employee-sort';
 import type { EmployeeStatus } from './employee-status';
 import type {
-  CreateEmployeeCommand,
-  EmployeeBirthdays,
-  EmployeeCalendarPage,
-  RosterEmployee,
-  EmployeeForTimeOff,
-  EmployeeMovement,
-  EmployeeMovements,
-  EmployeeProfile,
-  TerminateEmployeeCommand,
-  UpdateEmployeeCommand,
-  EmployeePage,
-  EmployeeSummary,
+    CreateEmployeeCommand,
+    EmployeeBirthdays,
+    EmployeeCalendarPage,
+    RosterEmployee,
+    EmployeeForTimeOff,
+    EmployeeMovement,
+    EmployeeMovements,
+    EmployeeProfile,
+    TerminateEmployeeCommand,
+    UpdateEmployeeCommand,
+    EmployeePage,
+    EmployeeSummary,
 } from './employee.types';
 import { toSearchTerms } from './filter/employee.criteria';
 import { isTerminationReason } from './termination-reason';
 
 export interface EmployeeListQuery {
-  search: string | undefined;
-  status: EmployeeStatus;
-  categoryId: string | undefined;
+    search: string | undefined;
+    status: EmployeeStatus;
+    categoryId: string | undefined;
 }
 
 const NEW_HIRE_WINDOW_DAYS = 30;
@@ -67,739 +57,694 @@ const MAX_EXPORT_EVENTS = 5000;
 
 @Injectable()
 export class EmployeeService {
-  constructor(
-    private readonly employeeRepository: EmployeeRepository,
-    private readonly userService: UserService,
-    private readonly auditService: AuditService,
-  ) {}
+    constructor(
+        private readonly employeeRepository: EmployeeRepository,
+        private readonly userService: UserService,
+        private readonly auditService: AuditService,
+    ) {}
 
-  async findPage(
-    organisationId: string,
-    query: EmployeeListQuery,
-    pageable: Pageable<EmployeeSortField>,
-  ): Promise<EmployeePage> {
-    const today = todayUtc();
-    const page = await this.employeeRepository.findPage(
-      organisationId,
-      {
-        searchTerms: toSearchTerms(query.search),
-        status: query.status,
-        categoryId: query.categoryId,
-        today,
-      },
-      pageable,
-    );
-    return { ...page, today };
-  }
-
-  /** Active employees today (planned leavers included) — what the plan's limit counts. */
-  countActive(organisationId: string): Promise<number> {
-    return this.employeeRepository.countActive(organisationId, todayUtc());
-  }
-
-  /**
-   * Active headcount, hires of the last 30 days, terminations of the last 90, mean tenure of
-   * active employees and active employees nobody is responsible for.
-   */
-  async summary(organisationId: string): Promise<EmployeeSummary> {
-    const today = todayUtc();
-    const [
-      totalActive,
-      newLast30Days,
-      terminatedLast90Days,
-      averageTenureDays,
-      withoutResponsible,
-    ] = await Promise.all([
-      this.employeeRepository.countActive(organisationId, today),
-      this.employeeRepository.countStartedBetween(
-        organisationId,
-        minusDays(today, NEW_HIRE_WINDOW_DAYS),
-        today,
-      ),
-      this.employeeRepository.countTerminatedBetween(
-        organisationId,
-        minusDays(today, TERMINATION_WINDOW_DAYS),
-        today,
-      ),
-      this.employeeRepository.averageTenureDays(organisationId, today),
-      this.employeeRepository.countActiveWithoutResponsible(organisationId, today),
-    ]);
-    return {
-      totalActive,
-      newLast30Days,
-      terminatedLast90Days,
-      averageTenureDays: Math.round(averageTenureDays),
-      withoutResponsible,
-    };
-  }
-
-  /**
-   * Creates the person's account (with the hash of a password generated by the caller) and their
-   * employee record with responsibles, in one transaction. For the employment module, which adds the
-   * starting salary in the same transaction.
-   */
-  @Transactional()
-  async create(
-    organisationId: string,
-    command: CreateEmployeeCommand,
-    passwordHash: string,
-    actorId: string,
-  ): Promise<EmployeeListItemRecord> {
-    const email = command.email.toLowerCase();
-    // Emails are unique across organisations: one sign-in, one account, one tenant.
-    if (await this.userService.existsByEmail(email)) {
-      throw new BusinessConflictException('errors.employee.emailTaken', { email }, 'email');
-    }
-    if (!(await this.employeeRepository.positionExists(organisationId, command.positionId))) {
-      throw new BusinessRuleException('errors.employee.positionNotFound', {}, 'positionId');
-    }
-    const responsibleUserIds = [...new Set(command.responsibleUserIds)];
-    if (
-      responsibleUserIds.length > 0 &&
-      (await this.employeeRepository.countResponsibleCandidates(
-        organisationId,
-        responsibleUserIds,
-      )) !== responsibleUserIds.length
-    ) {
-      throw new BusinessRuleException(
-        'errors.employee.responsibleNotFound',
-        {},
-        'responsibleUserIds',
-      );
-    }
-    const userId = await this.userService.createWithPassword({
-      organisationId,
-      email,
-      firstName: command.firstName,
-      lastName: command.lastName,
-      role: UserRole.EMPLOYEE,
-      passwordHash,
-      createdBy: actorId,
-    });
-    const employeeId = await this.employeeRepository.create({
-      organisationId,
-      userId,
-      positionId: command.positionId,
-      startDate: new Date(`${command.startDate}T00:00:00Z`),
-      mobile: command.mobile,
-      personalEmail: command.personalEmail?.toLowerCase(),
-      linkedinUrl: command.linkedinUrl,
-      telegram: command.telegram ? `@${command.telegram.replace(/^@/, '')}` : undefined,
-      address: command.address,
-      dateOfBirth: command.dateOfBirth ? new Date(`${command.dateOfBirth}T00:00:00Z`) : undefined,
-      responsibleUserIds,
-      createdBy: actorId,
-    });
-    const [employee, profile] = await Promise.all([
-      this.employeeRepository.findListItemById(organisationId, employeeId),
-      this.employeeRepository.findProfileById(organisationId, employeeId),
-    ]);
-    if (!employee || !profile) {
-      throw new Error('Created employee not found in the same transaction');
-    }
-    await this.auditService.record({
-      action: AuditAction.EMPLOYEE_CREATED,
-      employeeId,
-      target: {
-        type: AuditTargetType.EMPLOYEE,
-        id: employeeId,
-        label: `${command.firstName} ${command.lastName}`,
-      },
-      // Contacts are personal data — the log names only the work facts.
-      changes: [
-        ...changeOf(AuditField.POSITION, null, auditValue.text(profile.position.title)),
-        ...changeOf(AuditField.START_DATE, null, auditValue.date(profile.startDate)),
-        ...(profile.responsibles.length > 0
-          ? changeOf(
-              AuditField.RESPONSIBLES,
-              null,
-              auditValue.people(
-                profile.responsibles.map(({ responsible }) => ({
-                  id: responsible.id,
-                  firstName: responsible.firstName,
-                  lastName: responsible.lastName,
-                })),
-              ),
-            )
-          : []),
-      ],
-    });
-    return employee;
-  }
-
-  /**
-   * Replaces who is responsible for the employee (0–10 admins, never the
-   * employee themselves). Records the change; a save without one changes nothing.
-   */
-  @Transactional()
-  async updateResponsibles(
-    organisationId: string,
-    employeeId: string,
-    command: { responsibleUserIds: string[]; version: number },
-    actorId: string,
-  ): Promise<EmployeeProfile> {
-    const before = await this.employeeRepository.findProfileById(organisationId, employeeId);
-    if (!before) {
-      throw new ResourceNotFoundException();
-    }
-    if (before.version !== command.version) {
-      throw new ConcurrentModificationException();
-    }
-    const responsibleUserIds = [...new Set(command.responsibleUserIds)];
-    if (responsibleUserIds.includes(before.user.id)) {
-      throw new BusinessRuleException('errors.employee.selfResponsible', {}, 'responsibleUserIds');
-    }
-    if (!(await this.areResponsibleCandidates(organisationId, responsibleUserIds))) {
-      throw new BusinessRuleException(
-        'errors.employee.responsibleNotFound',
-        {},
-        'responsibleUserIds',
-      );
-    }
-    const current = before.responsibles.map(({ responsible }) => responsible.id).sort();
-    const next = [...responsibleUserIds].sort();
-    if (current.length === next.length && current.every((id, index) => id === next[index])) {
-      // Nothing changed: no write, no history entry.
-      return { employee: before, today: todayUtc() };
-    }
-    if (
-      !(await this.employeeRepository.replaceResponsibles(
-        organisationId,
-        employeeId,
-        command.version,
-        responsibleUserIds,
-        actorId,
-      ))
-    ) {
-      throw new ConcurrentModificationException();
-    }
-    const after = await this.employeeRepository.findProfileById(organisationId, employeeId);
-    if (!after) {
-      throw new Error('Updated employee not found in the same transaction');
-    }
-    await this.auditService.record({
-      action: AuditAction.EMPLOYEE_UPDATED,
-      employeeId,
-      target: {
-        type: AuditTargetType.EMPLOYEE,
-        id: employeeId,
-        label: `${after.user.firstName} ${after.user.lastName}`,
-      },
-      changes: changeOf(AuditField.RESPONSIBLES, peopleOf(before), peopleOf(after)),
-    });
-    return { employee: after, today: todayUtc() };
-  }
-
-  /**
-   * Name, work email, position, start date and contacts. For the employment module, which moves
-   * the starting salary along with the start date in the same transaction. Records what changed
-   * (contacts as "changed" only); a save without changes writes nothing.
-   */
-  @Transactional()
-  async update(
-    organisationId: string,
-    employeeId: string,
-    command: UpdateEmployeeCommand,
-    actorId: string,
-  ): Promise<{ before: EmployeeProfileRecord; after: EmployeeProfileRecord }> {
-    const before = await this.requireProfile(organisationId, employeeId, command.version);
-    const email = command.email.toLowerCase();
-    if (await this.userService.isEmailTakenByOther(email, before.user.id)) {
-      throw new BusinessConflictException('errors.employee.emailTaken', { email }, 'email');
-    }
-    if (!(await this.employeeRepository.positionExists(organisationId, command.positionId))) {
-      throw new BusinessRuleException('errors.employee.positionNotFound', {}, 'positionId');
-    }
-    const startDate = new Date(`${command.startDate}T00:00:00Z`);
-    if (before.terminatedOn && startDate > before.terminatedOn) {
-      throw new BusinessRuleException('errors.employee.startAfterTermination', {}, 'startDate');
-    }
-    const details = {
-      positionId: command.positionId,
-      startDate,
-      mobile: command.mobile ?? null,
-      personalEmail: command.personalEmail?.toLowerCase() ?? null,
-      linkedinUrl: command.linkedinUrl ?? null,
-      telegram: command.telegram ? `@${command.telegram.replace(/^@/, '')}` : null,
-      address: command.address ?? null,
-      dateOfBirth: command.dateOfBirth ? new Date(`${command.dateOfBirth}T00:00:00Z`) : null,
-    };
-    const contactChanges: AuditChange[] = CONTACT_FIELDS.flatMap(([column, field]) =>
-      before[column] === details[column]
-        ? []
-        : [
+    async findPage(
+        organisationId: string,
+        query: EmployeeListQuery,
+        pageable: Pageable<EmployeeSortField>,
+    ): Promise<EmployeePage> {
+        const today = todayUtc();
+        const page = await this.employeeRepository.findPage(
+            organisationId,
             {
-              field,
-              from: before[column] === null ? null : auditValue.redacted(),
-              to: details[column] === null ? null : auditValue.redacted(),
+                searchTerms: toSearchTerms(query.search),
+                status: query.status,
+                categoryId: query.categoryId,
+                today,
             },
-          ],
-    );
-    // Personal data like the contacts: the log says that it changed, never the date.
-    const dateOfBirthChanged =
-      (before.dateOfBirth?.getTime() ?? null) !== (details.dateOfBirth?.getTime() ?? null);
-    if (dateOfBirthChanged) {
-      contactChanges.push({
-        field: AuditField.DATE_OF_BIRTH,
-        from: before.dateOfBirth === null ? null : auditValue.redacted(),
-        to: details.dateOfBirth === null ? null : auditValue.redacted(),
-      });
+            pageable,
+        );
+        return { ...page, today };
     }
-    const identityChanged =
-      before.user.firstName !== command.firstName ||
-      before.user.lastName !== command.lastName ||
-      before.user.email !== email;
-    const detailsChanged =
-      before.position.id !== details.positionId ||
-      before.startDate.getTime() !== startDate.getTime() ||
-      contactChanges.length > 0;
-    if (!identityChanged && !detailsChanged) {
-      return { before, after: before };
+
+    /** Active employees today (planned leavers included) — what the plan's limit counts. */
+    countActive(organisationId: string): Promise<number> {
+        return this.employeeRepository.countActive(organisationId, todayUtc());
     }
-    if (identityChanged) {
-      await this.userService.updateIdentity(
-        before.user.id,
-        { firstName: command.firstName, lastName: command.lastName, email },
-        actorId,
-      );
+
+    /**
+     * Active headcount, hires of the last 30 days, terminations of the last 90, mean tenure of
+     * active employees and active employees nobody is responsible for.
+     */
+    async summary(organisationId: string): Promise<EmployeeSummary> {
+        const today = todayUtc();
+        const [totalActive, newLast30Days, terminatedLast90Days, averageTenureDays, withoutResponsible] =
+            await Promise.all([
+                this.employeeRepository.countActive(organisationId, today),
+                this.employeeRepository.countStartedBetween(
+                    organisationId,
+                    minusDays(today, NEW_HIRE_WINDOW_DAYS),
+                    today,
+                ),
+                this.employeeRepository.countTerminatedBetween(
+                    organisationId,
+                    minusDays(today, TERMINATION_WINDOW_DAYS),
+                    today,
+                ),
+                this.employeeRepository.averageTenureDays(organisationId, today),
+                this.employeeRepository.countActiveWithoutResponsible(organisationId, today),
+            ]);
+        return {
+            totalActive,
+            newLast30Days,
+            terminatedLast90Days,
+            averageTenureDays: Math.round(averageTenureDays),
+            withoutResponsible,
+        };
     }
-    if (
-      !(await this.employeeRepository.updateDetails(
-        organisationId,
-        employeeId,
-        command.version,
-        details,
-        actorId,
-      ))
-    ) {
-      throw new ConcurrentModificationException();
+
+    /**
+     * Creates the person's account (with the hash of a password generated by the caller) and their
+     * employee record with responsibles, in one transaction. For the employment module, which adds the
+     * starting salary in the same transaction.
+     */
+    @Transactional()
+    async create(
+        organisationId: string,
+        command: CreateEmployeeCommand,
+        passwordHash: string,
+        actorId: string,
+    ): Promise<EmployeeListItemRecord> {
+        const email = command.email.toLowerCase();
+        // Emails are unique across organisations: one sign-in, one account, one tenant.
+        if (await this.userService.existsByEmail(email)) {
+            throw new BusinessConflictException('errors.employee.emailTaken', { email }, 'email');
+        }
+        if (!(await this.employeeRepository.positionExists(organisationId, command.positionId))) {
+            throw new BusinessRuleException('errors.employee.positionNotFound', {}, 'positionId');
+        }
+        const responsibleUserIds = [...new Set(command.responsibleUserIds)];
+        if (
+            responsibleUserIds.length > 0 &&
+            (await this.employeeRepository.countResponsibleCandidates(organisationId, responsibleUserIds)) !==
+                responsibleUserIds.length
+        ) {
+            throw new BusinessRuleException('errors.employee.responsibleNotFound', {}, 'responsibleUserIds');
+        }
+        const userId = await this.userService.createWithPassword({
+            organisationId,
+            email,
+            firstName: command.firstName,
+            lastName: command.lastName,
+            role: UserRole.EMPLOYEE,
+            passwordHash,
+            createdBy: actorId,
+        });
+        const employeeId = await this.employeeRepository.create({
+            organisationId,
+            userId,
+            positionId: command.positionId,
+            startDate: new Date(`${command.startDate}T00:00:00Z`),
+            mobile: command.mobile,
+            personalEmail: command.personalEmail?.toLowerCase(),
+            linkedinUrl: command.linkedinUrl,
+            telegram: command.telegram ? `@${command.telegram.replace(/^@/, '')}` : undefined,
+            address: command.address,
+            dateOfBirth: command.dateOfBirth ? new Date(`${command.dateOfBirth}T00:00:00Z`) : undefined,
+            responsibleUserIds,
+            createdBy: actorId,
+        });
+        const [employee, profile] = await Promise.all([
+            this.employeeRepository.findListItemById(organisationId, employeeId),
+            this.employeeRepository.findProfileById(organisationId, employeeId),
+        ]);
+        if (!employee || !profile) {
+            throw new Error('Created employee not found in the same transaction');
+        }
+        await this.auditService.record({
+            action: AuditAction.EMPLOYEE_CREATED,
+            employeeId,
+            target: {
+                type: AuditTargetType.EMPLOYEE,
+                id: employeeId,
+                label: `${command.firstName} ${command.lastName}`,
+            },
+            // Contacts are personal data — the log names only the work facts.
+            changes: [
+                ...changeOf(AuditField.POSITION, null, auditValue.text(profile.position.title)),
+                ...changeOf(AuditField.START_DATE, null, auditValue.date(profile.startDate)),
+                ...(profile.responsibles.length > 0
+                    ? changeOf(
+                          AuditField.RESPONSIBLES,
+                          null,
+                          auditValue.people(
+                              profile.responsibles.map(({ responsible }) => ({
+                                  id: responsible.id,
+                                  firstName: responsible.firstName,
+                                  lastName: responsible.lastName,
+                              })),
+                          ),
+                      )
+                    : []),
+            ],
+        });
+        return employee;
     }
-    const after = await this.requireProfile(organisationId, employeeId);
-    await this.auditService.record({
-      action: AuditAction.EMPLOYEE_UPDATED,
-      employeeId,
-      target: { type: AuditTargetType.EMPLOYEE, id: employeeId, label: nameOf(after) },
-      changes: [
-        ...changeOf(
-          AuditField.FIRST_NAME,
-          auditValue.text(before.user.firstName),
-          auditValue.text(after.user.firstName),
-        ),
-        ...changeOf(
-          AuditField.LAST_NAME,
-          auditValue.text(before.user.lastName),
-          auditValue.text(after.user.lastName),
-        ),
-        ...changeOf(
-          AuditField.EMAIL,
-          auditValue.text(before.user.email),
-          auditValue.text(after.user.email),
-        ),
-        ...changeOf(
-          AuditField.POSITION,
-          auditValue.text(before.position.title),
-          auditValue.text(after.position.title),
-        ),
-        ...changeOf(
-          AuditField.START_DATE,
-          auditValue.date(before.startDate),
-          auditValue.date(after.startDate),
-        ),
-        ...contactChanges,
-      ],
-    });
-    return { before, after };
-  }
 
-  /**
-   * Terminates the employee from `date` (today, past or future — a future date is a planned
-   * leave), or changes an existing termination. For the employment module, which cancels the
-   * reviews scheduled after that date in the same transaction.
-   */
-  @Transactional()
-  async terminate(
-    organisationId: string,
-    employeeId: string,
-    command: TerminateEmployeeCommand,
-    actorId: string,
-  ): Promise<{ before: EmployeeProfileRecord; after: EmployeeProfileRecord }> {
-    const before = await this.requireProfile(organisationId, employeeId, command.version);
-    const terminatedOn = new Date(`${command.date}T00:00:00Z`);
-    if (terminatedOn < before.startDate) {
-      throw new BusinessRuleException('errors.employee.terminationBeforeStart', {}, 'date');
+    /**
+     * Replaces who is responsible for the employee (0–10 admins, never the
+     * employee themselves). Records the change; a save without one changes nothing.
+     */
+    @Transactional()
+    async updateResponsibles(
+        organisationId: string,
+        employeeId: string,
+        command: { responsibleUserIds: string[]; version: number },
+        actorId: string,
+    ): Promise<EmployeeProfile> {
+        const before = await this.employeeRepository.findProfileById(organisationId, employeeId);
+        if (!before) {
+            throw new ResourceNotFoundException();
+        }
+        if (before.version !== command.version) {
+            throw new ConcurrentModificationException();
+        }
+        const responsibleUserIds = [...new Set(command.responsibleUserIds)];
+        if (responsibleUserIds.includes(before.user.id)) {
+            throw new BusinessRuleException('errors.employee.selfResponsible', {}, 'responsibleUserIds');
+        }
+        if (!(await this.areResponsibleCandidates(organisationId, responsibleUserIds))) {
+            throw new BusinessRuleException('errors.employee.responsibleNotFound', {}, 'responsibleUserIds');
+        }
+        const current = before.responsibles.map(({ responsible }) => responsible.id).sort();
+        const next = [...responsibleUserIds].sort();
+        if (current.length === next.length && current.every((id, index) => id === next[index])) {
+            // Nothing changed: no write, no history entry.
+            return { employee: before, today: todayUtc() };
+        }
+        if (
+            !(await this.employeeRepository.replaceResponsibles(
+                organisationId,
+                employeeId,
+                command.version,
+                responsibleUserIds,
+                actorId,
+            ))
+        ) {
+            throw new ConcurrentModificationException();
+        }
+        const after = await this.employeeRepository.findProfileById(organisationId, employeeId);
+        if (!after) {
+            throw new Error('Updated employee not found in the same transaction');
+        }
+        await this.auditService.record({
+            action: AuditAction.EMPLOYEE_UPDATED,
+            employeeId,
+            target: {
+                type: AuditTargetType.EMPLOYEE,
+                id: employeeId,
+                label: `${after.user.firstName} ${after.user.lastName}`,
+            },
+            changes: changeOf(AuditField.RESPONSIBLES, peopleOf(before), peopleOf(after)),
+        });
+        return { employee: after, today: todayUtc() };
     }
-    if (!isTerminationReason(command.reason)) {
-      throw new BusinessRuleException('errors.employee.terminationReasonInvalid', {}, 'reason');
+
+    /**
+     * Name, work email, position, start date and contacts. For the employment module, which moves
+     * the starting salary along with the start date in the same transaction. Records what changed
+     * (contacts as "changed" only); a save without changes writes nothing.
+     */
+    @Transactional()
+    async update(
+        organisationId: string,
+        employeeId: string,
+        command: UpdateEmployeeCommand,
+        actorId: string,
+    ): Promise<{ before: EmployeeProfileRecord; after: EmployeeProfileRecord }> {
+        const before = await this.requireProfile(organisationId, employeeId, command.version);
+        const email = command.email.toLowerCase();
+        if (await this.userService.isEmailTakenByOther(email, before.user.id)) {
+            throw new BusinessConflictException('errors.employee.emailTaken', { email }, 'email');
+        }
+        if (!(await this.employeeRepository.positionExists(organisationId, command.positionId))) {
+            throw new BusinessRuleException('errors.employee.positionNotFound', {}, 'positionId');
+        }
+        const startDate = new Date(`${command.startDate}T00:00:00Z`);
+        if (before.terminatedOn && startDate > before.terminatedOn) {
+            throw new BusinessRuleException('errors.employee.startAfterTermination', {}, 'startDate');
+        }
+        const details = {
+            positionId: command.positionId,
+            startDate,
+            mobile: command.mobile ?? null,
+            personalEmail: command.personalEmail?.toLowerCase() ?? null,
+            linkedinUrl: command.linkedinUrl ?? null,
+            telegram: command.telegram ? `@${command.telegram.replace(/^@/, '')}` : null,
+            address: command.address ?? null,
+            dateOfBirth: command.dateOfBirth ? new Date(`${command.dateOfBirth}T00:00:00Z`) : null,
+        };
+        const contactChanges: AuditChange[] = CONTACT_FIELDS.flatMap(([column, field]) =>
+            before[column] === details[column]
+                ? []
+                : [
+                      {
+                          field,
+                          from: before[column] === null ? null : auditValue.redacted(),
+                          to: details[column] === null ? null : auditValue.redacted(),
+                      },
+                  ],
+        );
+        // Personal data like the contacts: the log says that it changed, never the date.
+        const dateOfBirthChanged = (before.dateOfBirth?.getTime() ?? null) !== (details.dateOfBirth?.getTime() ?? null);
+        if (dateOfBirthChanged) {
+            contactChanges.push({
+                field: AuditField.DATE_OF_BIRTH,
+                from: before.dateOfBirth === null ? null : auditValue.redacted(),
+                to: details.dateOfBirth === null ? null : auditValue.redacted(),
+            });
+        }
+        const identityChanged =
+            before.user.firstName !== command.firstName ||
+            before.user.lastName !== command.lastName ||
+            before.user.email !== email;
+        const detailsChanged =
+            before.position.id !== details.positionId ||
+            before.startDate.getTime() !== startDate.getTime() ||
+            contactChanges.length > 0;
+        if (!identityChanged && !detailsChanged) {
+            return { before, after: before };
+        }
+        if (identityChanged) {
+            await this.userService.updateIdentity(
+                before.user.id,
+                { firstName: command.firstName, lastName: command.lastName, email },
+                actorId,
+            );
+        }
+        if (
+            !(await this.employeeRepository.updateDetails(
+                organisationId,
+                employeeId,
+                command.version,
+                details,
+                actorId,
+            ))
+        ) {
+            throw new ConcurrentModificationException();
+        }
+        const after = await this.requireProfile(organisationId, employeeId);
+        await this.auditService.record({
+            action: AuditAction.EMPLOYEE_UPDATED,
+            employeeId,
+            target: { type: AuditTargetType.EMPLOYEE, id: employeeId, label: nameOf(after) },
+            changes: [
+                ...changeOf(
+                    AuditField.FIRST_NAME,
+                    auditValue.text(before.user.firstName),
+                    auditValue.text(after.user.firstName),
+                ),
+                ...changeOf(
+                    AuditField.LAST_NAME,
+                    auditValue.text(before.user.lastName),
+                    auditValue.text(after.user.lastName),
+                ),
+                ...changeOf(AuditField.EMAIL, auditValue.text(before.user.email), auditValue.text(after.user.email)),
+                ...changeOf(
+                    AuditField.POSITION,
+                    auditValue.text(before.position.title),
+                    auditValue.text(after.position.title),
+                ),
+                ...changeOf(AuditField.START_DATE, auditValue.date(before.startDate), auditValue.date(after.startDate)),
+                ...contactChanges,
+            ],
+        });
+        return { before, after };
     }
-    const comment = command.comment ?? null;
-    const changes = [
-      ...changeOf(
-        AuditField.TERMINATION_DATE,
-        before.terminatedOn ? auditValue.date(before.terminatedOn) : null,
-        auditValue.date(terminatedOn),
-      ),
-      ...changeOf(
-        AuditField.TERMINATION_REASON,
-        before.terminationReason ? auditValue.terminationReason(before.terminationReason) : null,
-        auditValue.terminationReason(command.reason),
-      ),
-      ...changeOf(
-        AuditField.TERMINATION_COMMENT,
-        before.terminationComment ? auditValue.text(before.terminationComment) : null,
-        comment ? auditValue.text(comment) : null,
-      ),
-    ];
-    if (changes.length === 0) {
-      return { before, after: before };
+
+    /**
+     * Terminates the employee from `date` (today, past or future — a future date is a planned
+     * leave), or changes an existing termination. For the employment module, which cancels the
+     * reviews scheduled after that date in the same transaction.
+     */
+    @Transactional()
+    async terminate(
+        organisationId: string,
+        employeeId: string,
+        command: TerminateEmployeeCommand,
+        actorId: string,
+    ): Promise<{ before: EmployeeProfileRecord; after: EmployeeProfileRecord }> {
+        const before = await this.requireProfile(organisationId, employeeId, command.version);
+        const terminatedOn = new Date(`${command.date}T00:00:00Z`);
+        if (terminatedOn < before.startDate) {
+            throw new BusinessRuleException('errors.employee.terminationBeforeStart', {}, 'date');
+        }
+        if (!isTerminationReason(command.reason)) {
+            throw new BusinessRuleException('errors.employee.terminationReasonInvalid', {}, 'reason');
+        }
+        const comment = command.comment ?? null;
+        const changes = [
+            ...changeOf(
+                AuditField.TERMINATION_DATE,
+                before.terminatedOn ? auditValue.date(before.terminatedOn) : null,
+                auditValue.date(terminatedOn),
+            ),
+            ...changeOf(
+                AuditField.TERMINATION_REASON,
+                before.terminationReason ? auditValue.terminationReason(before.terminationReason) : null,
+                auditValue.terminationReason(command.reason),
+            ),
+            ...changeOf(
+                AuditField.TERMINATION_COMMENT,
+                before.terminationComment ? auditValue.text(before.terminationComment) : null,
+                comment ? auditValue.text(comment) : null,
+            ),
+        ];
+        if (changes.length === 0) {
+            return { before, after: before };
+        }
+        if (
+            !(await this.employeeRepository.updateTermination(
+                organisationId,
+                employeeId,
+                command.version,
+                { terminatedOn, reason: command.reason, comment },
+                actorId,
+            ))
+        ) {
+            throw new ConcurrentModificationException();
+        }
+        const after = await this.requireProfile(organisationId, employeeId);
+        await this.auditService.record({
+            action: AuditAction.EMPLOYEE_TERMINATED,
+            employeeId,
+            target: { type: AuditTargetType.EMPLOYEE, id: employeeId, label: nameOf(after) },
+            changes,
+        });
+        return { before, after };
     }
-    if (
-      !(await this.employeeRepository.updateTermination(
-        organisationId,
-        employeeId,
-        command.version,
-        { terminatedOn, reason: command.reason, comment },
-        actorId,
-      ))
-    ) {
-      throw new ConcurrentModificationException();
+
+    /** Takes a termination back (the employee is active again). Not terminated → nothing to do. */
+    @Transactional()
+    async cancelTermination(
+        organisationId: string,
+        employeeId: string,
+        version: number,
+        actorId: string,
+    ): Promise<EmployeeProfileRecord> {
+        const before = await this.requireProfile(organisationId, employeeId, version);
+        if (!before.terminatedOn) {
+            return before;
+        }
+        if (!(await this.employeeRepository.updateTermination(organisationId, employeeId, version, null, actorId))) {
+            throw new ConcurrentModificationException();
+        }
+        await this.auditService.record({
+            action: AuditAction.EMPLOYEE_TERMINATION_CANCELED,
+            employeeId,
+            target: { type: AuditTargetType.EMPLOYEE, id: employeeId, label: nameOf(before) },
+            changes: [
+                ...changeOf(AuditField.TERMINATION_DATE, auditValue.date(before.terminatedOn), null),
+                ...(before.terminationReason
+                    ? changeOf(
+                          AuditField.TERMINATION_REASON,
+                          auditValue.terminationReason(before.terminationReason),
+                          null,
+                      )
+                    : []),
+                ...(before.terminationComment
+                    ? changeOf(AuditField.TERMINATION_COMMENT, auditValue.text(before.terminationComment), null)
+                    : []),
+            ],
+        });
+        return this.requireProfile(organisationId, employeeId);
     }
-    const after = await this.requireProfile(organisationId, employeeId);
-    await this.auditService.record({
-      action: AuditAction.EMPLOYEE_TERMINATED,
-      employeeId,
-      target: { type: AuditTargetType.EMPLOYEE, id: employeeId, label: nameOf(after) },
-      changes,
-    });
-    return { before, after };
-  }
 
-  /** Takes a termination back (the employee is active again). Not terminated → nothing to do. */
-  @Transactional()
-  async cancelTermination(
-    organisationId: string,
-    employeeId: string,
-    version: number,
-    actorId: string,
-  ): Promise<EmployeeProfileRecord> {
-    const before = await this.requireProfile(organisationId, employeeId, version);
-    if (!before.terminatedOn) {
-      return before;
+    /** 404 for an unknown employee; with `version`, 409 when it is not the current one. */
+    private async requireProfile(
+        organisationId: string,
+        employeeId: string,
+        version?: number,
+    ): Promise<EmployeeProfileRecord> {
+        const employee = await this.employeeRepository.findProfileById(organisationId, employeeId);
+        if (!employee) {
+            throw new ResourceNotFoundException();
+        }
+        if (version !== undefined && employee.version !== version) {
+            throw new ConcurrentModificationException();
+        }
+        return employee;
     }
-    if (
-      !(await this.employeeRepository.updateTermination(
-        organisationId,
-        employeeId,
-        version,
-        null,
-        actorId,
-      ))
-    ) {
-      throw new ConcurrentModificationException();
+
+    /** The employee's change history, newest first; 404 for an unknown employee. */
+    async findActivity(
+        organisationId: string,
+        employeeId: string,
+        pageable: Pageable<AuditEventSortField>,
+    ): Promise<AuditEventPage> {
+        if (!(await this.employeeRepository.existsById(organisationId, employeeId))) {
+            throw new ResourceNotFoundException();
+        }
+        return this.auditService.findPageByEmployee(organisationId, employeeId, pageable);
     }
-    await this.auditService.record({
-      action: AuditAction.EMPLOYEE_TERMINATION_CANCELED,
-      employeeId,
-      target: { type: AuditTargetType.EMPLOYEE, id: employeeId, label: nameOf(before) },
-      changes: [
-        ...changeOf(AuditField.TERMINATION_DATE, auditValue.date(before.terminatedOn), null),
-        ...(before.terminationReason
-          ? changeOf(
-              AuditField.TERMINATION_REASON,
-              auditValue.terminationReason(before.terminationReason),
-              null,
-            )
-          : []),
-        ...(before.terminationComment
-          ? changeOf(
-              AuditField.TERMINATION_COMMENT,
-              auditValue.text(before.terminationComment),
-              null,
-            )
-          : []),
-      ],
-    });
-    return this.requireProfile(organisationId, employeeId);
-  }
 
-  /** 404 for an unknown employee; with `version`, 409 when it is not the current one. */
-  private async requireProfile(
-    organisationId: string,
-    employeeId: string,
-    version?: number,
-  ): Promise<EmployeeProfileRecord> {
-    const employee = await this.employeeRepository.findProfileById(organisationId, employeeId);
-    if (!employee) {
-      throw new ResourceNotFoundException();
+    /** The employee's whole change history for a CSV export (Business plan), newest first. */
+    async findAllActivity(organisationId: string, employeeId: string): Promise<AuditEvent[]> {
+        if (!(await this.employeeRepository.existsById(organisationId, employeeId))) {
+            throw new ResourceNotFoundException();
+        }
+        return this.auditService.findAllByEmployee(organisationId, employeeId, MAX_EXPORT_EVENTS);
     }
-    if (version !== undefined && employee.version !== version) {
-      throw new ConcurrentModificationException();
+
+    /** The employee's whole security log for a CSV export (Business plan), newest first. */
+    async findAllSecurityLog(organisationId: string, employeeId: string): Promise<SecurityEvent[]> {
+        const userId = await this.employeeRepository.findUserIdById(organisationId, employeeId);
+        if (!userId) {
+            throw new ResourceNotFoundException();
+        }
+        return this.auditService.findAllSecurity(organisationId, userId, MAX_EXPORT_EVENTS);
     }
-    return employee;
-  }
 
-  /** The employee's change history, newest first; 404 for an unknown employee. */
-  async findActivity(
-    organisationId: string,
-    employeeId: string,
-    pageable: Pageable<AuditEventSortField>,
-  ): Promise<AuditEventPage> {
-    if (!(await this.employeeRepository.existsById(organisationId, employeeId))) {
-      throw new ResourceNotFoundException();
+    /** The employee's security log (their account's sign-ins, password changes…), for admins. */
+    async findSecurityLog(
+        organisationId: string,
+        employeeId: string,
+        category: SecurityCategory | null,
+        pageable: Pageable<AuditEventSortField>,
+    ): Promise<SecurityEventPage> {
+        const userId = await this.employeeRepository.findUserIdById(organisationId, employeeId);
+        if (!userId) {
+            throw new ResourceNotFoundException();
+        }
+        return this.auditService.findSecurityPage(organisationId, userId, category, pageable);
     }
-    return this.auditService.findPageByEmployee(organisationId, employeeId, pageable);
-  }
 
-  /** The employee's whole change history for a CSV export (Business plan), newest first. */
-  async findAllActivity(organisationId: string, employeeId: string): Promise<AuditEvent[]> {
-    if (!(await this.employeeRepository.existsById(organisationId, employeeId))) {
-      throw new ResourceNotFoundException();
+    /** For other modules (employment): the employee's account; 404 for an unknown employee. */
+    async findUserId(organisationId: string, employeeId: string): Promise<string> {
+        const userId = await this.employeeRepository.findUserIdById(organisationId, employeeId);
+        if (!userId) {
+            throw new ResourceNotFoundException();
+        }
+        return userId;
     }
-    return this.auditService.findAllByEmployee(organisationId, employeeId, MAX_EXPORT_EVENTS);
-  }
 
-  /** The employee's whole security log for a CSV export (Business plan), newest first. */
-  async findAllSecurityLog(organisationId: string, employeeId: string): Promise<SecurityEvent[]> {
-    const userId = await this.employeeRepository.findUserIdById(organisationId, employeeId);
-    if (!userId) {
-      throw new ResourceNotFoundException();
+    /** For other modules (employment): the employee's sign-in email; 404 for an unknown employee. */
+    async findEmail(organisationId: string, employeeId: string): Promise<string> {
+        const email = await this.employeeRepository.findEmailById(organisationId, employeeId);
+        if (!email) {
+            throw new ResourceNotFoundException();
+        }
+        return email;
     }
-    return this.auditService.findAllSecurity(organisationId, userId, MAX_EXPORT_EVENTS);
-  }
 
-  /** The employee's security log (their account's sign-ins, password changes…), for admins. */
-  async findSecurityLog(
-    organisationId: string,
-    employeeId: string,
-    category: SecurityCategory | null,
-    pageable: Pageable<AuditEventSortField>,
-  ): Promise<SecurityEventPage> {
-    const userId = await this.employeeRepository.findUserIdById(organisationId, employeeId);
-    if (!userId) {
-      throw new ResourceNotFoundException();
+    async findProfile(organisationId: string, id: string): Promise<EmployeeProfile> {
+        const employee = await this.employeeRepository.findProfileById(organisationId, id);
+        if (!employee) {
+            throw new ResourceNotFoundException();
+        }
+        return { employee, today: todayUtc() };
     }
-    return this.auditService.findSecurityPage(organisationId, userId, category, pageable);
-  }
 
-  /** For other modules (employment): the employee's account; 404 for an unknown employee. */
-  async findUserId(organisationId: string, employeeId: string): Promise<string> {
-    const userId = await this.employeeRepository.findUserIdById(organisationId, employeeId);
-    if (!userId) {
-      throw new ResourceNotFoundException();
+    /** For other modules (time off): the caller's employee record; null for admins (none). */
+    async findForTimeOffByUserId(userId: string): Promise<EmployeeForTimeOff | null> {
+        const employee = await this.employeeRepository.findTimeOffByUserId(userId);
+        return employee ? toTimeOff(employee) : null;
     }
-    return userId;
-  }
 
-  /** For other modules (employment): the employee's sign-in email; 404 for an unknown employee. */
-  async findEmail(organisationId: string, employeeId: string): Promise<string> {
-    const email = await this.employeeRepository.findEmailById(organisationId, employeeId);
-    if (!email) {
-      throw new ResourceNotFoundException();
+    /**
+     * For other modules (auth): has this user's employment ended (terminated on or before today)?
+     * Admins have no employee record — never.
+     */
+    async hasAccessEnded(userId: string): Promise<boolean> {
+        const employee = await this.employeeRepository.findTimeOffByUserId(userId);
+        return employee?.terminatedOn != null && employee.terminatedOn <= todayUtc();
     }
-    return email;
-  }
 
-  async findProfile(organisationId: string, id: string): Promise<EmployeeProfile> {
-    const employee = await this.employeeRepository.findProfileById(organisationId, id);
-    if (!employee) {
-      throw new ResourceNotFoundException();
+    /**
+     * For other modules (auth, a system job over every organisation): users whose employment ended
+     * in the last `days` days, today included.
+     */
+    usersWhoLeftWithin(days: number): Promise<{ userId: string; organisationId: string }[]> {
+        const today = todayUtc();
+        return this.employeeRepository.findUsersTerminatedBetween(minusDays(today, days - 1), today, MAX_ROSTER);
     }
-    return { employee, today: todayUtc() };
-  }
 
-  /** For other modules (time off): the caller's employee record; null for admins (none). */
-  async findForTimeOffByUserId(userId: string): Promise<EmployeeForTimeOff | null> {
-    const employee = await this.employeeRepository.findTimeOffByUserId(userId);
-    return employee ? toTimeOff(employee) : null;
-  }
-
-  /**
-   * For other modules (auth): has this user's employment ended (terminated on or before today)?
-   * Admins have no employee record — never.
-   */
-  async hasAccessEnded(userId: string): Promise<boolean> {
-    const employee = await this.employeeRepository.findTimeOffByUserId(userId);
-    return employee?.terminatedOn != null && employee.terminatedOn <= todayUtc();
-  }
-
-  /**
-   * For other modules (auth, a system job over every organisation): users whose employment ended
-   * in the last `days` days, today included.
-   */
-  usersWhoLeftWithin(days: number): Promise<{ userId: string; organisationId: string }[]> {
-    const today = todayUtc();
-    return this.employeeRepository.findUsersTerminatedBetween(
-      minusDays(today, days - 1),
-      today,
-      MAX_ROSTER,
-    );
-  }
-
-  /** For other modules (time off): one employee; null when unknown. */
-  async findForTimeOff(
-    organisationId: string,
-    employeeId: string,
-  ): Promise<EmployeeForTimeOff | null> {
-    const employee = await this.employeeRepository.findTimeOffById(organisationId, employeeId);
-    return employee ? toTimeOff(employee) : null;
-  }
-
-  /** For other modules (time-off calendar): people employed on at least one day of [from, to]. */
-  async findCalendarPage(
-    organisationId: string,
-    search: string | undefined,
-    from: Date,
-    to: Date,
-    pageable: Pageable<EmployeeSortField>,
-  ): Promise<EmployeeCalendarPage> {
-    const page = await this.employeeRepository.findCalendarPage(
-      organisationId,
-      { searchTerms: toSearchTerms(search), from, to },
-      pageable,
-    );
-    return {
-      content: page.content.map((employee) => ({
-        id: employee.id,
-        userId: employee.user.id,
-        firstName: employee.user.firstName,
-        lastName: employee.user.lastName,
-        positionTitle: employee.position.title,
-        startDate: employee.startDate,
-        terminatedOn: employee.terminatedOn,
-      })),
-      totalElements: page.totalElements,
-    };
-  }
-
-  /**
-   * For other modules (dashboard): birthdays between `from` and `to` (one month) of people employed
-   * on at least one day of it, a page at a time. 29 February birthdays count on the 28th in a year
-   * without one.
-   */
-  async birthdays(
-    organisationId: string,
-    range: { from: Date; to: Date },
-    page: { page: number; size: number },
-  ): Promise<EmployeeBirthdays> {
-    const { from, to } = range;
-    const year = from.getUTCFullYear();
-    const month = from.getUTCMonth() + 1;
-    const isLeap = new Date(Date.UTC(year, 1, 29)).getUTCMonth() === 1;
-    const days = Array.from(
-      { length: to.getUTCDate() - from.getUTCDate() + 1 },
-      (_, index) => from.getUTCDate() + index,
-    );
-    if (month === 2 && !isLeap && days.includes(28)) {
-      days.push(29);
+    /** For other modules (time off): one employee; null when unknown. */
+    async findForTimeOff(organisationId: string, employeeId: string): Promise<EmployeeForTimeOff | null> {
+        const employee = await this.employeeRepository.findTimeOffById(organisationId, employeeId);
+        return employee ? toTimeOff(employee) : null;
     }
-    const result = await this.employeeRepository.findBirthdays(
-      organisationId,
-      { from, to, month, days },
-      { offset: page.page * page.size, limit: page.size },
-    );
-    return {
-      content: result.content.map(({ id, ...row }) => ({ employeeId: id, ...row })),
-      totalElements: result.totalElements,
-    };
-  }
 
-  /**
-   * For other modules (insights): everyone who ever worked here, with dates and position. One
-   * company is small; bounded defensively.
-   */
-  async roster(organisationId: string): Promise<RosterEmployee[]> {
-    const rows = await this.employeeRepository.findRoster(organisationId, MAX_ROSTER);
-    return rows.map((row) => ({
-      id: row.id,
-      userId: row.user.id,
-      firstName: row.user.firstName,
-      lastName: row.user.lastName,
-      startDate: row.startDate,
-      terminatedOn: row.terminatedOn,
-      position: { id: row.position.id, title: row.position.title },
-      category: row.position.category,
-    }));
-  }
+    /** For other modules (time-off calendar): people employed on at least one day of [from, to]. */
+    async findCalendarPage(
+        organisationId: string,
+        search: string | undefined,
+        from: Date,
+        to: Date,
+        pageable: Pageable<EmployeeSortField>,
+    ): Promise<EmployeeCalendarPage> {
+        const page = await this.employeeRepository.findCalendarPage(
+            organisationId,
+            { searchTerms: toSearchTerms(search), from, to },
+            pageable,
+        );
+        return {
+            content: page.content.map((employee) => ({
+                id: employee.id,
+                userId: employee.user.id,
+                firstName: employee.user.firstName,
+                lastName: employee.user.lastName,
+                positionTitle: employee.position.title,
+                startDate: employee.startDate,
+                terminatedOn: employee.terminatedOn,
+            })),
+            totalElements: page.totalElements,
+        };
+    }
 
-  /** For other modules (dashboard): who starts and who leaves in the next `days` days. */
-  async movements(organisationId: string, today: Date, days: number): Promise<EmployeeMovements> {
-    const until = new Date(today.getTime() + days * 86_400_000);
-    const [joining, leaving] = await Promise.all([
-      this.employeeRepository.findStartingBetween(organisationId, today, until),
-      this.employeeRepository.findLeavingBetween(organisationId, today, until),
-    ]);
-    const events: EmployeeMovement[] = [
-      ...joining.map((employee) => movementOf('JOINING', employee.startDate, employee)),
-      ...leaving.flatMap((employee) =>
-        employee.terminatedOn ? [movementOf('LEAVING', employee.terminatedOn, employee)] : [],
-      ),
-    ].sort((left, right) => left.date.getTime() - right.date.getTime());
-    return { joining: joining.length, leaving: leaving.length, next: events[0] ?? null };
-  }
+    /**
+     * For other modules (dashboard): birthdays between `from` and `to` (one month) of people employed
+     * on at least one day of it, a page at a time. 29 February birthdays count on the 28th in a year
+     * without one.
+     */
+    async birthdays(
+        organisationId: string,
+        range: { from: Date; to: Date },
+        page: { page: number; size: number },
+    ): Promise<EmployeeBirthdays> {
+        const { from, to } = range;
+        const year = from.getUTCFullYear();
+        const month = from.getUTCMonth() + 1;
+        const isLeap = new Date(Date.UTC(year, 1, 29)).getUTCMonth() === 1;
+        const days = Array.from(
+            { length: to.getUTCDate() - from.getUTCDate() + 1 },
+            (_, index) => from.getUTCDate() + index,
+        );
+        if (month === 2 && !isLeap && days.includes(28)) {
+            days.push(29);
+        }
+        const result = await this.employeeRepository.findBirthdays(
+            organisationId,
+            { from, to, month, days },
+            { offset: page.page * page.size, limit: page.size },
+        );
+        return {
+            content: result.content.map(({ id, ...row }) => ({ employeeId: id, ...row })),
+            totalElements: result.totalElements,
+        };
+    }
 
-  /** For other modules: does the employee exist? */
-  exists(organisationId: string, id: string): Promise<boolean> {
-    return this.employeeRepository.existsById(organisationId, id);
-  }
+    /**
+     * For other modules (insights): everyone who ever worked here, with dates and position. One
+     * company is small; bounded defensively.
+     */
+    async roster(organisationId: string): Promise<RosterEmployee[]> {
+        const rows = await this.employeeRepository.findRoster(organisationId, MAX_ROSTER);
+        return rows.map((row) => ({
+            id: row.id,
+            userId: row.user.id,
+            firstName: row.user.firstName,
+            lastName: row.user.lastName,
+            startDate: row.startDate,
+            terminatedOn: row.terminatedOn,
+            position: { id: row.position.id, title: row.position.title },
+            category: row.position.category,
+        }));
+    }
 
-  /** For other modules: are all these users admins of the organisation (possible responsibles)? */
-  async areResponsibleCandidates(organisationId: string, userIds: string[]): Promise<boolean> {
-    const unique = [...new Set(userIds)];
-    return (
-      unique.length === 0 ||
-      (await this.employeeRepository.countResponsibleCandidates(organisationId, unique)) ===
-        unique.length
-    );
-  }
+    /** For other modules (dashboard): who starts and who leaves in the next `days` days. */
+    async movements(organisationId: string, today: Date, days: number): Promise<EmployeeMovements> {
+        const until = new Date(today.getTime() + days * 86_400_000);
+        const [joining, leaving] = await Promise.all([
+            this.employeeRepository.findStartingBetween(organisationId, today, until),
+            this.employeeRepository.findLeavingBetween(organisationId, today, until),
+        ]);
+        const events: EmployeeMovement[] = [
+            ...joining.map((employee) => movementOf('JOINING', employee.startDate, employee)),
+            ...leaving.flatMap((employee) =>
+                employee.terminatedOn ? [movementOf('LEAVING', employee.terminatedOn, employee)] : [],
+            ),
+        ].sort((left, right) => left.date.getTime() - right.date.getTime());
+        return { joining: joining.length, leaving: leaving.length, next: events[0] ?? null };
+    }
 
-  positionOptions(organisationId: string) {
-    return this.employeeRepository.findPositionOptions(organisationId);
-  }
+    /** For other modules: does the employee exist? */
+    exists(organisationId: string, id: string): Promise<boolean> {
+        return this.employeeRepository.existsById(organisationId, id);
+    }
 
-  responsibleCandidates(organisationId: string, search: string | undefined) {
-    return this.employeeRepository.findResponsibleCandidates(organisationId, toSearchTerms(search));
-  }
+    /** For other modules: are all these users admins of the organisation (possible responsibles)? */
+    async areResponsibleCandidates(organisationId: string, userIds: string[]): Promise<boolean> {
+        const unique = [...new Set(userIds)];
+        return (
+            unique.length === 0 ||
+            (await this.employeeRepository.countResponsibleCandidates(organisationId, unique)) === unique.length
+        );
+    }
+
+    positionOptions(organisationId: string) {
+        return this.employeeRepository.findPositionOptions(organisationId);
+    }
+
+    responsibleCandidates(organisationId: string, search: string | undefined) {
+        return this.employeeRepository.findResponsibleCandidates(organisationId, toSearchTerms(search));
+    }
 }
 
-const nameOf = (employee: EmployeeProfileRecord): string =>
-  `${employee.user.firstName} ${employee.user.lastName}`;
+const nameOf = (employee: EmployeeProfileRecord): string => `${employee.user.firstName} ${employee.user.lastName}`;
 
 /** Personal contacts: the log says that they changed, never their values. */
 const CONTACT_FIELDS = [
-  ['mobile', AuditField.MOBILE],
-  ['personalEmail', AuditField.PERSONAL_EMAIL],
-  ['linkedinUrl', AuditField.LINKEDIN_URL],
-  ['telegram', AuditField.TELEGRAM],
-  ['address', AuditField.ADDRESS],
+    ['mobile', AuditField.MOBILE],
+    ['personalEmail', AuditField.PERSONAL_EMAIL],
+    ['linkedinUrl', AuditField.LINKEDIN_URL],
+    ['telegram', AuditField.TELEGRAM],
+    ['address', AuditField.ADDRESS],
 ] as const;
 
 /** Responsible people as an audit value, sorted by id so order never reads as a change. */
 const peopleOf = (employee: EmployeeProfileRecord) => {
-  const people = employee.responsibles
-    .map(({ responsible }) => ({
-      id: responsible.id,
-      firstName: responsible.firstName,
-      lastName: responsible.lastName,
-    }))
-    .sort((left, right) => left.id.localeCompare(right.id));
-  return people.length > 0 ? auditValue.people(people) : null;
+    const people = employee.responsibles
+        .map(({ responsible }) => ({
+            id: responsible.id,
+            firstName: responsible.firstName,
+            lastName: responsible.lastName,
+        }))
+        .sort((left, right) => left.id.localeCompare(right.id));
+    return people.length > 0 ? auditValue.people(people) : null;
 };
 
 const toTimeOff = (employee: EmployeeTimeOffRecord): EmployeeForTimeOff => ({
-  id: employee.id,
-  startDate: employee.startDate,
-  terminatedOn: employee.terminatedOn,
-  responsibleUserIds: employee.responsibles.map(({ responsibleUserId }) => responsibleUserId),
+    id: employee.id,
+    startDate: employee.startDate,
+    terminatedOn: employee.terminatedOn,
+    responsibleUserIds: employee.responsibles.map(({ responsibleUserId }) => responsibleUserId),
 });
 
 const movementOf = (
-  kind: EmployeeMovement['kind'],
-  date: Date,
-  employee: EmployeeMovementRecord,
+    kind: EmployeeMovement['kind'],
+    date: Date,
+    employee: EmployeeMovementRecord,
 ): EmployeeMovement => ({
-  kind,
-  date,
-  employeeId: employee.id,
-  userId: employee.user.id,
-  firstName: employee.user.firstName,
-  lastName: employee.user.lastName,
+    kind,
+    date,
+    employeeId: employee.id,
+    userId: employee.user.id,
+    firstName: employee.user.firstName,
+    lastName: employee.user.lastName,
 });

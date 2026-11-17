@@ -22,75 +22,67 @@ const PERMISSIONS_POLICY = 'camera=(), microphone=(), geolocation=(), payment=()
 const WEBHOOK_PATH_PREFIX = '/api/v1/webhooks/';
 
 const bootstrap = async (): Promise<void> => {
-  const app = await NestFactory.create<NestExpressApplication>(AppModule, {
-    bufferLogs: true,
-    bodyParser: false,
-  });
-  app.useLogger(app.get(Logger));
-  const logger = await app.resolve(PinoLogger);
-  logger.setContext('Bootstrap');
-  process.on('unhandledRejection', (reason) => {
-    logger.error({ err: reason }, 'Unhandled rejection');
-    process.exit(1);
-  });
-  process.on('uncaughtException', (error) => {
-    logger.error({ err: error }, 'Uncaught exception');
-    process.exit(1);
-  });
+    const app = await NestFactory.create<NestExpressApplication>(AppModule, {
+        bufferLogs: true,
+        bodyParser: false,
+    });
+    app.useLogger(app.get(Logger));
+    const logger = await app.resolve(PinoLogger);
+    logger.setContext('Bootstrap');
+    process.on('unhandledRejection', (reason) => {
+        logger.error({ err: reason }, 'Unhandled rejection');
+        process.exit(1);
+    });
+    process.on('uncaughtException', (error) => {
+        logger.error({ err: error }, 'Uncaught exception');
+        process.exit(1);
+    });
 
-  const config = app.get(AppConfigService);
-  const trustProxyHops = config.get('TRUST_PROXY_HOPS');
-  app.set('trust proxy', trustProxyHops > 0 ? trustProxyHops : false);
-  app.disable('x-powered-by');
-  app.use(new ClsMiddleware(CLS_MIDDLEWARE_OPTIONS).use);
-  app.useBodyParser('json', {
-    limit: BODY_LIMIT,
-    // The raw bytes are kept for webhook routes only: their signature covers the exact body.
-    verify: (
-      request: RawBodyRequest<IncomingMessage>,
-      _response: ServerResponse,
-      buffer: Buffer,
-    ) => {
-      if (request.url?.startsWith(WEBHOOK_PATH_PREFIX)) {
-        request.rawBody = buffer;
-      }
-    },
-  });
-  app.use(cookieParser());
+    const config = app.get(AppConfigService);
+    const trustProxyHops = config.get('TRUST_PROXY_HOPS');
+    app.set('trust proxy', trustProxyHops > 0 ? trustProxyHops : false);
+    app.disable('x-powered-by');
+    app.use(new ClsMiddleware(CLS_MIDDLEWARE_OPTIONS).use);
+    app.useBodyParser('json', {
+        limit: BODY_LIMIT,
+        // The raw bytes are kept for webhook routes only: their signature covers the exact body.
+        verify: (request: RawBodyRequest<IncomingMessage>, _response: ServerResponse, buffer: Buffer) => {
+            if (request.url?.startsWith(WEBHOOK_PATH_PREFIX)) {
+                request.rawBody = buffer;
+            }
+        },
+    });
+    app.use(cookieParser());
 
-  const strictHelmet = helmet({
-    contentSecurityPolicy: {
-      useDefaults: false,
-      directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] },
-    },
-    strictTransportSecurity: { maxAge: 31_536_000, includeSubDomains: true },
-    xFrameOptions: { action: 'deny' },
-    referrerPolicy: { policy: 'no-referrer' },
-  });
-  const docsHelmet = helmet({ contentSecurityPolicy: false });
-  app.use((request: Request, response: Response, next: NextFunction) => {
-    response.setHeader('Permissions-Policy', PERMISSIONS_POLICY);
-    const isDocs = config.isDev && request.path.startsWith(`/${DOCS_PATH}`);
-    (isDocs ? docsHelmet : strictHelmet)(request, response, next);
-  });
+    const strictHelmet = helmet({
+        contentSecurityPolicy: {
+            useDefaults: false,
+            directives: { defaultSrc: ["'none'"], frameAncestors: ["'none'"] },
+        },
+        strictTransportSecurity: { maxAge: 31_536_000, includeSubDomains: true },
+        xFrameOptions: { action: 'deny' },
+        referrerPolicy: { policy: 'no-referrer' },
+    });
+    const docsHelmet = helmet({ contentSecurityPolicy: false });
+    app.use((request: Request, response: Response, next: NextFunction) => {
+        response.setHeader('Permissions-Policy', PERMISSIONS_POLICY);
+        const isDocs = config.isDev && request.path.startsWith(`/${DOCS_PATH}`);
+        (isDocs ? docsHelmet : strictHelmet)(request, response, next);
+    });
 
-  app.enableCors({
-    origin: config.get('CORS_ALLOWED_ORIGINS'),
-    credentials: true,
-    exposedHeaders: ['Deprecation', 'Sunset', 'Retry-After', TRACE_ID_HEADER],
-  });
-  app.enableShutdownHooks();
+    app.enableCors({
+        origin: config.get('CORS_ALLOWED_ORIGINS'),
+        credentials: true,
+        exposedHeaders: ['Deprecation', 'Sunset', 'Retry-After', TRACE_ID_HEADER],
+    });
+    app.enableShutdownHooks();
 
-  if (config.isDev) {
-    SwaggerModule.setup(
-      DOCS_PATH,
-      app,
-      buildOpenApiDocument(app, config.get('SESSION_COOKIE_NAME')),
-    );
-  }
+    if (config.isDev) {
+        SwaggerModule.setup(DOCS_PATH, app, buildOpenApiDocument(app, config.get('SESSION_COOKIE_NAME')));
+    }
 
-  await app.listen(config.get('PORT'));
-  logger.info({ port: config.get('PORT'), env: config.get('APP_ENV') }, 'Application started');
+    await app.listen(config.get('PORT'));
+    logger.info({ port: config.get('PORT'), env: config.get('APP_ENV') }, 'Application started');
 };
 
 void bootstrap();

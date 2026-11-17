@@ -6,161 +6,161 @@ export type MessageArgs = Readonly<Record<string, string | number>>;
 
 /** Base of every error our code throws. Carries an i18n key, never a message string. */
 export abstract class ApiException extends Error {
-  readonly status: number;
+    readonly status: number;
 
-  protected constructor(
-    readonly code: ErrorCode,
-    readonly messageKey: I18nPath,
-    readonly args: MessageArgs = {},
-  ) {
-    super(code);
-    this.status = ErrorCode[code];
-  }
+    protected constructor(
+        readonly code: ErrorCode,
+        readonly messageKey: I18nPath,
+        readonly args: MessageArgs = {},
+    ) {
+        super(code);
+        this.status = ErrorCode[code];
+    }
 }
 
 export class NotAuthenticatedException extends ApiException {
-  constructor() {
-    super('UNAUTHORIZED', 'errors.UNAUTHORIZED');
-  }
+    constructor() {
+        super('UNAUTHORIZED', 'errors.UNAUTHORIZED');
+    }
 }
 
 export class InvalidCredentialsException extends ApiException {
-  constructor() {
-    super('INVALID_CREDENTIALS', 'errors.INVALID_CREDENTIALS');
-  }
+    constructor() {
+        super('INVALID_CREDENTIALS', 'errors.INVALID_CREDENTIALS');
+    }
 }
 
 /** The password was right, but the person's employment has ended. */
 export class AccessEndedException extends ApiException {
-  constructor() {
-    super('ACCESS_ENDED', 'errors.ACCESS_ENDED');
-  }
+    constructor() {
+        super('ACCESS_ENDED', 'errors.ACCESS_ENDED');
+    }
 }
 
 export class OrganisationNotActiveException extends ApiException {
-  constructor() {
-    super('ORGANISATION_NOT_ACTIVE', 'errors.ORGANISATION_NOT_ACTIVE');
-  }
+    constructor() {
+        super('ORGANISATION_NOT_ACTIVE', 'errors.ORGANISATION_NOT_ACTIVE');
+    }
 }
 
 /** The public demo refuses actions that would lock other visitors out. */
 export class DemoRestrictedException extends ApiException {
-  constructor() {
-    super('DEMO_RESTRICTED', 'errors.DEMO_RESTRICTED');
-  }
+    constructor() {
+        super('DEMO_RESTRICTED', 'errors.DEMO_RESTRICTED');
+    }
 }
 
 /** 403 — the feature is on a higher plan; the hint names the cheapest plan that has it. */
 export class PlanUpgradeRequiredException extends ApiException {
-  constructor(
-    readonly feature: Feature,
-    readonly requiredPlan: Plan,
-  ) {
-    super('PLAN_UPGRADE_REQUIRED', 'errors.PLAN_UPGRADE_REQUIRED', {
-      plan: PLAN_CATALOGUE[requiredPlan].name,
-    });
-  }
+    constructor(
+        readonly feature: Feature,
+        readonly requiredPlan: Plan,
+    ) {
+        super('PLAN_UPGRADE_REQUIRED', 'errors.PLAN_UPGRADE_REQUIRED', {
+            plan: PLAN_CATALOGUE[requiredPlan].name,
+        });
+    }
 }
 
 /** 403 — the plan's employee limit is reached (the 11th employee on Starter). */
 export class PlanLimitReachedException extends ApiException {
-  constructor(plan: Plan, limit: number) {
-    super('PLAN_LIMIT_REACHED', 'errors.PLAN_LIMIT_REACHED', {
-      plan: PLAN_CATALOGUE[plan].name,
-      limit,
-    });
-  }
+    constructor(plan: Plan, limit: number) {
+        super('PLAN_LIMIT_REACHED', 'errors.PLAN_LIMIT_REACHED', {
+            plan: PLAN_CATALOGUE[plan].name,
+            limit,
+        });
+    }
 }
 
 /** 401 — a webhook whose signature does not verify (or has no raw body to verify). */
 export class WebhookSignatureException extends ApiException {
-  constructor() {
-    super('UNAUTHORIZED', 'errors.billing.invalidSignature');
-  }
+    constructor() {
+        super('UNAUTHORIZED', 'errors.billing.invalidSignature');
+    }
 }
 
 export class SessionExpiredException extends ApiException {
-  constructor() {
-    super('SESSION_EXPIRED', 'errors.SESSION_EXPIRED');
-  }
+    constructor() {
+        super('SESSION_EXPIRED', 'errors.SESSION_EXPIRED');
+    }
 }
 
 export class AccessDeniedException extends ApiException {
-  constructor() {
-    super('FORBIDDEN', 'errors.FORBIDDEN');
-  }
+    constructor() {
+        super('FORBIDDEN', 'errors.FORBIDDEN');
+    }
 }
 
 export class UnsupportedMediaTypeException extends ApiException {
-  constructor() {
-    super('UNSUPPORTED_MEDIA_TYPE', 'errors.UNSUPPORTED_MEDIA_TYPE');
-  }
+    constructor() {
+        super('UNSUPPORTED_MEDIA_TYPE', 'errors.UNSUPPORTED_MEDIA_TYPE');
+    }
 }
 
 export class RateLimitExceededException extends ApiException {
-  constructor(readonly retryAfterSeconds: number) {
-    super('RATE_LIMIT_EXCEEDED', 'errors.RATE_LIMIT_EXCEEDED', {
-      minutes: Math.max(1, Math.ceil(retryAfterSeconds / 60)),
-    });
-  }
+    constructor(readonly retryAfterSeconds: number) {
+        super('RATE_LIMIT_EXCEEDED', 'errors.RATE_LIMIT_EXCEEDED', {
+            minutes: Math.max(1, Math.ceil(retryAfterSeconds / 60)),
+        });
+    }
 }
 
 export class UpstreamUnavailableException extends ApiException {
-  constructor() {
-    super('UPSTREAM_UNAVAILABLE', 'errors.UPSTREAM_UNAVAILABLE');
-  }
+    constructor() {
+        super('UPSTREAM_UNAVAILABLE', 'errors.UPSTREAM_UNAVAILABLE');
+    }
 }
 
 export class InvalidParameterException extends ApiException {
-  constructor(parameter: string) {
-    super('INVALID_PARAMETER', 'errors.INVALID_PARAMETER', { parameter });
-  }
+    constructor(parameter: string) {
+        super('INVALID_PARAMETER', 'errors.INVALID_PARAMETER', { parameter });
+    }
 }
 
 /** 409 — the request conflicts with existing data; `field` points the client at the input. */
 export class BusinessConflictException extends ApiException {
-  constructor(
-    messageKey: I18nPath,
-    args: MessageArgs = {},
-    readonly field?: string,
-  ) {
-    super('CONFLICT', messageKey, args);
-  }
+    constructor(
+        messageKey: I18nPath,
+        args: MessageArgs = {},
+        readonly field?: string,
+    ) {
+        super('CONFLICT', messageKey, args);
+    }
 }
 
 /** 422 — the request is well-formed but breaks a business rule. */
 export class BusinessRuleException extends ApiException {
-  constructor(
-    messageKey: I18nPath,
-    args: MessageArgs = {},
-    readonly field?: string,
-  ) {
-    super('BUSINESS_RULE_VIOLATION', messageKey, args);
-  }
+    constructor(
+        messageKey: I18nPath,
+        args: MessageArgs = {},
+        readonly field?: string,
+    ) {
+        super('BUSINESS_RULE_VIOLATION', messageKey, args);
+    }
 }
 
 export class IdempotencyKeyReusedException extends ApiException {
-  constructor() {
-    super('IDEMPOTENCY_KEY_REUSED', 'errors.IDEMPOTENCY_KEY_REUSED');
-  }
+    constructor() {
+        super('IDEMPOTENCY_KEY_REUSED', 'errors.IDEMPOTENCY_KEY_REUSED');
+    }
 }
 
 /** 409 — the same Idempotency-Key is still being processed. */
 export class RequestInProgressException extends ApiException {
-  constructor() {
-    super('CONFLICT', 'errors.CONFLICT');
-  }
+    constructor() {
+        super('CONFLICT', 'errors.CONFLICT');
+    }
 }
 
 export class ResourceNotFoundException extends ApiException {
-  constructor() {
-    super('RESOURCE_NOT_FOUND', 'errors.RESOURCE_NOT_FOUND');
-  }
+    constructor() {
+        super('RESOURCE_NOT_FOUND', 'errors.RESOURCE_NOT_FOUND');
+    }
 }
 
 /** 409 — the record changed since the client read it (optimistic locking). */
 export class ConcurrentModificationException extends ApiException {
-  constructor() {
-    super('CONCURRENT_MODIFICATION', 'errors.CONCURRENT_MODIFICATION');
-  }
+    constructor() {
+        super('CONCURRENT_MODIFICATION', 'errors.CONCURRENT_MODIFICATION');
+    }
 }

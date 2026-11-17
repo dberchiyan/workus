@@ -18,188 +18,182 @@ import { PasswordResetResponse } from './dto/password-reset.response';
 @ApiTags('Employees')
 @Controller('api/v1/employees')
 export class EmploymentController {
-  constructor(private readonly employmentService: EmploymentService) {}
+    constructor(private readonly employmentService: EmploymentService) {}
 
-  @Post()
-  @HttpCode(HttpStatus.OK)
-  @Authorize(can.manageEmployees)
-  @Idempotent({ redact: ['temporaryPassword'] })
-  @ApiOperation({
-    summary:
-      'Create an employee with their account (a generated password, returned once), responsibles and starting salary',
-  })
-  @ZodResponse({ status: HttpStatus.OK, type: HiredEmployeeResponse })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-    'CONFLICT',
-    'IDEMPOTENCY_KEY_REUSED',
-    'BUSINESS_RULE_VIOLATION',
-    'PLAN_LIMIT_REACHED',
-  )
-  hire(
-    @Body() request: CreateEmployeeRequest,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<HiredEmployeeResponse> {
-    return this.employmentService.hire(
-      principal.organisationId,
-      {
-        firstName: request.firstName,
-        lastName: request.lastName,
-        email: request.email,
-        positionId: request.positionId,
-        startDate: request.startDate,
-        startingSalary: request.startingSalary,
-        mobile: request.mobile,
-        personalEmail: request.personalEmail,
-        linkedinUrl: request.linkedinUrl,
-        telegram: request.telegram,
-        address: request.address,
-        dateOfBirth: request.dateOfBirth,
-        responsibleUserIds: request.responsibleUserIds,
-      },
-      principal.userId,
-    );
-  }
+    @Post()
+    @HttpCode(HttpStatus.OK)
+    @Authorize(can.manageEmployees)
+    @Idempotent({ redact: ['temporaryPassword'] })
+    @ApiOperation({
+        summary:
+            'Create an employee with their account (a generated password, returned once), responsibles and starting salary',
+    })
+    @ZodResponse({ status: HttpStatus.OK, type: HiredEmployeeResponse })
+    @ApiErrors(
+        'VALIDATION_FAILED',
+        'INVALID_PARAMETER',
+        'UNAUTHORIZED',
+        'SESSION_EXPIRED',
+        'FORBIDDEN',
+        'CONFLICT',
+        'IDEMPOTENCY_KEY_REUSED',
+        'BUSINESS_RULE_VIOLATION',
+        'PLAN_LIMIT_REACHED',
+    )
+    hire(
+        @Body() request: CreateEmployeeRequest,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<HiredEmployeeResponse> {
+        return this.employmentService.hire(
+            principal.organisationId,
+            {
+                firstName: request.firstName,
+                lastName: request.lastName,
+                email: request.email,
+                positionId: request.positionId,
+                startDate: request.startDate,
+                startingSalary: request.startingSalary,
+                mobile: request.mobile,
+                personalEmail: request.personalEmail,
+                linkedinUrl: request.linkedinUrl,
+                telegram: request.telegram,
+                address: request.address,
+                dateOfBirth: request.dateOfBirth,
+                responsibleUserIds: request.responsibleUserIds,
+            },
+            principal.userId,
+        );
+    }
 
-  @Put(':employeeId')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.manageEmployee)
-  @ApiOperation({
-    summary:
-      'Edit name, work email, position, start date and contacts; the version must match the one read',
-  })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-    'RESOURCE_NOT_FOUND',
-    'CONFLICT',
-    'CONCURRENT_MODIFICATION',
-    'BUSINESS_RULE_VIOLATION',
-    'DEMO_RESTRICTED',
-  )
-  async update(
-    @UuidParam('employeeId') employeeId: string,
-    @Body() request: UpdateEmployeeRequest,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<void> {
-    await this.employmentService.update(
-      principal.organisationId,
-      employeeId,
-      {
-        firstName: request.firstName,
-        lastName: request.lastName,
-        email: request.email,
-        positionId: request.positionId,
-        startDate: request.startDate,
-        mobile: request.mobile,
-        personalEmail: request.personalEmail,
-        linkedinUrl: request.linkedinUrl,
-        telegram: request.telegram,
-        address: request.address,
-        dateOfBirth: request.dateOfBirth,
-        version: request.version,
-      },
-      principal.userId,
-    );
-  }
+    @Put(':employeeId')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Authorize(can.manageEmployee)
+    @ApiOperation({
+        summary: 'Edit name, work email, position, start date and contacts; the version must match the one read',
+    })
+    @ApiErrors(
+        'VALIDATION_FAILED',
+        'INVALID_PARAMETER',
+        'UNAUTHORIZED',
+        'SESSION_EXPIRED',
+        'FORBIDDEN',
+        'RESOURCE_NOT_FOUND',
+        'CONFLICT',
+        'CONCURRENT_MODIFICATION',
+        'BUSINESS_RULE_VIOLATION',
+        'DEMO_RESTRICTED',
+    )
+    async update(
+        @UuidParam('employeeId') employeeId: string,
+        @Body() request: UpdateEmployeeRequest,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<void> {
+        await this.employmentService.update(
+            principal.organisationId,
+            employeeId,
+            {
+                firstName: request.firstName,
+                lastName: request.lastName,
+                email: request.email,
+                positionId: request.positionId,
+                startDate: request.startDate,
+                mobile: request.mobile,
+                personalEmail: request.personalEmail,
+                linkedinUrl: request.linkedinUrl,
+                telegram: request.telegram,
+                address: request.address,
+                dateOfBirth: request.dateOfBirth,
+                version: request.version,
+            },
+            principal.userId,
+        );
+    }
 
-  @Put(':employeeId/termination')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.manageEmployee)
-  @ApiOperation({
-    summary:
-      'Terminate the employee from a date (or change the termination); later scheduled reviews are canceled',
-  })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-    'RESOURCE_NOT_FOUND',
-    'CONCURRENT_MODIFICATION',
-    'BUSINESS_RULE_VIOLATION',
-    'DEMO_RESTRICTED',
-  )
-  async terminate(
-    @UuidParam('employeeId') employeeId: string,
-    @Body() request: TerminateEmployeeRequest,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<void> {
-    await this.employmentService.terminate(
-      principal.organisationId,
-      employeeId,
-      {
-        date: request.date,
-        reason: request.reason,
-        comment: request.comment,
-        version: request.version,
-      },
-      principal.userId,
-    );
-  }
+    @Put(':employeeId/termination')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Authorize(can.manageEmployee)
+    @ApiOperation({
+        summary: 'Terminate the employee from a date (or change the termination); later scheduled reviews are canceled',
+    })
+    @ApiErrors(
+        'VALIDATION_FAILED',
+        'INVALID_PARAMETER',
+        'UNAUTHORIZED',
+        'SESSION_EXPIRED',
+        'FORBIDDEN',
+        'RESOURCE_NOT_FOUND',
+        'CONCURRENT_MODIFICATION',
+        'BUSINESS_RULE_VIOLATION',
+        'DEMO_RESTRICTED',
+    )
+    async terminate(
+        @UuidParam('employeeId') employeeId: string,
+        @Body() request: TerminateEmployeeRequest,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<void> {
+        await this.employmentService.terminate(
+            principal.organisationId,
+            employeeId,
+            {
+                date: request.date,
+                reason: request.reason,
+                comment: request.comment,
+                version: request.version,
+            },
+            principal.userId,
+        );
+    }
 
-  /** A body on DELETE carries the version (optimistic locking), as on PUT. */
-  @Delete(':employeeId/termination')
-  @HttpCode(HttpStatus.NO_CONTENT)
-  @Authorize(can.manageEmployee)
-  @ApiOperation({ summary: 'Cancel the termination; the employee is active again' })
-  @ApiErrors(
-    'VALIDATION_FAILED',
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-    'RESOURCE_NOT_FOUND',
-    'CONCURRENT_MODIFICATION',
-  )
-  async cancelTermination(
-    @UuidParam('employeeId') employeeId: string,
-    @Body() request: CancelTerminationRequest,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<void> {
-    await this.employmentService.cancelTermination(
-      principal.organisationId,
-      employeeId,
-      request.version,
-      principal.userId,
-    );
-  }
+    /** A body on DELETE carries the version (optimistic locking), as on PUT. */
+    @Delete(':employeeId/termination')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    @Authorize(can.manageEmployee)
+    @ApiOperation({ summary: 'Cancel the termination; the employee is active again' })
+    @ApiErrors(
+        'VALIDATION_FAILED',
+        'INVALID_PARAMETER',
+        'UNAUTHORIZED',
+        'SESSION_EXPIRED',
+        'FORBIDDEN',
+        'RESOURCE_NOT_FOUND',
+        'CONCURRENT_MODIFICATION',
+    )
+    async cancelTermination(
+        @UuidParam('employeeId') employeeId: string,
+        @Body() request: CancelTerminationRequest,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<void> {
+        await this.employmentService.cancelTermination(
+            principal.organisationId,
+            employeeId,
+            request.version,
+            principal.userId,
+        );
+    }
 
-  @Post(':employeeId/password-reset')
-  @HttpCode(HttpStatus.OK)
-  @Authorize(can.manageEmployee)
-  @DemoRestricted()
-  @Idempotent({ redact: ['temporaryPassword'] })
-  @ApiOperation({
-    summary:
-      'Give the employee a new generated password (returned once); the old one stops working and they are signed out everywhere',
-  })
-  @ZodResponse({ status: HttpStatus.OK, type: PasswordResetResponse })
-  @ApiErrors(
-    'INVALID_PARAMETER',
-    'UNAUTHORIZED',
-    'SESSION_EXPIRED',
-    'FORBIDDEN',
-    'RESOURCE_NOT_FOUND',
-    'IDEMPOTENCY_KEY_REUSED',
-    'DEMO_RESTRICTED',
-  )
-  resetPassword(
-    @UuidParam('employeeId') employeeId: string,
-    @CurrentPrincipal() principal: Principal,
-  ): Promise<PasswordResetResponse> {
-    return this.employmentService.resetPassword(
-      principal.organisationId,
-      employeeId,
-      principal.userId,
-    );
-  }
+    @Post(':employeeId/password-reset')
+    @HttpCode(HttpStatus.OK)
+    @Authorize(can.manageEmployee)
+    @DemoRestricted()
+    @Idempotent({ redact: ['temporaryPassword'] })
+    @ApiOperation({
+        summary:
+            'Give the employee a new generated password (returned once); the old one stops working and they are signed out everywhere',
+    })
+    @ZodResponse({ status: HttpStatus.OK, type: PasswordResetResponse })
+    @ApiErrors(
+        'INVALID_PARAMETER',
+        'UNAUTHORIZED',
+        'SESSION_EXPIRED',
+        'FORBIDDEN',
+        'RESOURCE_NOT_FOUND',
+        'IDEMPOTENCY_KEY_REUSED',
+        'DEMO_RESTRICTED',
+    )
+    resetPassword(
+        @UuidParam('employeeId') employeeId: string,
+        @CurrentPrincipal() principal: Principal,
+    ): Promise<PasswordResetResponse> {
+        return this.employmentService.resetPassword(principal.organisationId, employeeId, principal.userId);
+    }
 }

@@ -5,10 +5,10 @@ import type { SecurityCategory } from '../types';
  * cleared on sign-out, so one cache never holds two organisations' data.
  */
 export const authKeys = {
-  all: ['auth'] as const,
-  me: () => [...authKeys.all, 'me'] as const,
-  sessions: () => [...authKeys.all, 'sessions'] as const,
-  sessionsPage: (page: number) => [...authKeys.sessions(), page] as const,
-  securityLog: (category: SecurityCategory | undefined, page: number) =>
-    [...authKeys.all, 'security-log', category ?? 'ALL', page] as const,
+    all: ['auth'] as const,
+    me: () => [...authKeys.all, 'me'] as const,
+    sessions: () => [...authKeys.all, 'sessions'] as const,
+    sessionsPage: (page: number) => [...authKeys.sessions(), page] as const,
+    securityLog: (category: SecurityCategory | undefined, page: number) =>
+        [...authKeys.all, 'security-log', category ?? 'ALL', page] as const,
 };

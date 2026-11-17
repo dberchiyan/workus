@@ -10,125 +10,116 @@ import { NOT_EMPLOYED_PATTERN, TYPE_VISUALS } from './timeOffVisuals';
 import { trackScrollEdges } from '@/shared/lib/scrollEdges';
 
 export interface CalendarToolbarProps {
-  month: string;
-  currentMonth: string;
-  types: TimeOffType[];
-  onMonth: (month: string) => void;
-  onTypes: (types: TimeOffType[]) => void;
+    month: string;
+    currentMonth: string;
+    types: TimeOffType[];
+    onMonth: (month: string) => void;
+    onTypes: (types: TimeOffType[]) => void;
 }
 
 /** Month switcher on the left; type toggles (also the legend) and the pending key on the right. */
-export function CalendarToolbar({
-  month,
-  currentMonth,
-  types,
-  onMonth,
-  onTypes,
-}: CalendarToolbarProps) {
-  const { t, i18n } = useTranslation('timeOff');
-  const toggle = (type: TimeOffType) => {
-    const next = types.includes(type) ? types.filter((item) => item !== type) : [...types, type];
-    // At least one type stays on — an empty calendar would look like nobody is away.
-    if (next.length > 0) {
-      onTypes(TIME_OFF_TYPES.filter((item) => next.includes(item)));
-    }
-  };
+export function CalendarToolbar({ month, currentMonth, types, onMonth, onTypes }: CalendarToolbarProps) {
+    const { t, i18n } = useTranslation('timeOff');
+    const toggle = (type: TimeOffType) => {
+        const next = types.includes(type) ? types.filter((item) => item !== type) : [...types, type];
+        // At least one type stays on — an empty calendar would look like nobody is away.
+        if (next.length > 0) {
+            onTypes(TIME_OFF_TYPES.filter((item) => next.includes(item)));
+        }
+    };
 
-  return (
-    <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-      <div className="flex items-center gap-2">
-        <MonthSwitcher
-          month={month}
-          onChange={onMonth}
-          locale={i18n.language}
-          previousLabel={t('calendar.page.previous')}
-          nextLabel={t('calendar.page.next')}
-          headingComponent="h2"
-        />
-        {month !== currentMonth && (
-          <Button
-            variant="outlined"
-            onClick={() => {
-              onMonth(currentMonth);
-            }}
-          >
-            {t('calendar.page.today')}
-          </Button>
-        )}
-      </div>
-      <div className="flex flex-wrap items-center gap-2">
-        {/* On a phone the types stay on one line and scroll sideways, edge to edge. */}
-        <div
-          role="group"
-          aria-label={t('calendar.page.types')}
-          ref={trackScrollEdges}
-          className="app-scroll-fade -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto px-4 sm:mx-0 sm:w-auto sm:flex-wrap sm:overflow-visible sm:px-0"
-        >
-          {TIME_OFF_TYPES.map((type) => {
-            const { icon: Icon, tone } = TYPE_VISUALS[type];
-            const selected = types.includes(type);
-            return (
-              <ToggleButton
-                key={type}
-                value={type}
-                selected={selected}
-                onChange={() => {
-                  toggle(type);
-                }}
-                className="shrink-0 gap-2 py-1 pr-3 pl-1 whitespace-nowrap"
-              >
-                <span
-                  aria-hidden
-                  className={cn(
-                    'flex size-8 items-center justify-center rounded-md',
-                    selected
-                      ? cn(tone, 'text-avatar-text')
-                      : 'bg-badge-neutral-background text-text-secondary',
-                  )}
+    return (
+        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex items-center gap-2">
+                <MonthSwitcher
+                    month={month}
+                    onChange={onMonth}
+                    locale={i18n.language}
+                    previousLabel={t('calendar.page.previous')}
+                    nextLabel={t('calendar.page.next')}
+                    headingComponent="h2"
+                />
+                {month !== currentMonth && (
+                    <Button
+                        variant="outlined"
+                        onClick={() => {
+                            onMonth(currentMonth);
+                        }}
+                    >
+                        {t('calendar.page.today')}
+                    </Button>
+                )}
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+                {/* On a phone the types stay on one line and scroll sideways, edge to edge. */}
+                <div
+                    role="group"
+                    aria-label={t('calendar.page.types')}
+                    ref={trackScrollEdges}
+                    className="app-scroll-fade -mx-4 flex w-[calc(100%+2rem)] gap-2 overflow-x-auto px-4 sm:mx-0 sm:w-auto sm:flex-wrap sm:overflow-visible sm:px-0"
                 >
-                  <Icon fontSize="small" />
-                </span>
-                {t(`types.${type}`)}
-              </ToggleButton>
-            );
-          })}
+                    {TIME_OFF_TYPES.map((type) => {
+                        const { icon: Icon, tone } = TYPE_VISUALS[type];
+                        const selected = types.includes(type);
+                        return (
+                            <ToggleButton
+                                key={type}
+                                value={type}
+                                selected={selected}
+                                onChange={() => {
+                                    toggle(type);
+                                }}
+                                className="shrink-0 gap-2 py-1 pr-3 pl-1 whitespace-nowrap"
+                            >
+                                <span
+                                    aria-hidden
+                                    className={cn(
+                                        'flex size-8 items-center justify-center rounded-md',
+                                        selected
+                                            ? cn(tone, 'text-avatar-text')
+                                            : 'bg-badge-neutral-background text-text-secondary',
+                                    )}
+                                >
+                                    <Icon fontSize="small" />
+                                </span>
+                                {t(`types.${type}`)}
+                            </ToggleButton>
+                        );
+                    })}
+                </div>
+                <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    component="span"
+                    className="flex items-center gap-2 sm:px-2"
+                >
+                    <span
+                        aria-hidden
+                        className="flex size-8 items-center justify-center rounded-md border border-dashed border-text-disabled bg-badge-neutral-background"
+                    >
+                        <HourglassEmptyOutlined fontSize="small" />
+                    </span>
+                    {t('calendar.page.pendingKey')}
+                </Typography>
+                <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    component="span"
+                    className="flex items-center gap-2 sm:px-2"
+                >
+                    <span aria-hidden className="size-8 rounded-md border border-error/40 bg-error/10" />
+                    {t('calendar.page.holidayKey')}
+                </Typography>
+                <Typography
+                    variant="body2"
+                    color="textSecondary"
+                    component="span"
+                    className="flex items-center gap-2 sm:px-2"
+                >
+                    <span aria-hidden className={cn('size-8 rounded-md border border-divider', NOT_EMPLOYED_PATTERN)} />
+                    {t('calendar.page.notEmployedKey')}
+                </Typography>
+            </div>
         </div>
-        <Typography
-          variant="body2"
-          color="textSecondary"
-          component="span"
-          className="flex items-center gap-2 sm:px-2"
-        >
-          <span
-            aria-hidden
-            className="flex size-8 items-center justify-center rounded-md border border-dashed border-text-disabled bg-badge-neutral-background"
-          >
-            <HourglassEmptyOutlined fontSize="small" />
-          </span>
-          {t('calendar.page.pendingKey')}
-        </Typography>
-        <Typography
-          variant="body2"
-          color="textSecondary"
-          component="span"
-          className="flex items-center gap-2 sm:px-2"
-        >
-          <span aria-hidden className="size-8 rounded-md border border-error/40 bg-error/10" />
-          {t('calendar.page.holidayKey')}
-        </Typography>
-        <Typography
-          variant="body2"
-          color="textSecondary"
-          component="span"
-          className="flex items-center gap-2 sm:px-2"
-        >
-          <span
-            aria-hidden
-            className={cn('size-8 rounded-md border border-divider', NOT_EMPLOYED_PATTERN)}
-          />
-          {t('calendar.page.notEmployedKey')}
-        </Typography>
-      </div>
-    </div>
-  );
+    );
 }

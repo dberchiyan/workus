@@ -21,58 +21,55 @@ export type NoticeAudience = 'employee' | 'responsibles' | 'everyone' | readonly
  */
 @Injectable()
 export class TimeOffNotifier {
-  constructor(
-    private readonly requestRepository: TimeOffRequestRepository,
-    private readonly notificationService: NotificationService,
-    @InjectPinoLogger(TimeOffNotifier.name) private readonly logger: PinoLogger,
-  ) {}
+    constructor(
+        private readonly requestRepository: TimeOffRequestRepository,
+        private readonly notificationService: NotificationService,
+        @InjectPinoLogger(TimeOffNotifier.name) private readonly logger: PinoLogger,
+    ) {}
 
-  async notify(
-    organisationId: string,
-    requestId: string,
-    type: NotificationType,
-    actorUserId: string,
-    audience: NoticeAudience,
-  ): Promise<void> {
-    const request = await this.requestRepository.findNoticeById(organisationId, requestId);
-    if (!request) {
-      return;
+    async notify(
+        organisationId: string,
+        requestId: string,
+        type: NotificationType,
+        actorUserId: string,
+        audience: NoticeAudience,
+    ): Promise<void> {
+        const request = await this.requestRepository.findNoticeById(organisationId, requestId);
+        if (!request) {
+            return;
+        }
+        const recipients =
+            audience === 'employee'
+                ? [employeeUserIdOf(request)]
+                : audience === 'responsibles'
+                  ? responsibleUserIdsOf(request)
+                  : audience === 'everyone'
+                    ? [employeeUserIdOf(request), ...responsibleUserIdsOf(request)]
+                    : audience;
+        await this.notificationService.send([requestNotice(request, type, actorUserId, recipients)]);
     }
-    const recipients =
-      audience === 'employee'
-        ? [employeeUserIdOf(request)]
-        : audience === 'responsibles'
-          ? responsibleUserIdsOf(request)
-          : audience === 'everyone'
-            ? [employeeUserIdOf(request), ...responsibleUserIdsOf(request)]
-            : audience;
-    await this.notificationService.send([requestNotice(request, type, actorUserId, recipients)]);
-  }
 
-  /**
-   * Every morning (UTC): pending requests waiting longer than REMINDER_AFTER_DAYS remind their
-   * responsible people — again every REMINDER_AFTER_DAYS days while still pending.
-   */
-  @Cron('0 8 * * *', { timeZone: 'UTC' })
-  async remindPending(): Promise<void> {
-    const now = Date.now();
-    const since = new Date(now - REMINDER_AFTER_DAYS * DAY_MS);
-    const requests = await this.requestRepository.findPendingCreatedBefore(
-      since,
-      MAX_REMINDERS_PER_RUN,
-    );
-    const count = await this.notificationService.sendUnlessSentSince(
-      requests.map((request) =>
-        requestNotice(
-          request,
-          NotificationType.TIME_OFF_REMINDER,
-          null,
-          responsibleUserIdsOf(request),
-          Math.floor((now - request.createdAt.getTime()) / DAY_MS),
-        ),
-      ),
-      since,
-    );
-    this.logger.info({ count }, 'Pending time-off reminders sent');
-  }
+    /**
+     * Every morning (UTC): pending requests waiting longer than REMINDER_AFTER_DAYS remind their
+     * responsible people — again every REMINDER_AFTER_DAYS days while still pending.
+     */
+    @Cron('0 8 * * *', { timeZone: 'UTC' })
+    async remindPending(): Promise<void> {
+        const now = Date.now();
+        const since = new Date(now - REMINDER_AFTER_DAYS * DAY_MS);
+        const requests = await this.requestRepository.findPendingCreatedBefore(since, MAX_REMINDERS_PER_RUN);
+        const count = await this.notificationService.sendUnlessSentSince(
+            requests.map((request) =>
+                requestNotice(
+                    request,
+                    NotificationType.TIME_OFF_REMINDER,
+                    null,
+                    responsibleUserIdsOf(request),
+                    Math.floor((now - request.createdAt.getTime()) / DAY_MS),
+                ),
+            ),
+            since,
+        );
+        this.logger.info({ count }, 'Pending time-off reminders sent');
+    }
 }

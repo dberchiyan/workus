@@ -14,28 +14,28 @@ import { SessionCookies } from './session-cookies';
  */
 @Injectable()
 export class SessionGuard implements CanActivate {
-  constructor(
-    private readonly sessionAuthenticator: SessionAuthenticator,
-    private readonly config: AppConfigService,
-    private readonly cls: ClsService<RequestContext>,
-    private readonly sessionCookies: SessionCookies,
-  ) {}
+    constructor(
+        private readonly sessionAuthenticator: SessionAuthenticator,
+        private readonly config: AppConfigService,
+        private readonly cls: ClsService<RequestContext>,
+        private readonly sessionCookies: SessionCookies,
+    ) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const request = context.switchToHttp().getRequest<Request>();
-    const token = readCookie(request, this.config.get('SESSION_COOKIE_NAME'));
-    if (!token) {
-      this.cls.set('sessionState', SessionState.NONE);
-      return true;
+    async canActivate(context: ExecutionContext): Promise<boolean> {
+        const request = context.switchToHttp().getRequest<Request>();
+        const token = readCookie(request, this.config.get('SESSION_COOKIE_NAME'));
+        if (!token) {
+            this.cls.set('sessionState', SessionState.NONE);
+            return true;
+        }
+        const authentication = await this.sessionAuthenticator.authenticate(token);
+        if (authentication.result === SessionLookup.VALID) {
+            this.cls.set('principal', authentication.principal);
+            this.cls.set('sessionState', SessionState.VALID);
+        } else {
+            this.cls.set('sessionState', SessionState.EXPIRED);
+            this.sessionCookies.clear(context.switchToHttp().getResponse<Response>());
+        }
+        return true;
     }
-    const authentication = await this.sessionAuthenticator.authenticate(token);
-    if (authentication.result === SessionLookup.VALID) {
-      this.cls.set('principal', authentication.principal);
-      this.cls.set('sessionState', SessionState.VALID);
-    } else {
-      this.cls.set('sessionState', SessionState.EXPIRED);
-      this.sessionCookies.clear(context.switchToHttp().getResponse<Response>());
-    }
-    return true;
-  }
 }

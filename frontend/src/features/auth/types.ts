@@ -11,5 +11,5 @@ export type SecurityEvent = Schemas['SecurityEvent_Output'];
 export type SecurityLog = Schemas['SecurityLogResponse_Output'];
 /** `?category=` of the security log: which kind of events to list. */
 export type SecurityCategory = NonNullable<
-  NonNullable<Operations['AuthController_securityLog']['parameters']['query']>['category']
+    NonNullable<Operations['AuthController_securityLog']['parameters']['query']>['category']
 >;
